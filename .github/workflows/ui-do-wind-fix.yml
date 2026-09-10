@@ -1,0 +1,61 @@
+name: UiDo wind wheel fix
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  fix:
+    if: github.event.head_commit.message != 'Apply UiDo wind wheel fix'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch wind wheel
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          old="document.querySelectorAll('.choice,.windpick').forEach(b=>b.onclick=()=>{const g=b.dataset.g;document.querySelectorAll(`[data-g=\"${g}\"]`).forEach(x=>x.classList.remove('active'));b.classList.add('active');S[g]=b.dataset.v;if(g==='wind')document.querySelector('.windcore').innerHTML=S.wind.replace(' · ','<br><span>')+'</span>'});"
+          new="""document.querySelectorAll('.choice,.windpick').forEach(b=>b.onclick=()=>{const g=b.dataset.g;document.querySelectorAll(`[data-g=\"${g}\"]`).forEach(x=>x.classList.remove('active'));b.classList.add('active');S[g]=b.dataset.v;if(g==='wind')document.querySelector('.windcore').innerHTML=S.wind.replace(' · ','<br><span>')+'</span>'});
+          const wc=document.querySelector('.windcircle');
+          let windDir='Into Left';
+          function setWindDirection(angle){
+            const dirs=['Head','Head Right','Right','Tail Right','Tail','Tail Left','Left','Head Left'];
+            const d=dirs[Math.round(((angle+360)%360)/45)%8];
+            const strength=(S.wind.match(/· (.+)$/)||[])[1]||'2 clubs';
+            windDir=d==='Head'?'Into':d;
+            const label=d==='Head'?'Into':d;
+            S.wind=label+' · '+strength;
+            document.querySelector('.windcore').innerHTML=label+'<br><span>'+strength+'</span>';
+            document.querySelectorAll('.windpick').forEach(x=>x.classList.remove('active'));
+          }
+          function handleWindPointer(e){
+            const r=wc.getBoundingClientRect(),x=(e.clientX??e.touches?.[0]?.clientX)-r.left-r.width/2,y=(e.clientY??e.touches?.[0]?.clientY)-r.top-r.height/2;
+            if(Math.hypot(x,y)<38)return;
+            const angle=Math.atan2(x,-y)*180/Math.PI;
+            setWindDirection(angle);
+          }
+          wc.addEventListener('pointerup',handleWindPointer);
+          wc.style.touchAction='none';
+          wc.title='Tap the wheel to set wind direction';"""
+          if old not in s:
+              raise SystemExit('target wind handler not found')
+          p.write_text(s.replace(old,new,1))
+          PY
+      - name: Commit fix
+        run: |
+          git config user.name 'UiDo Bot'
+          git config user.email 'uido-bot@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Apply UiDo wind wheel fix' || exit 0
+          git push
+      - name: Remove patch workflow
+        if: success()
+        run: |
+          rm -f .github/workflows/ui-do-wind-fix.yml
+          git config user.name 'UiDo Bot'
+          git config user.email 'uido-bot@users.noreply.github.com'
+          git add -u .github/workflows/ui-do-wind-fix.yml
+          git commit -m 'Remove temporary wind fix workflow' || exit 0
+          git push
