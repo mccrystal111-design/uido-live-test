@@ -17,69 +17,18 @@ jobs:
           import re
           p = Path('index.html')
           s = p.read_text()
-
           s = s.replace('<title>UiDo Live Test v0.8</title>', '<title>UiDo Live Test v0.9</title>')
           s = s.replace('<div class="round">LIVE TEST · v0.7</div>', '<div class="round">LIVE TEST · v0.9</div>')
-
-          css = '''
-          /* v0.9 wind buttons */
-          .windcircle{cursor:default;touch-action:auto}
-          .windsector{opacity:.35}
-          .windarrow{width:40%;height:7px;transform-origin:0 50%;}
-          .windarrow:after{right:auto;left:-7px;border-right:12px solid var(--g);border-left:0;border-top:7px solid transparent;border-bottom:7px solid transparent}
-          .winddir{position:absolute;width:64px;height:42px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font-size:10px;font-weight:750;line-height:1.05;padding:4px 3px;z-index:6;box-shadow:0 2px 6px #0001}
-          .winddir.active{border:2px solid var(--g);background:#e7f1ec;color:var(--g);padding:3px 2px}
-          .winddir.d0{top:-7px;left:50%;transform:translateX(-50%)}
-          .winddir.d1{top:10%;right:-10px;transform:translateY(-50%)}
-          .winddir.d2{top:50%;right:-18px;transform:translateY(-50%)}
-          .winddir.d3{bottom:10%;right:-10px;transform:translateY(50%)}
-          .winddir.d4{bottom:-7px;left:50%;transform:translateX(-50%)}
-          .winddir.d5{bottom:10%;left:-10px;transform:translateY(50%)}
-          .winddir.d6{top:50%;left:-18px;transform:translateY(-50%)}
-          .winddir.d7{top:10%;left:-10px;transform:translateY(-50%)}
-          .windbuttons{grid-template-columns:repeat(4,1fr);gap:7px;margin-top:8px}.windpick{min-height:48px}
-          '''
-          s = s.replace('</style>', css + '</style>', 1)
-
-          start = s.index('<section class="screen" data-i="1">')
-          end = s.index('<!-- 3 -->', start)
-          wind = '''<section class="screen" data-i="1"><div class="card">
-           <div class="title">Wind</div><div class="sub">Tap the wind direction. Then choose strength.</div>
-           <div class="windwrap">
-            <div class="windcircle" id="windWheel">
-              <div class="windring"></div><div class="windsector s1"></div><div class="windsector s2"></div>
-              <button class="winddir d0 active" data-angle="0">Into</button>
-              <button class="winddir d1" data-angle="45">Into<br>Right</button>
-              <button class="winddir d2" data-angle="90">Right</button>
-              <button class="winddir d3" data-angle="135">Helping<br>Right</button>
-              <button class="winddir d4" data-angle="180">Helping</button>
-              <button class="winddir d5" data-angle="225">Helping<br>Left</button>
-              <button class="winddir d6" data-angle="270">Left</button>
-              <button class="winddir d7" data-angle="315">Into<br>Left</button>
-              <div class="windarrow" id="windArrow"></div><div class="windcore" id="windCore">Into<br><span>2 clubs</span></div>
-            </div>
-           </div>
-           <div class="windhint" id="windHint">Wind is coming from in front (into you)</div>
-           <div class="windbuttons">
-             <button class="windpick active" data-g="windStrength" data-v="2 clubs">2 clubs</button>
-             <button class="windpick" data-g="windStrength" data-v="1 club">1 club</button>
-             <button class="windpick" data-g="windStrength" data-v="½ club">½ club</button>
-             <button class="windpick" data-g="windStrength" data-v="Calm">Calm</button>
-           </div><div class="nav"><button class="btn secondary prev">Back</button><button class="btn next">Next</button></div>
-          </div></section>
-
-          '''
-          s = s[:start] + wind + s[end:]
-
-          old = re.compile(r'function windLabel\(angle\).*?document\.querySelectorAll\("\.windpick"\).*?updateWind\(\);', re.S)
-          new = '''function windLabel(angle){const dirs=["Into","Into Right","Right","Helping Right","Helping","Helping Left","Left","Into Left"];return dirs[Math.round(((angle%360)+360)%360/45)%8]}
-          function updateWind(){const label=windLabel(S.windAngle),strength=S.windStrength;S.wind=label+" · "+strength;document.querySelectorAll(".winddir").forEach(b=>b.classList.toggle("active",Number(b.dataset.angle)===Number(S.windAngle)));document.getElementById("windCore").innerHTML=label+"<br><span>"+strength+"</span>";document.getElementById("windArrow").style.transform="rotate("+(Number(S.windAngle)+90)+"deg)";document.getElementById("windHint").innerHTML="Wind is coming "+(label.startsWith("Into")?"from in front":label.startsWith("Helping")?"from behind":"from the "+label.toLowerCase())+(label.includes("Right")?" and right":label.includes("Left")?" and left":"")+(label.startsWith("Into")?" (into you)":label.startsWith("Helping")?" (helping)":"")}
-          document.querySelectorAll(".winddir").forEach(b=>b.onclick=()=>{S.windAngle=Number(b.dataset.angle);updateWind()});
-          document.querySelectorAll(".windpick").forEach(b=>b.onclick=()=>{document.querySelectorAll(".windpick").forEach(x=>x.classList.remove("active"));b.classList.add("active");S.windStrength=b.dataset.v;updateWind()});updateWind();'''
-          s, n = old.subn(new, s)
-          if n != 1:
-              raise SystemExit(f'Wind JS block replacement count={n}')
-
+          css='''\n/* v0.9 wind buttons */\n.windcircle{cursor:default;touch-action:auto}\n.windsector{opacity:.35}\n.windarrow{width:40%;height:7px;transform-origin:0 50%}\n.windarrow:after{right:auto;left:-7px;border-right:12px solid var(--g);border-left:0;border-top:7px solid transparent;border-bottom:7px solid transparent}\n.winddir{position:absolute;width:64px;height:42px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font-size:10px;font-weight:750;line-height:1.05;padding:4px 3px;z-index:6;box-shadow:0 2px 6px #0001}\n.winddir.active{border:2px solid var(--g);background:#e7f1ec;color:var(--g);padding:3px 2px}\n.winddir.d0{top:-7px;left:50%;transform:translateX(-50%)}\n.winddir.d1{top:10%;right:-10px;transform:translateY(-50%)}\n.winddir.d2{top:50%;right:-18px;transform:translateY(-50%)}\n.winddir.d3{bottom:10%;right:-10px;transform:translateY(50%)}\n.winddir.d4{bottom:-7px;left:50%;transform:translateX(-50%)}\n.winddir.d5{bottom:10%;left:-10px;transform:translateY(50%)}\n.winddir.d6{top:50%;left:-18px;transform:translateY(-50%)}\n.winddir.d7{top:10%;left:-10px;transform:translateY(-50%)}\n.windbuttons{grid-template-columns:repeat(4,1fr);gap:7px;margin-top:8px}.windpick{min-height:48px}\n'''
+          s=s.replace('</style>',css+'</style>',1)
+          start=s.index('<section class="screen" data-i="1">')
+          end=s.index('<section class="screen" data-i="2">',start)
+          wind='''<section class="screen" data-i="1"><div class="card"><div class="title">Wind</div><div class="sub">Tap the wind direction. Then choose strength.</div><div class="windwrap"><div class="windcircle" id="windWheel"><div class="windring"></div><div class="windsector s1"></div><div class="windsector s2"></div><button class="winddir d0 active" data-angle="0">Into</button><button class="winddir d1" data-angle="45">Into<br>Right</button><button class="winddir d2" data-angle="90">Right</button><button class="winddir d3" data-angle="135">Helping<br>Right</button><button class="winddir d4" data-angle="180">Helping</button><button class="winddir d5" data-angle="225">Helping<br>Left</button><button class="winddir d6" data-angle="270">Left</button><button class="winddir d7" data-angle="315">Into<br>Left</button><div class="windarrow" id="windArrow"></div><div class="windcore" id="windCore">Into<br><span>2 clubs</span></div></div></div><div class="windhint" id="windHint">Wind is coming from in front (into you)</div><div class="windbuttons"><button class="windpick active" data-g="windStrength" data-v="2 clubs">2 clubs</button><button class="windpick" data-g="windStrength" data-v="1 club">1 club</button><button class="windpick" data-g="windStrength" data-v="½ club">½ club</button><button class="windpick" data-g="windStrength" data-v="Calm">Calm</button></div><div class="nav"><button class="btn secondary prev">Back</button><button class="btn next">Next</button></div></div></section>\n\n'''
+          s=s[:start]+wind+s[end:]
+          old=re.compile(r'function windLabel\(angle\).*?document\.querySelectorAll\("\.windpick"\).*?updateWind\(\);',re.S)
+          new='''function windLabel(angle){const dirs=["Into","Into Right","Right","Helping Right","Helping","Helping Left","Left","Into Left"];return dirs[Math.round(((angle%360)+360)%360/45)%8]}\nfunction updateWind(){const label=windLabel(S.windAngle),strength=S.windStrength;S.wind=label+" · "+strength;document.querySelectorAll(".winddir").forEach(b=>b.classList.toggle("active",Number(b.dataset.angle)===Number(S.windAngle)));document.getElementById("windCore").innerHTML=label+"<br><span>"+strength+"</span>";document.getElementById("windArrow").style.transform="rotate("+(Number(S.windAngle)+90)+"deg)";document.getElementById("windHint").innerHTML="Wind is coming "+(label.startsWith("Into")?"from in front":label.startsWith("Helping")?"from behind":"from the "+label.toLowerCase())+(label.includes("Right")?" and right":label.includes("Left")?" and left":"")+(label.startsWith("Into")?" (into you)":label.startsWith("Helping")?" (helping)":"")}\ndocument.querySelectorAll(".winddir").forEach(b=>b.onclick=()=>{S.windAngle=Number(b.dataset.angle);updateWind()});\ndocument.querySelectorAll(".windpick").forEach(b=>b.onclick=()=>{document.querySelectorAll(".windpick").forEach(x=>x.classList.remove("active"));b.classList.add("active");S.windStrength=b.dataset.v;updateWind()});updateWind();'''
+          s,n=old.subn(new,s)
+          if n!=1: raise SystemExit(f'wind JS replacement count={n}')
           p.write_text(s)
           PY
       - name: Validate and commit
