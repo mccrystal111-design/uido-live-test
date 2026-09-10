@@ -1,0 +1,48 @@
+name: UiDo restore and expand options
+on:
+  push:
+    paths:
+      - '.github/workflows/restore-options.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore working v0.9 and expand options
+        run: |
+          git fetch --no-tags origin f8e4c1b498214eb01feb9e61c8d9e761766bb7ef
+          git checkout f8e4c1b498214eb01feb9e61c8d9e761766bb7ef -- index.html
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          s=s.replace('.lie-fairway{background:#e8f3e7}', '.lie-fairway{background:#e8f3e7}.lie-tee{background:#dfeee7}')
+          s=s.replace('.lie-fairway.active{background:#cfe5d0}', '.lie-fairway.active{background:#cfe5d0}.lie-tee.active{background:#c5ddd1}')
+          s=s.replace('  <button class="choice lie-bunker" data-g="lie" data-v="Bunker">Bunker</button>', '  <button class="choice lie-tee" data-g="lie" data-v="Tee">Tee</button><button class="choice lie-bunker" data-g="lie" data-v="Bunker">Bunker</button>')
+          old=''' <div class="grid"><button class="choice" data-g="shape" data-v="Draw">↙<br>Draw</button><button class="choice active" data-g="shape" data-v="Straight">↑<br>Straight</button><button class="choice" data-g="shape" data-v="Fade">↘<br>Fade</button></div>'''
+          new=''' <div class="grid"><button class="choice" data-g="shape" data-v="Draw">↙<br>Draw</button><button class="choice active" data-g="shape" data-v="Straight">↑<br>Straight</button><button class="choice" data-g="shape" data-v="Fade">↘<br>Fade</button><button class="choice" data-g="shape" data-v="Hook">↙<br>Hook</button><button class="choice" data-g="shape" data-v="Slice">↘<br>Slice</button><button class="choice" data-g="shape" data-v="Punch">↓<br>Punch</button></div>'''
+          assert old in s
+          s=s.replace(old,new)
+          old='''  <button class="choice" data-g="strike" data-v="Low Heel">Low<br>Heel</button><button class="choice" data-g="strike" data-v="Low">Low</button><button class="choice" data-g="strike" data-v="Low Toe">Low<br>Toe</button>'''
+          new='''  <button class="choice" data-g="strike" data-v="Low Heel">Low<br>Heel</button><button class="choice" data-g="strike" data-v="Low">Low</button><button class="choice" data-g="strike" data-v="Low Toe">Low<br>Toe</button><button class="choice" data-g="strike" data-v="Heavy">Heavy</button>'''
+          assert old in s
+          s=s.replace(old,new)
+          p.write_text(s)
+          PY
+          node --check <(python - <<'PY'
+          import re
+          from pathlib import Path
+          s=Path('index.html').read_text()
+          print(re.search(r'<script>(.*?)</script>',s,re.S).group(1))
+          PY
+          )
+      - name: Commit and remove workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git rm .github/workflows/restore-options.yml
+          git commit -m 'Restore UiDo live test and expand shot options'
+          git push
