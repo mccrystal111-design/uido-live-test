@@ -1,0 +1,73 @@
+name: UiDo UX and icon fix
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Patch UiDo
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          p = Path('index.html')
+          s = p.read_text()
+
+          # Cache-bust the PWA manifest so Chrome sees the refreshed icon metadata.
+          s = s.replace('href="manifest.webmanifest"', 'href="manifest.webmanifest?v=2"', 1)
+
+          # Hide redundant Next buttons on single-choice shot-entry screens.
+          marker = '/* UiDo auto-advance: single-choice screens */'
+          css = '''\n/* UiDo auto-advance: single-choice screens */\n.screen[data-i="2"] .nav,.screen[data-i="3"] .nav,.screen[data-i="4"] .nav,.screen[data-i="5"] .nav{display:none}\n'''
+          if marker not in s:
+              s = s.replace('</style>', css + '</style>', 1)
+
+          # Selecting Lie / Start Line / Shape / Strike immediately advances.
+          js_marker = '// UiDo single-choice auto-advance v1'
+          js = '''\n<script>\n// UiDo single-choice auto-advance v1\n(function(){\n  const single = new Set(['2','3','4','5']);\n  document.addEventListener('click', function(e){\n    const choice = e.target.closest && e.target.closest('.choice');\n    if(!choice) return;\n    const screen = choice.closest('.screen');\n    if(!screen || !single.has(screen.dataset.i)) return;\n    setTimeout(function(){\n      const next = screen.querySelector('.nav .next');\n      if(next) next.click();\n    }, 120);\n  });\n})();\n// UiDo single-choice auto-advance v1\n</script>\n'''
+          if js_marker not in s:
+              s = s.replace('</body>', js + '</body>', 1)
+
+          p.write_text(s)
+
+          # Replace the temporary icon SVG with the official icon-first Version C mark.
+          Path('uido-icon.svg').write_text('''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#0b0b0b"/><circle cx="256" cy="150" r="35" fill="#ffd400"/><path d="M256 188 C250 250 250 318 246 390" fill="none" stroke="#ffd400" stroke-width="18" stroke-linecap="round"/><ellipse cx="256" cy="404" rx="76" ry="20" fill="none" stroke="#ffd400" stroke-width="14"/><ellipse cx="256" cy="404" rx="48" ry="10" fill="none" stroke="#ffd400" stroke-width="8"/></svg>''')
+
+          m = Path('manifest.webmanifest')
+          manifest = json.loads(m.read_text())
+          manifest['icons'] = [{
+              'src':'uido-icon.svg?v=2',
+              'sizes':'any',
+              'type':'image/svg+xml',
+              'purpose':'any maskable'
+          }]
+          m.write_text(json.dumps(manifest, indent=2) + '\n')
+          PY
+
+          grep -q 'manifest.webmanifest?v=2' index.html
+          grep -q 'UiDo single-choice auto-advance v1' index.html
+          grep -q 'uido-icon.svg?v=2' manifest.webmanifest
+
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html manifest.webmanifest uido-icon.svg
+          git commit -m 'Fix shot entry navigation and refresh UiDo icon'
+          git push
+
+      - name: Remove one-time workflow
+        if: success()
+        run: |
+          rm .github/workflows/uido-ux-icon-fix.yml
+          git add .github/workflows/uido-ux-icon-fix.yml
+          git commit -m 'Remove one-time UX icon workflow'
+          git push
