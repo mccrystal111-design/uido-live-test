@@ -1,0 +1,24 @@
+(function(){
+  var PAR=[4,3,5,3,4,4,4,4,5,4,5,4,3,4,4,4,4,5];
+  var KEY='uido_hole_scores_v2';
+  function get(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return {}}}
+  function put(x){try{localStorage.setItem(KEY,JSON.stringify(x))}catch(e){}}
+  function exportCsv(){var x=get(),r=[['Hole','Par','Score','To Par']];for(var i=1;i<=18;i++){var v=x[i]||'';r.push([i,PAR[i-1],v,v===''?'':(+v-PAR[i-1])]);}var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([r.map(function(z){return z.join(',')}).join('\n')],{type:'text/csv'}));a.download='uido-scorecard.csv';a.click();}
+  function open(){
+    var x=get(),total=0,n=0,to=0,rows='';
+    for(var i=1;i<=18;i++){var v=x[i]||'',d=v===''?'':(+v-PAR[i-1]);if(v!==''){total+=+v;n++;to+=+v-PAR[i-1];}rows+='<div class="scrow"><b>'+i+'</b><span>'+PAR[i-1]+'</span><input data-h="'+i+'" inputmode="numeric" value="'+v+'"><strong>'+(d===''?'':(d>0?'+'+d:d))+'</strong></div>';}
+    var o=document.getElementById('scOverlay');if(!o){o=document.createElement('div');o.id='scOverlay';document.body.appendChild(o);}
+    o.innerHTML='<div class="scbox"><div class="schead"><b>UiDo Scorecard / Stats</b><button id="scClose">Close</button></div><div class="scsum"><div><b>'+total+'</b><small>Total</small></div><div><b>'+(to>0?'+':'')+to+'</b><small>To par</small></div><div><b>'+n+'/18</b><small>Holes</small></div></div><div class="scrows"><div class="scrow hdr"><b>Hole</b><span>Par</span><span>Score</span><strong>+/-</strong></div>'+rows+'</div><div class="scactions"><button id="scExport">Export Scorecard</button><button id="scClose2">Close</button></div></div>';
+    o.className='open';o.querySelector('#scClose').onclick=close;o.querySelector('#scClose2').onclick=close;o.querySelector('#scExport').onclick=exportCsv;o.querySelectorAll('[data-h]').forEach(function(inp){inp.onchange=function(){var z=get(),v=inp.value.trim();if(v)z[inp.dataset.h]=+v;else delete z[inp.dataset.h];put(z);open();};});
+  }
+  function close(){var o=document.getElementById('scOverlay');if(o)o.className='';}
+  function ensure(){
+    var final=document.querySelector('.screen[data-i="7"]');if(!final)return;
+    var nav=final.querySelector('.nav');
+    if(!document.getElementById('scOpen')){var b=document.createElement('button');b.id='scOpen';b.type='button';b.className='btn';b.textContent='Scorecard / Stats';b.onclick=open;if(nav)nav.parentNode.insertBefore(b,nav);else final.appendChild(b);}
+    if(!document.getElementById('scExportBottom')){var e=document.createElement('button');e.id='scExportBottom';e.type='button';e.className='btn';e.textContent='Export Scorecard';e.onclick=exportCsv;if(nav)nav.parentNode.insertBefore(e,nav);else final.appendChild(e);}
+    var shot=document.querySelector('.screen[data-i="6"]');if(shot&&!document.getElementById('scScore')){var p=document.createElement('div');p.id='scScore';p.innerHTML='<b>Hole score</b> <input id="scScoreInput" inputmode="numeric" placeholder="Score"> <button id="scScoreSave" type="button">Save</button>';var n=shot.querySelector('.nav');if(n)n.parentNode.insertBefore(p,n);else shot.appendChild(p);document.getElementById('scScoreSave').onclick=function(){var h=1,m=(document.querySelector('.hole')||{}).textContent;var q=m&&m.match(/\d+/);if(q)h=+q[0];var v=document.getElementById('scScoreInput').value.trim();if(v){var z=get();z[h]=+v;put(z);}};}
+  }
+  var st=document.createElement('style');st.textContent='#scOverlay{display:none;position:fixed;inset:0;z-index:99999;background:#062e22dd;padding:12px;overflow:auto}#scOverlay.open{display:flex;align-items:center;justify-content:center}.scbox{width:min(430px,100%);background:#f6f8f6;border-radius:18px;overflow:hidden}.schead{background:#075b3d;color:white;padding:14px;display:flex;justify-content:space-between;align-items:center}.schead button{padding:7px;border-radius:8px}.scsum{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:10px}.scsum div{background:white;border-radius:10px;text-align:center;padding:8px}.scsum b,.scsum small{display:block}.scrows{padding:0 10px 10px}.scrow{display:grid;grid-template-columns:42px 42px 1fr 45px;gap:6px;align-items:center;padding:7px 3px;border-bottom:1px solid #dde6e1}.scrow input{width:50px;padding:6px;text-align:center}.scactions{display:flex;gap:8px;padding:10px}.scactions button{flex:1;padding:12px;border:0;border-radius:9px;background:#075b3d;color:white;font-weight:bold}#scScore{margin:8px 0;padding:8px;border:1px solid #dbe5df;border-radius:10px;background:#f3f7f4}#scScore input{width:65px;padding:7px}#scScore button{padding:7px}';document.head.appendChild(st);
+  document.addEventListener('DOMContentLoaded',ensure);setTimeout(ensure,300);setTimeout(ensure,1000);setTimeout(ensure,2000);new MutationObserver(ensure).observe(document.documentElement,{childList:true,subtree:true});
+})();
