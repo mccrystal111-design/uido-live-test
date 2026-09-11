@@ -3,6 +3,7 @@ on:
   workflow_dispatch:
   push:
     paths:
+      - '.github/workflows/load-scorecard.yml'
       - 'scorecard.js'
 jobs:
   patch:
@@ -19,19 +20,21 @@ jobs:
           s=p.read_text()
           tag='<script src="scorecard.js" defer></script>'
           if tag not in s:
-              s=s.replace('</head>',tag+'</head>')
+              if '</head>' not in s:
+                  raise SystemExit('No closing head tag')
+              s=s.replace('</head>',tag+'</head>',1)
               p.write_text(s)
           PY
           grep -q 'scorecard.js' index.html
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git commit -m 'Load scorecard script' || exit 0
+          git diff --cached --quiet || git commit -m 'Load scorecard script'
           git push
       - name: Remove workflow
         if: success()
         run: |
           rm .github/workflows/load-scorecard.yml
           git add .github/workflows/load-scorecard.yml
-          git commit -m 'Remove one-time scorecard loader' || exit 0
+          git commit -m 'Remove one-time scorecard loader'
           git push
