@@ -1,0 +1,58 @@
+name: UiDo shot GPS flow v1
+on:
+  push:
+    paths:
+      - .github/workflows/uido-shotflow.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch shot GPS flow
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html')
+          s=p.read_text()
+          marker='<!-- UIDO_SHOT_FLOW_V1 -->'
+          if marker in s:
+              print('already patched')
+              raise SystemExit(0)
+          css=r'''\n<!-- UIDO_SHOT_FLOW_V1_CSS -->\n<style>\n.shotFlowStatus{margin:8px 0 0;background:#eef6f1;border:1px solid #dce9e2;border-radius:11px;padding:8px 10px;font-size:11px;color:var(--ink);text-align:center}\n.shotFlowStatus strong{display:block;font-size:13px}.shotFlowStatus span{color:var(--muted)}\n.newShotFlow{width:100%;margin-top:8px;min-height:48px}\n</style>\n'''
+          s=s.replace('</head>', css+'\n</head>',1)
+          gps_anchor=re.search(r'(<div class="screen" data-i="0">.*?<div class="card">)',s,re.S)
+          if gps_anchor:
+              insert='''\n<div id="shotFlowStatus" class="shotFlowStatus"><strong>Shot 1 · waiting for GPS</strong><span>GPS starts each shot. The next GPS fix closes the previous shot.</span></div>\n'''
+              pos=gps_anchor.end(); s=s[:pos]+insert+s[pos:]
+          else: raise SystemExit('GPS screen anchor not found')
+          pat=r'(<div class="screen" data-i="6">.*?)(<div class="nav">)'
+          m=re.search(pat,s,re.S)
+          if not m: raise SystemExit('Shot Complete screen/nav not found')
+          button='''<button id="newShotFlow" class="btn newShotFlow" type="button">New Shot → GPS</button>\n'''
+          s=s[:m.start(2)]+button+s[m.start(2):]
+          script=r'''\n<!-- UIDO_SHOT_FLOW_V1 -->\n<script>\n(function(){\nconst KEY='uido_shot_flow_v1';\nconst load=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{roundId:new Date().toISOString(),shots:[],current:null}}catch(e){return {roundId:new Date().toISOString(),shots:[],current:null}}};\nlet flow=load(); const save=()=>localStorage.setItem(KEY,JSON.stringify(flow));\nconst $=q=>document.querySelector(q), $$=q=>Array.from(document.querySelectorAll(q));\nfunction holeNo(){const m=$('.hole');const x=m&&m.textContent.match(/(\d+)/);return x?Number(x[1]):1}\nfunction status(t,s){const e=$('#shotFlowStatus');if(e)e.innerHTML='<strong>'+t+'</strong><span>'+s+'</span>'}\nfunction posObj(p){return {lat:p.coords.latitude,lon:p.coords.longitude,accuracy_m:p.coords.accuracy,heading_deg:p.coords.heading,time:new Date(p.timestamp||Date.now()).toISOString()}}\nfunction captureGPS(){if(!navigator.geolocation){status('GPS unavailable','This browser does not provide location services.');return}status('GPS · locating…','Capturing the ball position');navigator.geolocation.getCurrentPosition(pos=>{const gps=posObj(pos),hole=holeNo();if(flow.current&&flow.current.hole===hole&&!flow.current.finishGps){flow.current.finishGps=gps;flow.current.finishedAt=gps.time}const shot={id:Date.now(),hole,shotNumber:flow.shots.filter(x=>x.hole===hole).length+1,startGps:gps,finishGps:null,finishLie:null};flow.shots.push(shot);flow.current=shot;save();status('Shot '+shot.shotNumber+' · GPS locked','±'+Math.round(gps.accuracy_m||0)+' m · '+gps.lat.toFixed(5)+', '+gps.lon.toFixed(5));const d=$('#dot');if(d)d.style.background='var(--good)'},err=>status('GPS failed',err.message||'Unable to get a position'),{enableHighAccuracy:true,maximumAge:0,timeout:12000})}\nfunction bindGPS(){const b=$$('.screen[data-i="0"] button').find(x=>/gps/i.test(x.textContent)&&!/match/i.test(x.textContent));if(b&&!b.dataset.shotFlowBound){b.dataset.shotFlowBound='1';b.addEventListener('click',()=>setTimeout(captureGPS,120))}}\nfunction bindLie(){ $$('#lie .choice,#lie button').forEach(b=>{if(b.dataset.shotFlowLieBound)return;b.dataset.shotFlowLieBound='1';b.addEventListener('click',()=>{if(flow.current){flow.current.finishLie=(b.textContent||'').trim();save()}})})}\nfunction goGPS(){ $$('.screen').forEach(x=>x.classList.remove('active'));const s=$('.screen[data-i="0"]');if(s)s.classList.add('active');$$('.tab').forEach((x,i)=>x.classList.toggle('active',i===0));$$('.p').forEach((x,i)=>x.classList.toggle('on',i===0));const b=$$('.screen[data-i="0"] button').find(x=>/gps/i.test(x.textContent)&&!/match/i.test(x.textContent));if(b)setTimeout(()=>b.click(),80)}\ndocument.addEventListener('DOMContentLoaded',()=>{bindGPS();bindLie();const b=$('#newShotFlow');if(b)b.addEventListener('click',goGPS);const nr=$('#headNewRound');if(nr&&!nr.dataset.shotFlowBound){nr.dataset.shotFlowBound='1';nr.addEventListener('click',()=>{flow={roundId:new Date().toISOString(),shots:[],current:null};save()})}const ex=$('#headExport');if(ex&&!ex.dataset.shotFlowBound){ex.dataset.shotFlowBound='1';ex.addEventListener('click',()=>{const blob=new Blob([JSON.stringify(flow,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='uido-shot-gps-'+flow.roundId.replace(/[:.]/g,'-')+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)})}setInterval(()=>{bindGPS();bindLie()},1000)})\nwindow.UiDoShotFlow={get:()=>flow,save};\n})();\n</script>\n'''
+          s=s.replace('</body>',script+'\n</body>',1)
+          p.write_text(s)
+          print('patched',len(s))
+          PY
+      - name: Validate
+        run: |
+          grep -q 'UIDO_SHOT_FLOW_V1' index.html
+          grep -q 'newShotFlow' index.html
+          grep -q 'uido_shot_flow_v1' index.html
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Add GPS-driven shot flow' || exit 0
+          git push
+      - name: Remove one-time workflow
+        run: |
+          git rm .github/workflows/uido-shotflow.yml
+          git commit -m 'Remove one-time shot flow workflow'
+          git push
