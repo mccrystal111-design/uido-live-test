@@ -3,6 +3,10 @@ package com.uido.live;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.webkit.GeolocationPermissions;
 import android.webkit.WebChromeClient;
@@ -13,6 +17,7 @@ import android.webkit.WebViewClient;
 public class MainActivity extends Activity {
     private static final int LOCATION_REQUEST = 1001;
     private WebView webView;
+    private LocationManager locationManager;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -37,6 +42,36 @@ public class MainActivity extends Activity {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_REQUEST);
         }
         webView.loadUrl("https://mccrystal111-design.github.io/uido-live-test/");
+        startNativeGps();
+    }
+
+    private void startNativeGps() {
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) return;
+        LocationListener listener = new LocationListener() {
+            @Override public void onLocationChanged(Location location) {
+                final double lat = location.getLatitude();
+                final double lon = location.getLongitude();
+                final float acc = location.hasAccuracy() ? location.getAccuracy() : 999f;
+                final long time = location.getTime();
+                String js = "window.dispatchEvent(new CustomEvent('uidoNativeGps',{detail:{lat:" + lat + ",lon:" + lon + ",accuracy:" + acc + ",time:" + time + "}}));";
+                webView.post(() -> webView.evaluateJavascript(js, null));
+            }
+        };
+        Criteria c = new Criteria();
+        c.setAccuracy(Criteria.ACCURACY_FINE);
+        c.setPowerRequirement(Criteria.POWER_HIGH);
+        String provider = locationManager.getBestProvider(c, true);
+        if (provider != null) {
+            locationManager.requestLocationUpdates(provider, 1000L, 0.5f, listener);
+        }
+    }
+
+    @Override protected void onDestroy() {
+        if (locationManager != null && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            locationManager.removeUpdates((LocationListener) null);
+        }
+        super.onDestroy();
     }
 
     @Override public void onBackPressed() {
