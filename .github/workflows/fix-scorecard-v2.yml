@@ -1,0 +1,98 @@
+name: Fix scorecard and stats UI
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/fix-scorecard-v2.yml'
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch scorecard UI
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          marker='<!-- UIDO_SCORECARD_FIX_V2 -->'
+          if marker in s:
+              print('already patched')
+          else:
+              patch=r'''<!-- UIDO_SCORECARD_FIX_V2 -->
+<script>
+(function(){
+  var PAR=[4,3,5,3,4,4,4,4,5,4,5,4,3,4,4,4,4,5];
+  var KEY='uido_hole_scores_v2';
+  function scores(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return {}}}
+  function save(o){try{localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}}
+  function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+  function currentHole(){
+    var t=document.querySelector('.hole');
+    var m=t && t.textContent.match(/(\d+)/);
+    return m ? Math.max(1,Math.min(18,+m[1])) : 1;
+  }
+  function exportCsv(){
+    var o=scores(), rows=[['Hole','Par','Score','To Par']];
+    for(var i=1;i<=18;i++){var v=o[i]||''; rows.push([i,PAR[i-1],v,v===''?'':(+v-PAR[i-1])]);}
+    var csv=rows.map(function(r){return r.join(',')}).join('\n');
+    var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='uido-scorecard.csv'; a.click(); setTimeout(function(){URL.revokeObjectURL(a.href)},1000);
+  }
+  function render(){
+    var o=scores(), total=0, n=0, to=0;
+    for(var i=1;i<=18;i++){if(o[i]!==undefined && o[i]!==''){total+=+o[i];n++;to+=(+o[i]-PAR[i-1]);}}
+    var rows='';
+    for(var i=1;i<=18;i++){var v=o[i]||''; var d=v===''?'':(+v-PAR[i-1]); rows+='<div class="uidoScoreRow"><b>'+i+'</b><span>'+PAR[i-1]+'</span><input inputmode="numeric" min="1" max="15" data-score-hole="'+i+'" value="'+esc(v)+'"><strong>'+(d===''?'':(d>0?'+'+d:d))+'</strong></div>';}
+    var overlay=document.getElementById('uidoScoreOverlay');
+    if(!overlay){overlay=document.createElement('div');overlay.id='uidoScoreOverlay';overlay.className='uidoScoreOverlay';document.body.appendChild(overlay);}
+    overlay.innerHTML='<div class="uidoScoreSheet"><div class="uidoScoreHead"><b>UiDo Scorecard / Stats</b><button type="button" id="uidoScoreClose">Close</button></div><div class="uidoScoreSummary"><div><b>'+total+'</b><span>Total</span></div><div><b>'+((to>0?'+':'')+to)+'</b><span>To par</span></div><div><b>'+n+'/18</b><span>Holes</span></div></div><div class="uidoScoreRows"><div class="uidoScoreRow head"><b>Hole</b><span>Par</span><span>Score</span><span>+/-</span></div>'+rows+'</div><div class="uidoScoreActions"><button type="button" id="uidoScoreExport">Export Scorecard</button><button type="button" id="uidoScoreClose2">Close</button></div></div>';
+    overlay.querySelector('#uidoScoreClose').onclick=close;
+    overlay.querySelector('#uidoScoreClose2').onclick=close;
+    overlay.querySelector('#uidoScoreExport').onclick=exportCsv;
+    overlay.querySelectorAll('[data-score-hole]').forEach(function(inp){inp.onchange=function(){var x=scores();var v=inp.value.trim();if(v==='')delete x[inp.dataset.scoreHole];else if(/^\d+$/.test(v))x[inp.dataset.scoreHole]=+v;save(x);render();open();};});
+  }
+  function open(){render();document.getElementById('uidoScoreOverlay').classList.add('open')}
+  function close(){var x=document.getElementById('uidoScoreOverlay');if(x)x.classList.remove('open')}
+  function ensure(){
+    if(document.getElementById('uidoScorecardBtn'))return;
+    var final=document.querySelector('.screen[data-i="7"] .card');
+    if(!final)return;
+    var b=document.createElement('button');b.type='button';b.id='uidoScorecardBtn';b.className='btn secondary';b.textContent='Scorecard / Stats';b.style.marginTop='10px';b.onclick=open;
+    var nav=final.querySelector('.nav');
+    if(nav)final.insertBefore(b,nav);else final.appendChild(b);
+    var exp=document.createElement('button');exp.type='button';exp.id='uidoBottomScoreExport';exp.className='btn light';exp.textContent='Export Scorecard';exp.style.marginTop='7px';exp.onclick=exportCsv;
+    if(nav)final.insertBefore(exp,nav);else final.appendChild(exp);
+    var shot=document.querySelector('.screen[data-i="6"] .card');
+    if(shot && !document.getElementById('uidoHoleScorePanel')){
+      var panel=document.createElement('div');panel.id='uidoHoleScorePanel';panel.className='uidoHoleScorePanel';
+      panel.innerHTML='<b>Hole score</b><div><input id="uidoHoleScoreInput" inputmode="numeric" min="1" max="15" placeholder="Score"><button type="button" id="uidoHoleScoreSave">Save score</button></div><span id="uidoHoleScoreSaved"></span>';
+      var n=shot.querySelector('.nav'); if(n)shot.insertBefore(panel,n); else shot.appendChild(panel);
+      document.getElementById('uidoHoleScoreSave').onclick=function(){var h=currentHole(),v=document.getElementById('uidoHoleScoreInput').value.trim();if(!/^\d+$/.test(v))return;var x=scores();x[h]=+v;save(x);document.getElementById('uidoHoleScoreSaved').textContent='Score saved for Hole '+h;};
+    }
+  }
+  var css=document.createElement('style');css.textContent='.uidoScoreOverlay{position:fixed;inset:0;background:#0b2d21cc;z-index:9999;display:none;padding:12px;overflow:auto}.uidoScoreOverlay.open{display:flex;justify-content:center}.uidoScoreSheet{width:min(430px,100%);margin:auto;background:#f5f7f5;border-radius:18px;overflow:hidden;box-shadow:0 10px 35px #0006}.uidoScoreHead{background:#075b3d;color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;font-size:18px}.uidoScoreHead button{border:1px solid #ffffff66;background:#ffffff12;color:#fff;border-radius:8px;padding:7px 10px;font-weight:800}.uidoScoreSummary{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:10px}.uidoScoreSummary div{background:#fff;border:1px solid #d7e2dc;border-radius:11px;text-align:center;padding:9px}.uidoScoreSummary b{display:block;font-size:20px}.uidoScoreSummary span{font-size:10px;color:#71847b}.uidoScoreRows{padding:0 10px 10px}.uidoScoreRow{display:grid;grid-template-columns:42px 42px 1fr 48px;gap:6px;align-items:center;padding:7px 4px;border-bottom:1px solid #e5ece8;font-size:12px}.uidoScoreRow.head{font-size:10px;color:#71847b;font-weight:800}.uidoScoreRow input{width:52px;border:1px solid #cad9d2;border-radius:7px;padding:6px;text-align:center;font-weight:800}.uidoScoreActions{display:flex;gap:8px;padding:10px}.uidoScoreActions button{flex:1;min-height:44px;border:0;border-radius:10px;background:#075b3d;color:#fff;font-weight:800}.uidoHoleScorePanel{margin-top:10px;background:#f1f6f3;border:1px solid #dfe9e4;border-radius:12px;padding:9px}.uidoHoleScorePanel>b{font-size:13px}.uidoHoleScorePanel>div{display:flex;gap:7px;margin-top:6px}.uidoHoleScorePanel input{width:80px;border:1px solid #cad9d2;border-radius:9px;padding:9px;font-size:17px;text-align:center;font-weight:800}.uidoHoleScorePanel button{flex:1;border:0;border-radius:9px;background:#075b3d;color:#fff;font-weight:800}.uidoHoleScorePanel span{display:block;font-size:10px;color:#35a96a;margin-top:4px}';document.head.appendChild(css);
+  document.addEventListener('DOMContentLoaded',function(){ensure();});
+  setTimeout(ensure,300);setTimeout(ensure,1000);setTimeout(ensure,2000);
+  var obs=new MutationObserver(ensure);obs.observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+'''
+              s=s.replace('</body>',patch+'</body>')
+              p.write_text(s)
+          PY
+          grep -q 'UIDO_SCORECARD_FIX_V2' index.html
+          grep -q 'uidoScorecardBtn' index.html
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Fix scorecard and stats UI' || exit 0
+          git push
+      - name: Remove one-time workflow
+        if: success()
+        run: |
+          rm -f .github/workflows/fix-scorecard-v2.yml
+          git add .github/workflows/fix-scorecard-v2.yml
+          git commit -m 'Remove one-time scorecard workflow' || exit 0
+          git push
