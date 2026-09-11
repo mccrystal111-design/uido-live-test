@@ -1,6 +1,8 @@
 name: UiDo PWA GPS setup
 on:
-  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/add-pwa-gps.yml'
 jobs:
   patch:
     runs-on: ubuntu-latest
@@ -12,12 +14,11 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-          p=Path('index.html')
-          s=p.read_text()
+          p=Path('index.html'); s=p.read_text()
           if 'rel="manifest"' not in s:
               s=s.replace('</head>','<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#075b3d"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}</script></head>',1)
           if 'UiDo continuous GPS' not in s:
-              gps='''<script>\n// UiDo continuous GPS: keeps the latest phone fix available while the installed app is open.\n(function(){\n  function start(){\n    if(!navigator.geolocation || window.__uidoGpsWatch) return;\n    window.__uidoGpsWatch=navigator.geolocation.watchPosition(function(pos){\n      try{\n        if(window.S && typeof window.S==='object'){window.S.gps={lat:pos.coords.latitude,lon:pos.coords.longitude,accuracy:pos.coords.accuracy,ts:pos.timestamp};}\n        if(typeof window.updateGreenDistances==='function') window.updateGreenDistances();\n        if(typeof window.persistRound==='function') window.persistRound();\n      }catch(e){}\n    },function(){},{enableHighAccuracy:true,maximumAge:3000,timeout:15000});\n  }\n  window.addEventListener('load',start);\n})();\n// UiDo continuous GPS\n</script>'''
+              gps='''<script>\n// UiDo continuous GPS\n(function(){function start(){if(!navigator.geolocation||window.__uidoGpsWatch)return;window.__uidoGpsWatch=navigator.geolocation.watchPosition(function(pos){try{if(window.S&&typeof window.S==='object')window.S.gps={lat:pos.coords.latitude,lon:pos.coords.longitude,accuracy:pos.coords.accuracy,ts:pos.timestamp};if(typeof window.updateGreenDistances==='function')window.updateGreenDistances();if(typeof window.persistRound==='function')window.persistRound();}catch(e){}},{},{enableHighAccuracy:true,maximumAge:3000,timeout:15000});}window.addEventListener('load',start);})();\n</script>'''
               s=s.replace('</body>',gps+'</body>',1)
           p.write_text(s)
           PY
@@ -27,18 +28,12 @@ jobs:
           grep -q 'UiDo continuous GPS' index.html
           test -f sw.js
           test -f manifest.webmanifest
-      - name: Commit
+      - name: Commit and remove workflow
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git commit -m 'Make UiDo installable and add continuous GPS' || exit 0
+          git commit -m 'Make UiDo installable and add continuous GPS' || true
+          git rm .github/workflows/add-pwa-gps.yml
+          git commit -m 'Remove one-time PWA setup workflow'
           git push
-      - name: Remove workflow
-        if: always()
-        run: |
-          git rm .github/workflows/add-pwa-gps.yml || true
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'Remove one-time PWA setup workflow' || true
-          git push || true
