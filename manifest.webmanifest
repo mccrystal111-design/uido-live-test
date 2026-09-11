@@ -1,0 +1,19 @@
+{
+  "name": "UiDo Golf",
+  "short_name": "UiDo",
+  "start_url": "/uido-live-test/",
+  "scope": "/uido-live-test/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f7f5",
+  "theme_color": "#075b3d",
+  "description": "UiDo SmartShot live golf test app",
+  "icons": [
+    {
+      "src": "uido-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
