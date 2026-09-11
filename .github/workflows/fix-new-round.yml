@@ -1,0 +1,43 @@
+name: Fix New Round button
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/fix-new-round.yml'
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch button
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          marker='<!-- UIDO_NEW_ROUND_FIX_V2 -->'
+          if marker not in s:
+              patch='''\n<!-- UIDO_NEW_ROUND_FIX_V2 -->\n<script>\n(function(){\n  function resetUiDoRound(e){\n    var b=e.target && e.target.closest ? e.target.closest('#headNewRound') : null;\n    if(!b) return;\n    e.preventDefault();\n    e.stopImmediatePropagation();\n    var ok=window.confirm('Start a new round? This will clear the current round data.');\n    if(!ok) return;\n    try{\n      ['uido_live_round_v1','uido_hole_scores_v1','uido_shot_flow_v1'].forEach(function(k){localStorage.removeItem(k);});\n    }catch(err){}\n    window.location.reload();\n  }\n  document.addEventListener('click',resetUiDoRound,true);\n})();\n</script>\n'''
+              s=s.replace('</body>',patch+'</body>')
+              p.write_text(s)
+          else:
+              print('already patched')
+          PY
+          grep -q 'UIDO_NEW_ROUND_FIX_V2' index.html
+          grep -q 'headNewRound' index.html
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Fix New Round button' || exit 0
+          git push
+      - name: Remove workflow
+        if: success()
+        run: |
+          rm -f .github/workflows/fix-new-round.yml
+          git add .github/workflows/fix-new-round.yml
+          git commit -m 'Remove one-time New Round fix workflow' || exit 0
+          git push
