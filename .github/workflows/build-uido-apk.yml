@@ -13,44 +13,82 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout exact triggering commit
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
+
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+
       - name: Install Android SDK platform
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
-      - name: Bundle UiDo web app into APK assets
+
+      - name: Bundle exact source UI into APK assets
         working-directory: android/app
+        env:
+          UIDO_SHA: ${{ github.sha }}
         run: |
           mkdir -p src/main/assets
-          curl -fsSL https://raw.githubusercontent.com/mccrystal111-design/uido-live-test/d9fdbfdf79fec8a20c035d51e4aab8f7923bc7e4/index.html -o src/main/assets/index.html
-          curl -fsSL https://raw.githubusercontent.com/mccrystal111-design/uido-live-test/d9fdbfdf79fec8a20c035d51e4aab8f7923bc7e4/scorecard.js -o src/main/assets/scorecard.js
-          curl -fsSL https://raw.githubusercontent.com/mccrystal111-design/uido-live-test/d9fdbfdf79fec8a20c035d51e4aab8f7923bc7e4/manifest-v3.webmanifest -o src/main/assets/manifest-v3.webmanifest
-          curl -fsSL https://raw.githubusercontent.com/mccrystal111-design/uido-live-test/d9fdbfdf79fec8a20c035d51e4aab8f7923bc7e4/uido-icon-v3.svg -o src/main/assets/uido-icon-v3.svg
+          RAW="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${UIDO_SHA}"
+          curl -fsSL "$RAW/index.html" -o src/main/assets/index.html
+          curl -fsSL "$RAW/scorecard.js" -o src/main/assets/scorecard.js
+          curl -fsSL "$RAW/manifest-v3.webmanifest" -o src/main/assets/manifest-v3.webmanifest
+          curl -fsSL "$RAW/uido-icon-v3.svg" -o src/main/assets/uido-icon-v3.svg
+          printf 'source_commit=%s\n' "$UIDO_SHA" > src/main/assets/build-info.txt
           test -s src/main/assets/index.html
           test -s src/main/assets/scorecard.js
           test -s src/main/assets/manifest-v3.webmanifest
           test -s src/main/assets/uido-icon-v3.svg
+          test -s src/main/assets/build-info.txt
+
+      - name: Verify source UI before Android build
+        working-directory: android/app
+        run: |
+          grep -Fq '<title>UiDo Live Test v0.9</title>' src/main/assets/index.html
+          grep -Fq 'AT YOUR BALL' src/main/assets/index.html
+          grep -Fq 'scoreOverlay' src/main/assets/index.html
+          grep -Fq 'data-i="0"' src/main/assets/index.html
+          grep -Fq 'source_commit=' src/main/assets/build-info.txt
+          echo "Source UI fingerprint checks passed."
+          echo "$(cat src/main/assets/build-info.txt)"
+
       - name: Install Gradle 8.13
         run: |
           curl -fsSL https://services.gradle.org/distributions/gradle-8.13-bin.zip -o /tmp/gradle.zip
           unzip -q /tmp/gradle.zip -d /tmp
-      - name: Build UiDo v0.9 debug APK
+
+      - name: Build UiDo debug APK
         working-directory: android
         run: /tmp/gradle-8.13/bin/gradle --no-daemon --stacktrace assembleDebug
-      - name: Verify APK
+
+      - name: Verify APK contains exact UI
+        env:
+          UIDO_SHA: ${{ github.sha }}
         run: |
-          test -s android/app/build/outputs/apk/debug/app-debug.apk
-          unzip -l android/app/build/outputs/apk/debug/app-debug.apk | grep -E 'assets/(index.html|scorecard.js|manifest-v3.webmanifest|uido-icon-v3.svg)'
-          ls -lh android/app/build/outputs/apk/debug/app-debug.apk
-      - name: Upload UiDo v0.9 APK
+          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$APK"
+          unzip -l "$APK" | grep -E 'assets/(index.html|scorecard.js|manifest-v3.webmanifest|uido-icon-v3.svg|build-info.txt)'
+          unzip -p "$APK" assets/index.html | grep -Fq '<title>UiDo Live Test v0.9</title>'
+          unzip -p "$APK" assets/index.html | grep -Fq 'AT YOUR BALL'
+          unzip -p "$APK" assets/index.html | grep -Fq 'scoreOverlay'
+          unzip -p "$APK" assets/index.html | grep -Fq 'data-i="0"'
+          unzip -p "$APK" assets/build-info.txt | grep -Fxq "source_commit=$UIDO_SHA"
+          echo "APK UI fingerprint checks passed."
+          echo "APK SHA-256:"
+          sha256sum "$APK"
+          ls -lh "$APK"
+
+      - name: Upload UiDo verified debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: UiDo-v0.9-bundled-debug-apk
+          name: UiDo-verified-${{ github.sha }}-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
