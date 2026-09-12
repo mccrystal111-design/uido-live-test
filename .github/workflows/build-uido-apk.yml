@@ -3,9 +3,8 @@ name: Build UiDo APK
 on:
   workflow_dispatch:
   push:
-    paths:
-      - 'android/**'
-      - 'gps.html'
+    branches:
+      - main
 
 permissions:
   contents: read
