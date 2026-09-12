@@ -31,11 +31,10 @@ jobs:
           UIDO_SHA: ${{ github.sha }}
         run: |
           mkdir -p src/main/assets
-          RAW="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${UIDO_SHA}"
-          curl -fsSL "$RAW/index.html" -o src/main/assets/index.html
-          curl -fsSL "$RAW/scorecard.js" -o src/main/assets/scorecard.js
-          curl -fsSL "$RAW/manifest-v3.webmanifest" -o src/main/assets/manifest-v3.webmanifest
-          curl -fsSL "$RAW/uido-icon-v3.svg" -o src/main/assets/uido-icon-v3.svg
+          cp ../../index.html src/main/assets/index.html
+          cp ../../scorecard.js src/main/assets/scorecard.js
+          cp ../../manifest-v3.webmanifest src/main/assets/manifest-v3.webmanifest
+          cp ../../uido-icon-v3.svg src/main/assets/uido-icon-v3.svg
           printf 'source_commit=%s\n' "$UIDO_SHA" > src/main/assets/build-info.txt
       - name: Apply final approved Shape correction to bundled UI
         working-directory: android/app
