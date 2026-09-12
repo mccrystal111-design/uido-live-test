@@ -18,19 +18,15 @@ jobs:
         with:
           ref: ${{ github.sha }}
           fetch-depth: 1
-
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
-
       - name: Install Android SDK platform
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
-
       - name: Bundle exact source UI into APK assets
         working-directory: android/app
         env:
@@ -47,37 +43,49 @@ jobs:
           test -s src/main/assets/scorecard.js
           test -s src/main/assets/manifest-v3.webmanifest
           test -s src/main/assets/uido-icon-v3.svg
-          test -s src/main/assets/build-info.txt
-
-      - name: Verify source UI before Android build
+      - name: Verify agreed UiDo source before Android build
         working-directory: android/app
         run: |
           grep -Fq '<title>UiDo</title>' src/main/assets/index.html
           grep -Fq 'server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/' src/main/assets/index.html
+          grep -Fq 'PLAY SMARTER' src/main/assets/index.html
+          grep -Fq 'Better decisions. Lower scores.' src/main/assets/index.html
           grep -Fq 'New Round' src/main/assets/index.html
-          grep -Fq 'FRONT' src/main/assets/index.html
-          grep -Fq 'MIDDLE' src/main/assets/index.html
-          grep -Fq 'BACK' src/main/assets/index.html
+          grep -Fq 'Select tee' src/main/assets/index.html
+          grep -Fq 'Check Wind' src/main/assets/index.html
           grep -Fq 'Confirm wind' src/main/assets/index.html
-          grep -Fq 'Actual club' src/main/assets/index.html
-          grep -Fq 'SHOT DISTANCE' src/main/assets/index.html
-          grep -Fq 'ROUND COMPLETE' src/main/assets/index.html
+          grep -Fq 'Fairway / Tee' src/main/assets/index.html
+          grep -Fq 'Semi rough' src/main/assets/index.html
+          grep -Fq 'Deep rough' src/main/assets/index.html
+          grep -Fq 'Bare / Other' src/main/assets/index.html
+          grep -Fq 'Obstructed' src/main/assets/index.html
+          grep -Fq 'What direction did the ball start on?' src/main/assets/index.html
+          grep -Fq '>Hook<' src/main/assets/index.html
+          grep -Fq '>Draw<' src/main/assets/index.html
+          grep -Fq '>Straight<' src/main/assets/index.html
+          grep -Fq '>Fade<' src/main/assets/index.html
+          grep -Fq '>Slice<' src/main/assets/index.html
+          grep -Fq 'SHOT STRIKE' src/main/assets/index.html
+          grep -Fq '>Heavy<' src/main/assets/index.html
+          grep -Fq 'Shot Recorded' src/main/assets/index.html
+          grep -Fq 'Save & Continue' src/main/assets/index.html
+          grep -Fq 'Finish Hole' src/main/assets/index.html
+          grep -Fq 'Save & Finish Round' src/main/assets/index.html
+          grep -Fq 'ROUND REVIEW' src/main/assets/index.html
           grep -Fq 'source_commit=${{ github.sha }}' src/main/assets/build-info.txt
           grep -R -Fq 'file:///android_asset/index.html' src/main/java
-          echo "New UiDo screen + satellite + yardage fingerprints passed."
-          echo "$(cat src/main/assets/build-info.txt)"
-          echo "Android wrapper points at bundled index.html."
-
+          ! grep -Fq 'Where is the pin?' src/main/assets/index.html
+          ! grep -Fq 'What did you hit?' src/main/assets/index.html
+          ! grep -Fq 'SHOT DISTANCE' src/main/assets/index.html
+          echo "Agreed UiDo round-flow fingerprints passed."
       - name: Install Gradle 8.13
         run: |
           curl -fsSL https://services.gradle.org/distributions/gradle-8.13-bin.zip -o /tmp/gradle.zip
           unzip -q /tmp/gradle.zip -d /tmp
-
       - name: Build UiDo debug APK
         working-directory: android
         run: /tmp/gradle-8.13/bin/gradle --no-daemon --stacktrace assembleDebug
-
-      - name: Verify APK contains exact UI
+      - name: Verify APK contains exact agreed UI
         env:
           UIDO_SHA: ${{ github.sha }}
         run: |
@@ -86,20 +94,18 @@ jobs:
           unzip -l "$APK" | grep -E 'assets/(index.html|scorecard.js|manifest-v3.webmanifest|uido-icon-v3.svg|build-info.txt)'
           unzip -p "$APK" assets/index.html | grep -Fq '<title>UiDo</title>'
           unzip -p "$APK" assets/index.html | grep -Fq 'server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/'
-          unzip -p "$APK" assets/index.html | grep -Fq 'New Round'
-          unzip -p "$APK" assets/index.html | grep -Fq 'FRONT'
-          unzip -p "$APK" assets/index.html | grep -Fq 'MIDDLE'
-          unzip -p "$APK" assets/index.html | grep -Fq 'BACK'
-          unzip -p "$APK" assets/index.html | grep -Fq 'Confirm wind'
-          unzip -p "$APK" assets/index.html | grep -Fq 'Actual club'
-          unzip -p "$APK" assets/index.html | grep -Fq 'SHOT DISTANCE'
-          unzip -p "$APK" assets/index.html | grep -Fq 'ROUND COMPLETE'
+          unzip -p "$APK" assets/index.html | grep -Fq 'PLAY SMARTER'
+          unzip -p "$APK" assets/index.html | grep -Fq 'Check Wind'
+          unzip -p "$APK" assets/index.html | grep -Fq 'What direction did the ball start on?'
+          unzip -p "$APK" assets/index.html | grep -Fq 'Shot Recorded'
+          unzip -p "$APK" assets/index.html | grep -Fq 'Save & Continue'
+          unzip -p "$APK" assets/index.html | grep -Fq 'ROUND REVIEW'
+          ! unzip -p "$APK" assets/index.html | grep -Fq 'Where is the pin?'
+          ! unzip -p "$APK" assets/index.html | grep -Fq 'What did you hit?'
+          ! unzip -p "$APK" assets/index.html | grep -Fq 'SHOT DISTANCE'
           unzip -p "$APK" assets/build-info.txt | grep -Fxq "source_commit=$UIDO_SHA"
-          echo "APK contains the exact new UiDo UI and satellite yardage code."
-          echo "APK SHA-256:"
           sha256sum "$APK"
           ls -lh "$APK"
-
       - name: Upload UiDo verified debug APK
         uses: actions/upload-artifact@v4
         with:
