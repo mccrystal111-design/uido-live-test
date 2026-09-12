@@ -1,5 +1,5 @@
 plugins { id 'com.android.application' }
 
 android { namespace 'com.uido.live'; compileSdk 35
-    defaultConfig { applicationId 'com.uido.live'; minSdk 26; targetSdk 35; versionCode 4; versionName '0.4-compass-wind-fix' }
+    defaultConfig { applicationId 'com.uido.live'; minSdk 26; targetSdk 35; versionCode 5; versionName '0.5-smooth-map' }
 }
