@@ -46,49 +46,67 @@ jobs:
       - name: Verify canonical UiDo source before Android build
         working-directory: android/app
         run: |
-          grep -Fq '<title>UiDo</title>' src/main/assets/index.html
-          grep -Fq 'server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/' src/main/assets/index.html
-          grep -Fq 'PLAY SMARTER' src/main/assets/index.html
-          grep -Fq 'Better decisions. Lower scores.' src/main/assets/index.html
-          grep -Fq 'New Round' src/main/assets/index.html
-          grep -Fq 'Overstone Park' src/main/assets/index.html
-          grep -Fq 'Select tee' src/main/assets/index.html
-          grep -Fq 'Start Round' src/main/assets/index.html
-          grep -Fq 'FRONT' src/main/assets/index.html
-          grep -Fq 'MIDDLE' src/main/assets/index.html
-          grep -Fq 'BACK' src/main/assets/index.html
-          grep -Fq 'Check Wind' src/main/assets/index.html
-          grep -Fq 'Confirm wind' src/main/assets/index.html
-          grep -Fq 'Fairway / Tee' src/main/assets/index.html
-          grep -Fq 'Semi rough' src/main/assets/index.html
-          grep -Fq 'Deep rough' src/main/assets/index.html
-          grep -Fq 'Bunker' src/main/assets/index.html
-          grep -Fq 'Bare / Other' src/main/assets/index.html
-          grep -Fq 'Obstructed' src/main/assets/index.html
-          grep -Fq 'What direction did the ball start on?' src/main/assets/index.html
-          grep -Fq '>Hook<' src/main/assets/index.html
-          grep -Fq '>Draw<' src/main/assets/index.html
-          grep -Fq '>Straight<' src/main/assets/index.html
-          grep -Fq '>Fade<' src/main/assets/index.html
-          grep -Fq '>Slice<' src/main/assets/index.html
-          grep -Fq 'SHOT STRIKE' src/main/assets/index.html
-          grep -Fq '>Heavy<' src/main/assets/index.html
-          grep -Fq 'Shot Recorded' src/main/assets/index.html
-          grep -Fq 'Save & Continue' src/main/assets/index.html
-          grep -Fq 'Finish Hole' src/main/assets/index.html
-          grep -Fq 'Score' src/main/assets/index.html
-          grep -Fq 'Save & Finish Round' src/main/assets/index.html
-          grep -Fq 'ROUND REVIEW' src/main/assets/index.html
-          grep -Fq 'source_commit=${{ github.sha }}' src/main/assets/build-info.txt
-          grep -R -Fq 'file:///android_asset/index.html' src/main/java
-          ! grep -Fq 'Where is the pin?' src/main/assets/index.html
-          ! grep -Fq 'What did you hit?' src/main/assets/index.html
-          ! grep -Fq 'SHOT DISTANCE' src/main/assets/index.html
-          ! grep -Fq 'Actual club' src/main/assets/index.html
-          ! grep -Fq 'Slight Draw' src/main/assets/index.html
-          ! grep -Fq 'Slight Fade' src/main/assets/index.html
-          ! grep -Fq 'Confirm & continue' src/main/assets/index.html
-          echo "Canonical UiDo round-flow fingerprints passed."
+          set -e
+          checks=(
+            '<title>UiDo</title>'
+            'server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/'
+            'PLAY SMARTER'
+            'Better decisions. Lower scores.'
+            'New Round'
+            'Overstone Park'
+            'Select tee'
+            'Start Round'
+            'FRONT'
+            'MIDDLE'
+            'BACK'
+            'Check Wind'
+            'Confirm wind'
+            'Fairway / Tee'
+            'Semi rough'
+            'Deep rough'
+            'Bunker'
+            'Bare / Other'
+            'Obstructed'
+            'What direction did the ball start on?'
+            '>Hook<'
+            '>Draw<'
+            '>Straight<'
+            '>Fade<'
+            '>Slice<'
+            'SHOT STRIKE'
+            '>Heavy<'
+            'Shot Recorded'
+            'Save & Continue'
+            'Finish Hole'
+            'Score'
+            'Save & Finish Round'
+            'ROUND REVIEW'
+            'source_commit=${{ github.sha }}'
+          )
+          for needle in "${checks[@]}"; do
+            if ! grep -Fq "$needle" src/main/assets/index.html && [[ "$needle" != source_commit=* ]]; then
+              echo "SOURCE CHECK FAILED: $needle"
+              exit 1
+            fi
+          done
+          grep -Fxq 'source_commit=${{ github.sha }}' src/main/assets/build-info.txt || { echo "SOURCE CHECK FAILED: build-info commit"; exit 1; }
+          grep -R -Fq 'file:///android_asset/index.html' src/main/java || { echo "SOURCE CHECK FAILED: Android asset entry point"; exit 1; }
+          forbidden=(
+            'Where is the pin?'
+            'What did you hit?'
+            'SHOT DISTANCE'
+            'Actual club'
+            'Slight Draw'
+            'Slight Fade'
+            'Confirm & continue'
+          )
+          for needle in "${forbidden[@]}"; do
+            if grep -Fq "$needle" src/main/assets/index.html; then
+              echo "FORBIDDEN UI FOUND: $needle"
+              exit 1
+            fi
+          done
+          echo "Canonical UiDo source fingerprints passed."
       - name: Install Gradle 8.13
         run: |
           curl -fsSL https://services.gradle.org/distributions/gradle-8.13-bin.zip -o /tmp/gradle.zip
@@ -100,23 +118,40 @@ jobs:
         env:
           UIDO_SHA: ${{ github.sha }}
         run: |
+          set -e
           APK=android/app/build/outputs/apk/debug/app-debug.apk
           test -s "$APK"
           unzip -l "$APK" | grep -E 'assets/(index.html|scorecard.js|manifest-v3.webmanifest|uido-icon-v3.svg|build-info.txt)'
-          unzip -p "$APK" assets/index.html | grep -Fq '<title>UiDo</title>'
-          unzip -p "$APK" assets/index.html | grep -Fq 'server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/'
-          unzip -p "$APK" assets/index.html | grep -Fq 'PLAY SMARTER'
-          unzip -p "$APK" assets/index.html | grep -Fq 'Check Wind'
-          unzip -p "$APK" assets/index.html | grep -Fq 'What direction did the ball start on?'
-          unzip -p "$APK" assets/index.html | grep -Fq 'Shot Recorded'
-          unzip -p "$APK" assets/index.html | grep -Fq 'Save & Continue'
-          unzip -p "$APK" assets/index.html | grep -Fq 'ROUND REVIEW'
-          ! unzip -p "$APK" assets/index.html | grep -Fq 'Where is the pin?'
-          ! unzip -p "$APK" assets/index.html | grep -Fq 'What did you hit?'
-          ! unzip -p "$APK" assets/index.html | grep -Fq 'SHOT DISTANCE'
-          ! unzip -p "$APK" assets/index.html | grep -Fq 'Actual club'
-          ! unzip -p "$APK" assets/index.html | grep -Fq 'Slight Draw'
-          ! unzip -p "$APK" assets/index.html | grep -Fq 'Slight Fade'
+          required=(
+            '<title>UiDo</title>'
+            'server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/'
+            'PLAY SMARTER'
+            'Check Wind'
+            'What direction did the ball start on?'
+            'Shot Recorded'
+            'Save & Continue'
+            'ROUND REVIEW'
+          )
+          for needle in "${required[@]}"; do
+            if ! unzip -p "$APK" assets/index.html | grep -Fq "$needle"; then
+              echo "APK CHECK FAILED: $needle"
+              exit 1
+            fi
+          done
+          forbidden=(
+            'Where is the pin?'
+            'What did you hit?'
+            'SHOT DISTANCE'
+            'Actual club'
+            'Slight Draw'
+            'Slight Fade'
+          )
+          for needle in "${forbidden[@]}"; do
+            if unzip -p "$APK" assets/index.html | grep -Fq "$needle"; then
+              echo "FORBIDDEN UI IN APK: $needle"
+              exit 1
+            fi
+          done
           unzip -p "$APK" assets/build-info.txt | grep -Fxq "source_commit=$UIDO_SHA"
           sha256sum "$APK"
           ls -lh "$APK"
