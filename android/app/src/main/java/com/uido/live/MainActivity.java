@@ -43,7 +43,7 @@ public class MainActivity extends Activity {
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_REQUEST);
         } else startGps();
-        webView.loadUrl("https://mccrystal111-design.github.io/uido-live-test/index.html?v=0.9");
+        webView.loadUrl("https://raw.githubusercontent.com/mccrystal111-design/uido-live-test/9cb7b3cda9e5fe8f62ba4d3eda9a2d9affab5c73/index.html");
     }
 
     @Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] results) {
