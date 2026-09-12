@@ -21,7 +21,7 @@ import java.net.URL;
 
 public class MainActivity extends Activity {
     private static final int LOCATION_REQUEST = 1001;
-    private static final String UIDO_HTML_URL = "https://raw.githubusercontent.com/mccrystal111-design/uido-live-test/350658c6886d72b9de462f2a7d4fb7a181edce6f/gps.html";
+    private static final String UIDO_HTML_URL = "https://raw.githubusercontent.com/mccrystal111-design/uido-live-test/d9fdbfdf79fec8a20c035d51e4aab8f7923bc7e4/index.html";
     private WebView webView;
     private LocationManager locationManager;
     private LocationListener listener;
