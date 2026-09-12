@@ -2,4 +2,4 @@ plugins {
     id 'com.android.application' version '8.13.0' apply false
 }
 
-// UiDo APK build trigger
+// UiDo v0.7 integrated-round clean build trigger
