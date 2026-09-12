@@ -6,5 +6,7 @@
 - Android version bumped from v0.6 sharper imagery to v0.7 integrated round (version code 8).
 - Added canonical project-state documentation.
 - Added canonical design-decision documentation.
-- Existing Android GitHub Actions build workflow is configured to build a debug APK when `android/**` changes.
-- Next build step: let GitHub Actions produce the v0.7 debug APK, then verify the resulting artifact before testing on-device.
+- Android GitHub Actions build workflow now triggers for `android/**` and `gps.html` changes.
+- Integrated the new UiDo home, course selection, on-course map, pre-shot context, shot capture, scoring, round review, scorecard and export screens into `gps.html`.
+- Triggered a fresh Android build by making a no-op functional UI-file change after fixing the workflow trigger.
+- Next step: verify the new GitHub Actions run and APK artifact, then test the integrated flow on-device.
