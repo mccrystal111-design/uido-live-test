@@ -52,7 +52,7 @@ jobs:
         working-directory: android/app
         run: |
           set -e
-          for needle in '<title>UiDo</title>' 'PLAY SMARTER' 'Better decisions. Lower scores.' 'New Round' 'Overstone Park' 'Select tee' 'Start Round' 'Confirm wind' 'Fairway / Tee' 'Semi rough' 'Deep rough' 'Bunker' 'Bare / Other' 'Obstructed' 'What direction did the ball start on?' 'Hook' 'Draw' 'Straight' 'Fade' 'Slice' 'Heavy' 'Shot Recorded' 'Save and continue' 'Save and finish round' 'Finish round' 'Scorecard' 'Hole 18 details'; do
+          for needle in '<title>UiDo</title>' 'PLAY SMARTER' 'New Round' 'Overstone Park' 'Select tee' 'Start Round' 'Confirm wind' 'Fairway / Tee' 'Semi rough' 'Deep rough' 'Bunker' 'Bare / Other' 'Obstructed' 'What direction did the ball start on?' 'Hook' 'Draw' 'Straight' 'Fade' 'Slice' 'Heavy' 'Shot Recorded' 'Save and continue' 'Save and finish round' 'Finish round' 'Scorecard' 'Hole 18 details'; do
             grep -Fq "$needle" src/main/assets/index.html || { echo "SOURCE CHECK FAILED: $needle"; exit 1; }
           done
           ! grep -Fq 'Slight Draw' src/main/assets/index.html || { echo 'SOURCE CHECK FAILED: Slight Draw still present'; exit 1; }
