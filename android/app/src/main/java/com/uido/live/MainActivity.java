@@ -10,18 +10,12 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.webkit.GeolocationPermissions;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 public class MainActivity extends Activity {
     private static final int LOCATION_REQUEST = 1001;
-    private static final String UIDO_HTML_URL = "https://raw.githubusercontent.com/mccrystal111-design/uido-live-test/d9fdbfdf79fec8a20c035d51e4aab8f7923bc7e4/index.html";
     private WebView webView;
     private LocationManager locationManager;
     private LocationListener listener;
@@ -36,19 +30,6 @@ public class MainActivity extends Activity {
         s.setDatabaseEnabled(true);
         s.setCacheMode(WebSettings.LOAD_NO_CACHE);
         webView.setWebViewClient(new WebViewClient() {
-            @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                if (UIDO_HTML_URL.equals(request.getUrl().toString())) {
-                    try {
-                        HttpURLConnection c = (HttpURLConnection)new URL(UIDO_HTML_URL).openConnection();
-                        c.setUseCaches(false);
-                        c.setConnectTimeout(10000);
-                        c.setReadTimeout(10000);
-                        c.setRequestProperty("Accept", "text/html");
-                        return new WebResourceResponse("text/html", "UTF-8", c.getInputStream());
-                    } catch (Exception ignored) { }
-                }
-                return super.shouldInterceptRequest(view, request);
-            }
             @Override public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 view.evaluateJavascript(V07_PATCH, null);
@@ -63,7 +44,7 @@ public class MainActivity extends Activity {
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_REQUEST);
         } else startGps();
-        webView.loadUrl(UIDO_HTML_URL);
+        webView.loadUrl("file:///android_asset/index.html");
     }
 
     @Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] results) {
