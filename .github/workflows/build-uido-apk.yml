@@ -52,16 +52,26 @@ jobs:
         working-directory: android/app
         run: |
           set -e
-          for needle in '<title>UiDo</title>' 'PLAY SMARTER' 'New Round' 'Overstone Park' 'Select tee' 'Start Round' 'Confirm wind' 'Fairway / Tee' 'Semi rough' 'Deep rough' 'Bunker' 'Bare / Other' 'Obstructed' 'What direction did the ball start on?' 'Hook' 'Draw' 'Straight' 'Fade' 'Slice' 'Heavy' 'Shot Recorded' 'Save and continue' 'Save and finish round' 'Finish round' 'Scorecard' 'Hole 18 details'; do
-            grep -Fq "$needle" src/main/assets/index.html || { echo "SOURCE CHECK FAILED: $needle"; exit 1; }
-          done
-          ! grep -Fq 'Slight Draw' src/main/assets/index.html || { echo 'SOURCE CHECK FAILED: Slight Draw still present'; exit 1; }
-          ! grep -Fq 'Slight Fade' src/main/assets/index.html || { echo 'SOURCE CHECK FAILED: Slight Fade still present'; exit 1; }
-          grep -Fq 'server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/' src/main/assets/index.html || { echo 'SOURCE CHECK FAILED: satellite'; exit 1; }
-          grep -Fxq 'source_commit=${{ github.sha }}' src/main/assets/build-info.txt || { echo 'SOURCE CHECK FAILED: commit'; exit 1; }
-          grep -R -Fq 'file:///android_asset/index.html' src/main/java || { echo 'SOURCE CHECK FAILED: Android entry point'; exit 1; }
+          grep -Fq '<title>UiDo</title>' src/main/assets/index.html
+          grep -Fq 'PLAY SMARTER' src/main/assets/index.html
+          grep -Fq 'New Round' src/main/assets/index.html
+          grep -Fq 'Overstone Park' src/main/assets/index.html
+          grep -Fq 'Select tee' src/main/assets/index.html
+          grep -Fq 'Confirm wind' src/main/assets/index.html
+          grep -Fq 'What direction did the ball start on?' src/main/assets/index.html
+          grep -Fq 'Hook' src/main/assets/index.html
+          grep -Fq 'Draw' src/main/assets/index.html
+          grep -Fq 'Straight' src/main/assets/index.html
+          grep -Fq 'Fade' src/main/assets/index.html
+          grep -Fq 'Slice' src/main/assets/index.html
+          grep -Fq 'Heavy' src/main/assets/index.html
+          ! grep -Fq 'Slight Draw' src/main/assets/index.html
+          ! grep -Fq 'Slight Fade' src/main/assets/index.html
+          grep -Fq 'server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/' src/main/assets/index.html
+          grep -Fxq 'source_commit=${{ github.sha }}' src/main/assets/build-info.txt
+          grep -R -Fq 'file:///android_asset/index.html' src/main/java
           for needle in 'Where is the pin?' 'What did you hit?' 'SHOT DISTANCE' 'Actual club'; do
-            ! grep -Fq "$needle" src/main/assets/index.html || { echo "FORBIDDEN UI FOUND: $needle"; exit 1; }
+            ! grep -Fq "$needle" src/main/assets/index.html
           done
       - name: Install Gradle 8.13
         run: |
@@ -78,12 +88,23 @@ jobs:
           APK=android/app/build/outputs/apk/debug/app-debug.apk
           test -s "$APK"
           unzip -l "$APK" | grep -q 'assets/index.html'
-          for needle in '<title>UiDo</title>' 'PLAY SMARTER' 'What direction did the ball start on?' 'Hook' 'Draw' 'Straight' 'Fade' 'Slice' 'Heavy' 'Shot Recorded' 'Save and continue' 'Scorecard'; do
-            unzip -p "$APK" assets/index.html | grep -Fq "$needle" || { echo "APK CHECK FAILED: $needle"; exit 1; }
-          done
-          for needle in 'Slight Draw' 'Slight Fade' 'Where is the pin?' 'What did you hit?' 'SHOT DISTANCE' 'Actual club'; do
-            ! unzip -p "$APK" assets/index.html | grep -Fq "$needle" || { echo "FORBIDDEN UI IN APK: $needle"; exit 1; }
-          done
+          unzip -p "$APK" assets/index.html | grep -Fq '<title>UiDo</title>'
+          unzip -p "$APK" assets/index.html | grep -Fq 'PLAY SMARTER'
+          unzip -p "$APK" assets/index.html | grep -Fq 'New Round'
+          unzip -p "$APK" assets/index.html | grep -Fq 'Overstone Park'
+          unzip -p "$APK" assets/index.html | grep -Fq 'What direction did the ball start on?'
+          unzip -p "$APK" assets/index.html | grep -Fq 'Hook'
+          unzip -p "$APK" assets/index.html | grep -Fq 'Draw'
+          unzip -p "$APK" assets/index.html | grep -Fq 'Straight'
+          unzip -p "$APK" assets/index.html | grep -Fq 'Fade'
+          unzip -p "$APK" assets/index.html | grep -Fq 'Slice'
+          unzip -p "$APK" assets/index.html | grep -Fq 'Heavy'
+          ! unzip -p "$APK" assets/index.html | grep -Fq 'Slight Draw'
+          ! unzip -p "$APK" assets/index.html | grep -Fq 'Slight Fade'
+          ! unzip -p "$APK" assets/index.html | grep -Fq 'Where is the pin?'
+          ! unzip -p "$APK" assets/index.html | grep -Fq 'What did you hit?'
+          ! unzip -p "$APK" assets/index.html | grep -Fq 'SHOT DISTANCE'
+          ! unzip -p "$APK" assets/index.html | grep -Fq 'Actual club'
           unzip -p "$APK" assets/build-info.txt | grep -Fxq "source_commit=$UIDO_SHA"
           sha256sum "$APK"
       - name: Upload green UiDo APK
