@@ -1,0 +1,47 @@
+name: UiDo smooth map rotation
+
+on:
+  push:
+    paths:
+      - '.github/workflows/smooth-map-rotation.yml'
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch map rotation
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('gps.html')
+          s=p.read_text()
+          old='scale(1.16)'
+          assert old in s
+          s=s.replace(old,'scale(1.50)',1)
+          old2="let map,me,accCircle,pos={lat:null,lon:null,accuracy:999};let windDir='Calm',windStrength='Calm',heading=null;"
+          new2="let map,me,accCircle,pos={lat:null,lon:null,accuracy:999};let windDir='Calm',windStrength='Calm',heading=null,targetMapRotation=0,visualMapRotation=0,mapAnim=null;"
+          assert old2 in s
+          s=s.replace(old2,new2,1)
+          old3="if(map)map.getContainer().style.setProperty('--map-rotation',(-relative)+'deg')}"
+          new3="if(map){targetMapRotation=-relative;if(!mapAnim)animateMapRotation()}}function animateMapRotation(){if(!map)return;let d=((targetMapRotation-visualMapRotation+540)%360)-180;if(Math.abs(d)<0.05){visualMapRotation=targetMapRotation;map.getContainer().style.setProperty('--map-rotation',visualMapRotation+'deg');mapAnim=null;return}visualMapRotation+=d*0.10;map.getContainer().style.setProperty('--map-rotation',visualMapRotation+'deg');mapAnim=requestAnimationFrame(animateMapRotation)}"
+          assert old3 in s
+          s=s.replace(old3,new3,1)
+          p.write_text(s)
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add gps.html
+          git commit -m 'Smooth and stabilise map rotation'
+          git push
+      - name: Remove one-time workflow
+        if: always()
+        run: |
+          rm -f .github/workflows/smooth-map-rotation.yml
+          git add .github/workflows/smooth-map-rotation.yml || true
+          git commit -m 'Remove one-time map rotation workflow' || true
+          git push || true
