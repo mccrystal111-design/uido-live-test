@@ -53,12 +53,15 @@ jobs:
         working-directory: android/app
         run: |
           grep -Fq '<title>UiDo Live Test v0.9</title>' src/main/assets/index.html
-          grep -Fq 'AT YOUR BALL' src/main/assets/index.html
           grep -Fq 'scoreOverlay' src/main/assets/index.html
+          grep -Fq 'windcircle' src/main/assets/index.html
+          grep -Fq 'holehead' src/main/assets/index.html
           grep -Fq 'data-i="0"' src/main/assets/index.html
-          grep -Fq 'source_commit=' src/main/assets/build-info.txt
+          grep -Fxq "source_commit=${{ github.sha }}" src/main/assets/build-info.txt
+          grep -Fq 'file:///android_asset/index.html' MainActivity.java
           echo "Source UI fingerprint checks passed."
           echo "$(cat src/main/assets/build-info.txt)"
+          echo "Android wrapper points at bundled index.html."
 
       - name: Install Gradle 8.13
         run: |
@@ -77,8 +80,9 @@ jobs:
           test -s "$APK"
           unzip -l "$APK" | grep -E 'assets/(index.html|scorecard.js|manifest-v3.webmanifest|uido-icon-v3.svg|build-info.txt)'
           unzip -p "$APK" assets/index.html | grep -Fq '<title>UiDo Live Test v0.9</title>'
-          unzip -p "$APK" assets/index.html | grep -Fq 'AT YOUR BALL'
           unzip -p "$APK" assets/index.html | grep -Fq 'scoreOverlay'
+          unzip -p "$APK" assets/index.html | grep -Fq 'windcircle'
+          unzip -p "$APK" assets/index.html | grep -Fq 'holehead'
           unzip -p "$APK" assets/index.html | grep -Fq 'data-i="0"'
           unzip -p "$APK" assets/build-info.txt | grep -Fxq "source_commit=$UIDO_SHA"
           echo "APK UI fingerprint checks passed."
