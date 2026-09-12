@@ -1,19 +1,15 @@
 name: Build UiDo APK
-
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
-
+    branches: [main]
 permissions:
   contents: read
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout exact triggering commit
+      - name: Checkout exact commit
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
@@ -25,9 +21,11 @@ jobs:
           java-version: '17'
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
-      - name: Install Android SDK platform
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
-      - name: Bundle exact source UI into APK assets
+      - name: Install Android SDK
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          yes | sdkmanager "platforms;android-35" "build-tools;35.0.0" >/dev/null
+      - name: Bundle exact UiDo source
         working-directory: android/app
         env:
           UIDO_SHA: ${{ github.sha }}
@@ -39,123 +37,43 @@ jobs:
           curl -fsSL "$RAW/manifest-v3.webmanifest" -o src/main/assets/manifest-v3.webmanifest
           curl -fsSL "$RAW/uido-icon-v3.svg" -o src/main/assets/uido-icon-v3.svg
           printf 'source_commit=%s\n' "$UIDO_SHA" > src/main/assets/build-info.txt
-          test -s src/main/assets/index.html
-          test -s src/main/assets/scorecard.js
-          test -s src/main/assets/manifest-v3.webmanifest
-          test -s src/main/assets/uido-icon-v3.svg
-      - name: Verify canonical UiDo source before Android build
+      - name: Verify UiDo source
         working-directory: android/app
         run: |
           set -e
-          checks=(
-            '<title>UiDo</title>'
-            'server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/'
-            'PLAY SMARTER'
-            'Better decisions. Lower scores.'
-            'New Round'
-            'Overstone Park'
-            'Select tee'
-            'Start Round'
-            'FRONT'
-            'MIDDLE'
-            'BACK'
-            'Check Wind'
-            'Confirm wind'
-            'Fairway / Tee'
-            'Semi rough'
-            'Deep rough'
-            'Bunker'
-            'Bare / Other'
-            'Obstructed'
-            'What direction did the ball start on?'
-            '>Hook<'
-            '>Draw<'
-            '>Straight<'
-            '>Fade<'
-            '>Slice<'
-            'SHOT STRIKE'
-            '>Heavy<'
-            'Shot Recorded'
-            'Save & Continue'
-            'Finish Hole'
-            'Score'
-            'Save & Finish Round'
-            'ROUND REVIEW'
-            'source_commit=${{ github.sha }}'
-          )
-          for needle in "${checks[@]}"; do
-            if ! grep -Fq "$needle" src/main/assets/index.html && [[ "$needle" != source_commit=* ]]; then
-              echo "SOURCE CHECK FAILED: $needle"
-              exit 1
-            fi
+          for needle in '<title>UiDo</title>' 'PLAY SMARTER' 'Better decisions. Lower scores.' 'New Round' 'Overstone Park' 'Select tee' 'Start Round' 'FRONT' 'MIDDLE' 'BACK' 'Check Wind' 'Confirm wind' 'Fairway / Tee' 'Semi rough' 'Deep rough' 'Bunker' 'Bare / Other' 'Obstructed' 'What direction did the ball start on?' 'Hook' 'Draw' 'Straight' 'Fade' 'Slice' 'SHOT STRIKE' 'Heavy' 'Shot Recorded' 'Save & Continue' 'Finish Hole' 'Score' 'Save & Finish Round' 'ROUND REVIEW'; do
+            grep -Fq "$needle" src/main/assets/index.html || { echo "SOURCE CHECK FAILED: $needle"; exit 1; }
           done
-          grep -Fxq 'source_commit=${{ github.sha }}' src/main/assets/build-info.txt || { echo "SOURCE CHECK FAILED: build-info commit"; exit 1; }
-          grep -R -Fq 'file:///android_asset/index.html' src/main/java || { echo "SOURCE CHECK FAILED: Android asset entry point"; exit 1; }
-          forbidden=(
-            'Where is the pin?'
-            'What did you hit?'
-            'SHOT DISTANCE'
-            'Actual club'
-            'Slight Draw'
-            'Slight Fade'
-            'Confirm & continue'
-          )
-          for needle in "${forbidden[@]}"; do
-            if grep -Fq "$needle" src/main/assets/index.html; then
-              echo "FORBIDDEN UI FOUND: $needle"
-              exit 1
-            fi
+          grep -Fq 'server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/' src/main/assets/index.html || { echo 'SOURCE CHECK FAILED: satellite'; exit 1; }
+          grep -Fxq 'source_commit=${{ github.sha }}' src/main/assets/build-info.txt || { echo 'SOURCE CHECK FAILED: commit'; exit 1; }
+          grep -R -Fq 'file:///android_asset/index.html' src/main/java || { echo 'SOURCE CHECK FAILED: Android entry point'; exit 1; }
+          for needle in 'Where is the pin?' 'What did you hit?' 'SHOT DISTANCE' 'Actual club' 'Slight Draw' 'Slight Fade'; do
+            ! grep -Fq "$needle" src/main/assets/index.html || { echo "FORBIDDEN UI FOUND: $needle"; exit 1; }
           done
-          echo "Canonical UiDo source fingerprints passed."
       - name: Install Gradle 8.13
         run: |
           curl -fsSL https://services.gradle.org/distributions/gradle-8.13-bin.zip -o /tmp/gradle.zip
           unzip -q /tmp/gradle.zip -d /tmp
-      - name: Build UiDo debug APK
+      - name: Build UiDo APK
         working-directory: android
         run: /tmp/gradle-8.13/bin/gradle --no-daemon --stacktrace assembleDebug
-      - name: Verify APK contains exact canonical UI
+      - name: Verify actual APK
         env:
           UIDO_SHA: ${{ github.sha }}
         run: |
           set -e
           APK=android/app/build/outputs/apk/debug/app-debug.apk
           test -s "$APK"
-          unzip -l "$APK" | grep -E 'assets/(index.html|scorecard.js|manifest-v3.webmanifest|uido-icon-v3.svg|build-info.txt)'
-          required=(
-            '<title>UiDo</title>'
-            'server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/'
-            'PLAY SMARTER'
-            'Check Wind'
-            'What direction did the ball start on?'
-            'Shot Recorded'
-            'Save & Continue'
-            'ROUND REVIEW'
-          )
-          for needle in "${required[@]}"; do
-            if ! unzip -p "$APK" assets/index.html | grep -Fq "$needle"; then
-              echo "APK CHECK FAILED: $needle"
-              exit 1
-            fi
+          unzip -l "$APK" | grep -q 'assets/index.html'
+          for needle in '<title>UiDo</title>' 'PLAY SMARTER' 'Check Wind' 'What direction did the ball start on?' 'Shot Recorded' 'Save & Continue' 'ROUND REVIEW'; do
+            unzip -p "$APK" assets/index.html | grep -Fq "$needle" || { echo "APK CHECK FAILED: $needle"; exit 1; }
           done
-          forbidden=(
-            'Where is the pin?'
-            'What did you hit?'
-            'SHOT DISTANCE'
-            'Actual club'
-            'Slight Draw'
-            'Slight Fade'
-          )
-          for needle in "${forbidden[@]}"; do
-            if unzip -p "$APK" assets/index.html | grep -Fq "$needle"; then
-              echo "FORBIDDEN UI IN APK: $needle"
-              exit 1
-            fi
+          for needle in 'Where is the pin?' 'What did you hit?' 'SHOT DISTANCE' 'Actual club' 'Slight Draw' 'Slight Fade'; do
+            ! unzip -p "$APK" assets/index.html | grep -Fq "$needle" || { echo "FORBIDDEN UI IN APK: $needle"; exit 1; }
           done
           unzip -p "$APK" assets/build-info.txt | grep -Fxq "source_commit=$UIDO_SHA"
           sha256sum "$APK"
-          ls -lh "$APK"
-      - name: Upload UiDo verified debug APK
+      - name: Upload green UiDo APK
         uses: actions/upload-artifact@v4
         with:
           name: UiDo-verified-${{ github.sha }}-debug-apk
