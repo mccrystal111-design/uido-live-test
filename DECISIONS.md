@@ -11,3 +11,4 @@
 - GPS accuracy/confidence must be displayed and captured with the position.
 - The pre-shot context should be auditable: distance, GPS accuracy, heading, lie, wind and pin can be shown for confirmation/editing before capture.
 - v0.7 is focused on reliable data capture and round completion, not full AI decision intelligence.
+- 2026-09-12: Integrated the new UiDo home, course selection, on-course map, pre-shot context, shot capture, scoring, round review and scorecard screens into `gps.html`, which is the screen loaded by the Android wrapper.
