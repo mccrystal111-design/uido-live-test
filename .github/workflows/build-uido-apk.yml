@@ -7,7 +7,7 @@ on:
       - 'android/**'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -28,20 +28,16 @@ jobs:
         run: |
           curl -fsSL https://services.gradle.org/distributions/gradle-8.13-bin.zip -o /tmp/gradle.zip
           unzip -q /tmp/gradle.zip -d /tmp
-      - name: Build debug APK
+      - name: Build v0.7 debug APK
         working-directory: android
-        run: /tmp/gradle-8.13/bin/gradle --no-daemon assembleDebug
-      - name: Upload APK
+        run: /tmp/gradle-8.13/bin/gradle --no-daemon --stacktrace assembleDebug
+      - name: Verify APK
+        run: |
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          ls -lh android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Upload v0.7 APK
         uses: actions/upload-artifact@v4
         with:
-          name: UiDo-v0.5-smooth-map-debug-apk
+          name: UiDo-v0.7-integrated-round-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-      - name: Publish APK as temporary base64 file
-        run: |
-          base64 -w 0 android/app/build/outputs/apk/debug/app-debug.apk > uido-apk-base64.txt
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add uido-apk-base64.txt
-          git commit -m 'Publish UiDo v0.5 APK payload'
-          git push
