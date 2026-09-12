@@ -1,0 +1,37 @@
+name: Fix UiDo Shape Options
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  fix:
+    if: ${{ !contains(github.event.head_commit.message, 'Remove Slight Draw and Slight Fade') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove non-approved shape options
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          s=s.replace('grid-template-columns:repeat(7,1fr)','grid-template-columns:repeat(5,1fr)')
+          s=s.replace('<button class="shape" onclick="pickShape(this)"><div class="arc">↖</div>Slight Draw</button>','')
+          s=s.replace('<button class="shape" onclick="pickShape(this)"><div class="arc">↗</div>Slight Fade</button>','')
+          p.write_text(s)
+
+          p=Path('.github/workflows/build-uido-apk.yml')
+          s=p.read_text()
+          s=s.replace("'Hook' 'Draw' 'Slight Draw' 'Straight' 'Slight Fade' 'Fade' 'Slice'","'Hook' 'Draw' 'Straight' 'Fade' 'Slice'")
+          s=s.replace("'Check Wind' 'What direction did the ball start on?' 'Slight Draw' 'Slight Fade' 'Shot Recorded'","'Check Wind' 'What direction did the ball start on?' 'Shot Recorded'")
+          p.write_text(s)
+          PY
+      - name: Commit corrected source
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html .github/workflows/build-uido-apk.yml
+          git diff --cached --quiet && exit 0
+          git commit -m 'Remove Slight Draw and Slight Fade'
+          git push
