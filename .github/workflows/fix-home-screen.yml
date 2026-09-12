@@ -1,0 +1,30 @@
+name: Fix UiDo Home Screen
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  fix:
+    if: ${{ !contains(github.event.head_commit.message, 'Fix UiDo Home Screen') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply home screen corrections
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html')
+          s=p.read_text()
+          s=re.sub(r'<section id="home" class="screen active">.*?</section>', '''<section id="home" class="screen active"><div id="homeMap" class="map"></div><div class="satshade"></div><div class="round-home"><div class="home-logo">UiDo</div><div class="tag">PLAY SMARTER</div><div class="greenline"></div><div class="home-copy">Better decisions.<br>Lower scores.</div><button class="home-main" onclick="show('course')"><span>▶</span>New Round　›</button><div class="home-nav"><button>▥<br>Past Rounds</button><button>♙<br>Courses</button><button>⚙<br>Settings</button></div></div></section>''', s, count=1, flags=re.S)
+          overrides='''\n/* 🔒 Screen 1 Home — approved visual sizing */\n.home-logo{font-size:82px;letter-spacing:-5px;line-height:.82}\n.tag{font-size:13px;letter-spacing:6px;margin-top:12px}\n.greenline{width:46px;height:2px;margin:10px 0 14px}\n.home-copy{font-size:20px;line-height:1.15;margin-bottom:24px}\n.home-main{height:65px;border-radius:14px;font-size:21px;font-weight:650}\n.home-main span{font-size:27px;margin-right:12px}\n.home-nav{gap:10px;margin-top:14px}\n.home-nav button{height:68px;border-radius:14px;font-size:13px}\n'''
+          s=s.replace('</style>',overrides+'</style>',1)
+          p.write_text(s)
+          PY
+          git config user.name 'uido-build'
+          git config user.email 'uido-build@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet && exit 0
+          git commit -m 'Fix UiDo Home Screen'
+          git push
