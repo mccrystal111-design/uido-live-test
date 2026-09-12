@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - 'android/**'
+      - 'gps.html'
 
 permissions:
   contents: read
