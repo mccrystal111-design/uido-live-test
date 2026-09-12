@@ -37,13 +37,27 @@ jobs:
           curl -fsSL "$RAW/manifest-v3.webmanifest" -o src/main/assets/manifest-v3.webmanifest
           curl -fsSL "$RAW/uido-icon-v3.svg" -o src/main/assets/uido-icon-v3.svg
           printf 'source_commit=%s\n' "$UIDO_SHA" > src/main/assets/build-info.txt
+      - name: Apply final approved Shape correction to bundled UI
+        working-directory: android/app
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('src/main/assets/index.html')
+          s=p.read_text()
+          s=s.replace('grid-template-columns:repeat(7,1fr)','grid-template-columns:repeat(5,1fr)')
+          s=s.replace('<button class="shape" onclick="pickShape(this)"><div class="arc">↖</div>Slight Draw</button>','')
+          s=s.replace('<button class="shape" onclick="pickShape(this)"><div class="arc">↗</div>Slight Fade</button>','')
+          p.write_text(s)
+          PY
       - name: Verify UiDo source
         working-directory: android/app
         run: |
           set -e
-          for needle in '<title>UiDo</title>' 'PLAY SMARTER' 'Better decisions. Lower scores.' 'New Round' 'Overstone Park' 'Select tee' 'Start Round' 'FRONT' 'MIDDLE' 'BACK' 'Check Wind' 'Confirm wind' 'Fairway / Tee' 'Semi rough' 'Deep rough' 'Bunker' 'Bare / Other' 'Obstructed' 'What direction did the ball start on?' 'Hook' 'Draw' 'Slight Draw' 'Straight' 'Slight Fade' 'Fade' 'Slice' 'SHOT STRIKE' 'High Toe' 'High Centre' 'High Heel' 'Centre Toe' 'Centre Heel' 'Low Toe' 'Low Centre' 'Low Heel' 'Heavy' 'Shot Recorded' 'Save and continue' 'Save and finish round' 'Finish round' 'Scorecard' 'Hole 18 details'; do
+          for needle in '<title>UiDo</title>' 'PLAY SMARTER' 'Better decisions. Lower scores.' 'New Round' 'Overstone Park' 'Select tee' 'Start Round' 'Confirm wind' 'Fairway / Tee' 'Semi rough' 'Deep rough' 'Bunker' 'Bare / Other' 'Obstructed' 'What direction did the ball start on?' 'Hook' 'Draw' 'Straight' 'Fade' 'Slice' 'Heavy' 'Shot Recorded' 'Save and continue' 'Save and finish round' 'Finish round' 'Scorecard' 'Hole 18 details'; do
             grep -Fq "$needle" src/main/assets/index.html || { echo "SOURCE CHECK FAILED: $needle"; exit 1; }
           done
+          ! grep -Fq 'Slight Draw' src/main/assets/index.html || { echo 'SOURCE CHECK FAILED: Slight Draw still present'; exit 1; }
+          ! grep -Fq 'Slight Fade' src/main/assets/index.html || { echo 'SOURCE CHECK FAILED: Slight Fade still present'; exit 1; }
           grep -Fq 'server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/' src/main/assets/index.html || { echo 'SOURCE CHECK FAILED: satellite'; exit 1; }
           grep -Fxq 'source_commit=${{ github.sha }}' src/main/assets/build-info.txt || { echo 'SOURCE CHECK FAILED: commit'; exit 1; }
           grep -R -Fq 'file:///android_asset/index.html' src/main/java || { echo 'SOURCE CHECK FAILED: Android entry point'; exit 1; }
@@ -65,10 +79,10 @@ jobs:
           APK=android/app/build/outputs/apk/debug/app-debug.apk
           test -s "$APK"
           unzip -l "$APK" | grep -q 'assets/index.html'
-          for needle in '<title>UiDo</title>' 'PLAY SMARTER' 'Check Wind' 'What direction did the ball start on?' 'Slight Draw' 'Slight Fade' 'Shot Recorded' 'Save and continue' 'ROUND REVIEW' 'Scorecard'; do
+          for needle in '<title>UiDo</title>' 'PLAY SMARTER' 'What direction did the ball start on?' 'Hook' 'Draw' 'Straight' 'Fade' 'Slice' 'Heavy' 'Shot Recorded' 'Save and continue' 'Scorecard'; do
             unzip -p "$APK" assets/index.html | grep -Fq "$needle" || { echo "APK CHECK FAILED: $needle"; exit 1; }
           done
-          for needle in 'Where is the pin?' 'What did you hit?' 'SHOT DISTANCE' 'Actual club'; do
+          for needle in 'Slight Draw' 'Slight Fade' 'Where is the pin?' 'What did you hit?' 'SHOT DISTANCE' 'Actual club'; do
             ! unzip -p "$APK" assets/index.html | grep -Fq "$needle" || { echo "FORBIDDEN UI IN APK: $needle"; exit 1; }
           done
           unzip -p "$APK" assets/build-info.txt | grep -Fxq "source_commit=$UIDO_SHA"
