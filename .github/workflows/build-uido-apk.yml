@@ -52,14 +52,19 @@ jobs:
       - name: Verify source UI before Android build
         working-directory: android/app
         run: |
-          grep -Fq '<title>UiDo Live Test v0.9</title>' src/main/assets/index.html
-          grep -Fq 'scoreOverlay' src/main/assets/index.html
-          grep -Fq 'windcircle' src/main/assets/index.html
-          grep -Fq 'holehead' src/main/assets/index.html
-          grep -Fq 'data-i="0"' src/main/assets/index.html
-          grep -Fxq "source_commit=${{ github.sha }}" src/main/assets/build-info.txt
+          grep -Fq '<title>UiDo</title>' src/main/assets/index.html
+          grep -Fq 'server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/' src/main/assets/index.html
+          grep -Fq 'New Round' src/main/assets/index.html
+          grep -Fq 'FRONT' src/main/assets/index.html
+          grep -Fq 'MIDDLE' src/main/assets/index.html
+          grep -Fq 'BACK' src/main/assets/index.html
+          grep -Fq 'Confirm wind' src/main/assets/index.html
+          grep -Fq 'Actual club' src/main/assets/index.html
+          grep -Fq 'SHOT DISTANCE' src/main/assets/index.html
+          grep -Fq 'ROUND COMPLETE' src/main/assets/index.html
+          grep -Fq 'source_commit=${{ github.sha }}' src/main/assets/build-info.txt
           grep -R -Fq 'file:///android_asset/index.html' src/main/java
-          echo "Source UI fingerprint checks passed."
+          echo "New UiDo screen + satellite + yardage fingerprints passed."
           echo "$(cat src/main/assets/build-info.txt)"
           echo "Android wrapper points at bundled index.html."
 
@@ -79,13 +84,18 @@ jobs:
           APK=android/app/build/outputs/apk/debug/app-debug.apk
           test -s "$APK"
           unzip -l "$APK" | grep -E 'assets/(index.html|scorecard.js|manifest-v3.webmanifest|uido-icon-v3.svg|build-info.txt)'
-          unzip -p "$APK" assets/index.html | grep -Fq '<title>UiDo Live Test v0.9</title>'
-          unzip -p "$APK" assets/index.html | grep -Fq 'scoreOverlay'
-          unzip -p "$APK" assets/index.html | grep -Fq 'windcircle'
-          unzip -p "$APK" assets/index.html | grep -Fq 'holehead'
-          unzip -p "$APK" assets/index.html | grep -Fq 'data-i="0"'
+          unzip -p "$APK" assets/index.html | grep -Fq '<title>UiDo</title>'
+          unzip -p "$APK" assets/index.html | grep -Fq 'server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/'
+          unzip -p "$APK" assets/index.html | grep -Fq 'New Round'
+          unzip -p "$APK" assets/index.html | grep -Fq 'FRONT'
+          unzip -p "$APK" assets/index.html | grep -Fq 'MIDDLE'
+          unzip -p "$APK" assets/index.html | grep -Fq 'BACK'
+          unzip -p "$APK" assets/index.html | grep -Fq 'Confirm wind'
+          unzip -p "$APK" assets/index.html | grep -Fq 'Actual club'
+          unzip -p "$APK" assets/index.html | grep -Fq 'SHOT DISTANCE'
+          unzip -p "$APK" assets/index.html | grep -Fq 'ROUND COMPLETE'
           unzip -p "$APK" assets/build-info.txt | grep -Fxq "source_commit=$UIDO_SHA"
-          echo "APK UI fingerprint checks passed."
+          echo "APK contains the exact new UiDo UI and satellite yardage code."
           echo "APK SHA-256:"
           sha256sum "$APK"
           ls -lh "$APK"
