@@ -58,7 +58,7 @@ jobs:
           grep -Fq 'holehead' src/main/assets/index.html
           grep -Fq 'data-i="0"' src/main/assets/index.html
           grep -Fxq "source_commit=${{ github.sha }}" src/main/assets/build-info.txt
-          grep -Fq 'file:///android_asset/index.html' MainActivity.java
+          grep -R -Fq 'file:///android_asset/index.html' src/main/java
           echo "Source UI fingerprint checks passed."
           echo "$(cat src/main/assets/build-info.txt)"
           echo "Android wrapper points at bundled index.html."
