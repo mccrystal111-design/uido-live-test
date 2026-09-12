@@ -24,6 +24,18 @@ jobs:
         uses: android-actions/setup-android@v3
       - name: Install Android SDK platform
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Bundle UiDo web app into APK assets
+        working-directory: android/app
+        run: |
+          mkdir -p src/main/assets
+          curl -fsSL https://raw.githubusercontent.com/mccrystal111-design/uido-live-test/d9fdbfdf79fec8a20c035d51e4aab8f7923bc7e4/index.html -o src/main/assets/index.html
+          curl -fsSL https://raw.githubusercontent.com/mccrystal111-design/uido-live-test/d9fdbfdf79fec8a20c035d51e4aab8f7923bc7e4/scorecard.js -o src/main/assets/scorecard.js
+          curl -fsSL https://raw.githubusercontent.com/mccrystal111-design/uido-live-test/d9fdbfdf79fec8a20c035d51e4aab8f7923bc7e4/manifest-v3.webmanifest -o src/main/assets/manifest-v3.webmanifest
+          curl -fsSL https://raw.githubusercontent.com/mccrystal111-design/uido-live-test/d9fdbfdf79fec8a20c035d51e4aab8f7923bc7e4/uido-icon-v3.svg -o src/main/assets/uido-icon-v3.svg
+          test -s src/main/assets/index.html
+          test -s src/main/assets/scorecard.js
+          test -s src/main/assets/manifest-v3.webmanifest
+          test -s src/main/assets/uido-icon-v3.svg
       - name: Install Gradle 8.13
         run: |
           curl -fsSL https://services.gradle.org/distributions/gradle-8.13-bin.zip -o /tmp/gradle.zip
@@ -34,10 +46,11 @@ jobs:
       - name: Verify APK
         run: |
           test -s android/app/build/outputs/apk/debug/app-debug.apk
+          unzip -l android/app/build/outputs/apk/debug/app-debug.apk | grep -E 'assets/(index.html|scorecard.js|manifest-v3.webmanifest|uido-icon-v3.svg)'
           ls -lh android/app/build/outputs/apk/debug/app-debug.apk
       - name: Upload UiDo v0.9 APK
         uses: actions/upload-artifact@v4
         with:
-          name: UiDo-v0.9-live-test-debug-apk
+          name: UiDo-v0.9-bundled-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
