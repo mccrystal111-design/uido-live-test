@@ -115,3 +115,4 @@ jobs:
           if-no-files-found: error
 
 # Force a clean build from the latest approved Home source.
+# Final Home visual tune is committed before this build is consumed.
