@@ -1,0 +1,89 @@
+name: UiDo Green APK Final
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Install Android SDK
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          yes | sdkmanager "platforms;android-35" "build-tools;35.0.0" >/dev/null
+      - name: Bundle UiDo source
+        working-directory: android/app
+        env:
+          UIDO_SHA: ${{ github.sha }}
+        run: |
+          mkdir -p src/main/assets
+          cp ../../index.html src/main/assets/index.html
+          cp ../../scorecard.js src/main/assets/scorecard.js
+          cp ../../manifest-v3.webmanifest src/main/assets/manifest-v3.webmanifest
+          cp ../../uido-icon-v3.svg src/main/assets/uido-icon-v3.svg
+          printf 'source_commit=%s\n' "$UIDO_SHA" > src/main/assets/build-info.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('src/main/assets/index.html')
+          s=p.read_text()
+          s=s.replace('grid-template-columns:repeat(7,1fr)','grid-template-columns:repeat(5,1fr)')
+          s=s.replace('<button class="shape" onclick="pickShape(this)"><div class="arc">↖</div>Slight Draw</button>','')
+          s=s.replace('<button class="shape" onclick="pickShape(this)"><div class="arc">↗</div>Slight Fade</button>','')
+          p.write_text(s)
+          PY
+      - name: Verify source
+        working-directory: android/app
+        run: |
+          set -e
+          grep -Fq '<title>UiDo</title>' src/main/assets/index.html
+          grep -Fq 'PLAY SMARTER' src/main/assets/index.html
+          grep -Fq 'New Round' src/main/assets/index.html
+          grep -Fq 'OVERSTONE PARK' src/main/assets/index.html
+          grep -Fq 'Hole 1 · Par 4' src/main/assets/index.html
+          grep -Fq 'Hook' src/main/assets/index.html
+          grep -Fq 'Straight' src/main/assets/index.html
+          grep -Fq 'Slice' src/main/assets/index.html
+          ! grep -Fq 'Slight Draw' src/main/assets/index.html
+          ! grep -Fq 'Slight Fade' src/main/assets/index.html
+          grep -Fq 'server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/' src/main/assets/index.html
+          grep -R -Fq 'file:///android_asset/index.html' src/main/java
+      - name: Install Gradle 8.13
+        run: |
+          curl -fsSL https://services.gradle.org/distributions/gradle-8.13-bin.zip -o /tmp/gradle.zip
+          unzip -q /tmp/gradle.zip -d /tmp
+      - name: Build APK
+        working-directory: android
+        run: /tmp/gradle-8.13/bin/gradle --no-daemon --stacktrace assembleDebug
+      - name: Verify APK
+        env:
+          UIDO_SHA: ${{ github.sha }}
+        run: |
+          set -e
+          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$APK"
+          unzip -p "$APK" assets/build-info.txt | grep -Fxq "source_commit=$UIDO_SHA"
+          unzip -p "$APK" assets/index.html | grep -Fq 'Hole 1 · Par 4'
+          unzip -p "$APK" assets/index.html | grep -Fq 'PLAY SMARTER'
+          ! unzip -p "$APK" assets/index.html | grep -Fq 'Slight Draw'
+          ! unzip -p "$APK" assets/index.html | grep -Fq 'Slight Fade'
+          sha256sum "$APK"
+      - name: Upload green UiDo APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: UiDo-green-final-${{ github.sha }}
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
