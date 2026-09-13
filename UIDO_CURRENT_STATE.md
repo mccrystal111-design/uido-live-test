@@ -77,3 +77,5 @@ The latest user-approved reference is the final uploaded Home/Hole composition: 
 
 ## Continuity rule
 Before making code changes in a new chat, read this file and the canonical agreed-flow document, then inspect the current GitHub source. Continue from that state; do not rebuild the product from remembered context.
+
+Build trigger: final approved Home reference build.
