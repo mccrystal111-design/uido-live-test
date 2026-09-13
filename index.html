@@ -6,51 +6,27 @@
 <title>UiDo</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#17392d;font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;color:#fff}
-.app{position:relative;width:100vw;height:100dvh;overflow:hidden;background:#17392d}
-#map{position:absolute;inset:0;z-index:0}
-.leaflet-control-attribution{font-size:7px;opacity:.55}
-.shade{position:absolute;inset:0;z-index:1;background:linear-gradient(to bottom,rgba(0,0,0,.20) 0%,rgba(0,0,0,.02) 42%,rgba(0,0,0,.26) 100%);pointer-events:none}
-.top{position:absolute;z-index:3;top:3.2%;left:3.2%;right:3.2%;display:flex;justify-content:space-between;align-items:flex-start}
-.identity{text-shadow:0 2px 8px rgba(0,0,0,.42)}
-.brand{font-size:clamp(29px,5.9vw,41px);line-height:.9;font-weight:800;letter-spacing:-1.9px}
-.course{margin-top:20px;font-size:clamp(11px,2.2vw,15px);font-weight:600;letter-spacing:.1px}
-.hole{margin-top:3px;font-size:clamp(21px,4.5vw,31px);font-weight:720;letter-spacing:-.4px}
-.actions{display:flex;gap:10px}
-.actions button{width:clamp(52px,9.55vw,66px);height:clamp(52px,9.55vw,66px);border:0;border-radius:15px;background:rgba(16,48,37,.72);color:#fff;font-size:clamp(23px,4.2vw,29px);display:grid;place-items:center;box-shadow:0 3px 12px rgba(0,0,0,.22);backdrop-filter:blur(3px)}
-.home{position:absolute;z-index:3;left:5%;right:5%;bottom:3.8%;display:flex;flex-direction:column;align-items:center;text-align:center;text-shadow:0 2px 8px rgba(0,0,0,.48)}
-.logo{font-size:clamp(51px,10.4vw,72px);font-weight:850;letter-spacing:-4.7px;line-height:.85}
-.tag{margin-top:9px;font-size:clamp(9px,1.9vw,13px);font-weight:600;letter-spacing:clamp(4px,1vw,6px)}
-.line{width:43px;height:2px;background:#55b56e;margin:13px 0 14px}
-.copy{font-size:clamp(14px,2.6vw,18px);font-weight:500;line-height:1.18;margin-bottom:23px}
-.new{width:100%;height:58px;border:2px solid #5fca78;border-radius:14px;background:rgba(8,52,35,.62);color:#fff;font-size:clamp(16px,2.75vw,19px);font-weight:650;display:flex;align-items:center;justify-content:space-between;padding:0 18px;box-shadow:0 4px 15px rgba(0,0,0,.24);backdrop-filter:blur(3px)}
-.new .play{font-size:18px;margin-right:5px}.new .chev{font-size:27px;font-weight:300;line-height:0}
-.nav{width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:15px;text-shadow:none}
-.nav button{height:61px;border:1px solid rgba(255,255,255,.32);border-radius:14px;background:rgba(11,53,38,.72);color:#fff;font-size:clamp(10px,1.8vw,12px);font-weight:650;box-shadow:0 3px 12px rgba(0,0,0,.2);backdrop-filter:blur(3px)}
-@media(max-height:700px){.home{bottom:2%}.copy{margin-bottom:12px}.line{margin:8px 0 9px}.nav button{height:52px}}
-</style>
-</head>
-<body>
-<div class="app">
-  <div id="map"></div><div class="shade"></div>
-  <div class="top">
-    <div class="identity"><div class="brand">UiDo</div><div class="course">OVERSTONE PARK</div><div class="hole">Hole 1 · Par 4</div></div>
-    <div class="actions"><button aria-label="Settings">⚙</button><button aria-label="Menu">☰</button></div>
-  </div>
-  <main class="home">
-    <div class="logo">UiDo</div>
-    <div class="tag">PLAY SMARTER</div>
-    <div class="line"></div>
-    <div class="copy">Better decisions. Lower scores.</div>
-    <button class="new" onclick="location.href='?round=new'"><span class="play">▶</span><span>New Round</span><span class="chev">›</span></button>
-    <div class="nav"><button>Past Rounds</button><button>Courses</button><button>Settings</button></div>
-  </main>
-</div>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-const C=[52.27789,-0.81722];
-const map=L.map('map',{zoomControl:false,attributionControl:true,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,boxZoom:false,touchZoom:false,keyboard:false}).setView(C,18);
-L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:20,attribution:'Tiles © Esri'}).addTo(map);
-</script>
-</body>
-</html>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#102c20;font-family:Arial,Helvetica,sans-serif;color:#fff}
+.app{position:relative;width:100vw;height:100dvh;max-width:691px;margin:auto;overflow:hidden;background:#102c20}
+#map{position:absolute;inset:0;z-index:0}.leaflet-control-attribution{display:none!important}
+.shade{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(to bottom,rgba(0,0,0,.18) 0%,rgba(0,0,0,.02) 38%,rgba(0,22,13,.40) 100%)}
+.top{position:absolute;z-index:4;top:5.1%;left:6.1%;right:6.1%;display:flex;justify-content:space-between;align-items:flex-start}.identity{text-shadow:0 2px 7px rgba(0,0,0,.55)}
+.brand{font-size:clamp(31px,5.9vw,43px);line-height:.95;font-weight:800;letter-spacing:-2.4px}.course{margin-top:23px;font-size:clamp(13px,2.15vw,16px);font-weight:500}.hole{margin-top:4px;font-size:clamp(25px,4.45vw,32px);font-weight:500;letter-spacing:-.7px}
+.actions{display:flex;flex-direction:column;gap:13px}.actions button{width:clamp(55px,9.6vw,67px);height:clamp(55px,9.6vw,67px);border:1px solid rgba(255,255,255,.55);border-radius:17px;background:rgba(8,54,38,.42);color:#fff;display:grid;place-items:center;box-shadow:0 3px 12px rgba(0,0,0,.2);backdrop-filter:blur(3px);padding:16px}.actions svg{width:100%;height:100%;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.home{position:absolute;z-index:4;left:5.8%;right:5.8%;bottom:4%;display:flex;flex-direction:column;align-items:center;text-align:center;text-shadow:0 2px 8px rgba(0,0,0,.6)}
+.logo{font-size:clamp(65px,10.5vw,78px);font-weight:800;letter-spacing:-6px;line-height:.84}.tag{margin-top:10px;font-size:clamp(10px,1.95vw,14px);font-weight:500;letter-spacing:clamp(4.8px,1vw,6.5px)}.line{width:44px;height:2px;background:#38b96b;margin:14px 0 17px}.copy{font-size:clamp(16px,2.65vw,19px);font-weight:400;line-height:1.18;margin-bottom:27px;max-width:250px}
+.new{width:100%;height:62px;border:2px solid #45c878;border-radius:16px;background:rgba(5,57,39,.56);color:#fff;font-size:clamp(18px,2.8vw,21px);font-weight:600;display:grid;grid-template-columns:45px 1fr 45px;align-items:center;padding:0 14px;box-shadow:0 4px 15px rgba(0,0,0,.22);backdrop-filter:blur(4px)}.new .play{font-size:22px;text-align:center}.new .chev{font-size:31px;font-weight:300;line-height:0;text-align:center}
+.nav{width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:15px;text-shadow:none}.nav button{height:68px;border:1px solid rgba(255,255,255,.42);border-radius:16px;background:rgba(7,51,36,.58);color:#fff;font-size:clamp(11px,1.85vw,13px);font-weight:500;box-shadow:0 3px 12px rgba(0,0,0,.2);backdrop-filter:blur(4px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px}.nav svg{width:25px;height:25px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.flag{position:absolute;z-index:2;left:53.5%;top:18.5%;width:42px;height:105px;pointer-events:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))}.flag:before{content:"";position:absolute;left:19px;top:8px;width:3px;height:88px;background:#fff;border-radius:2px}.flag:after{content:"";position:absolute;left:21px;top:8px;border-top:13px solid transparent;border-bottom:13px solid transparent;border-right:28px solid #fff}
+@media(max-height:760px){.top{top:3%}.course{margin-top:14px}.home{bottom:2%}.copy{margin-bottom:15px}.nav button{height:55px}.flag{top:17%}}
+</style></head>
+<body><div class="app"><div id="map"></div><div class="shade"></div><div class="flag"></div>
+<div class="top"><div class="identity"><div class="brand">UiDo</div><div class="course">OVERSTONE PARK</div><div class="hole">Hole 1 · Par 4</div></div><div class="actions">
+<button aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.7 1.7-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.04 1.56V20h-2.4v-.2a1.7 1.7 0 0 0-1.04-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-1.7-1.7.06-.06A1.7 1.7 0 0 0 8.44 15a1.7 1.7 0 0 0-1.56-1.04H6v-2.4h.2A1.7 1.7 0 0 0 7.76 10a1.7 1.7 0 0 0-.34-1.88l-.06-.06 1.7-1.7.06.06A1.7 1.7 0 0 0 11 6.76 1.7 1.7 0 0 0 12.04 5.2V5h2.4v.2A1.7 1.7 0 0 0 15.48 6.76a1.7 1.7 0 0 0 1.88-.34l.06-.06 1.7 1.7-.06.06A1.7 1.7 0 0 0 18.72 10a1.7 1.7 0 0 0 1.56 1.04h.2v2.4h-.2A1.7 1.7 0 0 0 19.4 15Z"/></svg></button>
+<button aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button></div></div>
+<main class="home"><div class="logo">UiDo</div><div class="tag">PLAY SMARTER</div><div class="line"></div><div class="copy">Better decisions.<br>Lower scores.</div><button class="new" onclick="location.href='?round=new'"><span class="play">▶</span><span>New Round</span><span class="chev">›</span></button><div class="nav">
+<button><svg viewBox="0 0 24 24"><path d="M4 19V13M10 19V9M16 19V5M22 19H2"/></svg><span>Past Rounds</span></button>
+<button><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M4 20c.7-3.2 3.4-5 8-5s7.3 1.8 8 5"/></svg><span>Courses</span></button>
+<button><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 15l1.5 1.5-2 2L17 17m-2 2h-2v2h-3v-2H8m1-4-1.5 1.5-2-2L7 13m-1-2V9h-2V6h2V4h3m4 1h2v-2h3v2h2v3h-2"/></svg><span>Settings</span></button></div></main></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script>const C=[52.27776,-0.81505];const map=L.map('map',{zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,boxZoom:false,touchZoom:false,keyboard:false}).setView(C,17);L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:20}).addTo(map);</script>
+</body></html>
