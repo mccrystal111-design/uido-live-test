@@ -1,2 +1,1 @@
-This commit intentionally triggers the Pages deployment for the exact approved Home website preview.
-Deployment retry: publish the current root index.html.
+Approved Home website preview deployed from the master image.
