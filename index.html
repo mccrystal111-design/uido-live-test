@@ -3,14 +3,37 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>UiDo Home Preview</title>
+<title>UiDo</title>
 <style>
+@font-face{font-family:'Space Grotesk';src:url('assets/fonts/SpaceGrotesk-Regular.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'Space Grotesk';src:url('assets/fonts/SpaceGrotesk-Medium.woff2') format('woff2');font-weight:500;font-display:swap}
+@font-face{font-family:'Space Grotesk';src:url('assets/fonts/SpaceGrotesk-SemiBold.woff2') format('woff2');font-weight:600;font-display:swap}
+:root{--yellow:#ffd600;--ink:#121212}
+*{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;background:#183b27;overflow:hidden}
-body{display:grid;place-items:center}
-.home{width:100vw;height:100dvh;display:block;object-fit:cover}
+body{font-family:'Space Grotesk',sans-serif}
+.home{position:relative;width:100vw;height:100dvh;min-height:100svh;overflow:hidden;background:#183b27}
+.home-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 20px calc(8vh + env(safe-area-inset-bottom));pointer-events:none}
+.logo{width:min(240px,62vw);height:auto;display:block;opacity:0;animation:fadeIn .8s ease-out .1s forwards}
+.tagline{margin-top:22px;color:#fff;text-align:center;font-size:14px;line-height:1.25;font-weight:500;letter-spacing:.02em;opacity:0;animation:fadeIn .5s ease-out 1.3s forwards;text-shadow:0 1px 8px rgba(0,0,0,.28)}
+.start-wrap{margin-top:34px;opacity:0;animation:fadeIn .5s ease-out 2.3s forwards;pointer-events:auto}
+.start{position:relative;width:min(320px,calc(100vw - 40px));height:56px;border:0;border-radius:28px;background:var(--yellow);color:var(--ink);font:600 16px/1 'Space Grotesk',sans-serif;letter-spacing:.02em;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.22);-webkit-tap-highlight-color:transparent}
+.start::after{content:'';position:absolute;inset:-5px;border:2px solid rgba(255,214,0,.55);border-radius:33px;opacity:0;animation:uidoPulse 2.4s ease-in-out 2.8s infinite}
+.start:active{transform:translateY(1px)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes uidoPulse{0%,100%{opacity:0;transform:scale(.98)}50%{opacity:.25;transform:scale(1.02)}}
+@media(prefers-reduced-motion:reduce){.logo,.tagline,.start-wrap{animation:none;opacity:1}.start::after{animation:none;opacity:0}}
 </style>
 </head>
 <body>
-<img class="home" src="assets/home-exact.png" alt="UiDo Home background">
+<main class="home" aria-label="UiDo Home">
+<img class="home-bg" src="assets/home-exact.png" alt="">
+<div class="content">
+<img class="logo" src="assets/uido-logo-primary-transparent.png" alt="UiDo">
+<div class="tagline">Your data, better decisions</div>
+<div class="start-wrap"><button class="start" type="button">START</button></div>
+</div>
+</main>
 </body>
 </html>
