@@ -114,4 +114,4 @@ jobs:
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
 
-# Build directly from the latest approved Home target.
+# Final green build from the approved reference.
