@@ -1,0 +1,1 @@
+Apply font-family: 'Space Grotesk', sans-serif; to UiDo interface text. Recommended weights: 400 body, 500 controls, 600 headings, 700 display emphasis.
