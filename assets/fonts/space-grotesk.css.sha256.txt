@@ -1,0 +1,1 @@
+Space Grotesk asset is maintained in assets/fonts/space-grotesk.css.
