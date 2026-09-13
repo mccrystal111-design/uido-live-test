@@ -33,6 +33,7 @@ jobs:
           cp index.html _site/index.html
           cp home-preview.html _site/home-preview.html
           if [ -f scorecard.js ]; then cp scorecard.js _site/scorecard.js; fi
+          if [ -d assets ]; then cp -R assets _site/assets; fi
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
