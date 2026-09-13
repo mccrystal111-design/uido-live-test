@@ -1,0 +1,2 @@
+Space Grotesk is the locked UiDo UI font.
+Weights: 300 / 400 / 500 / 600 / 700.
