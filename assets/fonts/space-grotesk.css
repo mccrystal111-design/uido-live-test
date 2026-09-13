@@ -1,0 +1,13 @@
+/* UiDo UI font — Space Grotesk
+   Source: Google Fonts / Space Grotesk project
+   License: SIL Open Font License 1.1
+*/
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --uido-font: 'Space Grotesk', sans-serif;
+}
+
+body, button, input, textarea, select {
+  font-family: var(--uido-font);
+}
