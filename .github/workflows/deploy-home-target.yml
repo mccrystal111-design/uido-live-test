@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   deploy:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, 'Deploy verified Home target')
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, 'Deploy website root from approved Home index')
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -23,8 +23,8 @@ jobs:
       - name: Prepare verified Home
         run: |
           mkdir -p _site
-          cp home-target.html _site/index.html
-          cp home-target.html _site/home-target.html
+          cp index.html _site/index.html
+          cp index.html _site/home-exact.html
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
