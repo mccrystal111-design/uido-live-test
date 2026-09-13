@@ -1,1 +1,1 @@
-Approved Home website preview deployed from the master image.
+Approved Home master preview deployed from the exact reference image.
