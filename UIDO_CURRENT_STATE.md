@@ -72,5 +72,8 @@ Replace the current `index.html` with the faithful agreed round flow while retai
 - Do not change the Start Line / Shape / Strike order.
 - Do not use the old v0.9 UI as the baseline.
 
+## Home reference
+The latest user-approved reference is the final uploaded Home/Hole composition: satellite background, small UiDo course header and Hole 1 · Par 4 at top-left, two square controls at top-right, large lower UiDo identity, PLAY SMARTER, Better decisions. Lower scores., New Round, and three lower navigation buttons. Treat that final uploaded image as the visual target.
+
 ## Continuity rule
 Before making code changes in a new chat, read this file and the canonical agreed-flow document, then inspect the current GitHub source. Continue from that state; do not rebuild the product from remembered context.
