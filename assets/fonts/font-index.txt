@@ -1,0 +1,1 @@
+Space Grotesk font files are referenced by space-grotesk-font.css.
