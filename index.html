@@ -1,229 +1,25 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>UiDo</title>
-<style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>UiDo</title><style>
 @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600&display=swap');
-@font-face{font-family:'Space Grotesk';src:url('assets/fonts/SpaceGrotesk-Regular.woff2') format('woff2');font-weight:400;font-display:swap}
-@font-face{font-family:'Space Grotesk';src:url('assets/fonts/SpaceGrotesk-Medium.woff2') format('woff2');font-weight:500;font-display:swap}
-@font-face{font-family:'Space Grotesk';src:url('assets/fonts/SpaceGrotesk-SemiBold.woff2') format('woff2');font-weight:600;font-display:swap}
-:root{--yellow:#ffd600;--glass:rgba(18,28,24,.56);--glass-strong:rgba(18,28,24,.70)}
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;background:#183b27;overflow:hidden}
-body{font-family:'Space Grotesk',sans-serif}
-.app{position:relative;width:100vw;height:100dvh;min-height:100svh;overflow:hidden;background:#183b27}
-.home-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.screen{position:absolute;inset:0;visibility:hidden;opacity:0;pointer-events:none;transition:opacity .45s ease,visibility 0s linear .45s}
-.screen.active{visibility:visible;opacity:1;pointer-events:auto;transition:opacity .45s ease}
-.content{position:absolute;inset:0}
-.brand-stack{position:absolute;left:20px;right:20px;top:calc(50% - 28vh);display:flex;flex-direction:column;align-items:center}
-.logo-text{display:flex;align-items:center;justify-content:center;color:#fff;font:600 92px/0.9 'Oxanium',sans-serif;letter-spacing:.015em;white-space:nowrap;text-align:center;text-shadow:0 1px 8px rgba(0,0,0,.24)}
-.aim-icon{display:block;width:auto;height:64px;margin:0 1px;transform:translateY(-5px);flex:0 0 auto;object-fit:contain}
-.tagline{margin-top:18px;color:#fff;font:500 27px/1.05 'Oxanium',sans-serif;letter-spacing:.01em;text-align:center;text-shadow:0 1px 8px rgba(0,0,0,.28)}
-.start-wrap{position:absolute;left:20px;right:20px;bottom:calc(8vh + env(safe-area-inset-bottom));display:flex;justify-content:center}
-.start,.hub-button,.primary-button{position:relative;width:min(320px,100%);height:64px;border:1px solid rgba(255,255,255,.62);border-radius:32px;background:linear-gradient(180deg,rgba(255,255,255,.48),rgba(255,255,255,.18));color:#fff;font:500 31px/1 'Oxanium',sans-serif;letter-spacing:.02em;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 0 rgba(255,255,255,.22),0 10px 30px rgba(0,0,0,.16);backdrop-filter:blur(14px) saturate(135%);-webkit-backdrop-filter:blur(14px) saturate(135%);-webkit-tap-highlight-color:transparent}
-.start::before,.hub-button::before,.primary-button::before{content:'';position:absolute;inset:1px;border-radius:31px;background:linear-gradient(110deg,rgba(255,255,255,.42),transparent 35%,transparent 65%,rgba(255,255,255,.18));pointer-events:none}
-.start::after,.hub-start::after,.primary-button::after{content:'';position:absolute;inset:-7px;border:1.5px solid rgba(255,214,0,.42);border-radius:39px;opacity:.55;box-shadow:0 0 18px rgba(255,214,0,.18),0 0 34px rgba(255,214,0,.10);animation:uidoPulse 2.4s ease-in-out infinite;pointer-events:none}
-.start:active,.hub-button:active,.primary-button:active{background:linear-gradient(180deg,rgba(255,255,255,.36),rgba(255,255,255,.12))}
-@keyframes uidoPulse{0%,100%{opacity:.55;box-shadow:0 0 18px rgba(255,214,0,.18),0 0 34px rgba(255,214,0,.10)}50%{opacity:.70;box-shadow:0 0 24px rgba(255,214,0,.25),0 0 46px rgba(255,214,0,.16)}}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-#welcome.active .logo-text{opacity:0;animation:fadeIn .8s ease-out .1s forwards}
-#welcome.active .tagline{opacity:0;animation:fadeIn .5s ease-out 1.3s forwards}
-#welcome.active .start-wrap{opacity:0;animation:fadeIn .5s ease-out 2.3s forwards}
-
-/* Shared dark glass layer for navigation/configuration screens */
-.screen-glass{position:absolute;inset:0;background:var(--glass);backdrop-filter:blur(3px) saturate(112%);-webkit-backdrop-filter:blur(3px) saturate(112%);opacity:0;transition:opacity .45s ease;pointer-events:none}
-.screen.active .screen-glass{opacity:1}
-
-/* HUB */
-.hub-brand{position:absolute;top:28px;left:20px;right:20px;display:flex;flex-direction:column;align-items:center;color:#fff;z-index:2}
-.hub-logo{display:flex;align-items:center;justify-content:center;font:600 50px/0.9 'Oxanium',sans-serif;letter-spacing:.015em;white-space:nowrap;text-shadow:0 1px 8px rgba(0,0,0,.3);opacity:0}
-.hub-logo .aim-icon{height:35px;margin:0;transform:translateY(-3px)}
-.hub-tagline{margin-top:5px;color:#fff;font:500 15px/1.05 'Oxanium',sans-serif;letter-spacing:.01em;text-align:center;text-shadow:0 1px 7px rgba(0,0,0,.28);opacity:0}
-.settings{position:absolute;top:28px;right:20px;width:48px;height:48px;border:0;background:transparent;color:var(--yellow);font-size:28px;line-height:1;display:grid;place-items:center;cursor:pointer;opacity:0;z-index:3}
-.hub-actions{position:absolute;left:20px;right:20px;top:50%;transform:translateY(-42%);display:flex;flex-direction:column;align-items:center;gap:18px;opacity:0;z-index:2}
-.hub-button{height:60px;font-size:27px;width:min(320px,100%)}
-.hub-button.secondary{height:56px;font-size:25px;background:linear-gradient(180deg,rgba(255,255,255,.35),rgba(255,255,255,.13))}
-.hub-button.stats{height:52px;font-size:23px;background:linear-gradient(180deg,rgba(255,255,255,.29),rgba(255,255,255,.10))}
-.hub-button span,.primary-button span{position:relative;z-index:1}
-.hub-button::before,.primary-button::before{z-index:0}
-.hub-button,.primary-button{z-index:1}
-#hub.active .hub-logo{animation:fadeIn .6s ease-out .05s forwards}
-#hub.active .hub-tagline{animation:fadeIn .5s ease-out .3s forwards}
-#hub.active .settings{animation:fadeIn .45s ease-out .55s forwards}
-#hub.active .hub-actions{animation:hubActionsIn .7s cubic-bezier(.22,.8,.3,1) .35s forwards}
-@keyframes hubActionsIn{from{opacity:0;transform:translateY(-35%)}to{opacity:1;transform:translateY(-42%)}}
-
-/* ROUND SETUP */
-#round{overflow:hidden}
-.round-shell{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;padding:24px 20px calc(18px + env(safe-area-inset-bottom));color:#fff}
-.round-header{display:flex;align-items:center;justify-content:center;position:relative;flex:0 0 auto}
-.round-logo{display:flex;align-items:center;font:600 38px/0.9 'Oxanium',sans-serif;letter-spacing:.015em;white-space:nowrap;text-shadow:0 1px 8px rgba(0,0,0,.35)}
-.round-logo .aim-icon{height:27px;margin:0;transform:translateY(-2px)}
-.round-tagline{margin-top:4px;text-align:center;font:500 13px/1 'Oxanium',sans-serif;text-shadow:0 1px 7px rgba(0,0,0,.3)}
-.round-back{position:absolute;left:0;top:0;width:44px;height:44px;border:0;border-radius:22px;background:rgba(255,255,255,.12);color:#fff;font:400 26px/1 'Space Grotesk',sans-serif;cursor:pointer;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-.round-scroll{width:100%;max-width:520px;margin:20px auto 0;overflow-y:auto;padding:0 0 96px;scrollbar-width:none}
-.round-scroll::-webkit-scrollbar{display:none}
-.section-label{margin:0 0 9px 3px;color:rgba(255,255,255,.70);font:600 12px/1 'Space Grotesk',sans-serif;letter-spacing:.12em;text-transform:uppercase}
-.course-card{padding:16px 17px;border:1px solid rgba(255,255,255,.20);border-radius:20px;background:rgba(12,20,17,.50);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 12px 28px rgba(0,0,0,.14);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
-.course-name{font:600 21px/1.15 'Space Grotesk',sans-serif}
-.course-status{margin-top:5px;color:rgba(255,255,255,.68);font:400 12px/1.2 'Space Grotesk',sans-serif}
-.round-section{margin-top:18px}
-.choice-row{display:flex;gap:10px}
-.choice{flex:1;min-width:0;min-height:50px;border:1px solid rgba(255,255,255,.24);border-radius:15px;background:rgba(255,255,255,.10);color:#fff;font:600 14px/1 'Space Grotesk',sans-serif;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.10);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:.2s ease}
-.choice.selected{border-color:rgba(255,214,0,.85);background:rgba(255,214,0,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 0 16px rgba(255,214,0,.08)}
-.tee-list{display:flex;flex-direction:column;gap:9px}
-.tee-button{width:100%;min-height:64px;padding:10px 15px;border:1px solid rgba(255,255,255,.24);border-radius:17px;color:#fff;display:flex;align-items:center;justify-content:space-between;text-align:left;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 7px 20px rgba(0,0,0,.10);backdrop-filter:blur(13px);-webkit-backdrop-filter:blur(13px);transition:.2s ease}
-.tee-button[data-colour="white"]{background:linear-gradient(100deg,rgba(255,255,255,.23),rgba(255,255,255,.09))}
-.tee-button[data-colour="yellow"]{background:linear-gradient(100deg,rgba(255,214,0,.20),rgba(255,255,255,.08))}
-.tee-button[data-colour="red"]{background:linear-gradient(100deg,rgba(225,62,62,.22),rgba(255,255,255,.08))}
-.tee-button.selected{border-color:rgba(255,214,0,.92);box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 0 18px rgba(255,214,0,.10)}
-.tee-main{display:flex;flex-direction:column;gap:4px;min-width:0}
-.tee-name{font:600 16px/1 'Space Grotesk',sans-serif}
-.tee-meta{font:400 11px/1.1 'Space Grotesk',sans-serif;color:rgba(255,255,255,.72);white-space:nowrap}
-.tee-check{width:20px;height:20px;border-radius:50%;border:1px solid rgba(255,255,255,.35);display:grid;place-items:center;flex:0 0 auto;margin-left:12px;color:transparent;font-size:12px}
-.tee-button.selected .tee-check{background:var(--yellow);border-color:var(--yellow);color:#142016}
-.leaderboard-row{display:flex;gap:10px}
-.leader-button{flex:1;min-height:58px;border:1px solid rgba(255,255,255,.24);border-radius:16px;background:rgba(255,255,255,.10);color:#fff;padding:9px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;cursor:pointer;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-.leader-button.active{border-color:rgba(255,214,0,.75);background:rgba(255,214,0,.14)}
-.leader-title{font:600 13px/1.15 'Space Grotesk',sans-serif}
-.leader-sub{display:block;margin-top:3px;color:rgba(255,255,255,.58);font:400 10px/1.1 'Space Grotesk',sans-serif}
-.qr-icon{width:25px;height:25px;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:1.7}
-.round-footer{position:absolute;left:20px;right:20px;bottom:calc(18px + env(safe-area-inset-bottom));display:flex;justify-content:center;z-index:4}
-.primary-button{height:60px;font-size:27px}
-
-/* simple QR action feedback */
-.qr-notice{position:absolute;left:20px;right:20px;bottom:calc(90px + env(safe-area-inset-bottom));z-index:5;display:none;padding:13px 16px;border:1px solid rgba(255,255,255,.20);border-radius:16px;background:rgba(10,17,14,.78);color:#fff;text-align:center;font:500 13px/1.25 'Space Grotesk',sans-serif;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
-.qr-notice.show{display:block}
-
-@media(max-height:700px){.round-scroll{margin-top:12px}.round-section{margin-top:13px}.tee-button{min-height:58px}.course-card{padding:12px 15px}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.screen.active{opacity:1}.logo-text,.tagline,.start-wrap,.hub-logo,.hub-tagline,.settings,.hub-actions{opacity:1!important}}
-</style>
-</head>
-<body>
-<main class="app" aria-label="UiDo">
-<img class="home-bg" src="assets/home-exact.jpg" alt="">
-
-<div id="welcome" class="screen active">
-<div class="content">
-<div class="brand-stack">
-<div class="logo-text" aria-label="UiDo"><span>U</span><img class="aim-icon" src="assets/smartaim-i-tight.png" alt=""><span>Do</span></div>
-<div class="tagline">Every Shot Counts</div>
-</div>
-<div class="start-wrap"><button id="enterButton" class="start" type="button">Enter</button></div>
-</div>
-</div>
-
-<div id="hub" class="screen">
-<div class="screen-glass"></div>
-<div class="hub-brand">
-<div class="hub-logo" aria-label="UiDo"><span>U</span><img class="aim-icon" src="assets/smartaim-i-tight.png" alt=""><span>Do</span></div>
-<div class="hub-tagline">Every Shot Counts</div>
-</div>
-<button class="settings" type="button" aria-label="Settings">⚙</button>
-<div class="hub-actions">
-<button id="startRoundButton" class="hub-button hub-start" type="button"><span>Start Round</span></button>
-<button class="hub-button secondary" type="button"><span>Profile</span></button>
-<button class="hub-button secondary" type="button"><span>Scorecards</span></button>
-<button class="hub-button stats" type="button"><span>Stats</span></button>
-</div>
-</div>
-
-<div id="round" class="screen">
-<div class="screen-glass"></div>
-<div class="round-shell">
-<div class="round-header">
-<button id="roundBack" class="round-back" type="button" aria-label="Back">‹</button>
-<div>
-<div class="round-logo" aria-label="UiDo"><span>U</span><img class="aim-icon" src="assets/smartaim-i-tight.png" alt=""><span>Do</span></div>
-<div class="round-tagline">Every Shot Counts</div>
-</div>
-</div>
-
-<div class="round-scroll">
-<section>
-<div class="section-label">Nearest Course</div>
-<div class="course-card">
-<div class="course-name">Overstone Park Golf Club</div>
-<div class="course-status">Location found · 18 holes · Par 72</div>
-</div>
-</section>
-
-<section class="round-section">
-<div class="section-label">Scoring Format</div>
-<div class="choice-row" id="formatChoices">
-<button class="choice selected" data-value="Stroke Play" type="button">Stroke Play</button>
-<button class="choice" data-value="Stableford" type="button">Stableford</button>
-</div>
-</section>
-
-<section class="round-section">
-<div class="section-label">Tees</div>
-<div class="tee-list" id="teeList"></div>
-</section>
-
-<section class="round-section">
-<div class="section-label">Live Leaderboard</div>
-<div class="leaderboard-row">
-<button id="joinLeaderboard" class="leader-button" type="button">
-<span><span class="leader-title">Join Live Leaderboard</span><span class="leader-sub">Scan a QR code</span></span>
-<svg class="qr-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h3v3h-3zM18 18h3v3h-3zM17 14h1M14 18h1M18 14h3M14 21h1"/></svg>
-</button>
-<button id="createLeaderboard" class="leader-button" type="button">
-<span><span class="leader-title">Create Live Leaderboard</span><span class="leader-sub">Invite players</span></span>
-<svg class="qr-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7zM17.5 14v3.5M14 17.5h3.5"/></svg>
-</button>
-</div>
-</section>
-</div>
-</div>
-<div id="qrNotice" class="qr-notice"></div>
-<div class="round-footer"><button id="beginRound" class="primary-button" type="button"><span>Start Round</span></button></div>
-</div>
-</main>
-<script>
-const welcome=document.getElementById('welcome');
-const hub=document.getElementById('hub');
-const round=document.getElementById('round');
-const enter=document.getElementById('enterButton');
-const startRound=document.getElementById('startRoundButton');
-const roundBack=document.getElementById('roundBack');
-const teeList=document.getElementById('teeList');
-const beginRound=document.getElementById('beginRound');
-const qrNotice=document.getElementById('qrNotice');
-
-/* Prototype course data. Structure is deliberately open-ended so future courses can return any number of tees. */
-const tees=[
-{name:'White',colour:'white',yards:'6,461 yd',rating:'71.5',slope:'125'},
-{name:'Yellow',colour:'yellow',yards:'6,102 yd',rating:'69.6',slope:'122'},
-{name:'Red',colour:'red',yards:'5,618 yd',rating:'72.9',slope:'125'}
-];
-
-function renderTees(){
-teeList.innerHTML='';
-tees.forEach((tee,index)=>{
-const button=document.createElement('button');
-button.type='button';
-button.className='tee-button'+(index===1?' selected':'');
-button.dataset.colour=tee.colour;
-button.innerHTML='<span class="tee-main"><span class="tee-name">'+tee.name+'</span><span class="tee-meta">'+tee.yards+'  ·  Rating '+tee.rating+'  ·  Slope '+tee.slope+'</span></span><span class="tee-check">✓</span>';
-button.addEventListener('click',()=>{document.querySelectorAll('.tee-button').forEach(b=>b.classList.remove('selected'));button.classList.add('selected')});
-teeList.appendChild(button);
-});
-}
-renderTees();
-
-enter.addEventListener('click',()=>{welcome.classList.remove('active');hub.classList.add('active')});
-startRound.addEventListener('click',()=>{hub.classList.remove('active');round.classList.add('active')});
-roundBack.addEventListener('click',()=>{round.classList.remove('active');hub.classList.add('active');qrNotice.classList.remove('show')});
-
-document.querySelectorAll('#formatChoices .choice').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('#formatChoices .choice').forEach(b=>b.classList.remove('selected'));button.classList.add('selected')}));
-
-document.getElementById('joinLeaderboard').addEventListener('click',()=>{qrNotice.textContent='QR scanner ready — scan the organiser’s leaderboard code.';qrNotice.classList.add('show')});
-document.getElementById('createLeaderboard').addEventListener('click',()=>{qrNotice.textContent='Leaderboard created — QR sharing will appear here.';qrNotice.classList.add('show')});
-beginRound.addEventListener('click',()=>{beginRound.querySelector('span').textContent='Starting…';beginRound.classList.add('loading');setTimeout(()=>{beginRound.querySelector('span').textContent='Start Round';beginRound.classList.remove('loading')},1200)});
-</script>
-</body>
-</html>
+@font-face{font-family:'Space Grotesk';src:url('assets/fonts/SpaceGrotesk-Regular.woff2') format('woff2');font-weight:400}@font-face{font-family:'Space Grotesk';src:url('assets/fonts/SpaceGrotesk-Medium.woff2') format('woff2');font-weight:500}@font-face{font-family:'Space Grotesk';src:url('assets/fonts/SpaceGrotesk-SemiBold.woff2') format('woff2');font-weight:600}
+:root{--yellow:#ffd600}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#183b27}body{font-family:'Space Grotesk',sans-serif}.app{position:relative;width:100vw;height:100dvh;overflow:hidden}.home-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.screen{position:absolute;inset:0;visibility:hidden;opacity:0;pointer-events:none;transition:opacity .45s ease}.screen.active{visibility:visible;opacity:1;pointer-events:auto}.screen-glass{position:absolute;inset:0;background:rgba(18,28,24,.56);backdrop-filter:blur(3px) saturate(112%);-webkit-backdrop-filter:blur(3px) saturate(112%)}
+.brand-stack{position:absolute;left:20px;right:20px;top:22%;display:flex;flex-direction:column;align-items:center}.logo-text{display:flex;align-items:center;color:#fff;font:600 92px/0.9 Oxanium,sans-serif;letter-spacing:.015em;text-shadow:0 1px 8px rgba(0,0,0,.24)}.aim-icon{height:64px;width:auto;margin:0 1px;transform:translateY(-5px)}.tagline{margin-top:18px;color:#fff;font:500 27px/1 Oxanium,sans-serif}.start-wrap{position:absolute;left:20px;right:20px;bottom:8vh;display:flex;justify-content:center}.start,.hub-button,.primary-button{position:relative;width:min(320px,100%);height:64px;border:1px solid rgba(255,255,255,.62);border-radius:32px;background:linear-gradient(180deg,rgba(255,255,255,.48),rgba(255,255,255,.18));color:#fff;font:500 31px/1 Oxanium,sans-serif;cursor:pointer;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:inset 0 1px rgba(255,255,255,.9),0 10px 30px rgba(0,0,0,.16)}.start:after,.hub-start:after,.primary-button:after{content:'';position:absolute;inset:-7px;border:1.5px solid rgba(255,214,0,.42);border-radius:39px;animation:pulse 2.4s ease-in-out infinite}@keyframes pulse{50%{opacity:.7;box-shadow:0 0 24px rgba(255,214,0,.25)}}
+.hub-brand{position:absolute;top:28px;left:20px;right:20px;display:flex;flex-direction:column;align-items:center;color:#fff;z-index:2}.hub-logo{display:flex;align-items:center;font:600 50px/1 Oxanium,sans-serif}.hub-logo .aim-icon{height:35px;transform:translateY(-3px)}.hub-tagline{margin-top:5px;font:500 15px/1 Oxanium,sans-serif}.settings{position:absolute;top:28px;right:20px;width:48px;height:48px;border:0;background:none;color:var(--yellow);font-size:28px;z-index:3}.hub-actions{position:absolute;left:20px;right:20px;top:50%;transform:translateY(-42%);display:flex;flex-direction:column;align-items:center;gap:18px;z-index:2}.hub-button{height:60px;font-size:27px}.hub-button.secondary{height:56px;font-size:25px;background:linear-gradient(180deg,rgba(255,255,255,.35),rgba(255,255,255,.13))}.hub-button.stats{height:52px;font-size:23px;background:linear-gradient(180deg,rgba(255,255,255,.29),rgba(255,255,255,.1))}
+.round-shell{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;padding:24px 20px 18px;color:#fff}.round-header{display:flex;justify-content:center;position:relative}.round-logo{display:flex;align-items:center;font:600 38px/1 Oxanium,sans-serif}.round-logo .aim-icon{height:27px;transform:translateY(-2px)}.round-tagline{margin-top:4px;text-align:center;font:500 13px/1 Oxanium,sans-serif}.round-back{position:absolute;left:0;top:0;width:44px;height:44px;border:0;border-radius:22px;background:rgba(255,255,255,.12);color:#fff;font-size:26px}.round-scroll{width:100%;max-width:520px;margin:20px auto 0;overflow-y:auto;padding-bottom:96px}.round-section{margin-top:18px}.section-label{margin:0 0 9px 3px;color:rgba(255,255,255,.7);font:600 12px/1 Space Grotesk,sans-serif;letter-spacing:.12em;text-transform:uppercase}.course-card{padding:16px 17px;border:1px solid rgba(255,255,255,.2);border-radius:20px;background:rgba(12,20,17,.5);backdrop-filter:blur(14px)}.course-name{font:600 21px/1.15 Space Grotesk,sans-serif}.course-status{margin-top:5px;color:rgba(255,255,255,.68);font-size:12px}.choice-row{display:flex;gap:10px}.choice{flex:1;min-height:50px;border:1px solid rgba(255,255,255,.24);border-radius:15px;background:rgba(255,255,255,.1);color:#fff;font:600 14px Space Grotesk,sans-serif}.choice.selected{border-color:rgba(255,214,0,.85);background:rgba(255,214,0,.18)}.tee-list{display:flex;flex-direction:column;gap:9px}.tee-button{width:100%;min-height:64px;padding:10px 15px;border:1px solid rgba(255,255,255,.24);border-radius:17px;color:#fff;display:flex;align-items:center;justify-content:space-between;text-align:left;backdrop-filter:blur(13px)}.tee-button[data-colour=white]{background:linear-gradient(100deg,rgba(255,255,255,.23),rgba(255,255,255,.09))}.tee-button[data-colour=yellow]{background:linear-gradient(100deg,rgba(255,214,0,.2),rgba(255,255,255,.08))}.tee-button[data-colour=red]{background:linear-gradient(100deg,rgba(225,62,62,.22),rgba(255,255,255,.08))}.tee-button.selected{border-color:rgba(255,214,0,.92);box-shadow:0 0 18px rgba(255,214,0,.1)}.tee-main{display:flex;flex-direction:column;gap:4px}.tee-name{font:600 16px Space Grotesk,sans-serif}.tee-meta{font:400 11px Space Grotesk,sans-serif;color:rgba(255,255,255,.72);white-space:nowrap}.tee-check{width:20px;height:20px;border-radius:50%;border:1px solid rgba(255,255,255,.35);display:grid;place-items:center;color:transparent}.tee-button.selected .tee-check{background:var(--yellow);border-color:var(--yellow);color:#142016}.leaderboard{display:flex;width:100%;min-height:58px;border:1px solid rgba(255,255,255,.28);border-radius:17px;overflow:hidden;background:rgba(255,255,255,.1);backdrop-filter:blur(12px)}.leader-button{flex:1;border:0;background:transparent;color:#fff;padding:9px 12px;display:flex;align-items:center;justify-content:center;gap:8px;font:600 13px/1.15 Space Grotesk,sans-serif}.leader-button+ .leader-button{border-left:1px solid rgba(255,255,255,.25)}.leader-button.active{background:rgba(255,214,0,.14);box-shadow:inset 0 -2px var(--yellow)}.qr-icon{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.7}.round-footer{position:absolute;left:20px;right:20px;bottom:18px;display:flex;justify-content:center;z-index:4}.primary-button{height:60px;font-size:27px}.qr-notice{position:absolute;left:20px;right:20px;bottom:88px;z-index:5;display:none;padding:12px;border-radius:16px;background:rgba(10,17,14,.8);color:#fff;text-align:center;font-size:13px}.qr-notice.show{display:block}
+</style></head><body><main class="app"><img class="home-bg" src="assets/home-exact.jpg" alt="">
+<div id="welcome" class="screen active"><div class="brand-stack"><div class="logo-text"><span>U</span><img class="aim-icon" src="assets/smartaim-i-tight.png" alt=""><span>Do</span></div><div class="tagline">Every Shot Counts</div></div><div class="start-wrap"><button id="enterButton" class="start">Enter</button></div></div>
+<div id="hub" class="screen"><div class="screen-glass"></div><div class="hub-brand"><div class="hub-logo"><span>U</span><img class="aim-icon" src="assets/smartaim-i-tight.png" alt=""><span>Do</span></div><div class="hub-tagline">Every Shot Counts</div></div><button class="settings">⚙</button><div class="hub-actions"><button id="startRoundButton" class="hub-button hub-start">Start Round</button><button class="hub-button secondary">Profile</button><button class="hub-button secondary">Scorecards</button><button class="hub-button stats">Stats</button></div></div>
+<div id="round" class="screen"><div class="screen-glass"></div><div class="round-shell"><div class="round-header"><button id="roundBack" class="round-back">‹</button><div><div class="round-logo"><span>U</span><img class="aim-icon" src="assets/smartaim-i-tight.png" alt=""><span>Do</span></div><div class="round-tagline">Every Shot Counts</div></div></div><div class="round-scroll">
+<div><div class="section-label">Nearest Course</div><div class="course-card"><div class="course-name">Overstone Park Golf Club</div><div class="course-status">Location found · 18 holes · Par 72</div></div></div>
+<section class="round-section"><div class="section-label">Scoring Format</div><div class="choice-row" id="formatChoices"><button class="choice selected">Stroke Play</button><button class="choice">Stableford</button></div></section>
+<section class="round-section"><div class="section-label">Tees</div><div class="tee-list" id="teeList"></div></section>
+<section class="round-section"><div class="section-label">Live Leaderboard</div><div class="leaderboard"><button id="joinLeaderboard" class="leader-button"><span>Join Live Leaderboard</span><svg class="qr-icon" viewBox="0 0 24 24"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h3v3h-3zM18 18h3v3h-3zM17 14h1M14 18h1M18 14h3M14 21h1"/></svg></button><button id="createLeaderboard" class="leader-button"><span>Create Live Leaderboard</span><svg class="qr-icon" viewBox="0 0 24 24"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7zM17.5 14v3.5M14 17.5h3.5"/></svg></button></div></section>
+</div></div><div id="qrNotice" class="qr-notice"></div><div class="round-footer"><button id="beginRound" class="primary-button">Start Round</button></div></div>
+</main><script>
+const welcome=document.getElementById('welcome'),hub=document.getElementById('hub'),round=document.getElementById('round');
+document.getElementById('enterButton').onclick=()=>{welcome.classList.remove('active');hub.classList.add('active')};
+document.getElementById('startRoundButton').onclick=()=>{hub.classList.remove('active');round.classList.add('active')};
+document.getElementById('roundBack').onclick=()=>{round.classList.remove('active');hub.classList.add('active');document.getElementById('qrNotice').classList.remove('show')};
+const tees=[['White','white','6,461 yd','71.5','125'],['Yellow','yellow','6,102 yd','69.6','122'],['Red','red','5,618 yd','72.9','125']];const list=document.getElementById('teeList');tees.forEach((t,i)=>{const b=document.createElement('button');b.className='tee-button'+(i===1?' selected':'');b.dataset.colour=t[1];b.innerHTML=`<span class="tee-main"><span class="tee-name">${t[0]}</span><span class="tee-meta">${t[2]} · Rating ${t[3]} · Slope ${t[4]}</span></span><span class="tee-check">✓</span>`;b.onclick=()=>{document.querySelectorAll('.tee-button').forEach(x=>x.classList.remove('selected'));b.classList.add('selected')};list.appendChild(b)});
+document.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{document.querySelectorAll('.choice').forEach(x=>x.classList.remove('selected'));b.classList.add('selected')});
+const notice=document.getElementById('qrNotice');document.getElementById('joinLeaderboard').onclick=()=>{notice.textContent='QR scanner ready — scan the organiser’s leaderboard code.';notice.classList.add('show')};document.getElementById('createLeaderboard').onclick=()=>{notice.textContent='Leaderboard created — QR sharing will appear here.';notice.classList.add('show')};
+</script></body></html>
