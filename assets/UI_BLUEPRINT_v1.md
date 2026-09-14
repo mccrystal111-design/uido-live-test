@@ -1,4 +1,4 @@
-# UiDo UI Blueprint v1.0
+# UiDo UI Blueprint v1.1
 
 **Status: LOCKED**
 
@@ -11,6 +11,17 @@ This document is the source of truth for UiDo UI component dimensions and visual
 - Green highlight: #1F8B46
 - White: #F9FAF9
 - Charcoal: #121212
+
+## UiDo Header / Logo Positioning — LOCKED
+- The **Welcome screen** uses the large hero UiDo logo and has its own approved hero positioning.
+- Every screen after Welcome uses the **small UiDo header** as one reusable component.
+- The small UiDo logo is horizontally centred to the full screen, never centred relative to the content column.
+- The small UiDo logo uses one fixed top anchor across all secondary screens, respecting the device safe area.
+- The small UiDo logo uses one fixed rendered height across all secondary screens.
+- The tagline, where present, is part of the same header component and keeps a fixed relationship to the logo.
+- Logo, SmartAim mark and tagline must not be independently nudged from screen to screen.
+- Secondary screens must not introduce screen-specific logo positioning unless this blueprint is explicitly updated.
+- Any future secondary screen must reuse the same header component and positioning rules.
 
 ## Buttons
 ### Primary Button
