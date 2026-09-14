@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>UiDo</title>
 <style>
-@font-face{font-family:'UiDo Display';src:url('assets/UiDo_Display.ttf') format('truetype');font-weight:400;font-display:swap}
+@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600&display=swap');
 @font-face{font-family:'Space Grotesk';src:url('assets/fonts/SpaceGrotesk-Regular.woff2') format('woff2');font-weight:400;font-display:swap}
 @font-face{font-family:'Space Grotesk';src:url('assets/fonts/SpaceGrotesk-Medium.woff2') format('woff2');font-weight:500;font-display:swap}
 @font-face{font-family:'Space Grotesk';src:url('assets/fonts/SpaceGrotesk-SemiBold.woff2') format('woff2');font-weight:600;font-display:swap}
@@ -19,7 +19,7 @@ body{font-family:'Space Grotesk',sans-serif}
 .logo{width:min(240px,62vw);height:auto;display:block;opacity:0;animation:fadeIn .8s ease-out .1s forwards}
 .tagline{width:min(360px,82vw);height:auto;display:block;margin-top:-2px;opacity:0;animation:fadeIn .5s ease-out 1.3s forwards;filter:drop-shadow(0 1px 8px rgba(0,0,0,.28))}
 .start-wrap{margin-top:18px;opacity:0;animation:fadeIn .5s ease-out 2.3s forwards;pointer-events:auto}
-.start{position:relative;width:min(320px,calc(100vw - 40px));height:64px;border:1px solid rgba(255,255,255,.62);border-radius:32px;background:linear-gradient(180deg,rgba(255,255,255,.48),rgba(255,255,255,.18));color:#fff;font:400 27px/1 'UiDo Display',sans-serif;letter-spacing:.01em;text-transform:lowercase;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 0 rgba(255,255,255,.22),0 10px 30px rgba(0,0,0,.16);backdrop-filter:blur(14px) saturate(135%);-webkit-backdrop-filter:blur(14px) saturate(135%);-webkit-tap-highlight-color:transparent;overflow:visible}
+.start{position:relative;width:min(320px,calc(100vw - 40px));height:64px;border:1px solid rgba(255,255,255,.62);border-radius:32px;background:linear-gradient(180deg,rgba(255,255,255,.48),rgba(255,255,255,.18));color:#fff;font:500 27px/1 'Oxanium',sans-serif;letter-spacing:.02em;text-transform:lowercase;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 0 rgba(255,255,255,.22),0 10px 30px rgba(0,0,0,.16);backdrop-filter:blur(14px) saturate(135%);-webkit-backdrop-filter:blur(14px) saturate(135%);-webkit-tap-highlight-color:transparent;overflow:visible}
 .start::before{content:'';position:absolute;inset:1px;border-radius:31px;background:linear-gradient(110deg,rgba(255,255,255,.42),transparent 35%,transparent 65%,rgba(255,255,255,.18));pointer-events:none}
 .start::after{content:'';position:absolute;inset:-7px;border:1.5px solid rgba(255,214,0,.42);border-radius:39px;opacity:.55;box-shadow:0 0 18px rgba(255,214,0,.18),0 0 34px rgba(255,214,0,.10);animation:uidoPulse 2.4s ease-in-out 2.8s infinite;pointer-events:none}
 .start:active{transform:none;background:linear-gradient(180deg,rgba(255,255,255,.36),rgba(255,255,255,.12));box-shadow:inset 0 1px 0 rgba(255,255,255,.75),inset 0 -1px 0 rgba(255,255,255,.18),0 6px 20px rgba(0,0,0,.18)}
