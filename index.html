@@ -23,10 +23,10 @@ body{font-family:'Space Grotesk',sans-serif}
 .aim-icon{display:block;width:auto;height:64px;margin:0 1px;transform:translateY(-5px);flex:0 0 auto;object-fit:contain}
 .tagline{margin-top:18px;color:#fff;font:500 27px/1.05 'Oxanium',sans-serif;letter-spacing:.01em;text-align:center;text-shadow:0 1px 8px rgba(0,0,0,.28)}
 .start-wrap{position:absolute;left:20px;right:20px;bottom:calc(8vh + env(safe-area-inset-bottom));display:flex;justify-content:center}
-.start,.hub-button{position:relative;width:min(320px,100%);height:64px;border:1px solid rgba(255,255,255,.62);border-radius:32px;background:linear-gradient(180deg,rgba(255,255,255,.48),rgba(255,255,255,.18));color:#fff;font:500 31px/1 'Oxanium',sans-serif;letter-spacing:.02em;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 0 rgba(255,255,255,.22),0 10px 30px rgba(0,0,0,.16);backdrop-filter:blur(14px) saturate(135%);-webkit-backdrop-filter:blur(14px) saturate(135%);-webkit-tap-highlight-color:transparent}
-.start::before,.hub-button::before{content:'';position:absolute;inset:1px;border-radius:31px;background:linear-gradient(110deg,rgba(255,255,255,.42),transparent 35%,transparent 65%,rgba(255,255,255,.18));pointer-events:none}
-.start::after,.hub-start::after{content:'';position:absolute;inset:-7px;border:1.5px solid rgba(255,214,0,.42);border-radius:39px;opacity:.55;box-shadow:0 0 18px rgba(255,214,0,.18),0 0 34px rgba(255,214,0,.10);animation:uidoPulse 2.4s ease-in-out infinite;pointer-events:none}
-.start:active,.hub-button:active{background:linear-gradient(180deg,rgba(255,255,255,.36),rgba(255,255,255,.12))}
+.start,.hub-button,.course-button{position:relative;width:min(320px,100%);height:64px;border:1px solid rgba(255,255,255,.62);border-radius:32px;background:linear-gradient(180deg,rgba(255,255,255,.48),rgba(255,255,255,.18));color:#fff;font:500 31px/1 'Oxanium',sans-serif;letter-spacing:.02em;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 0 rgba(255,255,255,.22),0 10px 30px rgba(0,0,0,.16);backdrop-filter:blur(14px) saturate(135%);-webkit-backdrop-filter:blur(14px) saturate(135%);-webkit-tap-highlight-color:transparent}
+.start::before,.hub-button::before,.course-button::before{content:'';position:absolute;inset:1px;border-radius:31px;background:linear-gradient(110deg,rgba(255,255,255,.42),transparent 35%,transparent 65%,rgba(255,255,255,.18));pointer-events:none}
+.start::after,.hub-start::after,.course-button::after{content:'';position:absolute;inset:-7px;border:1.5px solid rgba(255,214,0,.42);border-radius:39px;opacity:.55;box-shadow:0 0 18px rgba(255,214,0,.18),0 0 34px rgba(255,214,0,.10);animation:uidoPulse 2.4s ease-in-out infinite;pointer-events:none}
+.start:active,.hub-button:active,.course-button:active{background:linear-gradient(180deg,rgba(255,255,255,.36),rgba(255,255,255,.12))}
 @keyframes uidoPulse{0%,100%{opacity:.55;box-shadow:0 0 18px rgba(255,214,0,.18),0 0 34px rgba(255,214,0,.10)}50%{opacity:.70;box-shadow:0 0 24px rgba(255,214,0,.25),0 0 46px rgba(255,214,0,.16)}}
 #welcome.active .logo-text{opacity:0;animation:fadeIn .8s ease-out .1s forwards}
 #welcome.active .tagline{opacity:0;animation:fadeIn .5s ease-out 1.3s forwards}
@@ -41,17 +41,31 @@ body{font-family:'Space Grotesk',sans-serif}
 .hub-button{height:60px;font-size:27px;width:min(320px,100%)}
 .hub-button.secondary{height:56px;font-size:25px;background:linear-gradient(180deg,rgba(255,255,255,.35),rgba(255,255,255,.13))}
 .hub-button.stats{height:52px;font-size:23px;background:linear-gradient(180deg,rgba(255,255,255,.29),rgba(255,255,255,.10))}
-.hub-button span{position:relative;z-index:1}
-.hub-button::before{z-index:0}
-.hub-button{z-index:1}
-.hub-start::after{z-index:-1}
+.hub-button span,.course-button span{position:relative;z-index:1}
+.hub-button::before,.course-button::before{z-index:0}
+.hub-button,.course-button{z-index:1}
+.hub-start::after,.course-button::after{z-index:-1}
 #hub.active .hub-logo{animation:fadeIn .6s ease-out .05s forwards}
 #hub.active .hub-tagline{animation:fadeIn .5s ease-out .3s forwards}
 #hub.active .settings{animation:fadeIn .45s ease-out .55s forwards}
 #hub.active .hub-actions{animation:hubActionsIn .7s cubic-bezier(.22,.8,.3,1) .35s forwards}
 @keyframes hubActionsIn{from{opacity:0;transform:translateY(-35%)}to{opacity:1;transform:translateY(-42%)}}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.screen.active{opacity:1}.logo-text,.tagline,.start-wrap,.hub-logo,.hub-tagline,.settings,.hub-actions{opacity:1!important}}
+/* GPS / local course */
+#course{transition:opacity .45s ease}
+.course-top{position:absolute;top:28px;left:20px;right:20px;display:flex;justify-content:center}
+.course-logo{display:flex;align-items:center;color:#fff;font:600 40px/0.9 'Oxanium',sans-serif;letter-spacing:.015em;white-space:nowrap;text-shadow:0 1px 8px rgba(0,0,0,.3)}
+.course-logo .aim-icon{height:28px;margin:0;transform:translateY(-2px)}
+.course-main{position:absolute;left:20px;right:20px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;text-align:center;color:#fff}
+.gps-ring{width:96px;height:96px;border-radius:50%;border:1.5px solid rgba(255,255,255,.65);background:rgba(255,255,255,.10);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:grid;place-items:center;box-shadow:0 12px 30px rgba(0,0,0,.18);position:relative}
+.gps-ring::before{content:'';width:42px;height:42px;border-radius:50%;border:2px solid rgba(255,214,0,.9);box-shadow:0 0 20px rgba(255,214,0,.25);animation:gpsPulse 2s ease-in-out infinite}
+.course-title{margin-top:28px;font:500 28px/1.1 'Oxanium',sans-serif;text-shadow:0 1px 8px rgba(0,0,0,.3)}
+.course-status{margin-top:10px;font:400 17px/1.3 'Space Grotesk',sans-serif;color:rgba(255,255,255,.86)}
+.course-button-wrap{position:absolute;left:20px;right:20px;bottom:calc(8vh + env(safe-area-inset-bottom));display:flex;justify-content:center;opacity:0}
+.course-button{font-size:26px;height:60px}
+@keyframes gpsPulse{0%,100%{transform:scale(.88);opacity:.65}50%{transform:scale(1);opacity:1}}
+#course.active .course-main{animation:fadeIn .55s ease-out .05s forwards}
+#course.active .course-button-wrap{animation:fadeIn .5s ease-out .6s forwards}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.screen.active{opacity:1}.logo-text,.tagline,.start-wrap,.hub-logo,.hub-tagline,.settings,.hub-actions,.course-main,.course-button-wrap{opacity:1!important}}
 </style>
 </head>
 <body>
@@ -73,18 +87,32 @@ body{font-family:'Space Grotesk',sans-serif}
 </div>
 <button class="settings" type="button" aria-label="Settings">⚙</button>
 <div class="hub-actions">
-<button class="hub-button hub-start" type="button"><span>Start Round</span></button>
+<button id="startRoundButton" class="hub-button hub-start" type="button"><span>Start Round</span></button>
 <button class="hub-button secondary" type="button"><span>Profile</span></button>
 <button class="hub-button secondary" type="button"><span>Scorecards</span></button>
 <button class="hub-button stats" type="button"><span>Stats</span></button>
 </div>
 </div>
+<div id="course" class="screen">
+<div class="course-top">
+<div class="course-logo" aria-label="UiDo"><span>U</span><img class="aim-icon" src="assets/smartaim-i-tight.png" alt=""><span>Do</span></div>
+</div>
+<div class="course-main">
+<div class="gps-ring" aria-hidden="true"></div>
+<div class="course-title">Finding your local course</div>
+<div class="course-status">Using your current location</div>
+</div>
+<div class="course-button-wrap"><button id="courseContinue" class="course-button" type="button"><span>Continue</span></button></div>
+</div>
 </main>
 <script>
 const welcome=document.getElementById('welcome');
 const hub=document.getElementById('hub');
+const course=document.getElementById('course');
 const enter=document.getElementById('enterButton');
+const startRound=document.getElementById('startRoundButton');
 enter.addEventListener('click',()=>{welcome.classList.remove('active');hub.classList.add('active')});
+startRound.addEventListener('click',()=>{hub.classList.remove('active');course.classList.add('active')});
 </script>
 </body>
 </html>
