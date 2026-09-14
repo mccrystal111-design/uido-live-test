@@ -17,8 +17,8 @@ body{font-family:'Space Grotesk',sans-serif}
 .home-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .content{position:absolute;inset:0;pointer-events:none}
 .brand-stack{position:absolute;left:20px;right:20px;top:calc(50% - 18vh);display:flex;flex-direction:column;align-items:center}
-.logo{width:min(240px,62vw);height:auto;display:block;opacity:0;animation:fadeIn .8s ease-out .1s forwards}
-.tagline{margin-top:10px;color:#fff;font:500 27px/1.05 'Oxanium',sans-serif;letter-spacing:.01em;text-align:center;text-shadow:0 1px 8px rgba(0,0,0,.28);opacity:0;animation:fadeIn .5s ease-out 1.3s forwards}
+.logo-text{color:#fff;font:600 92px/0.9 'Oxanium',sans-serif;letter-spacing:.015em;white-space:nowrap;text-align:center;text-shadow:0 1px 8px rgba(0,0,0,.24);opacity:0;animation:fadeIn .8s ease-out .1s forwards}
+.tagline{margin-top:18px;color:#fff;font:500 27px/1.05 'Oxanium',sans-serif;letter-spacing:.01em;text-align:center;text-shadow:0 1px 8px rgba(0,0,0,.28);opacity:0;animation:fadeIn .5s ease-out 1.3s forwards}
 .start-wrap{position:absolute;left:20px;right:20px;bottom:calc(8vh + env(safe-area-inset-bottom));display:flex;justify-content:center;opacity:0;animation:fadeIn .5s ease-out 2.3s forwards;pointer-events:auto}
 .start{position:relative;width:min(320px,100%);height:64px;border:1px solid rgba(255,255,255,.62);border-radius:32px;background:linear-gradient(180deg,rgba(255,255,255,.48),rgba(255,255,255,.18));color:#fff;font:500 31px/1 'Oxanium',sans-serif;letter-spacing:.02em;text-transform:none;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 0 rgba(255,255,255,.22),0 10px 30px rgba(0,0,0,.16);backdrop-filter:blur(14px) saturate(135%);-webkit-backdrop-filter:blur(14px) saturate(135%);-webkit-tap-highlight-color:transparent;overflow:visible}
 .start::before{content:'';position:absolute;inset:1px;border-radius:31px;background:linear-gradient(110deg,rgba(255,255,255,.42),transparent 35%,transparent 65%,rgba(255,255,255,.18));pointer-events:none}
@@ -26,7 +26,7 @@ body{font-family:'Space Grotesk',sans-serif}
 .start:active{transform:none;background:linear-gradient(180deg,rgba(255,255,255,.36),rgba(255,255,255,.12));box-shadow:inset 0 1px 0 rgba(255,255,255,.75),inset 0 -1px 0 rgba(255,255,255,.18),0 6px 20px rgba(0,0,0,.18)}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes uidoPulse{0%,100%{opacity:.55;box-shadow:0 0 18px rgba(255,214,0,.18),0 0 34px rgba(255,214,0,.10)}50%{opacity:.70;box-shadow:0 0 24px rgba(255,214,0,.25),0 0 46px rgba(255,214,0,.16)}}
-@media(prefers-reduced-motion:reduce){.logo,.tagline,.start-wrap{animation:none;opacity:1}.start::after{animation:none;opacity:.55}}
+@media(prefers-reduced-motion:reduce){.logo-text,.tagline,.start-wrap{animation:none;opacity:1}.start::after{animation:none;opacity:.55}}
 </style>
 </head>
 <body>
@@ -34,7 +34,7 @@ body{font-family:'Space Grotesk',sans-serif}
 <img class="home-bg" src="assets/home-exact.jpg" alt="">
 <div class="content">
 <div class="brand-stack">
-<img class="logo" src="assets/uido-logo-primary-transparent.png" alt="UiDo">
+<div class="logo-text" aria-label="UiDo"><span>U</span><span class="aim-slot">i</span><span>Do</span></div>
 <div class="tagline">Every Shot Counts</div>
 </div>
 <div class="start-wrap"><button class="start" type="button">Enter</button></div>
