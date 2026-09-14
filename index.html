@@ -9,37 +9,78 @@
 @font-face{font-family:'Space Grotesk';src:url('assets/fonts/SpaceGrotesk-Regular.woff2') format('woff2');font-weight:400;font-display:swap}
 @font-face{font-family:'Space Grotesk';src:url('assets/fonts/SpaceGrotesk-Medium.woff2') format('woff2');font-weight:500;font-display:swap}
 @font-face{font-family:'Space Grotesk';src:url('assets/fonts/SpaceGrotesk-SemiBold.woff2') format('woff2');font-weight:600;font-display:swap}
-:root{--yellow:#ffd600;--ink:#121212}
+:root{--yellow:#ffd600}
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;background:#183b27;overflow:hidden}
 body{font-family:'Space Grotesk',sans-serif}
-.home{position:relative;width:100vw;height:100dvh;min-height:100svh;overflow:hidden;background:#183b27}
+.app{position:relative;width:100vw;height:100dvh;min-height:100svh;overflow:hidden;background:#183b27}
 .home-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.content{position:absolute;inset:0;pointer-events:none}
+.screen{position:absolute;inset:0;visibility:hidden;opacity:0;pointer-events:none}
+.screen.active{visibility:visible;opacity:1;pointer-events:auto}
+.content{position:absolute;inset:0}
+/* Shared Welcome logo lock-up */
 .brand-stack{position:absolute;left:20px;right:20px;top:calc(50% - 28vh);display:flex;flex-direction:column;align-items:center}
-.logo-text{display:flex;align-items:center;justify-content:center;color:#fff;font:600 92px/0.9 'Oxanium',sans-serif;letter-spacing:.015em;white-space:nowrap;text-align:center;text-shadow:0 1px 8px rgba(0,0,0,.24);opacity:0;animation:fadeIn .8s ease-out .1s forwards}
+.logo-text{display:flex;align-items:center;justify-content:center;color:#fff;font:600 92px/0.9 'Oxanium',sans-serif;letter-spacing:.015em;white-space:nowrap;text-align:center;text-shadow:0 1px 8px rgba(0,0,0,.24)}
 .aim-icon{display:block;width:auto;height:64px;margin:0 1px;transform:translateY(-5px);flex:0 0 auto;object-fit:contain}
-.tagline{margin-top:18px;color:#fff;font:500 27px/1.05 'Oxanium',sans-serif;letter-spacing:.01em;text-align:center;text-shadow:0 1px 8px rgba(0,0,0,.28);opacity:0;animation:fadeIn .5s ease-out 1.3s forwards}
-.start-wrap{position:absolute;left:20px;right:20px;bottom:calc(8vh + env(safe-area-inset-bottom));display:flex;justify-content:center;opacity:0;animation:fadeIn .5s ease-out 2.3s forwards;pointer-events:auto}
-.start{position:relative;width:min(320px,100%);height:64px;border:1px solid rgba(255,255,255,.62);border-radius:32px;background:linear-gradient(180deg,rgba(255,255,255,.48),rgba(255,255,255,.18));color:#fff;font:500 31px/1 'Oxanium',sans-serif;letter-spacing:.02em;text-transform:none;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 0 rgba(255,255,255,.22),0 10px 30px rgba(0,0,0,.16);backdrop-filter:blur(14px) saturate(135%);-webkit-backdrop-filter:blur(14px) saturate(135%);-webkit-tap-highlight-color:transparent;overflow:visible}
-.start::before{content:'';position:absolute;inset:1px;border-radius:31px;background:linear-gradient(110deg,rgba(255,255,255,.42),transparent 35%,transparent 65%,rgba(255,255,255,.18));pointer-events:none}
-.start::after{content:'';position:absolute;inset:-7px;border:1.5px solid rgba(255,214,0,.42);border-radius:39px;opacity:.55;box-shadow:0 0 18px rgba(255,214,0,.18),0 0 34px rgba(255,214,0,.10);animation:uidoPulse 2.4s ease-in-out 2.8s infinite;pointer-events:none}
-.start:active{transform:none;background:linear-gradient(180deg,rgba(255,255,255,.36),rgba(255,255,255,.12));box-shadow:inset 0 1px 0 rgba(255,255,255,.75),inset 0 -1px 0 rgba(255,255,255,.18),0 6px 20px rgba(0,0,0,.18)}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.tagline{margin-top:18px;color:#fff;font:500 27px/1.05 'Oxanium',sans-serif;letter-spacing:.01em;text-align:center;text-shadow:0 1px 8px rgba(0,0,0,.28)}
+.start-wrap{position:absolute;left:20px;right:20px;bottom:calc(8vh + env(safe-area-inset-bottom));display:flex;justify-content:center}
+.start,.hub-button{position:relative;width:min(320px,100%);height:64px;border:1px solid rgba(255,255,255,.62);border-radius:32px;background:linear-gradient(180deg,rgba(255,255,255,.48),rgba(255,255,255,.18));color:#fff;font:500 31px/1 'Oxanium',sans-serif;letter-spacing:.02em;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 0 rgba(255,255,255,.22),0 10px 30px rgba(0,0,0,.16);backdrop-filter:blur(14px) saturate(135%);-webkit-backdrop-filter:blur(14px) saturate(135%);-webkit-tap-highlight-color:transparent}
+.start::before,.hub-button::before{content:'';position:absolute;inset:1px;border-radius:31px;background:linear-gradient(110deg,rgba(255,255,255,.42),transparent 35%,transparent 65%,rgba(255,255,255,.18));pointer-events:none}
+.start::after,.hub-start::after{content:'';position:absolute;inset:-7px;border:1.5px solid rgba(255,214,0,.42);border-radius:39px;opacity:.55;box-shadow:0 0 18px rgba(255,214,0,.18),0 0 34px rgba(255,214,0,.10);animation:uidoPulse 2.4s ease-in-out infinite;pointer-events:none}
+.start:active,.hub-button:active{background:linear-gradient(180deg,rgba(255,255,255,.36),rgba(255,255,255,.12))}
 @keyframes uidoPulse{0%,100%{opacity:.55;box-shadow:0 0 18px rgba(255,214,0,.18),0 0 34px rgba(255,214,0,.10)}50%{opacity:.70;box-shadow:0 0 24px rgba(255,214,0,.25),0 0 46px rgba(255,214,0,.16)}}
-@media(prefers-reduced-motion:reduce){.logo-text,.tagline,.start-wrap{animation:none;opacity:1}.start::after{animation:none;opacity:.55}}
+/* Welcome animation */
+#welcome.active .logo-text{opacity:0;animation:fadeIn .8s ease-out .1s forwards}
+#welcome.active .tagline{opacity:0;animation:fadeIn .5s ease-out 1.3s forwards}
+#welcome.active .start-wrap{opacity:0;animation:fadeIn .5s ease-out 2.3s forwards}
+/* Hub */
+#hub{transition:opacity .45s ease}
+.hub-logo{position:absolute;top:34px;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;color:#fff;font:600 50px/0.9 'Oxanium',sans-serif;letter-spacing:.015em;white-space:nowrap;text-shadow:0 1px 8px rgba(0,0,0,.3);opacity:0}
+.hub-logo .aim-icon{height:35px;margin:0 0;transform:translateY(-3px)}
+.settings{position:absolute;top:28px;right:20px;width:48px;height:48px;border:0;background:transparent;color:var(--yellow);font-size:28px;line-height:1;display:grid;place-items:center;cursor:pointer;opacity:0}
+.hub-actions{position:absolute;left:20px;right:20px;top:50%;transform:translateY(-42%);display:flex;flex-direction:column;align-items:center;gap:18px;opacity:0}
+.hub-button{height:60px;font-size:27px;width:min(320px,100%)}
+.hub-button.secondary{height:56px;font-size:25px;background:linear-gradient(180deg,rgba(255,255,255,.35),rgba(255,255,255,.13))}
+.hub-button span{position:relative;z-index:1}
+.hub-button::before{z-index:0}
+.hub-button{z-index:1}
+.hub-start::after{z-index:-1}
+#hub.active .hub-logo{animation:hubLogoIn .75s cubic-bezier(.22,.8,.3,1) .05s forwards}
+#hub.active .settings{animation:fadeIn .45s ease-out .55s forwards}
+#hub.active .hub-actions{animation:hubActionsIn .7s cubic-bezier(.22,.8,.3,1) .35s forwards}
+@keyframes hubLogoIn{from{opacity:0;top:34px;transform:translate(-50%,-18px)}to{opacity:1;top:34px;transform:translateX(-50%)}}
+@keyframes hubActionsIn{from{opacity:0;transform:translateY(-35%)}to{opacity:1;transform:translateY(-42%)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.screen.active{opacity:1}.logo-text,.tagline,.start-wrap,.hub-logo,.settings,.hub-actions{opacity:1!important}}
 </style>
 </head>
 <body>
-<main class="home" aria-label="UiDo Home">
+<main class="app" aria-label="UiDo">
 <img class="home-bg" src="assets/home-exact.jpg" alt="">
+<div id="welcome" class="screen active">
 <div class="content">
 <div class="brand-stack">
 <div class="logo-text" aria-label="UiDo"><span>U</span><img class="aim-icon" src="assets/smartaim-i-tight.png" alt=""><span>Do</span></div>
 <div class="tagline">Every Shot Counts</div>
 </div>
-<div class="start-wrap"><button class="start" type="button">Enter</button></div>
+<div class="start-wrap"><button id="enterButton" class="start" type="button">Enter</button></div>
+</div>
+</div>
+<div id="hub" class="screen">
+<div class="hub-logo" aria-label="UiDo"><span>U</span><img class="aim-icon" src="assets/smartaim-i-tight.png" alt=""><span>Do</span></div>
+<button class="settings" type="button" aria-label="Settings">⚙</button>
+<div class="hub-actions">
+<button class="hub-button hub-start" type="button"><span>Start Round</span></button>
+<button class="hub-button secondary" type="button"><span>Profile</span></button>
+<button class="hub-button secondary" type="button"><span>Scorecards</span></button>
+</div>
 </div>
 </main>
+<script>
+const welcome=document.getElementById('welcome');
+const hub=document.getElementById('hub');
+const enter=document.getElementById('enterButton');
+enter.addEventListener('click',()=>{welcome.classList.remove('active');hub.classList.add('active')});
+</script>
 </body>
 </html>
