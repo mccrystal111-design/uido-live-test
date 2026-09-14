@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>UiDo — Wind Tile</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600&display=swap');
+:root{--yellow:#ffd600;--ink:#12251f;--white:#fff}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#183b27}
+body{font-family:'Oxanium',sans-serif;color:#fff}
+.stage{position:relative;width:100vw;height:100dvh;display:grid;place-items:center;padding:22px;background:linear-gradient(rgba(18,28,24,.60),rgba(18,28,24,.60)),url('assets/home-exact.jpg') center/cover no-repeat}
+.tile{position:relative;width:min(88vw,520px);aspect-ratio:1/1;border:1px solid rgba(255,255,255,.24);border-radius:28px;background:rgba(18,31,27,.62);backdrop-filter:blur(10px) saturate(110%);-webkit-backdrop-filter:blur(10px) saturate(110%);box-shadow:0 14px 40px rgba(0,0,0,.24);overflow:hidden}
+.tile:before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(circle at 50% 45%,rgba(255,214,0,.08),transparent 46%)}
+.help{position:absolute;right:5.5%;top:5.5%;width:11%;aspect-ratio:1;border:1.5px solid rgba(255,214,0,.85);border-radius:50%;background:rgba(18,31,27,.45);color:#fff;font:500 clamp(18px,4.5vw,28px)/1 Oxanium;cursor:pointer;z-index:5;box-shadow:0 0 12px rgba(255,214,0,.12)}
+.radial{position:absolute;inset:8.5%;border-radius:50%}
+.sector{position:absolute;left:50%;top:50%;width:27%;height:43%;transform-origin:50% 100%;clip-path:polygon(18% 0,82% 0,100% 100%,0 100%);background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.14);cursor:pointer;filter:drop-shadow(0 1px 1px rgba(0,0,0,.18));transition:background .18s ease,box-shadow .18s ease,transform .18s ease}
+.sector:hover{background:rgba(255,255,255,.12)}
+.sector.selected{background:rgba(255,214,0,.22);box-shadow:0 0 22px rgba(255,214,0,.18)}
+.s1{transform:translate(-50%,-100%) rotate(0deg)}
+.s2{transform:translate(-50%,-100%) rotate(45deg)}
+.s3{transform:translate(-50%,-100%) rotate(90deg)}
+.s4{transform:translate(-50%,-100%) rotate(135deg)}
+.s5{transform:translate(-50%,-100%) rotate(180deg)}
+.s6{transform:translate(-50%,-100%) rotate(225deg)}
+.s7{transform:translate(-50%,-100%) rotate(270deg)}
+.s8{transform:translate(-50%,-100%) rotate(315deg)}
+.arrow{position:absolute;left:50%;top:18%;width:0;height:0;border-left:11px solid transparent;border-right:11px solid transparent;border-top:0;border-bottom:26px solid #fff;transform:translateX(-50%);filter:drop-shadow(0 1px 2px rgba(0,0,0,.25))}
+.arrow:after{content:'';position:absolute;left:-11px;top:18px;width:22px;height:17px;background:#fff;clip-path:polygon(0 0,100% 0,100% 100%,0 100%)}
+.center{position:absolute;left:50%;top:50%;width:43%;aspect-ratio:1;transform:translate(-50%,-50%);border:1.5px solid rgba(255,214,0,.92);border-radius:50%;background:rgba(15,30,26,.86);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 0 22px rgba(255,214,0,.12),inset 0 0 24px rgba(255,214,0,.05);z-index:4;padding:4%}
+.wind-icon{font-family:Arial,sans-serif;color:var(--yellow);font-size:clamp(30px,8vw,54px);line-height:.8;transform:rotate(0deg);margin-bottom:4%}
+.into{font-size:clamp(20px,5.2vw,32px);font-weight:500;line-height:1}
+.strength{font-size:clamp(44px,11vw,70px);font-weight:600;line-height:1.05;margin-top:4%}
+.club{font-size:clamp(17px,4vw,26px);font-weight:500;color:rgba(255,255,255,.68);line-height:1;margin-top:2%}
+.status{position:absolute;left:6%;right:6%;bottom:4.5%;text-align:center;color:rgba(255,255,255,.68);font-size:clamp(11px,2.8vw,15px);min-height:1.2em}
+.modal{position:absolute;inset:0;background:rgba(8,16,13,.72);backdrop-filter:blur(4px);display:none;place-items:center;padding:9%;z-index:10}
+.modal.show{display:grid}
+.modal-card{width:100%;max-width:360px;border:1px solid rgba(255,255,255,.24);border-radius:20px;background:rgba(25,39,34,.94);padding:24px;color:#fff;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.modal-card h2{margin:0 0 12px;font-size:24px;font-weight:500}.modal-card p{margin:0 0 20px;font:400 15px/1.45 'Space Grotesk',Arial,sans-serif;color:rgba(255,255,255,.8)}
+.close{border:1px solid rgba(255,255,255,.24);border-radius:15px;background:rgba(255,255,255,.1);color:#fff;padding:12px 22px;font:500 16px Oxanium;cursor:pointer}
+.countdown{position:absolute;inset:0;display:none;place-items:center;background:rgba(8,16,13,.72);backdrop-filter:blur(3px);z-index:9}
+.countdown.show{display:grid}.count-number{font:600 110px/1 Oxanium;color:#fff;text-shadow:0 0 28px rgba(255,214,0,.32)}
+@media(max-width:420px){.tile{width:91vw;border-radius:24px}.radial{inset:9%}.sector{width:29%;height:44%}.arrow{border-left-width:9px;border-right-width:9px;border-bottom-width:22px}.arrow:after{left:-9px;top:15px;width:18px;height:14px}}
+</style>
+</head>
+<body>
+<main class="stage">
+  <section class="tile" aria-label="UiDo Wind Tile">
+    <button class="help" id="help" aria-label="Wind help">?</button>
+    <div class="radial" id="radial">
+      <button class="sector s1" data-dir="0" aria-label="Wind direction 12 o'clock"><span class="arrow"></span></button>
+      <button class="sector s2" data-dir="45" aria-label="Wind direction 1:30"><span class="arrow"></span></button>
+      <button class="sector s3" data-dir="90" aria-label="Wind direction 3 o'clock"><span class="arrow"></span></button>
+      <button class="sector s4" data-dir="135" aria-label="Wind direction 4:30"><span class="arrow"></span></button>
+      <button class="sector s5" data-dir="180" aria-label="Wind direction 6 o'clock"><span class="arrow"></span></button>
+      <button class="sector s6" data-dir="225" aria-label="Wind direction 7:30"><span class="arrow"></span></button>
+      <button class="sector s7" data-dir="270" aria-label="Wind direction 9 o'clock"><span class="arrow"></span></button>
+      <button class="sector s8" data-dir="315" aria-label="Wind direction 10:30"><span class="arrow"></span></button>
+    </div>
+    <button class="center" id="strengthButton" aria-label="Cycle wind strength">
+      <div class="wind-icon">≋</div>
+      <div class="into">INTO</div>
+      <div class="strength" id="strength">1/2</div>
+      <div class="club">CLUB</div>
+    </button>
+    <div class="status" id="status">Tap the centre to cycle strength · tap an arrow to select</div>
+    <div class="countdown" id="countdown"><div class="count-number" id="countNumber">3</div></div>
+    <div class="modal" id="modal"><div class="modal-card"><h2>Wind</h2><p>Select the direction the wind is travelling <strong>towards</strong> you. The arrows point into the centre. Tap the centre control to cycle the wind strength.</p><button class="close" id="close">Got it</button></div></div>
+  </section>
+</main>
+<script>
+const strengths=['0','1/4','1/2','3/4','1','1 1/4'];
+let strengthIndex=2;
+let selected=null;
+const strength=document.getElementById('strength');
+const status=document.getElementById('status');
+const countdown=document.getElementById('countdown');
+const countNumber=document.getElementById('countNumber');
+const modal=document.getElementById('modal');
+document.getElementById('strengthButton').addEventListener('click',e=>{e.stopPropagation();strengthIndex=(strengthIndex+1)%strengths.length;strength.textContent=strengths[strengthIndex];status.textContent='Wind strength selected · tap an arrow for direction';});
+document.querySelectorAll('.sector').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();document.querySelectorAll('.sector').forEach(x=>x.classList.remove('selected'));btn.classList.add('selected');selected=btn.dataset.dir;status.textContent='Direction selected · moving to Lie';let n=3;countNumber.textContent=n;countdown.classList.add('show');const timer=setInterval(()=>{n--;if(n>0)countNumber.textContent=n;else{clearInterval(timer);countdown.classList.remove('show');status.textContent='Wind confirmed · Lie next';}},1000);}));
+document.getElementById('help').addEventListener('click',e=>{e.stopPropagation();modal.classList.add('show')});
+document.getElementById('close').addEventListener('click',()=>modal.classList.remove('show'));
+</script>
+</body>
+</html>
