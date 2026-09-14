@@ -18,7 +18,6 @@ body{font-family:'Space Grotesk',sans-serif}
 .screen{position:absolute;inset:0;visibility:hidden;opacity:0;pointer-events:none}
 .screen.active{visibility:visible;opacity:1;pointer-events:auto}
 .content{position:absolute;inset:0}
-/* Shared Welcome logo lock-up */
 .brand-stack{position:absolute;left:20px;right:20px;top:calc(50% - 28vh);display:flex;flex-direction:column;align-items:center}
 .logo-text{display:flex;align-items:center;justify-content:center;color:#fff;font:600 92px/0.9 'Oxanium',sans-serif;letter-spacing:.015em;white-space:nowrap;text-align:center;text-shadow:0 1px 8px rgba(0,0,0,.24)}
 .aim-icon{display:block;width:auto;height:64px;margin:0 1px;transform:translateY(-5px);flex:0 0 auto;object-fit:contain}
@@ -29,14 +28,14 @@ body{font-family:'Space Grotesk',sans-serif}
 .start::after,.hub-start::after{content:'';position:absolute;inset:-7px;border:1.5px solid rgba(255,214,0,.42);border-radius:39px;opacity:.55;box-shadow:0 0 18px rgba(255,214,0,.18),0 0 34px rgba(255,214,0,.10);animation:uidoPulse 2.4s ease-in-out infinite;pointer-events:none}
 .start:active,.hub-button:active{background:linear-gradient(180deg,rgba(255,255,255,.36),rgba(255,255,255,.12))}
 @keyframes uidoPulse{0%,100%{opacity:.55;box-shadow:0 0 18px rgba(255,214,0,.18),0 0 34px rgba(255,214,0,.10)}50%{opacity:.70;box-shadow:0 0 24px rgba(255,214,0,.25),0 0 46px rgba(255,214,0,.16)}}
-/* Welcome animation */
 #welcome.active .logo-text{opacity:0;animation:fadeIn .8s ease-out .1s forwards}
 #welcome.active .tagline{opacity:0;animation:fadeIn .5s ease-out 1.3s forwards}
 #welcome.active .start-wrap{opacity:0;animation:fadeIn .5s ease-out 2.3s forwards}
-/* Hub */
 #hub{transition:opacity .45s ease}
-.hub-logo{position:absolute;top:34px;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;color:#fff;font:600 50px/0.9 'Oxanium',sans-serif;letter-spacing:.015em;white-space:nowrap;text-shadow:0 1px 8px rgba(0,0,0,.3);opacity:0}
-.hub-logo .aim-icon{height:35px;margin:0 0;transform:translateY(-3px)}
+.hub-brand{position:absolute;top:28px;left:20px;right:20px;display:flex;flex-direction:column;align-items:center;color:#fff}
+.hub-logo{display:flex;align-items:center;justify-content:center;font:600 50px/0.9 'Oxanium',sans-serif;letter-spacing:.015em;white-space:nowrap;text-shadow:0 1px 8px rgba(0,0,0,.3);opacity:0}
+.hub-logo .aim-icon{height:35px;margin:0;transform:translateY(-3px)}
+.hub-tagline{margin-top:5px;color:#fff;font:500 15px/1.05 'Oxanium',sans-serif;letter-spacing:.01em;text-align:center;text-shadow:0 1px 7px rgba(0,0,0,.28);opacity:0}
 .settings{position:absolute;top:28px;right:20px;width:48px;height:48px;border:0;background:transparent;color:var(--yellow);font-size:28px;line-height:1;display:grid;place-items:center;cursor:pointer;opacity:0}
 .hub-actions{position:absolute;left:20px;right:20px;top:50%;transform:translateY(-42%);display:flex;flex-direction:column;align-items:center;gap:18px;opacity:0}
 .hub-button{height:60px;font-size:27px;width:min(320px,100%)}
@@ -46,13 +45,13 @@ body{font-family:'Space Grotesk',sans-serif}
 .hub-button::before{z-index:0}
 .hub-button{z-index:1}
 .hub-start::after{z-index:-1}
-#hub.active .hub-logo{animation:hubLogoIn .75s cubic-bezier(.22,.8,.3,1) .05s forwards}
+#hub.active .hub-logo{animation:fadeIn .6s ease-out .05s forwards}
+#hub.active .hub-tagline{animation:fadeIn .5s ease-out .3s forwards}
 #hub.active .settings{animation:fadeIn .45s ease-out .55s forwards}
 #hub.active .hub-actions{animation:hubActionsIn .7s cubic-bezier(.22,.8,.3,1) .35s forwards}
-@keyframes hubLogoIn{from{opacity:0;top:34px;transform:translate(-50%,-18px)}to{opacity:1;top:34px;transform:translateX(-50%)}}
 @keyframes hubActionsIn{from{opacity:0;transform:translateY(-35%)}to{opacity:1;transform:translateY(-42%)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.screen.active{opacity:1}.logo-text,.tagline,.start-wrap,.hub-logo,.settings,.hub-actions{opacity:1!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.screen.active{opacity:1}.logo-text,.tagline,.start-wrap,.hub-logo,.hub-tagline,.settings,.hub-actions{opacity:1!important}}
 </style>
 </head>
 <body>
@@ -68,7 +67,10 @@ body{font-family:'Space Grotesk',sans-serif}
 </div>
 </div>
 <div id="hub" class="screen">
+<div class="hub-brand">
 <div class="hub-logo" aria-label="UiDo"><span>U</span><img class="aim-icon" src="assets/smartaim-i-tight.png" alt=""><span>Do</span></div>
+<div class="hub-tagline">Every Shot Counts</div>
+</div>
 <button class="settings" type="button" aria-label="Settings">⚙</button>
 <div class="hub-actions">
 <button class="hub-button hub-start" type="button"><span>Start Round</span></button>
