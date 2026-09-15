@@ -12,6 +12,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#183b27}
 body{font-family:Oxanium,sans-serif;color:#fff}
 .stage{width:100vw;height:100dvh;display:grid;place-items:center;padding:22px;background:linear-gradient(rgba(18,28,24,.56),rgba(18,28,24,.56)),url('assets/home-exact.jpg') center/cover no-repeat}
 .tile{position:relative;width:min(88vw,520px);aspect-ratio:1;border:1px solid rgba(255,255,255,.24);border-radius:28px;background:rgba(18,31,27,.62);backdrop-filter:blur(10px) saturate(110%);-webkit-backdrop-filter:blur(10px) saturate(110%);overflow:hidden}
+.club-selection-frame{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;z-index:6}
 .help{position:absolute;right:5.5%;top:5.5%;width:10%;aspect-ratio:1;border:1.5px solid rgba(255,214,0,.78);border-radius:50%;background:rgba(18,31,27,.38);cursor:pointer;z-index:8;display:grid;place-items:center;padding:0}.help img{width:62%;height:62%;object-fit:contain}
 .club-circle{position:absolute;left:50%;top:50%;width:96%;height:96%;transform:translate(-50%,-50%);border-radius:50%;overflow:hidden;background:rgba(18,31,27,.34);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
 .headers{position:absolute;left:10%;right:10%;top:15%;display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center;align-items:center;font-size:clamp(12px,3vw,17px);letter-spacing:.09em;color:rgba(255,255,255,.62);z-index:5}
@@ -29,8 +30,9 @@ body{font-family:Oxanium,sans-serif;color:#fff}
 </style>
 </head>
 <body><main class="stage"><section class="tile" aria-label="UiDo Club Tile">
-<button class="help" id="help"><img src="assets/uido-question-mark-white.svg?v=1" alt="Help"></button>
 <div class="club-circle"><div class="headers"><div>CLUB</div><div>CARRY</div><div>TOTAL</div></div><div class="roller" id="roller"><div class="rows" id="rows"></div></div></div>
+<img class="club-selection-frame" src="assets/uido-club-selection-frame.png?v=1" alt="">
+<button class="help" id="help"><img src="assets/uido-question-mark-white.svg?v=1" alt="Help"></button>
 <button class="check" id="confirm" aria-label="Confirm club"><img src="assets/uido-check-white.svg" alt="Confirm"></button>
 <div class="countdown" id="countdown"><div class="count-number" id="countNumber">3</div><div class="next-advice"><div class="next-label">NEXT</div><div class="next-value"><strong>CLUB</strong> · RECOMMENDATION</div></div></div>
 <div class="result" id="result"><div class="result-main">START LINE</div><div class="result-sub" id="resultSub">Club confirmed.</div></div>
