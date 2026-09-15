@@ -11,17 +11,20 @@
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#183b27}
 body{font-family:Oxanium,sans-serif;color:#fff}
 .stage{width:100vw;height:100dvh;display:grid;place-items:center;padding:22px;background:linear-gradient(rgba(18,28,24,.56),rgba(18,28,24,.56)),url('assets/home-exact.jpg') center/cover no-repeat}
-.tile{position:relative;width:min(88vw,520px);aspect-ratio:1;border:1px solid rgba(255,255,255,.24);border-radius:28px;background:rgba(18,31,27,.62);backdrop-filter:blur(10px) saturate(110%);-webkit-backdrop-filter:blur(10px) saturate(110%);overflow:hidden}
+.tile{position:relative;width:min(88vw,520px);aspect-ratio:1;border:1px solid rgba(255,255,255,.24);border-radius:28px;background:rgba(18,31,27,.62);backdrop-filter:blur(10px) saturate(110%);-webkit-backdrop-filter:blur(10px) saturate(110%);overflow:hidden;touch-action:pan-y}
 .help{position:absolute;right:5.5%;top:5.5%;width:10%;aspect-ratio:1;border:1.5px solid rgba(255,214,0,.78);border-radius:50%;background:rgba(18,31,27,.38);color:#fff;cursor:pointer;z-index:8;display:grid;place-items:center;padding:0}
 .help img{width:62%;height:62%;display:block;object-fit:contain}
 .lie-circle{position:absolute;left:50%;top:50%;width:96%;height:96%;transform:translate(-50%,-50%);border-radius:50%;overflow:hidden;z-index:1;background:#34463d;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
-.lie-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 65%;display:block}
-.photo-shade{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(8,15,12,.04) 0%,rgba(8,15,12,.01) 48%,rgba(8,15,12,.10) 68%,rgba(8,15,12,.20) 100%)}
-.lie-label{position:absolute;left:50%;top:20%;transform:translate(-50%,-50%);font-size:clamp(25px,6.5vw,42px);font-weight:600;letter-spacing:.04em;text-shadow:0 2px 10px rgba(0,0,0,.55);white-space:nowrap;z-index:3}
-.answer-row{position:absolute;left:0;right:0;bottom:7%;height:auto;display:flex;justify-content:space-evenly;align-items:center;z-index:4}
+.lie-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 65%;display:block;transition:opacity .16s ease}
+.photo-shade{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(8,15,12,.04) 0%,rgba(8,15,12,.01) 48%,rgba(8,15,12,.10) 68%,rgba(8,15,12,.20) 100%);pointer-events:none}
+.lie-label{position:absolute;left:50%;top:20%;transform:translate(-50%,-50%);font-size:clamp(25px,6.5vw,42px);font-weight:600;letter-spacing:.04em;text-shadow:0 2px 10px rgba(0,0,0,.55);white-space:nowrap;z-index:3;pointer-events:none}
+.answer-row{position:absolute;left:0;right:0;bottom:7%;display:flex;justify-content:space-evenly;align-items:center;z-index:4}
 .answer{width:12%;min-width:44px;max-width:58px;aspect-ratio:1;border:1.5px solid rgba(255,214,0,.88);border-radius:50%;background:rgba(18,31,27,.94);color:#fff;cursor:pointer;touch-action:manipulation;display:grid;place-items:center;padding:0;overflow:hidden}
 .answer img{width:62%;height:62%;display:block;object-fit:contain}
 .answer:active{filter:brightness(1.18);transform:scale(.96)}
+.answer.confirm-only{position:absolute;left:50%;transform:translateX(-50%)}
+.answer.confirm-only:active{transform:translateX(-50%) scale(.96)}
+.correction-hint{position:absolute;left:50%;bottom:17%;transform:translateX(-50%);font-size:clamp(11px,2.8vw,14px);letter-spacing:.08em;color:rgba(255,255,255,.58);white-space:nowrap;z-index:4;pointer-events:none}
 .countdown{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(8,16,13,.72);backdrop-filter:blur(3px);z-index:12}
 .countdown.show{display:flex}
 .count-number{font:600 110px/1 Oxanium;color:#fff;text-shadow:0 0 28px rgba(255,214,0,.32)}
@@ -29,15 +32,6 @@ body{font-family:Oxanium,sans-serif;color:#fff}
 .next-label{font:500 14px/1 Oxanium;color:rgba(255,255,255,.58);letter-spacing:.12em;margin-bottom:7px}
 .next-value{font:500 clamp(18px,4.8vw,28px)/1.1 Oxanium;color:#fff}
 .next-value strong{color:var(--yellow);font-weight:600}
-.correction{position:absolute;inset:0;background:rgba(8,16,13,.94);z-index:10;display:none;flex-direction:column;align-items:center;justify-content:center;padding:8%}
-.correction.show{display:flex}
-.correction-title{font-size:clamp(18px,4.5vw,26px);color:rgba(255,255,255,.65);margin-bottom:7%}
-.correction-circle{position:relative;width:58%;aspect-ratio:1;border-radius:50%;overflow:hidden;border:1px solid rgba(255,255,255,.18);margin-bottom:6%}
-.correction-circle img{width:100%;height:100%;object-fit:cover;display:block}
-.correction-label{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:clamp(19px,5vw,30px);font-weight:600;white-space:nowrap;text-shadow:0 2px 10px rgba(0,0,0,.7)}
-.correction-controls{width:100%;display:grid;grid-template-columns:58px 1fr 58px;gap:10px;align-items:center}
-.cycle{width:58px;height:58px;border-radius:50%;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);color:#fff;font:500 28px Oxanium;cursor:pointer}
-.confirm{width:100%;height:58px;border:0;border-radius:18px;background:#2d8b57;color:#fff;font:600 20px Oxanium;cursor:pointer}
 .modal{position:absolute;inset:0;background:rgba(8,16,13,.72);backdrop-filter:blur(4px);display:none;place-items:center;padding:9%;z-index:15}
 .modal.show{display:grid}
 .modal-card{width:100%;max-width:360px;border:1px solid rgba(255,255,255,.24);border-radius:20px;background:rgba(25,39,34,.94);padding:24px;color:#fff;text-align:center}
@@ -53,25 +47,21 @@ body{font-family:Oxanium,sans-serif;color:#fff}
 </head>
 <body>
 <main class="stage">
-<section class="tile" aria-label="UiDo Lie Tile">
+<section class="tile" id="tile" aria-label="UiDo Lie Tile">
 <button class="help" id="help"><img src="assets/uido-question-mark-white.svg?v=1" alt="Help"></button>
 <div class="lie-circle">
 <img class="lie-photo" id="liePhoto" src="assets/Fairway.png" alt="">
 <div class="photo-shade"></div>
 <div class="lie-label" id="lieLabel">FAIRWAY</div>
-<div class="answer-row">
+<div class="answer-row" id="answerRow">
 <button class="answer yes" id="yes" aria-label="Confirm lie"><img src="assets/uido-check-white.svg" alt="Confirm"></button>
-<button class="answer no" id="no" aria-label="Correct lie"><img src="assets/cross-new.svg?v=1" alt="Correct"></button>
+<button class="answer no" id="no" aria-label="Lie is incorrect"><img src="assets/cross-new.svg?v=1" alt="Incorrect"></button>
 </div>
+<div class="correction-hint" id="correctionHint" hidden>SWIPE TO CHANGE LIE</div>
 </div>
 <div class="countdown" id="countdown"><div class="count-number" id="countNumber">3</div><div class="next-advice"><div class="next-label">NEXT</div><div class="next-value"><strong>LIE</strong> · CONFIRM</div></div></div>
-<div class="correction" id="correction">
-<div class="correction-title">WHAT IS THE LIE?</div>
-<div class="correction-circle"><img id="correctionPhoto" src="assets/Fairway.png" alt=""><div class="correction-label" id="correctionLabel">FAIRWAY</div></div>
-<div class="correction-controls"><button class="cycle" id="prev" aria-label="Previous lie">‹</button><button class="confirm" id="confirm">CONFIRM LIE</button><button class="cycle" id="next" aria-label="Next lie">›</button></div>
-</div>
 <div class="result" id="result"><div class="result-main" id="resultMain">START LINE</div><div class="result-sub" id="resultSub">Lie confirmed. UiDo prediction and player confirmation recorded.</div></div>
-<div class="modal" id="modal"><div class="modal-card"><h2>Lie</h2><p>UiDo predicts the lie from the available course and location data. Tap the tick to confirm it. Tap the cross if the prediction is wrong, then select the correct lie.</p><button class="close" id="close">Got it</button></div></div>
+<div class="modal" id="modal"><div class="modal-card"><h2>Lie</h2><p>UiDo predicts the lie from the available course and location data. Tap the tick to confirm it. If it is wrong, tap the cross and swipe through the ground conditions until the correct one is shown.</p><button class="close" id="close">Got it</button></div></div>
 </section>
 </main>
 <script>
@@ -84,30 +74,52 @@ const lies=[
  {label:'OBSTRUCTED',file:'assets/Obstructed.png'}
 ];
 let selected=0;
-let prediction='FAIRWAY';
-let confirmed=null;
+const prediction='FAIRWAY';
+let correcting=false;
+let touchStartX=null;
+const tile=document.getElementById('tile');
 const photo=document.getElementById('liePhoto');
 const label=document.getElementById('lieLabel');
-const correction=document.getElementById('correction');
-const correctionPhoto=document.getElementById('correctionPhoto');
-const correctionLabel=document.getElementById('correctionLabel');
+const answerRow=document.getElementById('answerRow');
+const yes=document.getElementById('yes');
+const no=document.getElementById('no');
+const correctionHint=document.getElementById('correctionHint');
 const countdown=document.getElementById('countdown');
 const countNumber=document.getElementById('countNumber');
 const result=document.getElementById('result');
-const resultMain=document.getElementById('resultMain');
 const resultSub=document.getElementById('resultSub');
 const modal=document.getElementById('modal');
-function renderLie(){const lie=lies[selected];photo.src=lie.file;label.textContent=lie.label;correctionPhoto.src=lie.file;correctionLabel.textContent=lie.label}
+function renderLie(){
+ const lie=lies[selected];
+ photo.style.opacity='0';
+ setTimeout(()=>{photo.src=lie.file;label.textContent=lie.label;photo.style.opacity='1'},90);
+}
+function enterCorrection(){
+ correcting=true;
+ selected=(selected+1)%lies.length;
+ renderLie();
+ no.style.display='none';
+ yes.classList.add('confirm-only');
+ correctionHint.hidden=false;
+}
+function changeLie(direction){
+ if(!correcting)return;
+ selected=(selected+direction+lies.length)%lies.length;
+ renderLie();
+}
+function finish(value){
+ resultSub.textContent=value===prediction?'Lie confirmed. UiDo prediction accepted.':'Lie corrected to '+value+'. UiDo prediction was '+prediction+'.';
+ result.classList.add('show');
+}
 function showCountdown(){let n=3;countNumber.textContent=n;countdown.classList.add('show');const t=setInterval(()=>{n--;if(n>0){countNumber.textContent=n}else{clearInterval(t);countdown.classList.remove('show')}},1000)}
-function finish(value){confirmed=value;resultMain.textContent='START LINE';resultSub.textContent=value===prediction?'Lie confirmed. UiDo prediction accepted.':'Lie corrected to '+value+'. UiDo prediction was '+prediction+'.';result.classList.add('show')}
-document.getElementById('yes').onclick=()=>finish(prediction);
-document.getElementById('no').onclick=()=>{selected=0;renderLie();correction.classList.add('show')};
-document.getElementById('prev').onclick=()=>{selected=(selected-1+lies.length)%lies.length;renderLie()};
-document.getElementById('next').onclick=()=>{selected=(selected+1)%lies.length;renderLie()};
-document.getElementById('confirm').onclick=()=>finish(lies[selected].label);
+yes.onclick=()=>finish(lies[selected].label);
+no.onclick=enterCorrection;
 document.getElementById('help').onclick=e=>{e.stopPropagation();modal.classList.add('show')};
 document.getElementById('close').onclick=()=>modal.classList.remove('show');
-renderLie();
+tile.addEventListener('touchstart',e=>{if(!correcting||e.touches.length!==1)return;touchStartX=e.touches[0].clientX},{passive:true});
+tile.addEventListener('touchend',e=>{if(!correcting||touchStartX===null)return;const dx=e.changedTouches[0].clientX-touchStartX;touchStartX=null;if(Math.abs(dx)<40)return;changeLie(dx<0?1:-1)},{passive:true});
+tile.addEventListener('pointerdown',e=>{if(!correcting||e.pointerType==='touch')return;touchStartX=e.clientX});
+tile.addEventListener('pointerup',e=>{if(!correcting||e.pointerType==='touch'||touchStartX===null)return;const dx=e.clientX-touchStartX;touchStartX=null;if(Math.abs(dx)<40)return;changeLie(dx<0?1:-1)});
 showCountdown();
 </script>
 </body>
