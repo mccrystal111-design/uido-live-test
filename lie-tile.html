@@ -6,7 +6,7 @@
 <title>UiDo — Lie Tile</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600&display=swap');
-:root{--yellow:#ffd600;--green:#2d8b57;--red:#6b2830}
+:root{--yellow:#ffd600}
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#183b27}
 body{font-family:Oxanium,sans-serif;color:#fff}
@@ -15,13 +15,13 @@ body{font-family:Oxanium,sans-serif;color:#fff}
 .help{position:absolute;right:5.5%;top:5.5%;width:10%;aspect-ratio:1;border:1.5px solid rgba(255,214,0,.78);border-radius:50%;background:rgba(18,31,27,.38);color:#fff;cursor:pointer;z-index:8;display:grid;place-items:center;padding:0}
 .help img{width:62%;height:62%;display:block;object-fit:contain}
 .lie-circle{position:absolute;left:50%;top:50%;width:96%;height:96%;transform:translate(-50%,-50%);border-radius:50%;overflow:hidden;z-index:1;background:#34463d;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
-.lie-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 55%;display:block;transform:translateY(-2.5%);}
+.lie-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 65%;display:block}
 .photo-shade{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(8,15,12,.04) 0%,rgba(8,15,12,.01) 48%,rgba(8,15,12,.10) 68%,rgba(8,15,12,.20) 100%)}
 .lie-label{position:absolute;left:50%;top:20%;transform:translate(-50%,-50%);font-size:clamp(25px,6.5vw,42px);font-weight:600;letter-spacing:.04em;text-shadow:0 2px 10px rgba(0,0,0,.55);white-space:nowrap;z-index:3}
-.answer-row{position:absolute;left:0;right:0;bottom:5.5%;height:15%;display:grid;grid-template-columns:1fr 1fr;align-items:center;z-index:4;pointer-events:none}
-.answer{width:15%;aspect-ratio:1;justify-self:center;border:1.5px solid rgba(255,214,0,.9);border-radius:50%;background:rgba(18,31,27,.96);color:#fff;cursor:pointer;touch-action:manipulation;display:grid;place-items:center;padding:0;pointer-events:auto;box-shadow:none}
-.answer img{width:54%;height:54%;display:block;object-fit:contain}
-.answer:active{filter:brightness(1.18)}
+.answer-row{position:absolute;left:0;right:0;bottom:7%;height:auto;display:flex;justify-content:space-evenly;align-items:center;z-index:4}
+.answer{width:12%;min-width:44px;max-width:58px;aspect-ratio:1;border:1.5px solid rgba(255,214,0,.88);border-radius:50%;background:rgba(18,31,27,.94);color:#fff;cursor:pointer;touch-action:manipulation;display:grid;place-items:center;padding:0;overflow:hidden}
+.answer img{width:62%;height:62%;display:block;object-fit:contain}
+.answer:active{filter:brightness(1.18);transform:scale(.96)}
 .countdown{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(8,16,13,.72);backdrop-filter:blur(3px);z-index:12}
 .countdown.show{display:flex}
 .count-number{font:600 110px/1 Oxanium;color:#fff;text-shadow:0 0 28px rgba(255,214,0,.32)}
@@ -37,7 +37,7 @@ body{font-family:Oxanium,sans-serif;color:#fff}
 .correction-label{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:clamp(19px,5vw,30px);font-weight:600;white-space:nowrap;text-shadow:0 2px 10px rgba(0,0,0,.7)}
 .correction-controls{width:100%;display:grid;grid-template-columns:58px 1fr 58px;gap:10px;align-items:center}
 .cycle{width:58px;height:58px;border-radius:50%;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);color:#fff;font:500 28px Oxanium;cursor:pointer}
-.confirm{width:100%;height:58px;border:0;border-radius:18px;background:var(--green);color:#fff;font:600 20px Oxanium;cursor:pointer}
+.confirm{width:100%;height:58px;border:0;border-radius:18px;background:#2d8b57;color:#fff;font:600 20px Oxanium;cursor:pointer}
 .modal{position:absolute;inset:0;background:rgba(8,16,13,.72);backdrop-filter:blur(4px);display:none;place-items:center;padding:9%;z-index:15}
 .modal.show{display:grid}
 .modal-card{width:100%;max-width:360px;border:1px solid rgba(255,255,255,.24);border-radius:20px;background:rgba(25,39,34,.94);padding:24px;color:#fff;text-align:center}
@@ -48,7 +48,7 @@ body{font-family:Oxanium,sans-serif;color:#fff}
 .result.show{display:flex}
 .result-main{font-size:clamp(28px,7vw,46px);font-weight:600;margin-bottom:12px}
 .result-sub{font-size:15px;color:rgba(255,255,255,.62);line-height:1.45}
-@media(max-width:420px){.tile{width:91vw;border-radius:24px}}
+@media(max-width:420px){.tile{width:91vw;border-radius:24px}.answer{width:13%;min-width:48px}}
 </style>
 </head>
 <body>
@@ -60,8 +60,8 @@ body{font-family:Oxanium,sans-serif;color:#fff}
 <div class="photo-shade"></div>
 <div class="lie-label" id="lieLabel">FAIRWAY</div>
 <div class="answer-row">
-<button class="answer yes" id="yes" aria-label="Confirm lie"><img src="assets/uido-check-white.svg?v=1" alt="Confirm"></button>
-<button class="answer no" id="no" aria-label="Correct lie"><img src="assets/uido-cross-white.svg?v=1" alt="Correct"></button>
+<button class="answer yes" id="yes" aria-label="Confirm lie"><img src="assets/uido-check-white.svg" alt="Confirm"></button>
+<button class="answer no" id="no" aria-label="Correct lie"><img src="assets/uido-cross-white.svg" alt="Correct"></button>
 </div>
 </div>
 <div class="countdown" id="countdown"><div class="count-number" id="countNumber">3</div><div class="next-advice"><div class="next-label">NEXT</div><div class="next-value"><strong>LIE</strong> · CONFIRM</div></div></div>
@@ -71,7 +71,7 @@ body{font-family:Oxanium,sans-serif;color:#fff}
 <div class="correction-controls"><button class="cycle" id="prev" aria-label="Previous lie">‹</button><button class="confirm" id="confirm">CONFIRM LIE</button><button class="cycle" id="next" aria-label="Next lie">›</button></div>
 </div>
 <div class="result" id="result"><div class="result-main" id="resultMain">START LINE</div><div class="result-sub" id="resultSub">Lie confirmed. UiDo prediction and player confirmation recorded.</div></div>
-<div class="modal" id="modal"><div class="modal-card"><h2>Lie</h2><p>UiDo predicts the lie from the available course and location data. Tap the check to confirm it. Tap the cross if the prediction is wrong, then select the correct lie.</p><button class="close" id="close">Got it</button></div></div>
+<div class="modal" id="modal"><div class="modal-card"><h2>Lie</h2><p>UiDo predicts the lie from the available course and location data. Tap the tick to confirm it. Tap the cross if the prediction is wrong, then select the correct lie.</p><button class="close" id="close">Got it</button></div></div>
 </section>
 </main>
 <script>
