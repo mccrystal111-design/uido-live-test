@@ -32,6 +32,8 @@ jobs:
           mkdir -p _site
           cp index.html _site/index.html
           cp home-preview.html _site/home-preview.html
+          if [ -f wind-tile.html ]; then cp wind-tile.html _site/wind-tile.html; fi
+          if [ -f hole.html ]; then cp hole.html _site/hole.html; fi
           if [ -f scorecard.js ]; then cp scorecard.js _site/scorecard.js; fi
           if [ -d assets ]; then cp -R assets _site/assets; fi
 
