@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg"
-     width="1000" height="1000" viewBox="0 0 100 100">
-  <g fill="none" stroke="#687476" stroke-linecap="round" stroke-linejoin="round">
-    <!-- Outer ring -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" viewBox="0 0 100 100">
+  <g fill="none" stroke="#687476" stroke-linecap="butt" stroke-linejoin="round">
     <circle cx="50" cy="50" r="49" stroke-width="1.1"/>
-    <!-- Decorative rings -->
     <circle cx="50" cy="50" r="44" stroke-width="0.8"/>
     <circle cx="50" cy="50" r="36" stroke-width="0.8"/>
-    <!-- Four continuous diameters create the eight sections -->
-    <line x1="50" y1="1" x2="50" y2="99" stroke-width="1.05"/>
-    <line x1="1" y1="50" x2="99" y2="50" stroke-width="1.05"/>
-    <line x1="15.35" y1="15.35" x2="84.65" y2="84.65" stroke-width="1.05"/>
-    <line x1="84.65" y1="15.35" x2="15.35" y2="84.65" stroke-width="1.05"/>
+    <g stroke-width="1.05">
+      <path d="M50 1V36 M50 36V44 M50 44V49 M50 51V56 M50 56V64 M50 64V99"/>
+      <path d="M1 50H36 M36 50H44 M44 50H49 M51 50H56 M56 50H64 M64 50H99"/>
+      <path d="M15.35 15.35L35.86 35.86 M35.86 35.86L40.91 40.91 M40.91 40.91L45.35 45.35 M54.65 54.65L59.09 59.09 M59.09 59.09L64.14 64.14 M64.14 64.14L84.65 84.65"/>
+      <path d="M84.65 15.35L64.14 35.86 M64.14 35.86L59.09 40.91 M59.09 40.91L54.65 45.35 M45.35 54.65L40.91 59.09 M40.91 59.09L35.86 64.14 M35.86 64.14L15.35 84.65"/>
+    </g>
   </g>
 </svg>
