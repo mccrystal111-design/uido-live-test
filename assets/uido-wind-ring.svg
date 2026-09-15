@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="1000" height="1000" viewBox="0 0 100 100">
+  <g fill="none" stroke="#687476" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Outer ring -->
+    <circle cx="50" cy="50" r="49" stroke-width="1.1"/>
+    <!-- Decorative rings -->
+    <circle cx="50" cy="50" r="44" stroke-width="0.8"/>
+    <circle cx="50" cy="50" r="36" stroke-width="0.8"/>
+    <!-- Four continuous diameters create the eight sections -->
+    <line x1="50" y1="1" x2="50" y2="99" stroke-width="1.05"/>
+    <line x1="1" y1="50" x2="99" y2="50" stroke-width="1.05"/>
+    <line x1="15.35" y1="15.35" x2="84.65" y2="84.65" stroke-width="1.05"/>
+    <line x1="84.65" y1="15.35" x2="15.35" y2="84.65" stroke-width="1.05"/>
+  </g>
+</svg>
