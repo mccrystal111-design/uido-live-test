@@ -1,4 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1536" fill="none">
-  <!-- UiDo arrowhead retained from the approved straight arrow; shaft is a single smooth curve. -->
-  <path d="M507 39 L498 50 L296 381 L296 388 L299 392 L308 394 L408 343 L420 340 L439 345 L449 355 L454 367 L454 392 L454 1457 C454 1485 477 1508 511 1508 C545 1508 568 1485 568 1457 L568 366 L575 352 L583 345 L594 341 L607 341 L712 393 L719 394 L723 392 L726 388 L726 381 L525 52 L515 39 Z" fill="#FFFFFF"/>
+  <path d="M514 1457 C514 1091.33 475.36 723.68 399.33 366" stroke="#FFFFFF" stroke-width="114" stroke-linecap="round" stroke-dasharray="1 68"/>
+  <g transform="translate(-111.67 0) rotate(-12 511 366)">
+    <path d="M507 39 L498 50 L296 381 L296 388 L299 392 L308 394 L408 343 L420 340 L439 345 L449 355 L454 367 L568 366 L575 352 L583 345 L594 341 L607 341 L712 393 L719 394 L723 392 L726 388 L726 381 L525 52 L515 39 Z" fill="#FFFFFF"/>
+  </g>
 </svg>
