@@ -9,9 +9,13 @@
 :root{--yellow:#ffd600}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#183b27}body{font-family:Oxanium,sans-serif;color:#fff}
 .stage{width:100vw;height:100dvh;display:grid;place-items:center;padding:22px;background:linear-gradient(rgba(18,28,24,.56),rgba(18,28,24,.56)),url('assets/home-exact.jpg') center/cover no-repeat}
 .tile{position:relative;width:min(88vw,520px);aspect-ratio:1;border:1px solid rgba(255,255,255,.24);border-radius:28px;background:rgba(18,31,27,.62);backdrop-filter:blur(10px) saturate(110%);-webkit-backdrop-filter:blur(10px) saturate(110%);overflow:hidden}
-.wind-map{position:absolute;inset:0;width:100%;height:100%;z-index:1}.sector{fill:rgba(255,255,255,.035);stroke:rgba(255,255,255,.20);stroke-width:1.25;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke;cursor:pointer;transition:fill .18s ease,stroke .18s ease}.sector:hover{fill:rgba(255,255,255,.065)}.sector.selected{fill:rgba(255,214,0,.13);stroke:rgba(255,214,0,.55)}
-.arrow{position:absolute;width:clamp(25px,6.5vw,34px);height:clamp(31px,8vw,42px);background:url('assets/wind-arrow.svg?v=8') center/contain no-repeat;filter:drop-shadow(0 1px 2px rgba(0,0,0,.22));opacity:.95;z-index:3;pointer-events:none}
-/* Supplied SVG is a downward arrow. Rotations make every arrow point inward toward the centre. */
+/* Decorative dartboard-style guide only. It is not interactive. */
+.wind-map{position:absolute;left:50%;top:50%;width:96%;height:96%;transform:translate(-50%,-50%);z-index:1;pointer-events:none}
+.board{fill:rgba(255,255,255,.018);stroke:rgba(255,255,255,.20);stroke-width:1.1;vector-effect:non-scaling-stroke}
+.ring{fill:none;stroke:rgba(255,255,255,.11);stroke-width:.8;vector-effect:non-scaling-stroke}
+.divider{stroke:rgba(255,255,255,.15);stroke-width:1.05;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.arrow{position:absolute;width:clamp(25px,6.5vw,34px);height:clamp(31px,8vw,42px);background:url('assets/wind-arrow.svg?v=9') center/contain no-repeat;filter:drop-shadow(0 1px 2px rgba(0,0,0,.22));opacity:.95;z-index:3;cursor:pointer;pointer-events:auto;touch-action:manipulation}
+/* Supplied SVG is a downward arrow. Each rotation makes the arrowhead point toward the centre. */
 .a-n{left:50%;top:10%;transform:translate(-50%,-50%) rotate(0deg)}
 .a-ne{left:76%;top:24%;transform:translate(-50%,-50%) rotate(45deg)}
 .a-e{left:89%;top:50%;transform:translate(-50%,-50%) rotate(90deg)}
@@ -26,12 +30,25 @@
 </head>
 <body><main class="stage"><section class="tile" aria-label="UiDo Wind Tile">
 <button class="help" id="help">?</button>
-<svg class="wind-map" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-<path class="sector" data-direction="N" d="M50 50 L30.8 1.8 Q30 0 32 0 H68 Q70 0 69.2 1.8 Z"/><path class="sector" data-direction="NE" d="M50 50 L69.2 1.8 Q70 0 71.8 0 L98.2 28.2 Q100 30 98.2 30.8 Z"/><path class="sector" data-direction="E" d="M50 50 L98.2 30.8 Q100 30 100 32 V68 Q100 70 98.2 69.2 Z"/><path class="sector" data-direction="SE" d="M50 50 L98.2 69.2 Q100 70 98.2 71.8 L71.8 100 Q70 100 69.2 98.2 Z"/><path class="sector" data-direction="S" d="M50 50 L69.2 98.2 Q70 100 68 100 H32 Q30 100 30.8 98.2 Z"/><path class="sector" data-direction="SW" d="M50 50 L30.8 98.2 Q30 100 28.2 100 L1.8 71.8 Q0 70 1.8 69.2 Z"/><path class="sector" data-direction="W" d="M50 50 L1.8 69.2 Q0 70 0 68 V32 Q0 30 1.8 30.8 Z"/><path class="sector" data-direction="NW" d="M50 50 L1.8 30.8 Q0 30 1.8 28.2 L28.2 0 Q30 0 30.8 1.8 Z"/>
+<svg class="wind-map" viewBox="0 0 100 100" aria-hidden="true">
+<circle class="board" cx="50" cy="50" r="49"/>
+<circle class="ring" cx="50" cy="50" r="36"/>
+<circle class="ring" cx="50" cy="50" r="44"/>
+<line class="divider" x1="50" y1="1" x2="50" y2="99"/>
+<line class="divider" x1="1" y1="50" x2="99" y2="50"/>
+<line class="divider" x1="15.35" y1="15.35" x2="84.65" y2="84.65"/>
+<line class="divider" x1="84.65" y1="15.35" x2="15.35" y2="84.65"/>
 </svg>
-<span class="arrow a-n"></span><span class="arrow a-ne"></span><span class="arrow a-e"></span><span class="arrow a-se"></span><span class="arrow a-s"></span><span class="arrow a-sw"></span><span class="arrow a-w"></span><span class="arrow a-nw"></span>
+<span class="arrow a-n" data-direction="N" aria-label="Wind from north toward centre"></span><span class="arrow a-ne" data-direction="NE" aria-label="Wind from north-east toward centre"></span><span class="arrow a-e" data-direction="E" aria-label="Wind from east toward centre"></span><span class="arrow a-se" data-direction="SE" aria-label="Wind from south-east toward centre"></span><span class="arrow a-s" data-direction="S" aria-label="Wind from south toward centre"></span><span class="arrow a-sw" data-direction="SW" aria-label="Wind from south-west toward centre"></span><span class="arrow a-w" data-direction="W" aria-label="Wind from west toward centre"></span><span class="arrow a-nw" data-direction="NW" aria-label="Wind from north-west toward centre"></span>
 <button class="center" id="strengthButton"><div class="wind-icon">≋</div><div class="into">INTO</div><div class="strength" id="strength">1/2</div><div class="club">CLUB</div></button>
 <div class="countdown" id="countdown"><div class="count-number" id="countNumber">3</div></div><div class="modal" id="modal"><div class="modal-card"><h2>Wind</h2><p>Select the direction the wind is travelling <strong>towards</strong> you. The arrows point into the centre. Tap the centre control to cycle the wind strength.</p><button class="close" id="close">Got it</button></div></div>
 </section></main>
-<script>const strengths=['1/2','1','2','3'];let i=0;const strength=document.getElementById('strength'),countdown=document.getElementById('countdown'),countNumber=document.getElementById('countNumber'),modal=document.getElementById('modal');document.getElementById('strengthButton').onclick=e=>{e.stopPropagation();i=(i+1)%strengths.length;strength.textContent=strengths[i]};document.querySelectorAll('.sector').forEach(b=>b.onclick=e=>{e.stopPropagation();document.querySelectorAll('.sector').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');let n=3;countNumber.textContent=n;countdown.classList.add('show');const t=setInterval(()=>{n--;if(n>0)countNumber.textContent=n;else{clearInterval(t);countdown.classList.remove('show')}},1000)});document.getElementById('help').onclick=e=>{e.stopPropagation();modal.classList.add('show')};document.getElementById('close').onclick=()=>modal.classList.remove('show');</script>
+<script>
+const strengths=['1/2','1','2','3'];let i=0;
+const strength=document.getElementById('strength'),countdown=document.getElementById('countdown'),countNumber=document.getElementById('countNumber'),modal=document.getElementById('modal');
+document.getElementById('strengthButton').onclick=e=>{e.stopPropagation();i=(i+1)%strengths.length;strength.textContent=strengths[i]};
+function selectDirection(el){document.querySelectorAll('.arrow').forEach(x=>x.style.filter='drop-shadow(0 1px 2px rgba(0,0,0,.22))');el.style.filter='drop-shadow(0 0 7px rgba(255,214,0,.8))';let n=3;countNumber.textContent=n;countdown.classList.add('show');const t=setInterval(()=>{n--;if(n>0)countNumber.textContent=n;else{clearInterval(t);countdown.classList.remove('show');el.style.filter='drop-shadow(0 1px 2px rgba(0,0,0,.22))'}},1000)}
+document.querySelectorAll('.arrow').forEach(a=>a.addEventListener('click',e=>{e.stopPropagation();selectDirection(a)}));
+document.getElementById('help').onclick=e=>{e.stopPropagation();modal.classList.add('show')};document.getElementById('close').onclick=()=>modal.classList.remove('show');
+</script>
 </body></html>
