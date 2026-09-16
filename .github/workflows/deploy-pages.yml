@@ -37,6 +37,7 @@ jobs:
           if [ -f club-tile.html ]; then cp club-tile.html _site/club-tile.html; fi
           if [ -f start-tile.html ]; then cp start-tile.html _site/start-tile.html; fi
           if [ -f shape-tile.html ]; then cp shape-tile.html _site/shape-tile.html; fi
+          if [ -f shape-tile-v2.html ]; then cp shape-tile-v2.html _site/shape-tile-v2.html; fi
           if [ -f hole.html ]; then cp hole.html _site/hole.html; fi
           if [ -f scorecard.js ]; then cp scorecard.js _site/scorecard.js; fi
           if [ -d assets ]; then cp -R assets _site/assets; fi
