@@ -8,12 +8,12 @@ function measure(){step=shapes[0].offsetWidth+(parseFloat(getComputedStyle(track
 function setActive(){shapes.forEach((el,i)=>el.classList.toggle('active',i===selected))}
 function centredOffset(i){return -i*step}
 function apply(x){offset=x;track.style.transform=`translate3d(calc(-50% + ${x}px),-50%,0)`}
-function snap(i,animate=true){selected=Math.max(0,Math.min(shapes.length-1,i));measure();setActive();track.style.transition=animate?'transform .26s cubic-bezier(.22,.75,.2,1)':'none';apply(centredOffset(selected))}
-roller.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;measure();dragging=true;dragMoved=false;pointerId=e.pointerId;startX=e.clientX;startOffset=centredOffset(selected);track.style.transition='none';roller.setPointerCapture?.(e.pointerId);roller.style.cursor='grabbing'});
+function setSelected(i,animate=true){selected=Math.max(0,Math.min(shapes.length-1,i));setActive();track.style.transition=animate?'transform .22s cubic-bezier(.22,.75,.2,1)':'none';apply(centredOffset(selected))}
+roller.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;measure();dragging=true;dragMoved=false;pointerId=e.pointerId;startX=e.clientX;startOffset=offset;track.style.transition='none';roller.setPointerCapture?.(e.pointerId);roller.style.cursor='grabbing'});
 roller.addEventListener('pointermove',e=>{if(!dragging||e.pointerId!==pointerId)return;const dx=e.clientX-startX;if(Math.abs(dx)>6)dragMoved=true;apply(startOffset+dx)});
-function finish(e){if(!dragging||e.pointerId!==pointerId)return;const dx=e.clientX-startX;const wasDrag=dragMoved;dragging=false;roller.style.cursor='grab';roller.releasePointerCapture?.(e.pointerId);if(Math.abs(dx)<6&&!wasDrag){const shape=e.target.closest('.shape');if(shape){const i=shapes.indexOf(shape);if(i>=0)snap(i,true);return}}const threshold=step*.32;let next=selected;if(Math.abs(dx)>=threshold)next=selected+(dx<0?1:-1);snap(next,true)}
-roller.addEventListener('pointerup',finish);roller.addEventListener('pointercancel',e=>{if(!dragging||e.pointerId!==pointerId)return;dragging=false;roller.style.cursor='grab';roller.releasePointerCapture?.(e.pointerId);snap(selected,true)});
-roller.addEventListener('wheel',e=>{e.preventDefault();const d=(Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY);snap(selected+(d>0?1:-1),true)},{passive:false});
-window.addEventListener('resize',()=>snap(selected,false));
-document.getElementById('confirm').onclick=()=>{resultMain.textContent=names[selected];result.classList.add('show')};measure();snap(selected,false);
+function finish(e){if(!dragging||e.pointerId!==pointerId)return;const dx=e.clientX-startX;const wasDrag=dragMoved;dragging=false;roller.style.cursor='grab';roller.releasePointerCapture?.(e.pointerId);if(!wasDrag){const shape=e.target.closest('.shape');if(shape){const i=shapes.indexOf(shape);if(i>=0)setSelected(i,true)}else apply(startOffset);return}const rawIndex=-offset/step;const nearest=Math.max(0,Math.min(shapes.length-1,Math.round(rawIndex)));selected=nearest;setActive();track.style.transition='none';apply(offset)}
+roller.addEventListener('pointerup',finish);roller.addEventListener('pointercancel',e=>{if(!dragging||e.pointerId!==pointerId)return;dragging=false;roller.style.cursor='grab';roller.releasePointerCapture?.(e.pointerId);track.style.transition='none';apply(startOffset)});
+roller.addEventListener('wheel',e=>{e.preventDefault();const d=(Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY);setSelected(selected+(d>0?1:-1),true)},{passive:false});
+window.addEventListener('resize',()=>{measure();setSelected(selected,false)});
+document.getElementById('confirm').onclick=()=>{resultMain.textContent=names[selected];result.classList.add('show')};measure();setSelected(selected,false);
 </script></body></html>
