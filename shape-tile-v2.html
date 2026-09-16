@@ -30,6 +30,9 @@ body{font-family:Oxanium,sans-serif;color:#fff;background:var(--green)}
 .check{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);width:12%;min-width:50px;max-width:62px;aspect-ratio:1;border:1.5px solid rgba(255,214,0,.9);border-radius:50%;background:rgba(18,31,27,.94);display:grid;place-items:center;padding:0;z-index:20;cursor:pointer}
 .check img{width:62%;height:62%;object-fit:contain}.check:active{transform:translateX(-50%) scale(.96)}
 .result{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(8,16,13,.94);z-index:60}.result.show{display:flex}.result-main{font-size:clamp(28px,7vw,46px);font-weight:600}
+.help-panel{position:absolute;inset:8%;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:10%;border:1px solid rgba(255,255,255,.18);border-radius:24px;background:rgba(8,18,14,.96);z-index:70;box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.help-panel.show{display:flex}.help-title{font-size:clamp(20px,5vw,28px);font-weight:600;margin-bottom:18px}.help-text{font-size:clamp(13px,3.5vw,17px);line-height:1.55;color:rgba(255,255,255,.82)}
+.help-close{margin-top:24px;padding:9px 22px;border:1.5px solid rgba(255,214,0,.9);border-radius:20px;background:transparent;color:#fff;font:500 clamp(12px,3vw,15px)/1 Oxanium,sans-serif;cursor:pointer}
 @media(max-width:420px){.tile{width:91vw;border-radius:24px}.roller{left:8%;right:8%;top:29%;height:39%}.shape{flex-basis:calc((100vw - 16vw - 16px)/5)}}
 </style>
 </head>
@@ -46,6 +49,11 @@ body{font-family:Oxanium,sans-serif;color:#fff;background:var(--green)}
 <div class="marker" aria-hidden="true"></div>
 <button class="check" id="confirm" aria-label="Confirm"><img src="assets/uido-check-white.svg" alt="Confirm"></button>
 <div class="result" id="result"><div class="result-main" id="resultMain"></div></div>
+<div class="help-panel" id="helpPanel" role="dialog" aria-modal="true" aria-label="Shape help">
+<div class="help-title">Shot Shape</div>
+<div class="help-text">Drag left or right to choose your shot shape.<br><br>Hook &nbsp;•&nbsp; Draw &nbsp;•&nbsp; Straight &nbsp;•&nbsp; Fade &nbsp;•&nbsp; Slice<br><br>Release to centre your selection, then tap ✓ to confirm.</div>
+<button class="help-close" id="helpClose">Got it</button>
+</div>
 </div>
 <button class="help" id="help" aria-label="Help">?</button>
 </section></main>
@@ -66,7 +74,12 @@ function up(e){if(!drag||e.pointerId!==pid)return;drag=false;roller.style.cursor
 roller.addEventListener('pointerdown',down);roller.addEventListener('pointermove',move);roller.addEventListener('pointerup',up);roller.addEventListener('pointercancel',up);
 window.addEventListener('resize',()=>{track.style.transition='none';apply(target(index))});
 document.getElementById('confirm').addEventListener('click',()=>{document.getElementById('resultMain').textContent=names[index];document.getElementById('result').classList.add('show')});
-document.getElementById('help').addEventListener('click',()=>{});
+const help=document.getElementById('help'),helpPanel=document.getElementById('helpPanel'),helpClose=document.getElementById('helpClose');
+function closeHelp(){helpPanel.classList.remove('show');help.focus()}
+help.addEventListener('click',()=>{helpPanel.classList.add('show');helpClose.focus()});
+helpClose.addEventListener('click',closeHelp);
+helpPanel.addEventListener('click',e=>{if(e.target===helpPanel)closeHelp()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&helpPanel.classList.contains('show'))closeHelp()});
 requestAnimationFrame(()=>{track.style.transition='none';highlight(2);apply(target(2))});
 </script>
 </body></html>
