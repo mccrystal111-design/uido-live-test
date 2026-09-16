@@ -33,8 +33,7 @@ body{font-family:Oxanium,sans-serif;color:#fff;background:var(--green)}
 .help-panel{position:absolute;inset:0;background:rgba(8,16,13,.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:none;place-items:center;padding:9%;z-index:70}
 .help-panel.show{display:grid}
 .help-card{width:100%;max-width:360px;border:1px solid rgba(255,255,255,.24);border-radius:20px;background:rgba(25,39,34,.94);padding:24px;color:#fff;text-align:center}
-.help-card h2{margin:0 0 12px;font-size:24px;font-weight:500}
-.help-card p{margin:0 0 20px;font:400 15px/1.45 Arial,sans-serif;color:rgba(255,255,255,.8)}
+.help-card h2{margin:0 0 12px;font-size:24px;font-weight:500}.help-card p{margin:0 0 20px;font:400 15px/1.45 Arial,sans-serif;color:rgba(255,255,255,.8)}
 .help-close{border:1px solid rgba(255,255,255,.24);border-radius:15px;background:rgba(255,255,255,.1);color:#fff;padding:12px 22px;font:500 16px Oxanium;cursor:pointer}
 @media(max-width:420px){.tile{width:91vw;border-radius:24px}.roller{left:8%;right:8%;top:29%;height:39%}.shape{flex-basis:calc((100vw - 16vw - 16px)/5)}}
 </style>
@@ -52,9 +51,9 @@ body{font-family:Oxanium,sans-serif;color:#fff;background:var(--green)}
 <div class="marker" aria-hidden="true"></div>
 <button class="check" id="confirm" aria-label="Confirm"><img src="assets/uido-check-white.svg" alt="Confirm"></button>
 <div class="result" id="result"><div class="result-main" id="resultMain"></div></div>
+</div>
 <div class="help-panel" id="helpPanel" role="dialog" aria-modal="true" aria-label="Shape help">
 <div class="help-card"><h2>Shape</h2><p>UiDo predicts the shot shape from the available player and shot data. Drag to change the shape if needed, then tap the tick to confirm.</p><button class="help-close" id="helpClose">Got it</button></div>
-</div>
 </div>
 <button class="help" id="help" aria-label="Help">?</button>
 </section></main>
