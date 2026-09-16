@@ -11,13 +11,13 @@
 body{font-family:Oxanium,sans-serif;color:#fff;background:var(--green)}
 .stage{width:100vw;height:100dvh;display:grid;place-items:center;padding:22px;background:linear-gradient(rgba(18,28,24,.56),rgba(18,28,24,.56)),url('assets/home-exact.jpg') center/cover no-repeat}
 .tile{position:relative;width:min(88vw,520px);aspect-ratio:1;border:1px solid rgba(255,255,255,.24);border-radius:28px;background:rgba(18,31,27,.62);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);overflow:hidden}
-.circle{position:absolute;inset:2%;border-radius:50%;overflow:hidden;background:rgba(18,31,27,.34);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
-.help{position:absolute;right:7%;top:5%;width:36px;height:36px;border:0;padding:0;margin:0;background:transparent;color:#fff;font:600 24px/36px Oxanium,sans-serif;text-align:center;z-index:100;cursor:pointer;display:block;appearance:none;-webkit-appearance:none}
-.help:focus{outline:none}.help:active{transform:scale(.94)}
+.circle{position:absolute;left:50%;top:50%;width:96%;height:96%;transform:translate(-50%,-50%);border-radius:50%;overflow:hidden;background:rgba(18,31,27,.34);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.help{position:absolute;right:5.5%;top:5.5%;width:10%;aspect-ratio:1;border:1.5px solid rgba(255,214,0,.78);border-radius:50%;background:rgba(18,31,27,.38);cursor:pointer;z-index:50;display:grid;place-items:center;padding:0;color:#fff;font:600 22px/1 Oxanium,sans-serif}
 .roller{position:absolute;left:9%;right:9%;top:27%;height:42%;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;z-index:10;cursor:grab}
 .track{position:absolute;left:0;top:50%;display:flex;align-items:center;gap:4px;height:100%;will-change:transform}
 .shape{flex:0 0 calc((100vw - 18vw - 16px)/5);max-width:112px;height:92%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:rgba(255,255,255,.25);cursor:pointer}
-.shape.active{color:#fff}.shape-arrow{width:82%;height:calc(100% - 18px);object-fit:contain;display:block;pointer-events:none}
+.shape.active{color:#fff}
+.shape-arrow{width:82%;height:calc(100% - 18px);object-fit:contain;display:block;pointer-events:none}
 .shape-arrow.straight{transform:rotate(-90deg)}
 .shape-arrow.draw{transform:scaleX(-1) rotate(-85deg)}
 .shape-arrow.hook{transform:scaleX(-1) rotate(-96deg)}
@@ -34,7 +34,6 @@ body{font-family:Oxanium,sans-serif;color:#fff;background:var(--green)}
 </head>
 <body>
 <main class="stage"><section class="tile" aria-label="UiDo Shape Tile V2">
-<button class="help" id="help" aria-label="Help">?</button>
 <div class="circle">
 <div class="roller" id="roller"><div class="track" id="track">
 <div class="shape"><img class="shape-arrow hook" src="assets/uido-curved-arrow-white-hook.svg" alt="Hook"><div class="shape-label">Hook</div></div>
@@ -46,7 +45,9 @@ body{font-family:Oxanium,sans-serif;color:#fff;background:var(--green)}
 <div class="marker" aria-hidden="true"></div>
 <button class="check" id="confirm" aria-label="Confirm"><img src="assets/uido-check-white.svg" alt="Confirm"></button>
 <div class="result" id="result"><div class="result-main" id="resultMain"></div></div>
-</div></section></main>
+</div>
+<button class="help" id="help" aria-label="Help">?</button>
+</section></main>
 <script>
 const roller=document.getElementById('roller'),track=document.getElementById('track'),items=[...document.querySelectorAll('.shape')],names=['Hook','Draw','Straight','Fade','Slice'];
 let index=2,offset=0,drag=false,pid=null,startX=0,startOffset=0,moved=false;
