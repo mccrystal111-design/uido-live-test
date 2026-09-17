@@ -40,6 +40,7 @@ jobs:
           if [ -f shape-tile-v2.html ]; then cp shape-tile-v2.html _site/shape-tile-v2.html; fi
           if [ -f putts-score-tile.html ]; then cp putts-score-tile.html _site/putts-score-tile.html; fi
           if [ -f yardage-tile.html ]; then cp yardage-tile.html _site/yardage-tile.html; fi
+          if [ -f yardage-tile-new.html ]; then cp yardage-tile-new.html _site/yardage-tile-new.html; fi
           if [ -f hole.html ]; then cp hole.html _site/hole.html; fi
           if [ -f scorecard.js ]; then cp scorecard.js _site/scorecard.js; fi
           if [ -d assets ]; then cp -R assets _site/assets; fi
