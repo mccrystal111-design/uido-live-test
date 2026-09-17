@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <circle cx="512" cy="512" r="485" fill="#F5F1E8"/>
+  <circle cx="512" cy="512" r="485" fill="none" stroke="#A88A5A" stroke-width="5"/>
+  <circle cx="512" cy="512" r="457" fill="none" stroke="#A88A5A" stroke-width="9"/>
+
+  <!-- UiDo Lie: five clean grass blades -->
+  <g fill="#173F2A">
+    <path d="M388 758 C386 681 370 596 320 510 C379 540 419 603 430 758 Z"/>
+    <path d="M449 758 C444 651 424 548 380 430 C442 466 481 551 486 758 Z"/>
+    <path d="M512 758 C505 621 513 470 586 296 C582 438 561 604 550 758 Z"/>
+    <path d="M577 758 C580 623 605 520 674 429 C640 553 626 652 632 758 Z"/>
+    <path d="M645 758 C650 655 686 560 756 486 C706 595 687 677 687 758 Z"/>
+  </g>
+</svg>
