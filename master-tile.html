@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UiDo Master Tile</title>
+<style>
+:root{--green:#0c2b20;--cream:#f4f0e7;--line:#aeb8ae;--major:#748176;--gold:#a88a52}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--green);font-family:Arial,sans-serif;color:var(--green)}
+.wrap{width:min(94vw,900px)}.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;color:var(--cream);font-size:14px}
+button{border:1px solid #718177;background:transparent;color:var(--cream);border-radius:18px;padding:7px 12px;cursor:pointer}button.active{background:var(--cream);color:var(--green)}
+.readout{margin-left:auto;font-variant-numeric:tabular-nums}.stage{position:relative;width:100%;aspect-ratio:1;background:var(--cream);border-radius:48px;overflow:hidden;box-shadow:0 10px 35px rgba(0,0,0,.18)}svg{display:block;width:100%;height:100%}
+.fine{stroke:#b9c0b8;stroke-width:1;opacity:.38}.major{stroke:#7e8b81;stroke-width:1.5;opacity:.58}.edge{stroke:var(--gold);stroke-width:2;stroke-dasharray:9 8;fill:none}.ring1{stroke:#b9c0b8;stroke-width:2;fill:none}.ring2{stroke:#829086;stroke-width:2;fill:none}.help{fill:none;stroke:#829086;stroke-width:3}.helpText{fill:#17402f;font:600 42px Georgia,serif;text-anchor:middle;dominant-baseline:middle}.cross{stroke:#17402f;stroke-width:1.5;opacity:.85}.click{stroke:#17402f;stroke-width:1.5;stroke-dasharray:6 6;opacity:.8}
+</style></head><body><div class="wrap"><div class="toolbar">
+<button id="fineBtn" class="active">Fine 25</button><button id="majorBtn" class="active">Major 100</button><button id="safeBtn" class="active">5% boundary</button><button id="ringBtn" class="active">Ring</button><button id="helpBtn" class="active">Help</button><span id="readout" class="readout">Click tile for X / Y</span></div>
+<div class="stage" id="stage"><svg id="svg" viewBox="0 0 1000 1000" aria-label="UiDo 1000 by 1000 master tile">
+<defs><clipPath id="clip"><rect width="1000" height="1000" rx="70"/></clipPath></defs><rect width="1000" height="1000" rx="70" fill="#f4f0e7"/>
+<g clip-path="url(#clip)" id="fineGrid"></g><g clip-path="url(#clip)" id="majorGrid"></g>
+<rect x="50" y="50" width="900" height="900" class="edge" id="safeBoundary"/>
+<g id="rings"><circle cx="500" cy="500" r="450" class="ring1"/><circle cx="500" cy="500" r="425" class="ring2"/></g>
+<g id="help"><circle cx="875" cy="125" r="47" class="help"/><text x="875" y="125" class="helpText">?</text></g>
+<g><line x1="475" y1="500" x2="525" y2="500" class="cross"/><line x1="500" y1="475" x2="500" y2="525" class="cross"/></g>
+<g id="clickMark" style="display:none"><line id="cx1" class="click"/><line id="cx2" class="click"/></g>
+</svg></div></div>
+<script>
+const NS='http://www.w3.org/2000/svg',svg=document.getElementById('svg'),stage=document.getElementById('stage'),readout=document.getElementById('readout');
+const fineGrid=document.getElementById('fineGrid'),majorGrid=document.getElementById('majorGrid');
+function line(x1,y1,x2,y2,cls){const l=document.createElementNS(NS,'line');Object.assign(l,{x1,y1,x2,y2});l.setAttribute('class',cls);return l}
+for(let i=25;i<1000;i+=25){fineGrid.append(line(i,0,i,1000,'fine'),line(0,i,1000,i,'fine'))}
+for(let i=100;i<1000;i+=100){majorGrid.append(line(i,0,i,1000,'major'),line(0,i,1000,i,'major'))}
+function toggle(btn,el){btn.classList.toggle('active');el.style.display=el.style.display==='none'?'':'none'}
+fineBtn.onclick=()=>toggle(fineBtn,fineGrid);majorBtn.onclick=()=>toggle(majorBtn,majorGrid);safeBtn.onclick=()=>toggle(safeBtn,safeBoundary);ringBtn.onclick=()=>toggle(ringBtn,rings);helpBtn.onclick=()=>toggle(helpBtn,help);
+stage.onclick=e=>{const r=svg.getBoundingClientRect();const x=Math.round((e.clientX-r.left)/r.width*1000),y=Math.round((e.clientY-r.top)/r.height*1000);readout.textContent=`X ${x} / Y ${y}`;clickMark.style.display='';cx1.setAttribute('x1',x);cx1.setAttribute('y1',0);cx1.setAttribute('x2',x);cx1.setAttribute('y2',1000);cx2.setAttribute('x1',0);cx2.setAttribute('y1',y);cx2.setAttribute('x2',1000);cx2.setAttribute('y2',y)};
+</script></body></html>
