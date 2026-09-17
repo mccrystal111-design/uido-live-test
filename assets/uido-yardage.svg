@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>UiDo Yardage</title>
+  <desc>UiDo yardage navigation mark: golf flag and green.</desc>
+  <ellipse cx="256" cy="365" rx="132" ry="42" fill="#173F2A"/>
+  <path d="M229 126 C229 119 235 114 242 114 C249 114 255 119 255 126 L255 350 L229 350 Z" fill="#173F2A"/>
+  <path d="M242 114 C246 114 249 115 253 117 L365 178 C372 182 372 191 365 195 L253 256 C249 258 246 259 242 259 Z" fill="#173F2A"/>
+  <path d="M229 350 L255 350 L255 365 C255 373 249 379 242 379 C235 379 229 373 229 365 Z" fill="#F5F1E8"/>
+</svg>
