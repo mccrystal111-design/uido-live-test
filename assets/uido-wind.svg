@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 1024 1024"
+     width="1024" height="1024"
+     role="img" aria-label="UiDo Wind icon">
+  <title>UiDo Wind</title>
+  <desc>UiDo wind navigation icon, fully vector.</desc>
+
+  <!-- Ivory medallion -->
+  <circle cx="512" cy="512" r="485" fill="#F5F1E8"/>
+
+  <!-- Restrained bronze instrument rim -->
+  <circle cx="512" cy="512" r="485"
+          fill="none" stroke="#A88A5A" stroke-width="5"/>
+  <circle cx="512" cy="512" r="457"
+          fill="none" stroke="#A88A5A" stroke-width="9"/>
+
+  <!-- Wind symbol -->
+  <g fill="none"
+     stroke="#173F2A"
+     stroke-width="48"
+     stroke-linecap="round"
+     stroke-linejoin="round">
+
+    <!-- Upper long flow into curl -->
+    <path d="M292 474 H650
+             C720 474 772 426 772 365
+             C772 303 725 256 666 256
+             C611 256 571 291 571 339"/>
+
+    <!-- Lower long flow into curl -->
+    <path d="M292 566 H565
+             C626 566 670 604 670 660
+             C670 716 629 759 575 759
+             C522 759 485 724 485 678"/>
+
+    <!-- Short upper stroke -->
+    <path d="M415 394 H470"/>
+  </g>
+</svg>
