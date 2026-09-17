@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 1024 1024"
+     width="1024" height="1024"
+     role="img" aria-label="UiDo golf ball mark">
+  <title>UiDo Golf Ball</title>
+
+  <!-- Golf ball body -->
+  <circle cx="512" cy="512" r="300"
+          fill="#F5F1E8"
+          stroke="#173F2A"
+          stroke-width="16"/>
+
+  <!-- Dimple field: dense on upper-left, progressively lighter toward lower-right -->
+  <g fill="#173F2A">
+
+    <!-- Upper-left -->
+    <ellipse cx="300" cy="355" rx="25" ry="16" transform="rotate(-28 300 355)"/>
+    <ellipse cx="350" cy="325" rx="23" ry="15" transform="rotate(-18 350 325)"/>
+    <ellipse cx="405" cy="305" rx="21" ry="14" transform="rotate(-8 405 305)"/>
+    <ellipse cx="465" cy="292" rx="19" ry="13" transform="rotate(2 465 292)"/>
+    <ellipse cx="525" cy="288" rx="18" ry="12" transform="rotate(8 525 288)"/>
+    <ellipse cx="580" cy="294" rx="17" ry="11" transform="rotate(12 580 294)"/>
+    <ellipse cx="635" cy="310" rx="15" ry="10" transform="rotate(18 635 310)"/>
+
+    <ellipse cx="275" cy="410" rx="28" ry="18" transform="rotate(-30 275 410)"/>
+    <ellipse cx="330" cy="390" rx="26" ry="17" transform="rotate(-20 330 390)"/>
+    <ellipse cx="390" cy="372" rx="23" ry="16" transform="rotate(-8 390 372)"/>
+    <ellipse cx="450" cy="360" rx="21" ry="14"/>
+    <ellipse cx="510" cy="355" rx="19" ry="13" transform="rotate(8 510 355)"/>
+    <ellipse cx="568" cy="360" rx="17" ry="12" transform="rotate(14 568 360)"/>
+    <ellipse cx="625" cy="372" rx="15" ry="10" transform="rotate(20 625 372)"/>
+
+    <ellipse cx="255" cy="470" rx="30" ry="20" transform="rotate(-24 255 470)"/>
+    <ellipse cx="315" cy="455" rx="28" ry="19" transform="rotate(-14 315 455)"/>
+    <ellipse cx="380" cy="445" rx="25" ry="17" transform="rotate(-5 380 445)"/>
+    <ellipse cx="445" cy="440" rx="22" ry="15"/>
+    <ellipse cx="505" cy="438" rx="20" ry="13" transform="rotate(8 505 438)"/>
+    <ellipse cx="565" cy="445" rx="18" ry="12" transform="rotate(15 565 445)"/>
+    <ellipse cx="625" cy="458" rx="15" ry="10" transform="rotate(22 625 458)"/>
+
+    <ellipse cx="250" cy="535" rx="31" ry="21" transform="rotate(-18 250 535)"/>
+    <ellipse cx="310" cy="525" rx="29" ry="19" transform="rotate(-10 310 525)"/>
+    <ellipse cx="375" cy="520" rx="25" ry="17"/>
+    <ellipse cx="440" cy="518" rx="22" ry="15" transform="rotate(5 440 518)"/>
+    <ellipse cx="500" cy="520" rx="19" ry="13" transform="rotate(10 500 520)"/>
+    <ellipse cx="560" cy="528" rx="17" ry="11" transform="rotate(17 560 528)"/>
+    <ellipse cx="620" cy="542" rx="14" ry="9" transform="rotate(24 620 542)"/>
+
+    <ellipse cx="265" cy="600" ry="20" rx="29" transform="rotate(-12 265 600)"/>
+    <ellipse cx="325" cy="595" rx="27" ry="18" transform="rotate(-6 325 595)"/>
+    <ellipse cx="390" cy="596" rx="24" ry="16" transform="rotate(2 390 596)"/>
+    <ellipse cx="450" cy="600" rx="21" ry="14" transform="rotate(7 450 600)"/>
+    <ellipse cx="510" cy="607" rx="18" ry="12" transform="rotate(13 510 607)"/>
+    <ellipse cx="568" style="transform=rotate(20 568 618)" cy="618" rx="15" rx="10"/>
+    <ellipse cx="625" cy="632" rx="12" ry="8" transform="rotate(27 625 632)"/>
+
+    <ellipse cx="300" cy="660" rx="25" ry="17" transform="rotate(-5 300 660)"/>
+    <ellipse cx="355" cy="665" rx="23" ry="15" transform="rotate(2 355 665)"/>
+    <ellipse cx="415" cy="670" rx="20" ry="13" transform="rotate(8 415 670)"/>
+    <ellipse cx="475" cy="678" rx="17" ry="11" transform="rotate(14 475 678)"/>
+    <ellipse cx="535" cy="687" rx="14" ry="9" transform="rotate(20 535 687)"/>
+    <ellipse cx="590" cy="695" rx="11" ry="7" transform="rotate(27 590 695)"/>
+
+    <!-- Lower-right fade -->
+    <g opacity=".72">
+      <ellipse cx="650" cy="400" rx="11" ry="7"/>
+      <ellipse cx="675" cy="475" rx="10" ry="6"/>
+      <ellipse cx="680" cy="550" rx="9" ry="6"/>
+      <ellipse cx="665" cy="620" rx="8" ry="5"/>
+    </g>
+    <g opacity=".48">
+      <ellipse cx="710" cy="430" rx="8" ry="5"/>
+      <ellipse cx="720" cy="500" rx="7" ry="5"/>
+      <ellipse cx="720" cy="570" rx="6" ry="4"/>
+      <ellipse cx="700" cy="640" rx="6" ry="4"/>
+    </g>
+    <g opacity=".28">
+      <ellipse cx="755" cy="470" rx="5" ry="3"/>
+      <ellipse cx="760" cy="530" rx="5" ry="3"/>
+      <ellipse cx="750" cy="590" rx="4" ry="3"/>
+      <ellipse cx="720" cy="675" rx="4" ry="3"/>
+    </g>
+    <g opacity=".14">
+      <circle cx="790" cy="505" r="3"/>
+      <circle cx="792" cy="555" r="3"/>
+      <circle cx="780" cy="610" r="3"/>
+      <circle cx="750" cy="665" r="3"/>
+    </g>
+  </g>
+</svg>
