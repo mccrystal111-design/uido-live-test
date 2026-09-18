@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document>
+<name>UiDo Overstone Hole 2 Capture</name>
+<Placemark><name>Hole 2 Green Front</name><Point><coordinates>-0.8166103,52.2762446,0</coordinates></Point></Placemark>
+<Placemark><name>Hole 2 Green Middle</name><Point><coordinates>-0.8166885565,52.2761187565,0</coordinates></Point></Placemark>
+<Placemark><name>Hole 2 Green Back</name><Point><coordinates>-0.8167443,52.2759866,0</coordinates></Point></Placemark>
+<Placemark><name>Hole 2 Green F-M-B</name><Style><LineStyle><color>ff00ffff</color><width>4</width></LineStyle></Style><LineString><tessellate>1</tessellate><coordinates>-0.8166103,52.2762446,0 -0.8166885565,52.2761187565,0 -0.8167443,52.2759866,0</coordinates></LineString></Placemark>
+</Document></kml>
