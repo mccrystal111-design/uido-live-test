@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>UiDo · Hole 1 Tee Inference Test</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--forest:#173F2A;--deep:#10251B;--ivory:#F5F1E8;--stone:#E5DED0;--bronze:#A88A5A}
+*{box-sizing:border-box}html,body{margin:0;background:var(--deep);color:var(--ivory);font-family:Arial,sans-serif}body{padding:14px}.app{max-width:1200px;margin:auto}
+.head{display:flex;justify-content:space-between;align-items:end;gap:16px;margin-bottom:12px}.brand{font-size:27px;font-weight:700}.sub{opacity:.72;font-size:13px;margin-top:4px}
+.stage{background:var(--ivory);border-radius:20px;padding:13px;color:var(--forest)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.bar button{min-height:40px;border:1px solid #496052;background:#182c21;color:var(--ivory);border-radius:9px;padding:0 12px;font-weight:700}.bar button.active{background:var(--bronze)}
+#map{height:min(70vh,700px);min-height:440px;border-radius:14px;overflow:hidden;border:1px solid #cfc6b5}
+.info{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:10px}.card{border:1px solid #d4cbbb;border-radius:11px;padding:10px;background:#faf7f0;font-size:12px}.card b{display:block;margin-bottom:4px}.big{font-size:19px;font-weight:800}
+.note{margin-top:10px;padding:10px 12px;border-radius:11px;background:#e9e2d5;font-size:12px;line-height:1.45}
+.leaflet-control-attribution{font-size:9px}
+@media(max-width:700px){body{padding:8px}.info{grid-template-columns:repeat(2,1fr)}#map{height:68vh;min-height:420px}}
+</style>
+</head>
+<body>
+<main class="app">
+<header class="head">
+<div><div class="brand">UiDo Tee Inference Test</div><div class="sub">Overstone Park · Hole 1 · geometry experiment</div></div>
+</header>
+<section class="stage">
+<div class="bar">
+<button id="all" class="active">All rings</button>
+<button id="yellow">Yellow 374 yd</button>
+<button id="white">White 391 yd</button>
+<button id="red">Red 346 yd</button>
+<button id="actual">Actual captured tee</button>
+<button id="fit">Reset</button>
+</div>
+<div id="map"></div>
+<div class="info">
+<div class="card"><b>GREEN MIDDLE</b><span class="big">Anchor</span><br>52.277759, −0.815051</div>
+<div class="card"><b>GREEN DEPTH</b><span class="big">32 yd</span><br>Front → back ≈ 29.4 m</div>
+<div class="card"><b>CAPTURED TEE</b><span class="big">≈359 yd</span><br>Straight-line to green middle</div>
+<div class="card"><b>API TEST</b><span class="big">346–391 yd</span><br>Candidate lies inside tee-yardage family</div>
+</div>
+<div class="note"><b>What this tests:</b> start from the known green middle, draw a distance ring from each API tee yardage, then look for satellite-recognised tee-box geometry beyond the green front. The captured Hole 1 tee is shown only as a validation point. It is not used to calculate the rings.</div>
+</section>
+</main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const green={
+ front:[52.2776675,-0.8151979],
+ middle:[52.2777593548,-0.8150508742],
+ back:[52.2778714,-0.8149234]
+};
+// Real tee GPS captured during UiDo live testing — validation only.
+const capturedTee=[52.276265,-0.8192183];
+
+const map=L.map('map',{zoomControl:true,attributionControl:true}).setView([52.2769,-0.8164],17);
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{
+ maxZoom:20,
+ attribution:'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community'
+}).addTo(map);
+
+const layers={rings:L.layerGroup().addTo(map),green:L.layerGroup().addTo(map),actual:L.layerGroup().addTo(map)};
+const teeColours={yellow:'#d5a400',white:'#ffffff',red:'#c54a4a'};
+
+function ring(yd,colour,label){
+ const r=yd*0.9144;
+ return L.circle(green.middle,{radius:r,color:colour,weight:3,fill:false,opacity:.8,dashArray:'8 7'})
+   .bindTooltip(label+' · '+yd+' yd',{sticky:true});
+}
+const ringObjs={
+ yellow:ring(374,teeColours.yellow,'Yellow'),
+ white:ring(391,teeColours.white,'White'),
+ red:ring(346,teeColours.red,'Red')
+};
+Object.values(ringObjs).forEach(x=>x.addTo(layers.rings));
+
+L.circle(green.middle,{radius:50,color:'#173F2A',weight:2,fill:false,opacity:.75}).addTo(layers.green);
+[['Front',green.front],['Middle',green.middle],['Back',green.back]].forEach(([name,p])=>{
+ L.marker(p,{icon:L.divIcon({className:'',html:'<div style="width:14px;height:14px;border-radius:50%;background:#A88A5A;border:2px solid #F5F1E8;box-shadow:0 0 0 1px #173F2A"></div>',iconSize:[14,14],iconAnchor:[7,7]})})
+  .bindTooltip(name,{direction:'top'}).addTo(layers.green);
+});
+
+const teeMarker=L.marker(capturedTee,{icon:L.divIcon({className:'',html:'<div style="width:22px;height:22px;border-radius:50%;background:#173F2A;color:#F5F1E8;border:2px solid #F5F1E8;box-shadow:0 0 0 2px #A88A5A;display:flex;align-items:center;justify-content:center;font:700 11px Arial">T</div>',iconSize:[22,22],iconAnchor:[11,11]})})
+ .bindTooltip('Captured Hole 1 tee · validation only',{direction:'top'});
+teeMarker.addTo(layers.actual);
+
+const corridor=L.polyline([capturedTee,green.middle],{color:'#A88A5A',weight:3,dashArray:'8 8',opacity:.85})
+ .bindTooltip('Captured tee → green middle',{sticky:true}).addTo(layers.actual);
+
+function setVisible(mode){
+ Object.values(ringObjs).forEach(x=>layers.rings.removeLayer(x));
+ if(mode==='all'||mode==='yellow')layers.rings.addLayer(ringObjs.yellow);
+ if(mode==='all'||mode==='white')layers.rings.addLayer(ringObjs.white);
+ if(mode==='all'||mode==='red')layers.rings.addLayer(ringObjs.red);
+ if(mode==='actual'){layers.actual.addTo(map)} else {layers.actual.removeFrom(map)}
+ if(mode==='all'||mode==='yellow'||mode==='white'||mode==='red'){layers.green.addTo(map)}
+ document.querySelectorAll('.bar button').forEach(b=>b.classList.remove('active'));
+ document.getElementById(mode).classList.add('active');
+}
+['all','yellow','white','red','actual'].forEach(id=>document.getElementById(id).onclick=()=>setVisible(id));
+document.getElementById('fit').onclick=()=>{map.setView([52.2769,-0.8164],17);setVisible('all')};
+window.addEventListener('load',()=>setTimeout(()=>map.invalidateSize(),250));
+</script>
+</body>
+</html>
