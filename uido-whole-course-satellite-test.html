@@ -1,0 +1,34 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UiDo Whole Course — Satellite Tee Extraction</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+html,body,#map{height:100%;margin:0}#map{background:#b9b5a7}
+.panel{position:absolute;z-index:9999;top:12px;left:12px;max-width:340px;background:rgba(255,255,255,.95);padding:13px 15px;border-radius:10px;font:13px/1.4 Arial;box-shadow:0 2px 14px #0004}
+.panel b{font-size:15px}.status{margin-top:7px;padding:7px;border-radius:6px;background:#f3eee3}
+button{margin-top:8px;border:0;border-radius:6px;padding:7px 10px;background:#173f2a;color:#fff}
+</style></head><body>
+<div id="map"></div>
+<div class="panel"><b>UiDo — Whole-Course Tee Extraction</b>
+<div class="status" id="status">Loading live satellite imagery…</div>
+<div>18 known greens are the anchors. Tee search is independent of field-test GPS.</div>
+<button onclick="location.href='https://www.google.com/maps/@52.278,-0.817,16z/data=!3m1!1e3'">Open satellite in Google Maps</button>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const greens={"1":{"front":[-0.8151979,52.2776675],"middle":[-0.8150508742,52.2777593548],"back":[-0.8149234,52.2778714]},"2":{"front":[-0.8166103,52.2762446],"middle":[-0.8166885565,52.2761187565],"back":[-0.8167443,52.2759866]},"3":{"front":[-0.8090129,52.2778812],"middle":[-0.8087891217,52.2778988565],"back":[-0.8085902,52.2779135]},"4":{"front":[-0.8087878,52.2772533],"middle":[-0.8087677038,52.2771159346],"back":[-0.8087173,52.2769427]},"5":{"front":[-0.8078104,52.2776584],"middle":[-0.8077740714,52.277808219],"back":[-0.8077361,52.2779524]},"6":{"front":[-0.8122362,52.2781104],"middle":[-0.812469884,52.27808518],"back":[-0.8126753,52.2780397]},"7":{"front":[-0.8088696,52.2794216],"middle":[-0.8087506273,52.2795195045],"back":[-0.8085806,52.2796419]},"8":{"front":[-0.813574,52.2786921],"middle":[-0.8137855971,52.2786696441],"back":[-0.8139867,52.2786162]},"9":{"front":[-0.8196546,52.2769114],"middle":[-0.8197574241,52.2768185621],"back":[-0.819892,52.2767091]},"10":{"front":[-0.8150479,52.278392],"middle":[-0.81486075,52.278398615],"back":[-0.8146675,52.2784586]},"11":{"front":[-0.8217361,52.2796879],"middle":[-0.821899464,52.279755232],"back":[-0.8220921,52.2798081]},"12":{"front":[-0.8176194,52.2794821],"middle":[-0.8174479594,52.2793910406],"back":[-0.8173131,52.2792755]},"13":{"front":[-0.8178728,52.2807912],"middle":[-0.818040525,52.2808534417],"back":[-0.8181271,52.2809468]},"14":{"front":[-0.8220366,52.2803959],"middle":[-0.8221441346,52.2802766038],"back":[-0.8222846,52.2801546]},"15":{"front":[-0.8191666,52.2778876],"middle":[-0.8190806174,52.2777620348],"back":[-0.8190402,52.2776311]},"16":{"front":[-0.8226127,52.2790903],"middle":[-0.8228008455,52.2791599318],"back":[-0.8229746,52.2792116]},"17":{"front":[-0.8250631,52.2794846],"middle":[-0.8252090294,52.2794704294],"back":[-0.8253495,52.2794893]},"18":{"front":[-0.8200444,52.2765729],"middle":[-0.8199714121,52.27643659697],"back":[-0.8198744,52.2762961]}};
+const map=L.map('map',{zoomControl:true}).setView([52.278,-0.817],16);
+const sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri World Imagery'});
+sat.on('tileerror',()=>document.getElementById('status').textContent='Satellite tiles could not be loaded in this viewer. Use the Open satellite button below.');
+sat.on('load',()=>document.getElementById('status').textContent='Live Esri satellite imagery loaded. Green anchors are shown below.');
+sat.addTo(map);
+const bounds=[];
+for(const [h,p] of Object.entries(greens)){
+ const f=[p.front[1],p.front[0]],m=[p.middle[1],p.middle[0]],b=[p.back[1],p.back[0]];
+ L.circleMarker(m,{radius:5,color:'#fff',weight:2,fillColor:'#173f2a',fillOpacity:1}).bindTooltip('Hole '+h+' green M').addTo(map);
+ L.circleMarker(f,{radius:3,color:'#fff',weight:1,fillColor:'#78a987',fillOpacity:1}).addTo(map);
+ L.circleMarker(b,{radius:3,color:'#fff',weight:1,fillColor:'#78a987',fillOpacity:1}).addTo(map);
+ bounds.push(f,m,b);
+}
+map.fitBounds(bounds,{padding:[35,35]});
+</script></body></html>
