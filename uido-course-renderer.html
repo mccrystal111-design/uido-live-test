@@ -3,81 +3,70 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>UiDo · Course Renderer Blueprint</title>
+<title>UiDo · Hole 1 Course Reference</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
-@font-face{font-family:Oxanium;src:url('assets/fonts/Oxanium-Regular.woff2')}@font-face{font-family:Oxanium;src:url('assets/fonts/Oxanium-SemiBold.woff2');font-weight:600}
-:root{--forest:#173F2A;--deep:#10251B;--ivory:#F5F1E8;--stone:#E5DED0;--sage:#AAB8A5;--bronze:#A88A5A;--sand:#D5C19A;--water:#8FA8A0}
-*{box-sizing:border-box}html,body{margin:0;background:var(--deep);color:var(--ivory);font-family:Arial,sans-serif}body{padding:18px}.app{max-width:1180px;margin:auto}.head{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:14px}.brand{font:600 30px Oxanium,sans-serif}.sub{opacity:.7;font-size:13px;margin-top:4px}.controls{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}.controls button,.controls select{min-height:42px;border:1px solid #496052;background:#182c21;color:var(--ivory);border-radius:10px;padding:0 12px;font-weight:600}.controls button.active{background:var(--bronze);color:#fff}.stage{background:var(--ivory);border-radius:22px;padding:18px;overflow:hidden}.stagebar{display:flex;justify-content:space-between;color:var(--forest);font-weight:700;font-size:13px;margin:0 4px 10px}.canvas{position:relative;width:100%;aspect-ratio:1.55;background:#e9e2d3;border-radius:16px;overflow:hidden}.canvas svg{width:100%;height:100%;display:block}.sat{position:absolute;inset:0;background-image:url('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/18/100000/100000');background-size:cover;opacity:0;pointer-events:none}.legend{display:flex;flex-wrap:wrap;gap:12px;color:var(--forest);font-size:12px;margin-top:12px}.sw{display:flex;align-items:center;gap:5px}.dot{width:11px;height:11px;border-radius:50%}.notes{margin-top:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.note{border:1px solid #d4cbbb;border-radius:12px;padding:11px;color:var(--forest);background:#faf7f0;font-size:12px}.note b{display:block;margin-bottom:4px}.hidden{display:none}@media(max-width:700px){body{padding:10px}.head{display:block}.stage{padding:10px}.notes{grid-template-columns:1fr}.canvas{aspect-ratio:1.05}.stagebar{font-size:11px}}
+:root{--forest:#173F2A;--deep:#10251B;--ivory:#F5F1E8;--stone:#E5DED0;--bronze:#A88A5A}
+*{box-sizing:border-box}html,body{margin:0;background:var(--deep);color:var(--ivory);font-family:Arial,sans-serif}body{padding:16px}.app{max-width:1200px;margin:auto}
+.head{display:flex;justify-content:space-between;align-items:end;gap:16px;margin-bottom:12px}.brand{font-size:28px;font-weight:700}.sub{opacity:.72;font-size:13px;margin-top:4px}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}.controls button{min-height:42px;border:1px solid #496052;background:#182c21;color:var(--ivory);border-radius:10px;padding:0 13px;font-weight:700}.controls button.active{background:var(--bronze)}
+.stage{background:var(--ivory);border-radius:20px;padding:14px;color:var(--forest)}.stagebar{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12px;font-weight:700;margin:2px 4px 10px}
+#map{height:min(72vh,720px);min-height:440px;border-radius:15px;overflow:hidden;border:1px solid #cfc6b5}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;margin-top:10px}.legend span{display:flex;align-items:center;gap:5px}.sw{width:12px;height:12px;border-radius:50%;display:inline-block}
+.notes{margin-top:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.note{border:1px solid #d4cbbb;border-radius:11px;padding:10px;background:#faf7f0;font-size:12px}.note b{display:block;margin-bottom:4px}
+.leaflet-control-attribution{font-size:9px}.green-dot{background:#173F2A;border:3px solid #F5F1E8;border-radius:50%;box-shadow:0 0 0 2px #173F2A}
+@media(max-width:700px){body{padding:9px}.head{display:block}.stage{padding:9px}#map{height:70vh;min-height:420px}.notes{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <main class="app">
-<header class="head"><div><div class="brand">UiDo Course Representation Engine</div><div class="sub">Blueprint v0.1 · Overstone Park · Hole 1 · same geometry, adaptive rendering</div></div></header>
-<nav class="controls" aria-label="Renderer controls">
-<button data-mode="uido" class="active">UiDo</button><button data-mode="hybrid">Hybrid</button><button data-mode="satellite">Reference</button>
-<select id="scale" aria-label="View scale"><option value="tee">Tee · whole hole</option><option value="ball">Ball · playing area</option><option value="approach">Approach · green</option><option value="green">Green · detail</option></select>
-<button id="animate">Simulate movement</button>
+<header class="head">
+<div><div class="brand">UiDo Course Representation Engine</div><div class="sub">Hole 1 · Overstone Park · real satellite reference before tracing</div></div>
+</header>
+<nav class="controls">
+<button id="whole" class="active">Whole-hole reference</button>
+<button id="green">Green detail</button>
+<button id="north">North up</button>
+<button id="fit">Reset view</button>
 </nav>
 <section class="stage">
-<div class="stagebar"><span>HOLE 1 · PAR 4</span><span id="scaleLabel">TEE VIEW</span><span>Fixed corridor · heading does not rotate</span></div>
-<div class="canvas" id="canvas">
-<div class="sat" id="sat"></div>
-<svg viewBox="0 0 1000 645" role="img" aria-label="Illustrated Overstone Park Hole 1 course representation">
-<defs>
-<pattern id="grass" width="18" height="18" patternUnits="userSpaceOnUse"><rect width="18" height="18" fill="#78936d"/><path d="M0 16L18 2M-5 18L3 10M15 18L18 15" stroke="#839d78" stroke-width="2" opacity=".45"/></pattern>
-<pattern id="sand" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="#d5c19a"/><circle cx="4" cy="5" r="1" fill="#b69d70"/><circle cx="12" cy="11" r="1" fill="#b69d70"/></pattern>
-</defs>
-<!-- rough / course envelope -->
-<path d="M70 600 C145 535 115 470 190 420 C245 383 235 315 310 280 C385 245 380 190 450 155 C525 118 570 93 650 85 C735 77 850 95 920 120 L900 190 C820 172 735 160 675 175 C600 190 565 225 500 255 C430 287 435 345 355 382 C300 409 300 475 230 505 C180 527 165 575 145 610 Z" fill="#9cab91"/>
-<!-- fairway -->
-<path d="M105 590 C175 535 155 475 220 430 C285 385 275 330 340 300 C410 270 410 220 485 190 C565 158 630 140 700 137 C770 134 825 143 875 155 L850 205 C790 194 725 191 670 202 C600 215 550 244 495 270 C425 303 430 355 365 387 C315 412 315 463 260 495 C210 525 205 565 160 600 Z" fill="url(#grass)" stroke="#5f7859" stroke-width="3"/>
-<!-- tee -->
-<path d="M62 582 Q93 548 132 565 L151 596 Q112 616 72 606 Z" fill="#6e8966" stroke="#4f6d4b" stroke-width="3"/>
-<circle cx="104" cy="584" r="6" fill="#f5f1e8"/><circle cx="119" cy="578" r="6" fill="#f5f1e8"/>
-<!-- bunkers -->
-<path d="M330 390 C345 373 374 374 388 387 C398 397 386 413 366 416 C343 420 322 407 330 390 Z" fill="url(#sand)" stroke="#a98e61" stroke-width="3"/>
-<path d="M560 236 C576 217 609 217 625 231 C635 242 623 257 603 261 C581 265 551 253 560 236 Z" fill="url(#sand)" stroke="#a98e61" stroke-width="3"/>
-<path d="M744 169 C758 153 788 153 802 164 C814 175 801 190 782 193 C761 196 735 184 744 169 Z" fill="url(#sand)" stroke="#a98e61" stroke-width="3"/>
-<!-- water -->
-<path d="M760 300 C815 275 872 284 915 315 L900 372 C850 350 805 347 755 361 Z" fill="#91aaa2" stroke="#718d86" stroke-width="4"/>
-<!-- woodland masses -->
-<g fill="#50694f" opacity=".9"><circle cx="500" cy="105" r="28"/><circle cx="535" cy="90" r="32"/><circle cx="575" cy="83" r="27"/><circle cx="620" cy="76" r="30"/><circle cx="660" cy="72" r="26"/><circle cx="875" cy="110" r="34"/><circle cx="905" cy="130" r="28"/><circle cx="180" cy="410" r="35"/><circle cx="150" cy="440" r="28"/></g>
-<!-- green -->
-<path d="M846 134 C873 125 906 134 918 151 C925 163 914 181 892 190 C866 201 832 192 820 175 C812 163 824 143 846 134 Z" fill="#6e9a61" stroke="#456f49" stroke-width="5"/>
-<path d="M850 143 C875 136 901 143 910 155 C915 165 905 176 889 182 C868 190 842 183 833 173 C826 163 835 148 850 143 Z" fill="#789f6d"/>
-<!-- green contour hints -->
-<path d="M846 154 Q870 145 897 153 M842 166 Q870 157 906 166 M850 176 Q875 169 897 175" fill="none" stroke="#a9bd99" stroke-width="2" opacity=".8"/>
-<!-- pin -->
-<line x1="877" y1="160" x2="877" y2="132" stroke="#fff" stroke-width="2"/><path d="M877 132 l18 7 -18 7z" fill="#a88a5a"/>
-<!-- F/M/B -->
-<g font-family="Arial" font-size="13" font-weight="700" fill="#173f2a"><text x="826" y="211">F 163</text><text x="863" y="225">M 174</text><text x="897" y="211">B 185</text></g>
-<!-- ball / player -->
-<g id="player"><circle cx="112" cy="570" r="12" fill="#fff" stroke="#173f2a" stroke-width="4"/><circle cx="112" cy="570" r="4" fill="#a88a5a"/></g>
-<!-- direction indicator, not map rotation -->
-<g id="heading" opacity=".85"><path d="M112 545 l-8 15 h16z" fill="#a88a5a"/><text x="126" y="551" font-size="12" fill="#173f2a" font-weight="700">HEADING</text></g>
-<!-- yardage line -->
-<path d="M130 570 L875 160" stroke="#a88a5a" stroke-width="2" stroke-dasharray="7 8" opacity=".65"/>
-</svg>
+<div class="stagebar"><span>HOLE 1 · PAR 4</span><span>Green anchor: F / M / B</span><span>Satellite = reference layer only</span></div>
+<div id="map"></div>
+<div class="legend">
+<span><i class="sw" style="background:#173F2A"></i>Green middle</span>
+<span><i class="sw" style="background:#A88A5A"></i>Front / middle / back</span>
+<span>372 yd listed hole length</span>
 </div>
-<div class="legend"><span class="sw"><i class="dot" style="background:#78936d"></i>Fairway</span><span class="sw"><i class="dot" style="background:#9cab91"></i>Rough</span><span class="sw"><i class="dot" style="background:#d5c19a"></i>Bunker</span><span class="sw"><i class="dot" style="background:#6e9a61"></i>Green</span><span class="sw"><i class="dot" style="background:#91aaa2"></i>Water</span></div>
 <div class="notes">
-<div class="note"><b>Stable corridor</b>The hole remains fixed. Player position and heading are independent.</div>
-<div class="note"><b>Adaptive detail</b>Scale is a rendering state: whole hole → ball → approach → green.</div>
-<div class="note"><b>Vector-first</b>Features are geometry, so the same course can render cleanly on phone or watch.</div>
+<div class="note"><b>Step 1 — Reference</b>Use the real aerial image to establish the actual Hole 1 corridor before drawing anything.</div>
+<div class="note"><b>Step 2 — Trace</b>Next we trace the real tee, fairway, rough, bunkers, trees, water and green from this reference.</div>
+<div class="note"><b>Step 3 — Render</b>Only after the geometry is correct do we build the premium illustrated yardage-book version.</div>
 </div>
 </section>
 </main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const player=document.getElementById('player'),label=document.getElementById('scaleLabel'),sat=document.getElementById('sat');
-const positions={tee:[112,570],ball:[420,370],approach:[700,235],green:[870,170]};
-const labels={tee:'TEE VIEW',ball:'BALL VIEW',approach:'APPROACH VIEW',green:'GREEN VIEW'};
-const scales={tee:1,ball:1.45,approach:2.15,green:3.2};
-let mode='uido',running=false,timer;
-function setScale(v){const p=positions[v];label.textContent=labels[v];player.setAttribute('transform','translate('+p[0]+' '+p[1]+') scale('+scales[v]+') translate('+(-p[0])+' '+(-p[1])+')');}
-document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;document.querySelectorAll('[data-mode]').forEach(x=>x.classList.toggle('active',x===b));sat.style.opacity=mode==='satellite'?'1':mode==='hybrid'?'.42':'0'}));
-document.getElementById('scale').addEventListener('change',e=>setScale(e.target.value));
-document.getElementById('animate').addEventListener('click',()=>{running=!running;document.getElementById('animate').textContent=running?'Stop movement':'Simulate movement';let i=0;clearInterval(timer);if(running){const seq=['tee','ball','approach','green'];timer=setInterval(()=>{document.getElementById('scale').value=seq[i%4];setScale(seq[i%4]);i++},1400)}});
-setScale('tee');
+const green={front:[52.2776675,-0.8151979],middle:[52.2777593548,-0.8150508742],back:[52.2778714,-0.8149234]};
+const centre=[52.2769,-0.8164];
+const map=L.map('map',{zoomControl:true,attributionControl:true}).setView(centre,17);
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{
+maxZoom:20,attribution:'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community'
+}).addTo(map);
+const greenLayer=L.layerGroup().addTo(map);
+function marker(latlng,label,cls){
+ const icon=L.divIcon({className:'',html:'<div style="width:16px;height:16px;border-radius:50%;background:#A88A5A;border:2px solid #F5F1E8;box-shadow:0 0 0 1px #173F2A"></div>',iconSize:[16,16],iconAnchor:[8,8]});
+ return L.marker(latlng,{icon}).bindTooltip(label,{permanent:false,direction:'top'});
+}
+marker(green.front,'Front',[green.front[0],green.front[1]]).addTo(greenLayer);
+marker(green.middle,'Middle',[green.middle[0],green.middle[1]]).addTo(greenLayer);
+marker(green.back,'Back',[green.back[0],green.back[1]]).addTo(greenLayer);
+L.circle(green.middle,{radius:50,color:'#173F2A',weight:2,fill:false,opacity:.7}).addTo(greenLayer);
+let currentZoom=17;
+document.getElementById('whole').onclick=()=>{map.setView(centre,17);currentZoom=17};
+document.getElementById('green').onclick=()=>{map.setView(green.middle,19);currentZoom=19};
+document.getElementById('north').onclick=()=>map.setBearing?map.setBearing(0):void 0;
+document.getElementById('fit').onclick=()=>map.setView(centre,17);
+window.addEventListener('load',()=>setTimeout(()=>map.invalidateSize(),250));
 </script>
 </body>
 </html>
