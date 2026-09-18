@@ -9,11 +9,11 @@
 :root{--forest:#173F2A;--deep:#10251B;--ivory:#F5F1E8;--stone:#E5DED0;--bronze:#A88A5A}
 *{box-sizing:border-box}html,body{margin:0;background:var(--deep);color:var(--ivory);font-family:Arial,sans-serif}body{padding:16px}.app{max-width:1200px;margin:auto}
 .head{display:flex;justify-content:space-between;align-items:end;gap:16px;margin-bottom:12px}.brand{font-size:28px;font-weight:700}.sub{opacity:.72;font-size:13px;margin-top:4px}
-.controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}.controls button{min-height:42px;border:1px solid #496052;background:#182c21;color:var(--ivory);border-radius:10px;padding:0 13px;font-weight:700}.controls button.active{background:var(--bronze)}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}.controls button{min-height:42px;border:1px solid #496052;background:#182c21;color:var(--ivory);border-radius:10px;padding:0 13px;font-weight:700;cursor:pointer}.controls button.active{background:var(--bronze)}
 .stage{background:var(--ivory);border-radius:20px;padding:14px;color:var(--forest)}.stagebar{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12px;font-weight:700;margin:2px 4px 10px}
 #map{height:min(72vh,720px);min-height:440px;border-radius:15px;overflow:hidden;border:1px solid #cfc6b5;position:relative}
-#map .leaflet-map-pane{transform-origin:50% 50%;transition:transform .45s ease}
-#map.corridor .leaflet-map-pane{transform:rotate(25deg) scale(1.16)}
+#map .leaflet-map-pane,#map .leaflet-overlay-pane,#map .leaflet-marker-pane,#map .leaflet-shadow-pane{transform-origin:50% 50%;transition:transform .45s ease}
+#map.corridor .leaflet-map-pane,#map.corridor .leaflet-overlay-pane,#map.corridor .leaflet-marker-pane,#map.corridor .leaflet-shadow-pane{transform:rotate(25deg) scale(1.16)}
 .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;margin-top:10px}.legend span{display:flex;align-items:center;gap:5px}.sw{width:12px;height:12px;border-radius:50%;display:inline-block}
 .notes{margin-top:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.note{border:1px solid #d4cbbb;border-radius:11px;padding:10px;background:#faf7f0;font-size:12px}.note b{display:block;margin-bottom:4px}
 .leaflet-control-attribution{font-size:9px}
@@ -24,7 +24,11 @@
 <main class="app">
 <header class="head"><div><div class="brand">UiDo Course Representation Engine</div><div class="sub">Hole 1 · Overstone Park · satellite reference before tracing</div></div></header>
 <nav class="controls">
-<button id="whole" class="active">Whole-hole reference</button><button id="green">Green detail</button><button id="corridor" class="active">Corridor up</button><button id="north">North up</button><button id="fit">Reset view</button>
+<button id="whole" class="active">Whole-hole reference</button>
+<button id="green">Green detail</button>
+<button id="corridor" class="active">Corridor up</button>
+<button id="north">North up</button>
+<button id="fit">Reset view</button>
 </nav>
 <section class="stage">
 <div class="stagebar"><span>HOLE 1 · PAR 4</span><span>Green anchor: F / M / B</span><span>Satellite = reference layer only</span></div>
@@ -41,26 +45,34 @@
 <script>
 const green={front:[52.2776675,-0.8151979],middle:[52.2777593548,-0.8150508742],back:[52.2778714,-0.8149234]};
 const centre=[52.2769,-0.8164];
-// Provisional presentation corridor: current course-centre → Hole 1 green middle.
-// Display orientation only; no tee/fairway geometry is invented.
-const corridorBearing=25;
 const map=L.map('map',{zoomControl:true,attributionControl:true}).setView(centre,17);
-map.getContainer().classList.add('corridor');
-L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:20,attribution:'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community'}).addTo(map);
+const container=map.getContainer();
+function setOrientation(mode){
+  container.classList.toggle('corridor',mode==='corridor');
+  document.getElementById('corridor').classList.toggle('active',mode==='corridor');
+  document.getElementById('north').classList.toggle('active',mode==='north');
+}
+setOrientation('corridor');
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{
+  maxZoom:20,
+  attribution:'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community'
+}).addTo(map);
 const greenLayer=L.layerGroup().addTo(map);
 function marker(latlng,label){
  const icon=L.divIcon({className:'',html:'<div style="width:16px;height:16px;border-radius:50%;background:#A88A5A;border:2px solid #F5F1E8;box-shadow:0 0 0 1px #173F2A"></div>',iconSize:[16,16],iconAnchor:[8,8]});
  return L.marker(latlng,{icon}).bindTooltip(label,{permanent:false,direction:'top'});
 }
-marker(green.front,'Front').addTo(greenLayer);marker(green.middle,'Middle').addTo(greenLayer);marker(green.back,'Back').addTo(greenLayer);
+marker(green.front,'Front').addTo(greenLayer);
+marker(green.middle,'Middle').addTo(greenLayer);
+marker(green.back,'Back').addTo(greenLayer);
 L.circle(green.middle,{radius:50,color:'#173F2A',weight:2,fill:false,opacity:.7}).addTo(greenLayer);
 const corridorGuide=L.polyline([centre,green.middle],{color:'#A88A5A',weight:3,dashArray:'8 8',opacity:.9}).addTo(greenLayer);
 corridorGuide.bindTooltip('Working corridor · presentation guide',{sticky:true});
 document.getElementById('whole').onclick=()=>map.setView(centre,17);
 document.getElementById('green').onclick=()=>map.setView(green.middle,19);
-document.getElementById('corridor').onclick=()=>{map.getContainer().classList.add('corridor');document.getElementById('corridor').classList.add('active');document.getElementById('north').classList.remove('active')};
-document.getElementById('north').onclick=()=>{map.getContainer().classList.remove('corridor');document.getElementById('north').classList.add('active');document.getElementById('corridor').classList.remove('active')};
-document.getElementById('fit').onclick=()=>map.setView(centre,17);
+document.getElementById('corridor').onclick=()=>setOrientation('corridor');
+document.getElementById('north').onclick=()=>setOrientation('north');
+document.getElementById('fit').onclick=()=>{map.setView(centre,17);setOrientation('corridor')};
 window.addEventListener('load',()=>setTimeout(()=>map.invalidateSize(),250));
 </script>
 </body>
