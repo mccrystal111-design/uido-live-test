@@ -1,0 +1,11 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>UiDo Hole 2 Tee Algorithm</title><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><style>html,body,#map{height:100%;margin:0}#map{background:#eee}.dotlabel{background:transparent;border:0;box-shadow:none;color:white;font-weight:bold;text-shadow:0 1px 3px #000}</style></head><body><div id="map"></div><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script>
+const F=[52.2762446,-0.8166103],M=[52.2761187565,-0.8166885565],B=[52.2759866,-0.8167443],YARDS=154,BAND=20;
+function bearing(a,b){const p=Math.PI/180,y1=a[0]*p,y2=b[0]*p,dl=(b[1]-a[1])*p;return (Math.atan2(Math.sin(dl)*Math.cos(y2),Math.cos(y1)*Math.sin(y2)-Math.sin(y1)*Math.cos(y2)*Math.cos(dl))*180/Math.PI+360)%360}
+function dest(p,deg,yd){const R=6371000,d=yd*.9144,a=deg*Math.PI/180,lat=p[0]*Math.PI/180,lon=p[1]*Math.PI/180;const la=Math.asin(Math.sin(lat)*Math.cos(d/R)+Math.cos(lat)*Math.sin(d/R)*Math.cos(a));const lo=lon+Math.atan2(Math.sin(a)*Math.sin(d/R)*Math.cos(lat),Math.cos(d/R)-Math.sin(lat)*Math.sin(la));return [la*180/Math.PI,lo*180/Math.PI]}
+const approach=bearing(M,F), reverse=approach+180;
+const a=dest(M,reverse-20,YARDS+BAND),b=dest(M,reverse+20,YARDS+BAND),c=dest(M,reverse+20,YARDS-BAND),d=dest(M,reverse-20,YARDS-BAND);
+const map=L.map('map').setView(M,18);L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri World Imagery'}).addTo(map);
+L.polygon([a,b,c,d],{color:'white',weight:1.5,fillColor:'white',fillOpacity:.08}).addTo(map);
+L.polyline([M,dest(M,reverse,210)],{color:'white',weight:2,dashArray:'6 6'}).addTo(map);
+[[F,'F'],[M,'M'],[B,'B']].forEach(x=>L.circleMarker(x[0],{radius:5,color:'white',fillColor:'white',fillOpacity:1,weight:2}).bindTooltip(x[1],{permanent:true,direction:'center',className:'dotlabel'}).addTo(map));
+</script></body></html>
