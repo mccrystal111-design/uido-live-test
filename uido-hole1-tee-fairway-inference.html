@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UiDo · Hole 1 · Tee/Fairway Inference</title>
+<style>
+html,body{margin:0;height:100%;font-family:Arial,sans-serif;background:#10251B;color:#F5F1E8}
+body{display:flex;align-items:center;justify-content:center}.app{width:min(1500px,97vw)}
+h1{font-size:24px;margin:0 0 4px}.sub{opacity:.75;margin-bottom:12px}
+.panel{background:#F5F1E8;color:#173F2A;border-radius:18px;padding:14px}
+.map{position:relative;height:min(78vh,760px);min-height:480px;border-radius:13px;overflow:hidden;background:#d9d0bd}
+.rotor{position:absolute;left:-20%;top:-20%;width:140%;height:140%;transform:rotate(-66deg) scale(1.02);transform-origin:center}
+.rotor img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.overlay{position:absolute;inset:0}
+.point{position:absolute;transform:translate(-50%,-50%);border-radius:50%;width:15px;height:15px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:bold;color:#F5F1E8;border:1px solid #F5F1E8;box-shadow:0 0 0 1px #173F2A}
+.front{background:#A88A5A}.middle{background:#173F2A}.back{background:#7C5A32}
+.axis{position:absolute;height:3px;background:#F5F1E8;transform-origin:left center;opacity:.9}
+.label{position:absolute;padding:4px 7px;border-radius:6px;background:#10251B;color:#F5F1E8;font-size:11px;font-weight:bold;white-space:nowrap}
+.tee{position:absolute;width:18px;height:18px;transform:translate(-50%,-50%) rotate(45deg);background:#D4A74B;border:2px solid #F5F1E8;box-shadow:0 0 0 2px #173F2A}
+.band{position:absolute;border:2px dashed rgba(245,241,232,.85);border-radius:50%;transform:translate(-50%,-50%)}
+.note{margin-top:10px;padding:10px;background:#e9e2d5;border-radius:10px;font-size:13px;line-height:1.5}
+.coords{font-family:monospace;font-size:11px;opacity:.75;margin-top:6px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:12px}.sw{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}
+</style></head>
+<body><div class="app"><h1>UiDo · Hole 1</h1><div class="sub">Overstone Park · Tee/Fairway inference test · playing corridor orientation</div>
+<div class="panel"><div class="map"><div class="rotor" id="rotor">
+<img src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=-0.822,52.274,-0.812,52.280&bboxSR=4326&size=1800,1100&imageSR=4326&format=jpg&f=image" alt="Satellite">
+<div class="overlay" id="overlay"></div></div></div>
+<div class="note"><b>Applied logic:</b> API playing yardage is used as a distance constraint; F/M establishes the approach relationship; the candidate tee area is then expected to connect through the fairway rather than requiring a straight tee→green line. The yellow tee is <b>validation only</b> and is not used to construct the search. The map is rotated so the inferred/validated playing corridor reads downward on screen.</div>
+<div class="legend"><span><i class="sw front"></i>Front</span><span><i class="sw middle"></i>Middle</span><span><i class="sw back"></i>Back</span><span>◇ validation tee</span><span>— M→F approach axis</span></div>
+<div class="coords">Yellow API yardage: 374 yd · Search band: 354–394 yd · Green F/M/B GPS source</div></div></div>
+<script>
+const bbox={west:-0.822,east:-0.812,south:52.274,north:52.280};
+const pts={F:[52.2776675,-0.8151979],M:[52.2777593548,-0.8150508742],B:[52.2778714,-0.8149234]};
+const validationTee=[52.276265,-0.8192183];
+function p(lat,lon){return{x:(lon-bbox.west)/(bbox.east-bbox.west)*100,y:(bbox.north-lat)/(bbox.north-bbox.south)*100}}
+const ov=document.getElementById('overlay');
+for(const [k,v] of Object.entries(pts)){const q=p(...v);const e=document.createElement('div');e.className='point '+k.toLowerCase();e.textContent=k;e.style.left=q.x+'%';e.style.top=q.y+'%';ov.appendChild(e)}
+// M→F approach axis, extended toward the green's front direction.
+function bearing(a,b){const r=Math.PI/180,la1=a[0]*r,la2=b[0]*r,d=(b[1]-a[1])*r;return (Math.atan2(Math.sin(d)*Math.cos(la2),Math.cos(la1)*Math.sin(la2)-Math.sin(la1)*Math.cos(la2)*Math.cos(d))/r+360)%360}
+const M=p(...pts.M),F=p(...pts.F); const dx=F.x-M.x,dy=F.y-M.y; const len=Math.hypot(dx,dy);const axis=document.createElement('div');axis.className='axis';axis.style.left=M.x+'%';axis.style.top=M.y+'%';axis.style.width=(len*5)+'%';axis.style.transform='rotate('+Math.atan2(dy,dx)+'rad)';ov.appendChild(axis);
+const lab=document.createElement('div');lab.className='label';lab.textContent='M → F approach';lab.style.left=(F.x+2)+'%';lab.style.top=(F.y-3)+'%';ov.appendChild(lab);
+// Yardage search band shown as a pair of rings around M. It is deliberately broad enough to accommodate dogleg geometry.
+for(const yd of [354,394]){const e=document.createElement('div');e.className='band';const q=p(...pts.M);const metres=yd*0.9144;const latm=111320,lonm=111320*Math.cos(pts.M[0]*Math.PI/180);e.style.left=q.x+'%';e.style.top=q.y+'%';e.style.width=(metres/lonm/(bbox.east-bbox.west)*100*2)+'%';e.style.height=(metres/latm/(bbox.north-bbox.south)*100*2)+'%';ov.appendChild(e)}
+const t=p(...validationTee);const tee=document.createElement('div');tee.className='tee';tee.style.left=t.x+'%';tee.style.top=t.y+'%';ov.appendChild(tee);
+</script></body></html>
