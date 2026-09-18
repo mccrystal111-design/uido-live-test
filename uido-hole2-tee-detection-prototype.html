@@ -1,0 +1,27 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UiDo Hole 2 Tee Detection Prototype</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>html,body,#map{height:100%;margin:0}#map{background:#ddd}.panel{position:absolute;z-index:9999;left:12px;top:12px;width:330px;background:#fff;padding:14px;border-radius:10px;font:13px Arial;box-shadow:0 2px 12px #0004}.row{margin:6px 0}.candidate{border-top:1px solid #ddd;padding:8px 0}.tag{font-weight:bold}.warn{background:#fff5d9;padding:7px;border-radius:6px;margin-top:8px}</style></head>
+<body><div id="map"></div><div class="panel"><b>UiDo — Hole 2 Tee Detection</b>
+<div class="row">Satellite: <span id="sat">loading…</span></div>
+<div class="row">Green anchor: F/M/B known</div><div class="row">Yellow API: 154 yd</div>
+<div class="warn">The geographic engine is running independently. Pixel-level satellite classification is deliberately not claimed until we have a reliable imagery-analysis layer.</div>
+<div id="out"></div></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const F=[52.2762446,-0.8166103],M=[52.2761187565,-0.8166885565],B=[52.2759866,-0.8167443],Y=154,T=20;
+function bearing(a,b){const p=Math.PI/180,y1=a[0]*p,y2=b[0]*p,dl=(b[1]-a[1])*p;return (Math.atan2(Math.sin(dl)*Math.cos(y2),Math.cos(y1)*Math.sin(y2)-Math.sin(y1)*Math.cos(y2)*Math.cos(dl))*180/Math.PI+360)%360}
+function dest(p,deg,yd){const R=6371000,d=yd*.9144,a=deg*Math.PI/180,la=p[0]*Math.PI/180,lo=p[1]*Math.PI/180;const lat=Math.asin(Math.sin(la)*Math.cos(d/R)+Math.cos(la)*Math.sin(d/R)*Math.cos(a));const lon=lo+Math.atan2(Math.sin(a)*Math.sin(d/R)*Math.cos(la),Math.cos(d/R)-Math.sin(la)*Math.sin(lat));return [lat*180/Math.PI,lon*180/Math.PI]}
+const app=bearing(M,F),map=L.map('map').setView([52.2765,-0.816],17.5);
+const sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri World Imagery'});
+sat.on('load',()=>document.getElementById('sat').textContent='loaded');sat.on('tileerror',()=>document.getElementById('sat').textContent='tile error / network blocked');sat.addTo(map);
+[[F,'F'],[M,'M'],[B,'B']].forEach(q=>L.circleMarker(q[0],{radius:5,color:'#fff',fillColor:'#173f2a',fillOpacity:1,weight:2}).bindTooltip(q[1],{permanent:true}).addTo(map));
+const min=Y-T,max=Y+T;
+const search=[dest(M,app-48,max),dest(M,app+48,max),dest(M,app+48,min),dest(M,app-48,min)];
+L.polygon(search,{color:'#fff',fillColor:'#fff',fillOpacity:.08,weight:2}).bindTooltip('Independent tee search envelope').addTo(map);
+L.polyline([M,dest(M,app,210)],{color:'#fff',weight:2,dashArray:'7 7'}).addTo(map);
+const candidates=[-36,-18,0,18,36].map((off,i)=>({p:dest(M,app+off,Y),bearing:(app+off+360)%360,distance:Y}));
+candidates.forEach((c,i)=>L.circleMarker(c.p,{radius:i===0?8:6,color:'#fff',weight:2,fillColor:i===0?'#d7a34a':'#4d9bd0',fillOpacity:.9}).bindTooltip('Geometric candidate '+(i+1),{permanent:true}).addTo(map));
+document.getElementById('out').innerHTML='<div class="row"><b>Next extraction layer:</b> replace the geometric candidate generator with a real satellite segmentation/classifier. The candidates above are search probes, not detected tees.</div>';
+</script></body></html>
