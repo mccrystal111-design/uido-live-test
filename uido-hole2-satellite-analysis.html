@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UiDo Hole 2 — Satellite Analysis</title>
+<style>
+body{margin:0;background:#10251b;color:#f5f1e8;font:14px Arial,sans-serif}
+.wrap{max-width:1200px;margin:auto;padding:16px}.card{background:#173f2a;border-radius:12px;padding:14px;margin-bottom:14px}
+#stage{position:relative;display:inline-block;max-width:100%;overflow:hidden;background:#333}
+#sat{display:block;max-width:100%;height:auto}
+.overlay{position:absolute;inset:0;pointer-events:none}
+#status{font-weight:700}.small{opacity:.8;font-size:12px;line-height:1.45}
+</style></head><body><div class="wrap">
+<div class="card"><b>UiDo — Hole 2 Satellite Extraction</b><div id="status">Loading local satellite asset…</div>
+<div class="small">Source hierarchy: satellite imagery + known green F/M/B + API yardage. Field-test tee is intentionally absent from the extraction input.</div></div>
+<div id="stage"><img id="sat" src="docs/assets/uido-hole2-satellite.jpg" crossorigin="anonymous"><canvas id="cv" class="overlay"></canvas></div>
+<div class="card"><b>Analysis pipeline</b><div id="log" class="small">1. Load imagery<br>2. Map pixels to geographic extent<br>3. Segment maintained turf candidates<br>4. Score tee geometry/context<br>5. Output candidate polygons + confidence<br>6. Validate separately against ground truth</div></div>
+<script>
+const img=document.getElementById('sat'),cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+img.onload=()=>{cv.width=img.naturalWidth;cv.height=img.naturalHeight;document.getElementById('status').textContent='Satellite asset loaded — pixel analysis can now run locally.';};
+img.onerror=()=>document.getElementById('status').textContent='Satellite asset not present yet. GitHub Action must finish first.';
+</script></div></body></html>
