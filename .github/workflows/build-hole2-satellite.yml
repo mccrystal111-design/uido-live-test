@@ -1,0 +1,36 @@
+name: Build Hole 2 satellite test asset
+
+on:
+  push:
+    paths:
+      - '.github/workflows/build-hole2-satellite.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch Hole 2 satellite export
+        run: |
+          mkdir -p docs/assets
+          curl -L --fail --retry 3 \
+            'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=-0.8180,52.2748,-0.8145,52.2776&bboxSR=4326&imageSR=4326&size=1400,1120&format=jpg&f=image' \
+            -o docs/assets/uido-hole2-satellite.jpg
+          file docs/assets/uido-hole2-satellite.jpg
+
+      - name: Commit generated imagery
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/assets/uido-hole2-satellite.jpg
+          if git diff --cached --quiet; then
+            echo 'No imagery changes'
+          else
+            git commit -m 'Add Hole 2 satellite extraction asset'
+            git push
+          fi
