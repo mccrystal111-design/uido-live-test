@@ -1,0 +1,42 @@
+{
+  "schema_version": "uido.course-source-manifest.v0.1",
+  "course": "overstone-park",
+  "required_inputs": [
+    {
+      "id": "osm_geojson",
+      "expected_examples": [
+        "export (1).geojson",
+        "UiDo_Overstone_OSM_Capture_v0.2.json"
+      ],
+      "role": "source geometry",
+      "status": "missing_from_repository"
+    },
+    {
+      "id": "satellite_raster",
+      "expected_examples": [
+        "Overstone_snapshot_09-18-2026_20_59_42.jpeg"
+      ],
+      "role": "imagery refinement",
+      "status": "missing_from_repository"
+    },
+    {
+      "id": "earth_studio_project",
+      "expected_examples": [
+        "Overstone.esp"
+      ],
+      "role": "capture provenance",
+      "status": "missing_from_repository"
+    },
+    {
+      "id": "registration_diagnostics",
+      "expected_examples": [
+        "UiDo_Overstone_Registration_Diagnostic_v2.png",
+        "UiDo_Overstone_Registration_central_x2.png"
+      ],
+      "role": "historical diagnostic only",
+      "status": "not_required_for_model"
+    }
+  ],
+  "recovery_rule": "Do not reconstruct missing geometry from screenshots or memory. Recover the original source artifacts, then run the deterministic normalisation and measured registration stages.",
+  "next_execution": "build_overstone_model.py -> register_affine.py -> satellite feature refinement -> validation/fusion"
+}
