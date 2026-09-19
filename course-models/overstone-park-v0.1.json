@@ -35,7 +35,7 @@
     }
   ],
   "registration": {
-    "status": "pending_artifact_recovery",
+    "status": "pending_recovery_of_measured_solution",
     "transform": null,
     "metrics": null,
     "note": "Do not invent or silently apply a transform. Populate only from the measured registered OSM→satellite solution."
@@ -583,5 +583,38 @@
     "verified",
     "conflict",
     "unknown"
+  ],
+  "feature_counts": {
+    "source_osm": {
+      "BUNKER": 31,
+      "TEE": 30,
+      "ROUGH": 23,
+      "GREEN": 20,
+      "FAIRWAY": 17,
+      "PATH": 17,
+      "WATER": 2
+    },
+    "green_anchors": 18
+  },
+  "source_capture_summary": {
+    "holes": 18,
+    "pins": 18,
+    "greens": 20,
+    "matched_greens": 18,
+    "unassigned_greens": 2,
+    "tees": 30,
+    "fairways": 17,
+    "bunkers": 31,
+    "rough": 23,
+    "cartpaths": 17,
+    "water_hazards": 2,
+    "driving_range": 1
+  },
+  "notes": [
+    "Source counts reflect the Overstone OSM capture documented in the 2026-09-19 handover.",
+    "The original OSM GeoJSON and satellite raster are not present in the current repository, so no registration transform or refined polygon is fabricated here.",
+    "OSM geometry is source data and is never overwritten by satellite refinement.",
+    "Verified GPS must not enter candidate generation; it belongs in a separate validation layer.",
+    "Missing OSM features remain missing; the model does not invent geometry."
   ]
 }
