@@ -11,3 +11,7 @@ It preserves source geometry, normalises common OSM golf tags, associates explic
 Inputs: --osm GeoJSON, --greens course_green_data.json, --out generated course model JSON.
 
 Example: python tools/course-model/build_overstone_model.py --osm export.geojson --greens course_green_data.json --out course-models/overstone-park-v0.1.json
+
+## Registration tool
+
+`register_affine.py` fits a measured affine transform from OSM longitude/latitude to satellite pixel coordinates and reports per-control-point residuals plus RMS/max error. It requires real measured control points; validation GPS must not be used as a shortcut.
