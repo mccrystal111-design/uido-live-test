@@ -1,0 +1,76 @@
+name: UiDo Course Builder - Overstone EA capture
+
+on:
+  workflow_dispatch:
+    inputs:
+      course:
+        description: "Course name"
+        required: true
+        default: "Overstone Park"
+      year:
+        description: "EA aerial survey year"
+        required: true
+        default: "2013"
+      resolution:
+        description: "EA aerial resolution (metres)"
+        required: true
+        default: "0.25"
+
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download EA aerial packages
+        env:
+          COURSE: ${{ inputs.course }}
+          YEAR: ${{ inputs.year }}
+          RESOLUTION: ${{ inputs.resolution }}
+        run: |
+          set -euo pipefail
+          mkdir -p build/ea-aerial/packages build/ea-aerial/sources
+          products=(vertical_aerial_photography_tiles_irrgb vertical_aerial_photography_tiles_rgb vertical_aerial_photography_tiles_nir)
+          blocks=(SP8064 SP8065 SP8164 SP8165)
+          found=0
+          for product in "${products[@]}"; do
+            rm -f build/ea-aerial/packages/*.zip
+            ok=1
+            for block in "${blocks[@]}"; do
+              url="https://environment.data.gov.uk/tiles/collections/survey/$product/$YEAR/$RESOLUTION/$block?subscription-key=dspui"
+              echo "Testing $product / $block"
+              code=$(curl -L --silent --show-error --output "build/ea-aerial/packages/$block.zip" --write-out '%{http_code}' "$url")
+              size=$(stat -c%s "build/ea-aerial/packages/$block.zip" || true)
+              echo "HTTP=$code SIZE=$size"
+              if [ "$code" != "200" ] || [ "$size" -lt 1000 ] || ! unzip -tq "build/ea-aerial/packages/$block.zip" >/dev/null 2>&1; then ok=0; break; fi
+            done
+            if [ "$ok" = "1" ]; then echo "product=$product" > build/ea-aerial/acquisition.txt; found=1; break; fi
+          done
+          test "$found" = "1"
+          for block in "${blocks[@]}"; do
+            unzip -l "build/ea-aerial/packages/$block.zip" | sed -n '1,30p'
+            unzip -oq "build/ea-aerial/packages/$block.zip" -d "build/ea-aerial/sources/$block"
+          done
+          find build/ea-aerial/sources -type f | sort
+          du -sh build/ea-aerial
+      - name: Write acquisition manifest
+        env:
+          COURSE: ${{ inputs.course }}
+          YEAR: ${{ inputs.year }}
+          RESOLUTION: ${{ inputs.resolution }}
+        run: |
+          python - <<'PY'
+          import hashlib,json,pathlib,os
+          root=pathlib.Path("build/ea-aerial")
+          product=(root/"acquisition.txt").read_text().strip().split("=",1)[1]
+          packages=[]
+          for p in sorted((root/"packages").glob("*.zip")):
+              packages.append({"block":p.stem,"bytes":p.stat().st_size,"sha256":hashlib.sha256(p.read_bytes()).hexdigest()})
+          manifest={"schema":"uido.course.ea-acquisition.v0.1","course":os.environ["COURSE"],"aerial":{"year":os.environ["YEAR"],"resolution_m":float(os.environ["RESOLUTION"]),"product":product},"projection":"EPSG:27700","blocks":["SP8064","SP8065","SP8164","SP8165"],"packages":packages,"status":"captured"}
+          (root/"manifest.json").write_text(json.dumps(manifest,indent=2)+"\n")
+          PY
+      - name: Upload captured EA dataset
+        uses: actions/upload-artifact@v4
+        with:
+          name: overstone-ea-aerial-capture
+          path: build/ea-aerial/
+          retention-days: 14
