@@ -17,8 +17,9 @@ WFS=EA+"/spatialdata/survey-index-files/wfs"
 E,N=480792.63,265074.40
 GRID="SP8065"
 
-def arcgis_point(layer:str)->list[dict[str,Any]]:
-    p={"where":"1=1","geometry":f"{E},{N}","geometryType":"esriGeometryPoint",
+def arcgis_bbox(layer:str)->list[dict[str,Any]]:
+    geometry=json.dumps({"xmin":480000,"ymin":265000,"xmax":485000,"ymax":270000,"spatialReference":{"wkid":27700}})
+    p={"where":"1=1","geometry":geometry,"geometryType":"esriGeometryEnvelope",
        "inSR":"27700","spatialRel":"esriSpatialRelIntersects","outFields":"*",
        "returnGeometry":"false","f":"json"}
     r=requests.get(layer+"/query",params=p,timeout=60); r.raise_for_status()
@@ -49,10 +50,10 @@ def main():
     a=ap.parse_args()
     out={"schema_version":"uido.course.public-source-resolution.v0.1",
          "course":"overstone-park","site":{"easting":E,"northing":N,"epsg":27700,"national_grid_5km":GRID},
-         "vap":{"method":"arcgis_point","records":[]},"lidar":{"method":"arcgis_point","records":[]},
+         "vap":{"method":"arcgis_sp8065_bbox","records":[]},"lidar":{"method":"arcgis_point","records":[]},
          "errors":[]}
     for k,url in (("vap",VAP),("lidar",LIDAR)):
-        try: out[k]["records"]=arcgis_point(url)
+        try: out[k]["records"]=arcgis_bbox(url)
         except Exception as e: out["errors"].append(f"{k} ArcGIS: {e}")
     if not out["vap"]["records"] or not out["lidar"]["records"]:
         try:
