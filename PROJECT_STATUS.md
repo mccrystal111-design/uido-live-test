@@ -1,6 +1,6 @@
 # UiDo — Project Source of Truth
 
-**Last updated:** 2026-09-20  
+**Last updated:** 2026-09-21  
 **Repository:** `mccrystal111-design/uido-live-test`  
 **Canonical project:** UiDo golf decision engine / virtual caddie / SmartShot intelligence.
 
@@ -8,7 +8,7 @@ This is the first file a fresh UiDo session should read. It records authoritativ
 
 ## Current state
 
-**Course data foundation: READY.** Overstone's authoritative OSM capture has been recovered, identity-locked and deterministically normalised. The provider-neutral course model and measured-registration tooling exist. Public EA source resolution is complete. **Raw EA raster/LAZ acquisition is the remaining source-data gate.**
+**Course data foundation: READY.** Overstone's authoritative OSM capture has been recovered, identity-locked and deterministically normalised. The provider-neutral course model and measured-registration tooling exist. Public EA source resolution is complete. **Raw EA raster/LAZ acquisition is still the remaining source-data gate.**
 
 **Do not start another visual prototype.** The immediate priority is the public-source data/model pipeline.
 
@@ -74,6 +74,21 @@ This v0.4 Library artifact is **not yet promoted as the GitHub canonical course 
 - `docs/UI_DO_COURSE_MODEL_V0.1.md` and related extraction/pixel/provenance docs.
 - Whole-course satellite viewer and historical Earth Studio/Hole 1/Hole 2 experiments exist. Do not rebuild them merely because a fresh chat cannot see an old conversation.
 
+### New EA acquisition runner — implemented, not yet proven
+
+`.github/workflows/build-overstone-ea.yml` is now the active manual acquisition runner. It:
+
+- discovers the actual EA aerial product/tiles for the fixed Overstone footprint through the EA survey catalogue;
+- requests the discovered ZIP packages using the EA survey download endpoint and public survey key;
+- validates ZIP integrity and raster members;
+- retries failed downloads;
+- records URLs, byte counts and SHA-256 hashes in `uido.course.ea-acquisition.v0.2` manifest output;
+- uploads the captured source package as a GitHub Actions artifact when successful.
+
+A manual run of the earlier implementation failed before producing an artifact. The failure was an acquisition-path assumption, not evidence that the EA data is absent. The runner was then changed to catalogue discovery plus retries in commit `95409ef365371972eff35a9b2f8db3e54ffbfaed`.
+
+**Important:** no successful end-to-end raw EA aerial capture has yet been recorded after this fix. Do not mark acquisition complete until a successful artifact is inspected.
+
 ## Public-source acquisition state
 
 ### EA catalogue resolution — COMPLETE
@@ -90,13 +105,15 @@ The EA Vertical Aerial Photography and National LiDAR catalogue services are mac
 
 Course footprint: EPSG:27700 E 480137.49–481451.93 / N 264803.28–266016.15.
 
-### Automated acquisition — NOT YET PROVEN
+### Automated acquisition — aerial runner awaiting proof
 
-The GitHub main branch now contains an EA catalogue connectivity test workflow (`.github/workflows/test-overstone-ea-acquisition.yml`) and the acquisition adapter. The test proves the intended machine-query path in code, but **no successful end-to-end raw raster/LAZ download has yet been recorded**.
+The GitHub main branch contains both the catalogue connectivity test and the new manual acquisition runner. The catalogue path is proven in code, but **raw raster/LAZ acquisition is not yet proven end-to-end**.
+
+The earlier direct-download implementation was manually triggered and failed in 12 seconds with exit code 1 and no artifact. The failure was recorded before the runner was changed to discover the product/tiles from the EA catalogue. The corrected runner is commit `95409ef365371972eff35a9b2f8db3e54ffbfaed` and is awaiting a fresh manual run.
 
 Draft PR #1 (`test/ea-machine-acquisition`) is open and unmerged. Do not treat the PR as production acquisition.
 
-A promising workaround has been identified: an existing public GitHub project automates the EA Survey Download application with headless Selenium, uploads an AOI, selects products/years, extracts the generated download URLs and downloads the resulting files. This is a credible route for UiDo, but it has **not yet been adapted/tested against the Overstone Vertical Aerial Photography product**, so acquisition remains gated.
+A headless Selenium EA Survey Download workaround remains available as fallback if the corrected direct survey endpoint fails. It has not yet been adapted/tested against the Overstone Vertical Aerial Photography product.
 
 ### Production architecture decision
 
@@ -129,22 +146,17 @@ LiDAR has **not** yet been ingested into the canonical GitHub course model. Its 
 
 ## UI / product state
 
-The Library contains current UI source-of-truth documents, including the revised premium-golf aesthetic, light/dark system, tile navigation language and agreed live-test round flow. The agreed flow keeps strategy/SmartShot out of the live capture loop until the engine is ready. The current primary path is GPS/course recognition -> Yardage -> Wind -> Lie -> Start Line -> Shape -> Strike -> Shot Recorded -> Score/round review.
-
-These UI documents are authoritative for their respective screens. Do not redesign a screen from memory or revive superseded interaction models without checking the current Library source-of-truth document first.
+The Library contains current UI source-of-truth documents, including the revised premium-golf aesthetic, light/dark system, tile navigation language and agreed live-test round flow. The current primary path is GPS/course recognition -> Yardage -> Wind -> Lie -> Start Line -> Shape -> Strike -> Shot Recorded -> Score/round review. The live-test flow deliberately keeps SmartShot strategy out until the engine is ready. Do not redesign screens from memory; use the current Library blueprint for each screen.
 
 ## EXACT NEXT STEP
 
-**Finish the automated EA acquisition proof using the headless Survey Download workaround.**
+**Run the corrected `.github/workflows/build-overstone-ea.yml` manually for Overstone Park / 2013 / 0.25 m and inspect the resulting job/artifact.**
 
-1. Adapt the existing headless Selenium pattern to UiDo's EA Survey Download workflow.
-2. Use the already-resolved Overstone AOI and exact aerial/LiDAR products; do not re-resolve or re-download source metadata unnecessarily.
-3. Prove a clean non-interactive download of at least the required Overstone aerial tiles; then prove LiDAR acquisition.
-4. Record exact download URLs/file hashes and acquisition method in the acquisition manifest.
-5. Persist raw source files in the source archive without modifying them.
-6. Only after acquisition succeeds: inspect raster georeferencing, establish measured control points, run affine registration, then proceed to refinement/LiDAR fusion.
-
-If the Selenium route fails, record the exact failure and keep the provider adapter abstraction; do not claim acquisition is automated.
+1. Trigger the workflow with the existing defaults.
+2. If it succeeds, inspect the artifact contents and manifest; verify the four required aerial tiles, raster members, hashes and georeferencing.
+3. If it fails, capture the exact catalogue/download response and fix the runner; do not switch to manual downloads merely to make the status green.
+4. Once aerial acquisition is proven, add/prove the corresponding LiDAR acquisition for SP8060/SP8065.
+5. Only after fixed raster acquisition succeeds: establish measured control points, run `register_affine.py`, record residuals, then proceed to refinement/LiDAR fusion.
 
 ## DO NOT REBUILD
 
@@ -161,6 +173,8 @@ If the Selenium route fails, record the exact failure and keep the provider adap
 11. If an artifact appears missing from GitHub, check the Library/conversation sources before declaring it lost.
 12. Do not silently promote Library v0.4 to replace GitHub v0.1; reconcile and version the promotion explicitly.
 13. Do not treat EA catalogue connectivity as equivalent to successful raw-data acquisition.
+14. Do not treat the failed pre-fix EA workflow run as proof that the EA source is unavailable.
+15. Do not replace the corrected acquisition runner with manual portal steps unless the automated route has been conclusively tested and documented as blocked.
 
 ## Change discipline
 
