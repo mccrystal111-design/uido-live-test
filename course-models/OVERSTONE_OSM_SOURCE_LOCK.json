@@ -1,0 +1,21 @@
+{
+  "course": "overstone-park",
+  "source_filename": "overstone-park-osm-capture-v0.2.geojson",
+  "original_uploaded_name": "export (1).geojson",
+  "sha256": "e1eebf606f5e2767cfdf2af3951f7e2f50660b5b6b75ff2567af5c755a01b16e",
+  "size_bytes": 363542,
+  "feature_counts": {
+    "holes": 18,
+    "pins": 18,
+    "greens": 20,
+    "tees": 30,
+    "fairways": 17,
+    "bunkers": 31,
+    "rough": 23,
+    "cartpaths": 17,
+    "water_hazards": 2,
+    "driving_range": 1
+  },
+  "library_path": "/UiDo/Overstone/source/overstone-park-osm-capture-v0.2.geojson",
+  "note": "Immutable source artifact is persisted in UiDo Library; this lock records its identity so the raw geometry can be reattached to the repository without ambiguity."
+}
