@@ -9,11 +9,19 @@
         "UiDo_Overstone_OSM_Capture_v0.2.json"
       ],
       "role": "source geometry",
-      "status": "recovered_in_chat_and_persisted_to_uido_library",
+      "status": "recovered_authoritative_source_persisted_and_source_normalized",
       "recovered_filename": "overstone-park-osm-capture-v0.2.geojson",
       "sha256": "e1eebf606f5e2767cfdf2af3951f7e2f50660b5b6b75ff2567af5c755a01b16e",
       "size_bytes": 363542,
-      "library_path": "/UiDo/Overstone/source/overstone-park-osm-capture-v0.2.geojson"
+      "library_path": "/UiDo/Overstone/source/overstone-park-osm-capture-v0.2.geojson",
+      "normalized_artifact": {
+        "path": "/UiDo/Overstone/source/overstone-source-normalized-v0.1.json",
+        "sha256": "876eb808a978f577057747f71cca759d4032ed5cc776c3bf036eb126ce6b28e9",
+        "size_bytes": 376625,
+        "schema": "uido.course.source-normalized.v0.1",
+        "feature_count": 177,
+        "hole_association_policy": "explicit_only"
+      }
     },
     {
       "id": "satellite_raster",
@@ -42,5 +50,5 @@
     }
   ],
   "recovery_rule": "Do not reconstruct missing geometry from screenshots or memory. Recover the original source artifacts, then run the deterministic normalisation and measured registration stages.",
-  "next_execution": "build_overstone_model.py -> register_affine.py -> satellite feature refinement -> validation/fusion"
+  "next_execution": "source-normalisation complete -> recover/acquire fixed satellite raster -> establish real OSM-to-satellite control points -> measured affine registration -> spatial hole association -> satellite refinement -> LiDAR enrichment -> verification/fusion"
 }
