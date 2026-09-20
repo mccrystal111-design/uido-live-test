@@ -1,0 +1,35 @@
+name: Test Overstone EA machine acquisition
+
+on:
+  pull_request:
+    paths:
+      - "tools/course-model/ea_source_acquisition.py"
+      - "course-models/OVERSTONE_ACQUISITION_MANIFEST.json"
+      - ".github/workflows/test-overstone-ea-acquisition.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test EA catalogue and OGC endpoints
+        run: |
+          python - <<'PY'
+          import json, requests
+          bbox=(480137.4894811138,264803.2820420222,481451.93252437544,266016.1542009115)
+          base="https://environment.data.gov.uk"
+          layers=[
+            base+"/KB6uNVj5ZcJr7jUP/ArcGIS/rest/services/Vertical_Aerial_Photography_Catalogues/FeatureServer/0",
+            base+"/KB6uNVj5ZcJr7jUP/ArcGIS/rest/services/National_LIDAR_Programme_Catalogues/FeatureServer/0",
+          ]
+          for layer in layers:
+            p={"where":"1=1","geometry":json.dumps({"xmin":bbox[0],"ymin":bbox[1],"xmax":bbox[2],"ymax":bbox[3],"spatialReference":{"wkid":27700}}),
+               "geometryType":"esriGeometryEnvelope","inSR":"27700","spatialRel":"esriSpatialRelIntersects",
+               "outFields":"*","returnGeometry":"false","f":"json"}
+            r=requests.get(layer+"/query",params=p,timeout=60)
+            r.raise_for_status()
+            j=r.json()
+            assert "error" not in j, j
+            print(layer, "records:", len(j.get("features",[])))
+          print("EA catalogue machine access: PASS")
+          PY
