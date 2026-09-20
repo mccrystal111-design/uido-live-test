@@ -201,3 +201,12 @@ The live EA catalogue query has now resolved the actual Overstone source records
 For Vertical Aerial Photography, the SP8065-area query returned 21 catalogue tiles: 15 NightTime 25 cm RGB tiles from 18 February 2013 and 6 IRRGB 50 cm tiles from 23 November 2012. The direct SP8065 2013 candidate is Ortho_NightTime_P00055670_20130218_20130218_25cm_res.ecw. This is now a real source candidate, not an inferred screenshot/raster. The exact course footprint still needs to reduce the surrounding VAP tile set before acquisition.
 
 This is an important change of state: **catalogue resolution is complete; raster/LAZ acquisition is the remaining source-data step.** The resolved metadata is persisted in course-models/OVERSTONE_PUBLIC_SOURCE_RESOLUTION.json.
+
+
+## Exact Overstone source tile coverage — 2026-09-20
+
+I have now intersected the recovered OSM course footprint with the OSGB36 grid rather than assuming one tile. The course spans approximately E 480137–481452 / N 264803–266016 (EPSG:27700).
+
+That means the public 25 cm 2013 VAP acquisition requires **four 1 km tiles**: SP8064, SP8065, SP8164 and SP8165. The corresponding filenames are recorded in OVERSTONE_PUBLIC_SOURCE_RESOLUTION.json. The course also crosses the 265000 northing boundary, so the 1 m National LIDAR Programme acquisition requires **two 5 km tiles**, SP8060 and SP8065, not just SP8065.
+
+The acquisition list is therefore now exact. The remaining blocker is the Defra Survey Data Download application's file-preparation step: the official documentation says an AOI is supplied to the Survey Download app, which then returns the available tiles and prepares the requested download. The public web interface is JavaScript-driven, so this environment can resolve the catalogue but cannot complete that interactive download transaction. The source data themselves remain open/public under the EA dataset terms.
