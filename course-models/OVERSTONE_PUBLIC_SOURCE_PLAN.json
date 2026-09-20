@@ -1,0 +1,81 @@
+{
+  "schema_version": "uido.course.public-source-plan.v0.1",
+  "course": "overstone-park",
+  "site_reference": {
+    "wgs84": {"lat": 52.27789, "lon": -0.81722},
+    "osgb36_approx": {"easting": 480792.63, "northing": 265074.40},
+    "national_grid_5km": "SP8065"
+  },
+  "source_priority": [
+    {
+      "id": "ea_vertical_aerial_photography",
+      "publisher": "Environment Agency / Defra Data Services Platform",
+      "role": "primary public orthorectified RGB/NIR imagery",
+      "status": "source_catalogue_confirmed",
+      "resolution_range_m": "0.10-0.50",
+      "format": "ECW",
+      "crs": "EPSG:27700",
+      "licence": "Open Government Licence",
+      "notes": "Use the Defra survey catalogue to identify the actual Overstone tile/date/resolution before downloading. Do not substitute screenshots."
+    },
+    {
+      "id": "ea_national_lidar",
+      "publisher": "Environment Agency / Defra Data Services Platform",
+      "role": "primary terrain and vegetation structure",
+      "status": "source_catalogue_confirmed",
+      "products": ["LAZ point cloud", "DSM", "DTM", "First Return DSM", "Intensity"],
+      "crs": "EPSG:27700",
+      "notes": "Query the National LIDAR Programme index at the site and select the best available survey/tile."
+    },
+    {
+      "id": "ea_lidar_composite",
+      "publisher": "Environment Agency / Defra Data Services Platform",
+      "role": "fallback/coverage-complete terrain source",
+      "status": "source_catalogue_confirmed",
+      "products": ["1m DTM", "1m FZ DSM", "2m DTM", "2m FZ DSM"],
+      "notes": "Useful where the individual National LIDAR survey has gaps or for a consistent whole-course baseline."
+    },
+    {
+      "id": "sport_england_sport_facilities",
+      "publisher": "Natural England / Sport England Active Places",
+      "role": "independent golf-course site-location validation",
+      "status": "source_confirmed",
+      "geometry": "point",
+      "licence": "Open Government Licence",
+      "notes": "Not detailed enough for feature extraction; use only as an independent course/site reference."
+    },
+    {
+      "id": "os_open_greenspace",
+      "publisher": "Ordnance Survey",
+      "role": "independent open-space/context validation",
+      "status": "source_confirmed",
+      "geometry": "vector",
+      "licence": "Open Government Licence",
+      "notes": "Do not expect private golf-course detail; use as contextual/validation data."
+    },
+    {
+      "id": "osm",
+      "publisher": "OpenStreetMap",
+      "role": "structural golf feature source",
+      "status": "recovered_authoritative_source",
+      "notes": "Already persisted and normalised in UiDo Library."
+    }
+  ],
+  "processing_strategy": [
+    "Acquire fixed EA aerial raster for the course footprint.",
+    "Preserve original ECW and catalogue metadata.",
+    "Reproject only working copies if required; retain source CRS EPSG:27700.",
+    "Register OSM geometries to the fixed public raster using measured control points.",
+    "Run feature-specific pixel mapping against the actual public raster rather than screenshots.",
+    "Use EA LiDAR DSM/FZ DSM/point cloud to identify trees and vegetation structure absent from OSM.",
+    "Use DTM to derive terrain/elevation and support lie/slope modelling.",
+    "Keep OSM, imagery-derived, and LiDAR-derived features separately attributed until verification/fusion.",
+    "Validate independent source agreement before promoting derived geometry."
+  ],
+  "do_not": [
+    "Do not use user screenshots as the primary source.",
+    "Do not fabricate a registration transform.",
+    "Do not infer tree polygons from RGB alone when LiDAR structure is available.",
+    "Do not overwrite OSM source geometry with derived imagery geometry."
+  ]
+}
