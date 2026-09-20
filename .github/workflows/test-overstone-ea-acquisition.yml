@@ -1,9 +1,16 @@
 name: Test Overstone EA machine acquisition
 
 on:
+  push:
+    paths:
+      - "tools/course-model/ea_source_acquisition.py"
+      - "tools/course-model/ea_survey_probe.py"
+      - "course-models/OVERSTONE_ACQUISITION_MANIFEST.json"
+      - ".github/workflows/test-overstone-ea-acquisition.yml"
   pull_request:
     paths:
       - "tools/course-model/ea_source_acquisition.py"
+      - "tools/course-model/ea_survey_probe.py"
       - "course-models/OVERSTONE_ACQUISITION_MANIFEST.json"
       - ".github/workflows/test-overstone-ea-acquisition.yml"
 
@@ -12,8 +19,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Test EA catalogue and OGC endpoints
+      - name: Test EA catalogue machine access
         run: |
+          python -m pip install --quiet requests
           python - <<'PY'
           import json, requests
           bbox=(480137.4894811138,264803.2820420222,481451.93252437544,266016.1542009115)
@@ -33,3 +41,19 @@ jobs:
             print(layer, "records:", len(j.get("features",[])))
           print("EA catalogue machine access: PASS")
           PY
+
+      - name: Install browser-probe dependencies
+        run: |
+          python -m pip install --quiet selenium pyshp
+
+      - name: Probe EA survey downloader headlessly
+        run: |
+          python tools/course-model/ea_survey_probe.py --out ea-survey-links.json
+
+      - name: Upload acquisition probe result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: overstone-ea-survey-probe
+          path: ea-survey-links.json
+          if-no-files-found: ignore
