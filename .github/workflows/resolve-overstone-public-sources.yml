@@ -1,0 +1,22 @@
+name: Resolve Overstone public sources
+on:
+  push:
+    branches: [main]
+    paths:
+      - "tools/course-model/resolve_overstone_public_sources.py"
+      - ".github/workflows/resolve-overstone-public-sources.yml"
+  workflow_dispatch:
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - run: python -m pip install requests
+      - run: python tools/course-model/resolve_overstone_public_sources.py --out overstone-public-source-resolution.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: overstone-public-source-resolution
+          path: overstone-public-source-resolution.json
