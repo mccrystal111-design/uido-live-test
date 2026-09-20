@@ -1,28 +1,98 @@
 {
-  "schema_version":"uido.course.public-source-resolution.v0.1",
-  "course":"overstone-park",
-  "site":{"easting":480792.63,"northing":265074.40,"epsg":27700,"national_grid_5km":"SP8065"},
-  "vertical_aerial_photography":{
-    "catalogue_query":"EPSG:27700 SP8065 5km bbox",
-    "records_found":21,
-    "candidate_course_tile":"SP8065",
-    "primary_candidate":{"filename":"Ortho_NightTime_P00055670_20130218_20130218_25cm_res.ecw","os_ref":"SP8065","resolution_m":0.25,"bands":3,"type":"NightTime","year":2013,"survey_date":"2013-02-18","latest":"No"},
-    "coverage_groups":{"nighttime_2013_25cm_tiles":15,"irrgb_2012_50cm_tiles":6},
-    "note":"The bbox query found 15 NightTime 25cm tiles from 2013 and 6 IRRGB 50cm tiles from 2012 around the SP8065 AOI. The exact course footprint should reduce this set before acquisition."
+  "schema_version": "uido.course.public-source-resolution.v0.1",
+  "course": "overstone-park",
+  "site": {
+    "easting": 480792.63,
+    "northing": 265074.4,
+    "epsg": 27700,
+    "national_grid_5km": "SP8065"
   },
-  "national_lidar_programme":{
-    "survey_id":"P_10738",
-    "season":"2019/2020",
-    "survey_dates":["2020-01-29","2020-03-06"],
-    "resolution_m":1,
-    "tile":"SP8065",
-    "dsm":"DSM_SP8065_P_10738_20200129_20200306.tif",
-    "dtm":"DTM_SP8065_P_10738_20200129_20200306.tif",
-    "first_return_dsm":"FZ_DSM_SP8065_P_10738_20200129_20200306.tif",
-    "intensity":"Intensity_LZ_SP8065_P_10738_20200129_20200306.tif",
-    "point_cloud":"SP8065_P_10738_20200129_20200306.laz",
-    "vom":"VOM_SP8065_P_10738_20200129_20200306.tif",
-    "latest":"No"
+  "vertical_aerial_photography": {
+    "catalogue_query": "EPSG:27700 SP8065 5km bbox",
+    "records_found": 21,
+    "candidate_course_tile": "SP8065",
+    "primary_candidate": {
+      "filename": "Ortho_NightTime_P00055670_20130218_20130218_25cm_res.ecw",
+      "os_ref": "SP8065",
+      "resolution_m": 0.25,
+      "bands": 3,
+      "type": "NightTime",
+      "year": 2013,
+      "survey_date": "2013-02-18",
+      "latest": "No"
+    },
+    "coverage_groups": {
+      "nighttime_2013_25cm_tiles": 15,
+      "irrgb_2012_50cm_tiles": 6
+    },
+    "note": "The bbox query found 15 NightTime 25cm tiles from 2013 and 6 IRRGB 50cm tiles from 2012 around the SP8065 AOI. The exact course footprint should reduce this set before acquisition.",
+    "required_1km_tiles": [
+      {
+        "os_ref": "SP8064",
+        "filename": "Ortho_NightTime_P00055683_20130218_20130218_25cm_res.ecw"
+      },
+      {
+        "os_ref": "SP8065",
+        "filename": "Ortho_NightTime_P00055670_20130218_20130218_25cm_res.ecw"
+      },
+      {
+        "os_ref": "SP8164",
+        "filename": "Ortho_NightTime_P00055697_20130218_20130218_25cm_res.ecw"
+      },
+      {
+        "os_ref": "SP8165",
+        "filename": "Ortho_NightTime_P00055618_20130218_20130218_25cm_res.ecw"
+      }
+    ]
   },
-  "status":{"catalogue_resolution":"complete","raster_acquisition":"pending","lidar_acquisition":"pending"}
+  "national_lidar_programme": {
+    "survey_id": "P_10738",
+    "season": "2019/2020",
+    "survey_dates": [
+      "2020-01-29",
+      "2020-03-06"
+    ],
+    "resolution_m": 1,
+    "tile": "SP8065",
+    "dsm": "DSM_SP8065_P_10738_20200129_20200306.tif",
+    "dtm": "DTM_SP8065_P_10738_20200129_20200306.tif",
+    "first_return_dsm": "FZ_DSM_SP8065_P_10738_20200129_20200306.tif",
+    "intensity": "Intensity_LZ_SP8065_P_10738_20200129_20200306.tif",
+    "point_cloud": "SP8065_P_10738_20200129_20200306.laz",
+    "vom": "VOM_SP8065_P_10738_20200129_20200306.tif",
+    "latest": "No",
+    "required_5km_tiles": [
+      {
+        "tilename": "SP8060",
+        "dsm": "DSM_SP8060_P_10738_20200129_20200306.tif",
+        "dtm": "DTM_SP8060_P_10738_20200129_20200306.tif",
+        "first_return_dsm": "FZ_DSM_SP8060_P_10738_20200129_20200306.tif",
+        "intensity": "Intensity_LZ_SP8060_P_10738_20200129_20200306.tif",
+        "point_cloud": "SP8060_P_10738_20200129_20200306.laz",
+        "vom": "VOM_SP8060_P_10738_20200129_20200306.tif"
+      },
+      {
+        "tilename": "SP8065",
+        "dsm": "DSM_SP8065_P_10738_20200129_20200306.tif",
+        "dtm": "DTM_SP8065_P_10738_20200129_20200306.tif",
+        "first_return_dsm": "FZ_DSM_SP8065_P_10738_20200129_20200306.tif",
+        "intensity": "Intensity_LZ_SP8065_P_10738_20200129_20200306.tif",
+        "point_cloud": "SP8065_P_10738_20200129_20200306.laz",
+        "vom": "VOM_SP8065_P_10738_20200129_20200306.tif"
+      }
+    ]
+  },
+  "status": {
+    "catalogue_resolution": "complete",
+    "course_tile_coverage": "resolved",
+    "raster_acquisition": "portal_download_required",
+    "lidar_acquisition": "portal_download_required"
+  },
+  "course_bbox_osgb36": {
+    "min_easting": 480137.49,
+    "max_easting": 481451.93,
+    "min_northing": 264803.28,
+    "max_northing": 266016.15,
+    "epsg": 27700
+  }
 }
