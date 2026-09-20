@@ -1,0 +1,45 @@
+{
+  "schema_version": "uido.course.registration-control-points.v0.1",
+  "course": "overstone-park",
+  "purpose": "Measured OSM-to-satellite registration input. Do not populate from screenshots by inference.",
+  "raster": {
+    "source_id": "satellite",
+    "expected_filename": "Overstone_snapshot_09-18-2026_20_59_42.jpeg",
+    "width_px": null,
+    "height_px": null,
+    "sha256": null
+  },
+  "control_points": [],
+  "requirements": {
+    "minimum_points": 3,
+    "preferred_points": "6-12 well-distributed, non-collinear points",
+    "recommended_features": [
+      "green corner or centre",
+      "bunker corner",
+      "path intersection",
+      "tee-centre",
+      "other stable, visually identifiable course feature"
+    ],
+    "measurement_rule": "Each point must be measured from the fixed raster against the corresponding OSM coordinate; no point may be inferred from a generated overlay.",
+    "distribution_rule": "Spread points across the course footprint rather than clustering them in one area.",
+    "validation_rule": "Keep independent check points separate from fit points where possible."
+  },
+  "point_schema": {
+    "id": "cp01",
+    "feature_ref": "OSM way/node id or greens dataset reference",
+    "lon": null,
+    "lat": null,
+    "pixel_x": null,
+    "pixel_y": null,
+    "role": "fit",
+    "measurement_method": "manual_fixed_raster",
+    "notes": ""
+  },
+  "registration_output": {
+    "transform_type": "affine",
+    "status": "pending",
+    "transform": null,
+    "metrics": null,
+    "per_point_residuals": []
+  }
+}
