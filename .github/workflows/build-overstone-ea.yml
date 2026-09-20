@@ -21,7 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download EA aerial packages
+
+      - name: Discover EA aerial tiles for course footprint
         env:
           COURSE: ${{ inputs.course }}
           YEAR: ${{ inputs.year }}
@@ -29,45 +30,209 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p build/ea-aerial/packages build/ea-aerial/sources
-          products=(vertical_aerial_photography_tiles_irrgb vertical_aerial_photography_tiles_rgb vertical_aerial_photography_tiles_nir)
-          blocks=(SP8064 SP8065 SP8164 SP8165)
-          found=0
-          for product in "${products[@]}"; do
-            rm -f build/ea-aerial/packages/*.zip
-            ok=1
-            for block in "${blocks[@]}"; do
-              url="https://environment.data.gov.uk/tiles/collections/survey/$product/$YEAR/$RESOLUTION/$block?subscription-key=dspui"
-              echo "Testing $product / $block"
-              code=$(curl -L --silent --show-error --output "build/ea-aerial/packages/$block.zip" --write-out '%{http_code}' "$url")
-              size=$(stat -c%s "build/ea-aerial/packages/$block.zip" || true)
-              echo "HTTP=$code SIZE=$size"
-              if [ "$code" != "200" ] || [ "$size" -lt 1000 ] || ! unzip -tq "build/ea-aerial/packages/$block.zip" >/dev/null 2>&1; then ok=0; break; fi
-            done
-            if [ "$ok" = "1" ]; then echo "product=$product" > build/ea-aerial/acquisition.txt; found=1; break; fi
-          done
-          test "$found" = "1"
-          for block in "${blocks[@]}"; do
-            unzip -l "build/ea-aerial/packages/$block.zip" | sed -n '1,30p'
-            unzip -oq "build/ea-aerial/packages/$block.zip" -d "build/ea-aerial/sources/$block"
-          done
-          find build/ea-aerial/sources -type f | sort
-          du -sh build/ea-aerial
-      - name: Write acquisition manifest
+
+          # Overstone Park course footprint in WGS84, derived from the authoritative
+          # course source extent. The EA search service accepts a GeoJSON polygon.
+          python - <<'PY'
+          import json, os, urllib.request
+
+          search_url = "https://environment.data.gov.uk/backend/catalog/api/tiles/collections/survey/search"
+          polygon = {
+              "type": "Polygon",
+              "coordinates": [[
+                  [-0.8266019, 52.2755460],
+                  [-0.8076190, 52.2755460],
+                  [-0.8076190, 52.2862605],
+                  [-0.8266019, 52.2862605],
+                  [-0.8266019, 52.2755460],
+              ]],
+          }
+          req = urllib.request.Request(
+              search_url,
+              data=json.dumps(polygon).encode(),
+              headers={
+                  "Content-Type": "application/geo+json",
+                  "Accept": "*/*",
+                  "Origin": "https://environment.data.gov.uk",
+                  "Referer": "https://environment.data.gov.uk/survey",
+                  "User-Agent": "UiDo-course-builder/0.1",
+              },
+              method="POST",
+          )
+          with urllib.request.urlopen(req, timeout=120) as response:
+              payload = json.load(response)
+
+          results = payload.get("results", [])
+          requested_year = str(os.environ["YEAR"])
+          requested_res = float(os.environ["RESOLUTION"])
+
+          print(f"EA search returned {len(results)} records")
+          for r in results:
+              p = r.get("product", {})
+              t = r.get("tile", {})
+              print(
+                  "CATALOGUE",
+                  "product=", p.get("id"),
+                  "year=", p.get("year", r.get("year")),
+                  "res=", p.get("resolution", r.get("resolution")),
+                  "tile=", t.get("id"),
+              )
+
+          matches = []
+          for r in results:
+              p = r.get("product", {})
+              t = r.get("tile", {})
+              pid = str(p.get("id", ""))
+              year = p.get("year", r.get("year"))
+              res = p.get("resolution", r.get("resolution"))
+              try:
+                  res_ok = abs(float(res) - requested_res) < 1e-9
+              except (TypeError, ValueError):
+                  res_ok = False
+              year_ok = str(year) == requested_year
+              if year_ok and res_ok and pid.startswith("vertical_aerial_photography_tiles_"):
+                  matches.append({
+                      "product": pid,
+                      "year": str(year),
+                      "resolution": float(res),
+                      "tile": t.get("id"),
+                  })
+
+          # De-duplicate while preserving order.
+          unique = []
+          seen = set()
+          for m in matches:
+              key = (m["product"], m["year"], m["resolution"], m["tile"])
+              if key not in seen and m["tile"]:
+                  seen.add(key)
+                  unique.append(m)
+
+          if not unique:
+              raise SystemExit(
+                  f"No EA vertical aerial tiles found for year={requested_year}, "
+                  f"resolution={requested_res}. See catalogue output above."
+              )
+
+          # Prefer a product that covers the most course tiles. This avoids
+          # assuming the product id (IRRGB/RGB/NIR) in advance.
+          counts = {}
+          for m in unique:
+              counts[m["product"]] = counts.get(m["product"], 0) + 1
+          product = max(counts, key=counts.get)
+          selected = [m for m in unique if m["product"] == product]
+
+          print(f"SELECTED product={product} tiles={len(selected)}")
+          with open("build/ea-aerial/discovery.json", "w") as f:
+              json.dump({
+                  "schema": "uido.course.ea-discovery.v0.1",
+                  "course": os.environ["COURSE"],
+                  "year": requested_year,
+                  "resolution_m": requested_res,
+                  "product": product,
+                  "tiles": selected,
+              }, f, indent=2)
+          PY
+
+          cat build/ea-aerial/discovery.json
+
+      - name: Download discovered EA aerial packages
         env:
           COURSE: ${{ inputs.course }}
-          YEAR: ${{ inputs.year }}
-          RESOLUTION: ${{ inputs.resolution }}
         run: |
+          set -euo pipefail
+
           python - <<'PY'
-          import hashlib,json,pathlib,os
-          root=pathlib.Path("build/ea-aerial")
-          product=(root/"acquisition.txt").read_text().strip().split("=",1)[1]
-          packages=[]
-          for p in sorted((root/"packages").glob("*.zip")):
-              packages.append({"block":p.stem,"bytes":p.stat().st_size,"sha256":hashlib.sha256(p.read_bytes()).hexdigest()})
-          manifest={"schema":"uido.course.ea-acquisition.v0.1","course":os.environ["COURSE"],"aerial":{"year":os.environ["YEAR"],"resolution_m":float(os.environ["RESOLUTION"]),"product":product},"projection":"EPSG:27700","blocks":["SP8064","SP8065","SP8164","SP8165"],"packages":packages,"status":"captured"}
-          (root/"manifest.json").write_text(json.dumps(manifest,indent=2)+"\n")
+          import hashlib, io, json, os, pathlib, time, urllib.request, zipfile
+
+          root = pathlib.Path("build/ea-aerial")
+          discovery = json.loads((root / "discovery.json").read_text())
+          product = discovery["product"]
+          year = discovery["year"]
+          resolution = str(discovery["resolution_m"]).rstrip("0").rstrip(".")
+          tiles = discovery["tiles"]
+
+          base = "https://environment.data.gov.uk/tiles/collections/survey"
+          headers = {
+              "Accept": "application/zip,*/*",
+              "Origin": "https://environment.data.gov.uk",
+              "Referer": "https://environment.data.gov.uk/survey",
+              "User-Agent": "UiDo-course-builder/0.1",
+          }
+
+          packages = root / "packages"
+          sources = root / "sources"
+          packages.mkdir(parents=True, exist_ok=True)
+          sources.mkdir(parents=True, exist_ok=True)
+
+          captured = []
+          for item in tiles:
+              tile = item["tile"]
+              url = f"{base}/{product}/{year}/{resolution}/{tile}?subscription-key=dspui"
+              target = packages / f"{tile}.zip"
+              last_error = None
+
+              for attempt in range(1, 5):
+                  try:
+                      print(f"DOWNLOAD {tile} attempt={attempt} url={url}", flush=True)
+                      req = urllib.request.Request(url, headers=headers)
+                      with urllib.request.urlopen(req, timeout=600) as response:
+                          data = response.read()
+
+                      print(f"HTTP=200 SIZE={len(data)}", flush=True)
+                      if len(data) < 1000:
+                          raise RuntimeError(f"response too small: {len(data)} bytes")
+
+                      with zipfile.ZipFile(io.BytesIO(data)) as archive:
+                          names = archive.namelist()
+                          if not names:
+                              raise RuntimeError("empty ZIP")
+                          archive.testzip()
+                          raster_names = [
+                              n for n in names
+                              if n.lower().endswith((".ecw", ".tif", ".tiff"))
+                          ]
+                          print(f"ZIP members={len(names)} raster_members={raster_names}", flush=True)
+
+                      target.write_bytes(data)
+                      captured.append({
+                          "block": tile,
+                          "url": url,
+                          "bytes": len(data),
+                          "sha256": hashlib.sha256(data).hexdigest(),
+                          "raster_members": raster_names,
+                      })
+
+                      with zipfile.ZipFile(io.BytesIO(data)) as archive:
+                          archive.extractall(sources / tile)
+                      break
+
+                  except Exception as exc:
+                      last_error = f"{type(exc).__name__}: {exc}"
+                      print(f"FAILED {tile}: {last_error}", flush=True)
+                      if attempt < 4:
+                          time.sleep(5 * (2 ** (attempt - 1)))
+                      else:
+                          raise SystemExit(f"EA download failed for {tile}: {last_error}")
+
+          (root / "acquisition.txt").write_text(f"product={product}\n")
+          manifest = {
+              "schema": "uido.course.ea-acquisition.v0.2",
+              "course": os.environ["COURSE"],
+              "aerial": {
+                  "year": year,
+                  "resolution_m": float(discovery["resolution_m"]),
+                  "product": product,
+              },
+              "projection": "EPSG:27700",
+              "tiles": captured,
+              "status": "captured",
+          }
+          (root / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
           PY
+
+          find build/ea-aerial/sources -type f | sort
+          du -sh build/ea-aerial
+
       - name: Upload captured EA dataset
         uses: actions/upload-artifact@v4
         with:
