@@ -183,3 +183,12 @@ The immediate priority is the **public-source data/model pipeline**, not another
 Whenever meaningful UiDo work changes the project state, update this document so that it remains usable as a fresh-chat handover.
 
 If there is a conflict between this document and actual authoritative source data, inspect the authoritative source, resolve the discrepancy explicitly, and update this document. Never silently guess.
+
+
+## Public-source catalogue resolution — 2026-09-20
+
+The Environment Agency catalogue services have now been confirmed directly. The Vertical Aerial Photography index is an EPSG:27700 polygon layer with fields for filename, survey id, OS 1k/5k references, flown dates, survey year, resolution, imagery type and band count. The National LIDAR Programme index is also EPSG:27700 and exposes tile name, survey id, flown dates, season, resolution and the DSM/DTM/FZ DSM/intensity/point-cloud filenames.
+
+The public dataset records also expose direct download-distribution identifiers for the catalogue packages. A deterministic resolver has been added at tools/course-model/resolve_overstone_public_sources.py; it queries the EA ArcGIS catalogues at the Overstone EPSG:27700 coordinate and falls back to the EA survey-index WFS. It is deliberately metadata-only: no imagery or LiDAR is silently downloaded or transformed.
+
+Current exact-source status: **the EA catalogue services are verified, but the exact Overstone aerial survey/date/resolution and LiDAR survey/date are still pending a live catalogue query.** The next data step is therefore source resolution, not pixel extraction. Once resolved, the raster's own EPSG:27700 georeferencing will be the primary coordinate-to-pixel mapping; any OSM-to-imagery residual will be measured separately rather than used to invent a raster transform.
