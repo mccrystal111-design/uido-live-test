@@ -33,3 +33,4 @@ jobs:
             print(layer, "records:", len(j.get("features",[])))
           print("EA catalogue machine access: PASS")
           PY
+      # Acquisition test branch trigger marker.
