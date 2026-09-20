@@ -1,0 +1,28 @@
+{
+  "schema_version": "uido.course.acquisition-manifest.v0.1",
+  "course": "overstone-park",
+  "aoi": "overstone-aoi-shapefile.zip",
+  "aoi_crs": "EPSG:27700",
+  "course_bbox_osgb36": {
+    "min_easting": 480137.4894811138,
+    "min_northing": 264803.2820420222,
+    "max_easting": 481451.93252437544,
+    "max_northing": 266016.1542009115
+  },
+  "ea_vap_tiles": [
+    "SP8064",
+    "SP8065",
+    "SP8164",
+    "SP8165"
+  ],
+  "ea_lidar_tiles": [
+    "SP8060",
+    "SP8065"
+  ],
+  "status": {
+    "catalogue_resolution": "complete",
+    "course_tile_coverage": "resolved",
+    "raster_acquisition": "portal_download_required"
+  },
+  "next_processing": "ingest acquired ECW/GeoTIFF/LAZ, preserve originals, clip to AOI plus buffer, derive raster feature layers, then fuse into the provider-neutral course model"
+}
