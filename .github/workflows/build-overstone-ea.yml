@@ -85,12 +85,14 @@ jobs:
               pid = str(p.get("id", ""))
               year = p.get("year", r.get("year"))
               res = p.get("resolution", r.get("resolution"))
+              if isinstance(year, dict): year = year.get("id")
+              if isinstance(res, dict): res = res.get("id")
               try:
                   res_ok = abs(float(res) - requested_res) < 1e-9
               except (TypeError, ValueError):
                   res_ok = False
               year_ok = str(year) == requested_year
-              if year_ok and res_ok and pid.startswith("vertical_aerial_photography_tiles_"):
+              if year_ok and res_ok and pid == "vertical_aerial_photography_tiles_night_time":
                   matches.append({
                       "product": pid,
                       "year": str(year),
@@ -113,12 +115,10 @@ jobs:
                   f"resolution={requested_res}. See catalogue output above."
               )
 
-          # Prefer a product that covers the most course tiles. This avoids
-          # assuming the product id (IRRGB/RGB/NIR) in advance.
-          counts = {}
-          for m in unique:
-              counts[m["product"]] = counts.get(m["product"], 0) + 1
-          product = max(counts, key=counts.get)
+          # The EA catalogue uses the actual product id `vertical_aerial_photography_tiles_night_time`
+          # for the Overstone 2013 survey. Use the catalogue tile ids directly; do not
+          # substitute the older SP8064/SP8164-style assumptions used by the first probe.
+          product = "vertical_aerial_photography_tiles_night_time"
           selected = [m for m in unique if m["product"] == product]
 
           print(f"SELECTED product={product} tiles={len(selected)}")
