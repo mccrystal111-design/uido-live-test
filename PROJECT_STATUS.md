@@ -192,3 +192,12 @@ The Environment Agency catalogue services have now been confirmed directly. The 
 The public dataset records also expose direct download-distribution identifiers for the catalogue packages. A deterministic resolver has been added at tools/course-model/resolve_overstone_public_sources.py; it queries the EA ArcGIS catalogues at the Overstone EPSG:27700 coordinate and falls back to the EA survey-index WFS. It is deliberately metadata-only: no imagery or LiDAR is silently downloaded or transformed.
 
 Current exact-source status: **the EA catalogue services are verified, but the exact Overstone aerial survey/date/resolution and LiDAR survey/date are still pending a live catalogue query.** The next data step is therefore source resolution, not pixel extraction. Once resolved, the raster's own EPSG:27700 georeferencing will be the primary coordinate-to-pixel mapping; any OSM-to-imagery residual will be measured separately rather than used to invent a raster transform.
+
+
+## Resolved EA source records — 2026-09-20
+
+The live EA catalogue query has now resolved the actual Overstone source records. The National LIDAR Programme has a 1 m survey block P_10738 covering tile SP8065, flown 29 January 2020 and 6 March 2020. The exact SP8065 products are the DSM, DTM, First Return DSM, intensity, point cloud and VOM files recorded in course-models/OVERSTONE_PUBLIC_SOURCE_RESOLUTION.json.
+
+For Vertical Aerial Photography, the SP8065-area query returned 21 catalogue tiles: 15 NightTime 25 cm RGB tiles from 18 February 2013 and 6 IRRGB 50 cm tiles from 23 November 2012. The direct SP8065 2013 candidate is Ortho_NightTime_P00055670_20130218_20130218_25cm_res.ecw. This is now a real source candidate, not an inferred screenshot/raster. The exact course footprint still needs to reduce the surrounding VAP tile set before acquisition.
+
+This is an important change of state: **catalogue resolution is complete; raster/LAZ acquisition is the remaining source-data step.** The resolved metadata is persisted in course-models/OVERSTONE_PUBLIC_SOURCE_RESOLUTION.json.
