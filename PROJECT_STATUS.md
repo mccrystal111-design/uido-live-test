@@ -138,18 +138,26 @@ Do not recreate these merely because a new chat cannot see an old conversation.
 10. Do not ask the user to repeat information already recorded in this document, the source manifest, source lock, course model or Library.
 11. If an artifact appears missing from GitHub, check the UiDo Library/conversation sources before declaring it lost.
 
+## Current execution finding
+
+The recovered Overstone OSM capture has been inspected directly. The 177-feature source contains the expected feature counts, but the feature polygons themselves do **not** carry hole numbers. Only the 18 `golf=hole` features have `ref=1..18`; tees, greens, fairways, rough, bunkers, paths and water are unassigned at source level. Therefore the normalisation stage must preserve all source geometry as unassigned source features first. Hole association should be performed spatially after registration, using the hole/green anchors and course geometry, rather than guessed from feature order.
+
+This is an important source-schema fact and should not be lost or rediscovered in a future chat.
+
 ## Exact next step
 
-**Continue from the recovered Overstone OSM source.**
+**Continue from the recovered Overstone OSM source and build the source-normalised layer without inventing hole assignments.**
 
-1. Deterministically normalise the recovered source into the provider-neutral model.
-2. Locate/recover the fixed satellite raster and/or acquire the agreed current imagery source.
-3. Establish real OSM-to-satellite control points.
-4. Run the measured registration tool and record residuals.
-5. Refine feature geometry using OSM ROIs + satellite evidence.
-6. Add LiDAR enrichment.
-7. Validate and fuse into the UiDo course model.
-8. Only then drive downstream renderers/UI from the model.
+1. Deterministically normalise the recovered source into the provider-neutral model, preserving every source feature and its original geometry/tags.
+2. Keep feature-to-hole association unresolved at this stage because the raw capture does not encode it.
+3. Locate/recover the fixed satellite raster and/or acquire the agreed current imagery source. Existing historical registration diagnostics are available in the UiDo Library, but they are diagnostics, not the authoritative raster/control-point dataset.
+4. Establish real OSM-to-satellite control points.
+5. Run the measured registration tool and record residuals.
+6. Spatially associate source features to holes using the registered geometry and green/hole anchors.
+7. Refine feature geometry using OSM ROIs + satellite evidence.
+8. Add LiDAR enrichment.
+9. Validate and fuse into the UiDo course model.
+10. Only then drive downstream renderers/UI from the model.
 
 The immediate priority is the **data/model pipeline**, not another visual prototype.
 
