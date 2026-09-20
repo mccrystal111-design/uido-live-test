@@ -146,15 +146,16 @@ This is an important source-schema fact and should not be lost or rediscovered i
 
 ## Exact next step
 
-**Continue from the recovered Overstone OSM source and build the source-normalised layer without inventing hole assignments.**
+**Source normalisation is now complete.** The exact 177-feature Overstone capture has been normalised without changing its geometry or inventing hole assignments. The normalized artifact is persisted in UiDo Library at `/UiDo/Overstone/source/overstone-source-normalized-v0.1.json` (schema `uido.course.source-normalized.v0.1`).
 
-1. Deterministically normalise the recovered source into the provider-neutral model, preserving every source feature and its original geometry/tags.
-2. Keep feature-to-hole association unresolved at this stage because the raw capture does not encode it.
-3. Locate/recover the fixed satellite raster and/or acquire the agreed current imagery source. Existing historical registration diagnostics are available in the UiDo Library, but they are diagnostics, not the authoritative raster/control-point dataset.
-4. Establish real OSM-to-satellite control points.
-5. Run the measured registration tool and record residuals.
-6. Spatially associate source features to holes using the registered geometry and green/hole anchors.
-7. Refine feature geometry using OSM ROIs + satellite evidence.
+1. Recover or acquire the fixed satellite raster.
+2. Establish real OSM-to-satellite control points.
+3. Run the measured affine registration tool and record residuals.
+4. Spatially associate the 141 currently unassigned non-hole/pin source features to holes using the registered geometry and existing hole/green anchors.
+5. Refine feature geometry using OSM ROIs + satellite evidence.
+6. Add LiDAR enrichment.
+7. Validate and fuse into the UiDo course model.
+8. Only then drive downstream renderers/UI from the model.
 8. Add LiDAR enrichment.
 9. Validate and fuse into the UiDo course model.
 10. Only then drive downstream renderers/UI from the model.
