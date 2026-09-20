@@ -88,7 +88,7 @@ Do **not**:
 - reconstruct a transform from screenshots;
 - silently apply an old/unmeasured transform.
 
-The next registration step is to obtain/locate real measured control points against the fixed satellite raster, then run `register_affine.py` and record residuals and registration version in the course model.
+The next registration step is to obtain/locate real measured control points against the fixed satellite raster, then run `register_affine.py` and record residuals and registration version in the course model. A machine-readable control-point template now exists at `course-models/OVERSTONE_REGISTRATION_CONTROL_POINTS.json`.
 
 ## Feature refinement
 
@@ -156,9 +156,7 @@ This is an important source-schema fact and should not be lost or rediscovered i
 6. Add LiDAR enrichment.
 7. Validate and fuse into the UiDo course model.
 8. Only then drive downstream renderers/UI from the model.
-8. Add LiDAR enrichment.
-9. Validate and fuse into the UiDo course model.
-10. Only then drive downstream renderers/UI from the model.
+
 
 The immediate priority is the **data/model pipeline**, not another visual prototype.
 
