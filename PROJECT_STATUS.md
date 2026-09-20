@@ -64,6 +64,24 @@ Preserve these source features. Do not invent an 18th fairway or collapse multip
 - `docs/UI_DO_PIXEL_TAGGER_SPEC.md`
 - `docs/UI_DO_WHOLE_COURSE_TEE_EXTRACTION_ALGORITHM.md`
 
+## Public imagery and LiDAR source strategy
+
+The pipeline is now being shifted away from user-supplied screenshots as the primary imagery source.
+
+The preferred public source is the **Environment Agency / Defra Vertical Aerial Photography** dataset. It provides orthorectified RGB/NIR aerial imagery at roughly 10–50 cm resolution, in ECW tiles on British National Grid, under the Open Government Licence. The Defra catalogue provides tile/date/resolution metadata and an area-of-interest download workflow. citeturn2view0
+
+Overstone is approximately **52.27789, -0.81722**, around OSGB36 easting 480793 / northing 265074 (SP8065 area). The public-source execution plan is recorded in `course-models/OVERSTONE_PUBLIC_SOURCE_PLAN.json`.
+
+For independent contextual validation, the Natural England/Sport England Sport Facilities dataset contains golf-course site points under OGL, while OS Open Greenspace is available as current open vector data. These are validation/context layers, not replacements for the detailed course model. citeturn3view0turn3search1
+
+For terrain and vegetation, the Environment Agency National LiDAR Programme provides 1 m data products including point cloud, DSM, DTM, First Return DSM and intensity; the catalogue identifies the survey/tile/date. The EA also provides composite DTM/DSM products covering England. citeturn2view1turn2view2
+
+The intended source hierarchy is now:
+
+`EA aerial imagery -> OSM structural geometry -> pixel refinement -> EA LiDAR vegetation/terrain -> verification/fusion`
+
+The objective is to work from the underlying geospatial sources, not screenshots, and use screenshots only as optional visual diagnostics.
+
 ## Satellite state
 
 The working visual strategy and live test viewer exist, including an Esri World Imagery whole-course viewer:
@@ -76,7 +94,7 @@ The historical controlled Hole 2 acquisition/analysis workflow is documented in:
 - `tools/earth-studio/hole2-kml.kml`
 - `uido-hole2-satellite-analysis.html`
 
-A local Hole 2 satellite asset is referenced by the analysis page but is not currently present in the repository. Treat this as a missing **artifact**, not evidence that the underlying work or source data never existed. Search available conversation/Library sources before asking the user to recreate anything.
+A local Hole 2 satellite asset is referenced by the analysis page but is not currently present in the repository. It is no longer the preferred primary imagery source: first identify and acquire the fixed public EA aerial tile(s) for Overstone. Treat the old asset as historical/prototype material, not as a reason to fall back to screenshots.
 
 ## Registration state
 
@@ -158,7 +176,7 @@ This is an important source-schema fact and should not be lost or rediscovered i
 8. Only then drive downstream renderers/UI from the model.
 
 
-The immediate priority is the **data/model pipeline**, not another visual prototype.
+The immediate priority is the **public-source data/model pipeline**, not another visual prototype.
 
 ## Change discipline
 
