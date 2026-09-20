@@ -19,13 +19,13 @@
       "id": "osm",
       "kind": "source",
       "provider": "OpenStreetMap",
-      "status": "capture referenced by handover; geometry artifact not present in current repository"
+      "status": "recovered_authoritative_source_persisted_in_uido_library"
     },
     {
       "id": "satellite",
       "kind": "source",
       "provider": "Esri World Imagery",
-      "status": "registration diagnostics referenced by handover; raster artifact not present in current repository"
+      "status": "imagery_source_defined; fixed raster not currently available in repository"
     },
     {
       "id": "lidar",
@@ -611,8 +611,10 @@
     "driving_range": 1
   },
   "notes": [
-    "Source counts reflect the Overstone OSM capture documented in the 2026-09-19 handover.",
-    "The original OSM GeoJSON and satellite raster are not present in the current repository, so no registration transform or refined polygon is fabricated here.",
+    "Source counts reflect the recovered Overstone OSM capture.",
+    "The authoritative raw OSM GeoJSON is persisted in UiDo Library at /UiDo/Overstone/source/overstone-park-osm-capture-v0.2.geojson and is locked by course-models/OVERSTONE_OSM_SOURCE_LOCK.json.",
+    "The source geometry is not duplicated into this model; this model references the authoritative source and contains the provider-neutral derived structure.",
+    "No registration transform or refined polygon is fabricated. Registration remains pending a measured OSM-to-satellite solution.",
     "OSM geometry is source data and is never overwritten by satellite refinement.",
     "Verified GPS must not enter candidate generation; it belongs in a separate validation layer.",
     "Missing OSM features remain missing; the model does not invent geometry."
