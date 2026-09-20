@@ -9,7 +9,11 @@
         "UiDo_Overstone_OSM_Capture_v0.2.json"
       ],
       "role": "source geometry",
-      "status": "missing_from_repository"
+      "status": "recovered_in_chat_and_persisted_to_uido_library",
+      "recovered_filename": "overstone-park-osm-capture-v0.2.geojson",
+      "sha256": "e1eebf606f5e2767cfdf2af3951f7e2f50660b5b6b75ff2567af5c755a01b16e",
+      "size_bytes": 363542,
+      "library_path": "/UiDo/Overstone/source/overstone-park-osm-capture-v0.2.geojson"
     },
     {
       "id": "satellite_raster",
