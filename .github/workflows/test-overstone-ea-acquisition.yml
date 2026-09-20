@@ -1,4 +1,4 @@
-name: Test Overstone EA machine acquisition
+name: Test Overstone EA machine acquisition\n# direct-endpoint-proof-v1
 
 on:
   push:
