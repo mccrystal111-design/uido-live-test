@@ -312,6 +312,126 @@ jobs:
           ls -lh build/ea-aerial/render/
           du -sh build/ea-aerial/render/
 
+      - name: Build UiDo offline course package
+        run: |
+          set -euo pipefail
+
+          PACKAGE="build/uido-course-package"
+          rm -rf "$PACKAGE"
+          mkdir -p "$PACKAGE/holes" "$PACKAGE/layers" "$PACKAGE/review" "$PACKAGE/sources"
+
+          # Start from the existing provider-neutral Overstone course model.
+          cp course-models/overstone-park-v0.1.json "$PACKAGE/course.json"
+          cp build/ea-aerial/manifest.json "$PACKAGE/sources/ea-aerial-manifest.json"
+          cp build/ea-aerial/discovery.json "$PACKAGE/sources/ea-discovery.json"
+
+          # Rendered imagery is runtime content; raw ECW remains outside the phone package.
+          cp build/ea-aerial/render/overstone-overview.webp "$PACKAGE/layers/overview.webp"
+          cp build/ea-aerial/render/render.json "$PACKAGE/layers/overview.json"
+
+          python3 - <<'PY'
+          import hashlib, json, pathlib, time
+
+          root = pathlib.Path("build/uido-course-package")
+          model = json.loads((root / "course.json").read_text())
+          holes = model.get("holes", [])
+
+          # Create small per-hole runtime records from the existing provider-neutral model.
+          for item in holes:
+              n = int(item["hole_number"])
+              (root / "holes" / f"{n:02d}.json").write_text(
+                  json.dumps({
+                      "schema": "uido.course.hole.v0.1",
+                      "course_id": model["course"]["id"],
+                      "hole_number": n,
+                      "green": item.get("green"),
+                      "tees": item.get("tees", []),
+                      "fairways": item.get("fairways", []),
+                      "hazards": item.get("hazards", []),
+                      "context": item.get("context", []),
+                      "routing": item.get("routing"),
+                      "extraction_status": item.get("extraction_status"),
+                  }, indent=2) + "\n"
+              )
+
+          manifest = {
+              "schema": "uido.course.package.v0.1",
+              "course": model["course"],
+              "revision": {
+                  "course_revision": "0.1.0-overstone-proof",
+                  "schema_revision": "0.1",
+                  "status": "review"
+              },
+              "package": {
+                  "offline": True,
+                  "crs": "EPSG:4326",
+                  "generated_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+              },
+              "sources": [
+                  {"id": "osm", "provider": "OpenStreetMap", "role": "course_geometry"},
+                  {"id": "ea-aerial", "provider": "Environment Agency", "role": "imagery"}
+              ],
+              "layers": {
+                  "course_model": "course.json",
+                  "overview": "layers/overview.webp",
+                  "overview_metadata": "layers/overview.json"
+              },
+              "holes": {
+                  "index": "holes/index.json",
+                  "count": len(holes)
+              },
+              "provenance": {
+                  "policy": model.get("provenance_policy"),
+                  "review_required_before_publish": True
+              }
+          }
+
+          (root / "holes" / "index.json").write_text(
+              json.dumps({
+                  "schema": "uido.course.hole-index.v0.1",
+                  "holes": [f"{int(h['hole_number']):02d}.json" for h in holes]
+              }, indent=2) + "\n"
+          )
+
+          # Review starts with machine checks; human approval remains a separate gate.
+          checks = {
+              "schema": "uido.course.review.v0.1",
+              "status": "review_required",
+              "checks": [
+                  {"id": "course-model-present", "status": "pass"},
+                  {"id": "ea-aerial-acquired", "status": "pass"},
+                  {"id": "overview-rendered", "status": "pass"},
+                  {"id": "18-holes-present", "status": "pass" if len(holes) == 18 else "fail"},
+                  {"id": "human-review", "status": "required"}
+              ]
+          }
+          (root / "review" / "review.json").write_text(json.dumps(checks, indent=2) + "\n")
+
+          # Content hash covers every package file except the hash field itself.
+          hashes = {}
+          for p in sorted(root.rglob("*")):
+              if p.is_file() and p.name != "manifest.json":
+                  hashes[str(p.relative_to(root))] = hashlib.sha256(p.read_bytes()).hexdigest()
+          manifest["package"]["files"] = hashes
+          manifest["package"]["content_sha256"] = hashlib.sha256(
+              json.dumps(hashes, sort_keys=True).encode()
+          ).hexdigest()
+          (root / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+
+          print(json.dumps(manifest, indent=2))
+          PY
+
+          echo "PACKAGE SIZE"
+          du -sh "$PACKAGE"
+          find "$PACKAGE" -maxdepth 3 -type f | sort
+
+      - name: Upload UiDo offline course package
+        uses: actions/upload-artifact@v4
+        with:
+          name: overstone-uido-course-package
+          path: build/uido-course-package/
+          retention-days: 14
+
       - name: Upload captured EA dataset
         uses: actions/upload-artifact@v4
         with:
