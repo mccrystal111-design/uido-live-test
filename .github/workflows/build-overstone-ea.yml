@@ -1,4 +1,5 @@
 name: UiDo Course Builder - Overstone EA capture
+# automatic push execution enabled
 
 on:
   push:
