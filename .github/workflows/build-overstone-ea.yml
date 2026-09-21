@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - ".github/workflows/build-overstone-ea.yml"
+      - "course-packages/README.md"
   workflow_dispatch:
     inputs:
       course:
