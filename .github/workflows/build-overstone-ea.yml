@@ -620,7 +620,226 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p build/ea-lidar/render
-          mapfile -t DTMS < <(find build/ea-lidar/sources/national_lidar_programme_dtm -type f | grep -Ei '\\.tiff?$' | sort)
+          mapfile -t DTMS < <(find build/ea-lidar/sources/national_lidar_programme_dtm -type f | grep -Ei '\.tiff? | sort)
+          mapfile -t DSMS < <(find build/ea-lidar/sources/national_lidar_programme_dsm -type f | grep -Ei '\\.tiff?$' | sort)
+          echo "DTM files: ${#DTMS[@]}"
+          printf '%s\n' "${DTMS[@]}"
+          echo "DSM files: ${#DSMS[@]}"
+          printf '%s\n' "${DSMS[@]}"
+          test "${#DTMS[@]}" -ge 2
+          test "${#DSMS[@]}" -ge 2
+
+          gdalbuildvrt -overwrite -resolution highest \
+            -te 480137.4894811138 264803.2820420222 481451.93252437544 266016.1542009115 \
+            build/ea-lidar/render/overstone-dtm.vrt "${DTMS[@]}"
+          gdalbuildvrt -overwrite -resolution highest \
+            -te 480137.4894811138 264803.2820420222 481451.93252437544 266016.1542009115 \
+            build/ea-lidar/render/overstone-dsm.vrt "${DSMS[@]}"
+
+          gdal_translate -of COG -projwin 480137.4894811138 266016.1542009115 481451.93252437544 264803.2820420222 \
+            -co COMPRESS=LZW -co BIGTIFF=IF_SAFER build/ea-lidar/render/overstone-dtm.vrt build/ea-lidar/render/overstone-dtm.tif
+          gdal_translate -of COG -projwin 480137.4894811138 266016.1542009115 481451.93252437544 264803.2820420222 \
+            -co COMPRESS=LZW -co BIGTIFF=IF_SAFER build/ea-lidar/render/overstone-dsm.vrt build/ea-lidar/render/overstone-dsm.tif
+
+          gdal_translate -of PNG -projwin 480137.4894811138 266016.1542009115 481451.93252437544 264803.2820420222 -scale \
+            build/ea-lidar/render/overstone-dtm.vrt build/ea-lidar/render/overstone-dtm.png
+          gdal_translate -of PNG -projwin 480137.4894811138 266016.1542009115 481451.93252437544 264803.2820420222 -scale \
+            build/ea-lidar/render/overstone-dsm.vrt build/ea-lidar/render/overstone-dsm.png
+
+          python3 - <<'PY'
+          import json, pathlib
+          root=pathlib.Path("build/ea-lidar/render")
+          root.joinpath("terrain.json").write_text(json.dumps({
+              "schema":"uido.course.terrain-render.v0.1",
+              "course":"Overstone Park",
+              "source":{"provider":"Environment Agency","product":"National LiDAR Programme","survey":"P_10738","resolution_m":1},
+              "crs":"EPSG:27700",
+              "bounds_m":{"min_easting":480137.4894811138,"min_northing":264803.2820420222,"max_easting":481451.93252437544,"max_northing":266016.1542009115},
+              "outputs":{"dtm_cog":"overstone-dtm.tif","dsm_cog":"overstone-dsm.tif","dtm_preview":"overstone-dtm.png","dsm_preview":"overstone-dsm.png"}
+          },indent=2)+"\n")
+          PY
+          ls -lh build/ea-lidar/render
+          du -sh build/ea-lidar/render
+
+      - name: Build UiDo offline course package
+        run: |
+          set -euo pipefail
+
+          PACKAGE="build/uido-course-package"
+          rm -rf "$PACKAGE"
+          mkdir -p "$PACKAGE/holes" "$PACKAGE/layers" "$PACKAGE/review" "$PACKAGE/sources"
+
+          # Start from the existing provider-neutral Overstone course model.
+          cp course-models/overstone-park-v0.1.json "$PACKAGE/course.json"
+          cp build/ea-aerial/manifest.json "$PACKAGE/sources/ea-aerial-manifest.json"
+          cp build/ea-aerial/discovery.json "$PACKAGE/sources/ea-discovery.json"
+
+          # Rendered imagery is runtime content; raw ECW remains outside the phone package.
+          cp build/ea-aerial/render/overstone-overview.webp "$PACKAGE/layers/overview.webp"
+          cp build/ea-aerial/render/render.json "$PACKAGE/layers/overview.json"
+
+          # Terrain is provider-neutral runtime data; raw LiDAR packages remain outside the phone package.
+          mkdir -p "$PACKAGE/layers/terrain"
+          cp build/ea-lidar/render/overstone-dtm.tif "$PACKAGE/layers/terrain/dtm.tif"
+          cp build/ea-lidar/render/overstone-dsm.tif "$PACKAGE/layers/terrain/dsm.tif"
+          cp build/ea-lidar/render/overstone-dtm.png "$PACKAGE/layers/terrain/dtm-preview.png"
+          cp build/ea-lidar/render/overstone-dsm.png "$PACKAGE/layers/terrain/dsm-preview.png"
+          cp build/ea-lidar/render/terrain.json "$PACKAGE/layers/terrain/terrain.json"
+          cp build/ea-lidar/manifest.json "$PACKAGE/sources/ea-lidar-manifest.json"
+          cp build/ea-lidar/discovery.json "$PACKAGE/sources/ea-lidar-discovery.json"
+
+          python3 - <<'PY'
+          import hashlib, json, pathlib, time
+
+          root = pathlib.Path("build/uido-course-package")
+          model = json.loads((root / "course.json").read_text())
+          holes = model.get("holes", [])
+
+          # Create small per-hole runtime records from the existing provider-neutral model.
+          for item in holes:
+              n = int(item["hole_number"])
+              (root / "holes" / f"{n:02d}.json").write_text(
+                  json.dumps({
+                      "schema": "uido.course.hole.v0.1",
+                      "course_id": model["course"]["id"],
+                      "hole_number": n,
+                      "green": item.get("green"),
+                      "tees": item.get("tees", []),
+                      "fairways": item.get("fairways", []),
+                      "hazards": item.get("hazards", []),
+                      "context": item.get("context", []),
+                      "routing": item.get("routing"),
+                      "extraction_status": item.get("extraction_status"),
+                  }, indent=2) + "\n"
+              )
+
+          manifest = {
+              "schema": "uido.course.package.v0.1",
+              "course": model["course"],
+              "revision": {
+                  "course_revision": "0.1.0-overstone-proof",
+                  "schema_revision": "0.1",
+                  "status": "review"
+              },
+              "package": {
+                  "offline": True,
+                  "crs": "EPSG:4326",
+                  "generated_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+              },
+              "sources": [
+                  {"id": "osm", "provider": "OpenStreetMap", "role": "course_geometry"},
+                  {"id": "ea-aerial", "provider": "Environment Agency", "role": "imagery"},
+                  {"id": "ea-lidar", "provider": "Environment Agency", "role": "terrain"}
+              ],
+              "layers": {
+                  "course_model": "course.json",
+                  "overview": "layers/overview.webp",
+                  "overview_metadata": "layers/overview.json",
+                  "terrain": "layers/terrain/terrain.json",
+                  "terrain_dtm": "layers/terrain/dtm.tif",
+                  "terrain_dsm": "layers/terrain/dsm.tif"
+              },
+              "holes": {
+                  "index": "holes/index.json",
+                  "count": len(holes)
+              },
+              "provenance": {
+                  "policy": model.get("provenance_policy"),
+                  "review_required_before_publish": True
+              }
+          }
+
+          (root / "holes" / "index.json").write_text(
+              json.dumps({
+                  "schema": "uido.course.hole-index.v0.1",
+                  "holes": [f"{int(h['hole_number']):02d}.json" for h in holes]
+              }, indent=2) + "\n"
+          )
+
+          # Review starts with machine checks; human approval remains a separate gate.
+          checks = {
+              "schema": "uido.course.review.v0.1",
+              "status": "review_required",
+              "checks": [
+                  {"id": "course-model-present", "status": "pass"},
+                  {"id": "ea-aerial-acquired", "status": "pass"},
+                  {"id": "overview-rendered", "status": "pass"},
+                  {"id": "ea-lidar-acquired", "status": "pass"},
+                  {"id": "terrain-rendered", "status": "pass"},
+                  {"id": "18-holes-present", "status": "pass" if len(holes) == 18 else "fail"},
+                  {"id": "human-review", "status": "required"}
+              ]
+          }
+          (root / "review" / "review.json").write_text(json.dumps(checks, indent=2) + "\n")
+
+          # Content hash covers every package file except the hash field itself.
+          hashes = {}
+          for p in sorted(root.rglob("*")):
+              if p.is_file() and p.name != "manifest.json":
+                  hashes[str(p.relative_to(root))] = hashlib.sha256(p.read_bytes()).hexdigest()
+          manifest["package"]["files"] = hashes
+          manifest["package"]["content_sha256"] = hashlib.sha256(
+              json.dumps(hashes, sort_keys=True).encode()
+          ).hexdigest()
+          (root / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+
+          print(json.dumps(manifest, indent=2))
+          PY
+
+          echo "PACKAGE SIZE"
+          du -sh "$PACKAGE"
+          find "$PACKAGE" -maxdepth 3 -type f | sort
+
+      - name: Assemble Overstone human review bundle
+        run: |
+          set -euo pipefail
+          REVIEW="build/overstone-course-review"
+          rm -rf "$REVIEW"
+          mkdir -p "$REVIEW/course-model" "$REVIEW/aerial" "$REVIEW/terrain" "$REVIEW/manifests"
+          cp course-models/overstone-park-v0.1.json "$REVIEW/course-model/overstone-park-v0.1.json"
+          cp build/ea-aerial/render/overstone-overview.webp "$REVIEW/aerial/overstone-overview.webp"
+          cp build/ea-aerial/render/overstone-overview.jpg "$REVIEW/aerial/overstone-overview.jpg"
+          cp build/ea-aerial/render/render.json "$REVIEW/aerial/render.json"
+          cp build/ea-lidar/render/overstone-dtm.png "$REVIEW/terrain/dtm-preview.png"
+          cp build/ea-lidar/render/overstone-dsm.png "$REVIEW/terrain/dsm-preview.png"
+          cp build/ea-lidar/render/terrain.json "$REVIEW/terrain/terrain.json"
+          cp build/ea-aerial/discovery.json "$REVIEW/manifests/ea-aerial-discovery.json"
+          cp build/ea-aerial/manifest.json "$REVIEW/manifests/ea-aerial-manifest.json"
+          cp build/ea-lidar/discovery.json "$REVIEW/manifests/ea-lidar-discovery.json"
+          cp build/ea-lidar/manifest.json "$REVIEW/manifests/ea-lidar-manifest.json"
+          cp build/uido-course-package/review/review.json "$REVIEW/review.json"
+          printf '%s\n' "UiDo Overstone Park course review bundle" "Review the course model, aerial coverage, DTM/DSM previews, and source manifests before publication." "This is a review artifact; raw provider data is not part of the phone runtime package." > "$REVIEW/README.txt"
+          find "$REVIEW" -type f | sort
+          du -sh "$REVIEW"
+
+      - name: Upload Overstone human review bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: overstone-course-review
+          path: build/overstone-course-review/
+          retention-days: 14
+
+      - name: Upload captured EA LiDAR dataset
+        uses: actions/upload-artifact@v4
+        with:
+          name: overstone-ea-lidar-capture
+          path: build/ea-lidar/
+          retention-days: 14
+
+      - name: Upload UiDo offline course package
+        uses: actions/upload-artifact@v4
+        with:
+          name: overstone-uido-course-package
+          path: build/uido-course-package/
+          retention-days: 14
+
+      - name: Upload captured EA dataset
+        uses: actions/upload-artifact@v4
+        with:
+          name: overstone-ea-aerial-capture
+          path: build/ea-aerial/
+          retention-days: 14
+ | sort)
           mapfile -t DSMS < <(find build/ea-lidar/sources/national_lidar_programme_dsm -type f | grep -Ei '\\.tiff?$' | sort)
           echo "DTM files: ${#DTMS[@]}"
           printf '%s\n' "${DTMS[@]}"
