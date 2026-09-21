@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1536" viewBox="0 0 1024 1536">
+  <title>Lo Flag Icon</title>
+  <g fill="#FDC101" stroke="#3F4B3B" stroke-width="1.333" stroke-linejoin="round">
+    <circle cx="510" cy="218" r="124"/>
+    <rect x="466" y="310" width="88" height="205"/>
+    <circle cx="510" cy="590" r="98"/>
+    <rect x="470" y="650" width="80" height="730" rx="10"/>
+  </g>
+  <ellipse cx="510" cy="1363" rx="101" ry="39" fill="#3F4B3B"/>
+</svg>
