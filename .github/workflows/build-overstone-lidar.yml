@@ -36,9 +36,9 @@ jobs:
 
       - name: Discover EA National LiDAR tiles for course footprint
         env:
-          COURSE: ${{ inputs.course }}
-          SURVEY: ${{ inputs.survey }}
-          RESOLUTION: ${{ inputs.resolution }}
+          COURSE: ${{ inputs.course || 'Overstone Park' }}
+          SURVEY: ${{ inputs.survey || 'P_10738' }}
+          RESOLUTION: ${{ inputs.resolution || '1' }}
         run: |
           set -euo pipefail
           mkdir -p build/ea-lidar/packages build/ea-lidar/sources
@@ -158,7 +158,7 @@ jobs:
 
       - name: Download discovered EA LiDAR packages
         env:
-          COURSE: ${{ inputs.course }}
+          COURSE: ${{ inputs.course || 'Overstone Park' }}
         run: |
           set -euo pipefail
 
