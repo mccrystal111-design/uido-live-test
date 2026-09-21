@@ -622,6 +622,10 @@ jobs:
           mkdir -p build/ea-lidar/render
           mapfile -t DTMS < <(find build/ea-lidar/sources/national_lidar_programme_dtm -type f | grep -Ei '\\.tiff?$' | sort)
           mapfile -t DSMS < <(find build/ea-lidar/sources/national_lidar_programme_dsm -type f | grep -Ei '\\.tiff?$' | sort)
+          echo "DTM files: ${#DTMS[@]}"
+          printf '%s\n' "${DTMS[@]}"
+          echo "DSM files: ${#DSMS[@]}"
+          printf '%s\n' "${DSMS[@]}"
           test "${#DTMS[@]}" -ge 2
           test "${#DSMS[@]}" -ge 2
 
