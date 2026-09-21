@@ -1,0 +1,326 @@
+name: UiDo Course Builder - Overstone EA LiDAR capture
+
+on:
+  workflow_dispatch:
+    inputs:
+      course:
+        description: "Course name"
+        required: true
+        type: choice
+        options:
+          - "Overstone Park"
+        default: "Overstone Park"
+      survey:
+        description: "EA National LiDAR survey id"
+        required: true
+        type: choice
+        options:
+          - "P_10738"
+        default: "P_10738"
+      resolution:
+        description: "EA LiDAR resolution (metres)"
+        required: true
+        type: choice
+        options:
+          - "1"
+        default: "1"
+
+jobs:
+  acquire-lidar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Discover EA National LiDAR tiles for course footprint
+        env:
+          COURSE: ${{ inputs.course }}
+          SURVEY: ${{ inputs.survey }}
+          RESOLUTION: ${{ inputs.resolution }}
+        run: |
+          set -euo pipefail
+          mkdir -p build/ea-lidar/packages build/ea-lidar/sources
+
+          python3 - <<'PY'
+          import json, os, urllib.request
+
+          search_url = "https://environment.data.gov.uk/backend/catalog/api/tiles/collections/survey/search"
+          polygon = {
+              "type": "Polygon",
+              "coordinates": [[
+                  [-0.8266019, 52.2755460],
+                  [-0.8076190, 52.2755460],
+                  [-0.8076190, 52.2862605],
+                  [-0.8266019, 52.2862605],
+                  [-0.8266019, 52.2755460],
+              ]],
+          }
+
+          req = urllib.request.Request(
+              search_url,
+              data=json.dumps(polygon).encode(),
+              headers={
+                  "Content-Type": "application/geo+json",
+                  "Accept": "*/*",
+                  "Origin": "https://environment.data.gov.uk",
+                  "Referer": "https://environment.data.gov.uk/survey",
+                  "User-Agent": "UiDo-course-builder/0.1",
+              },
+              method="POST",
+          )
+          with urllib.request.urlopen(req, timeout=120) as response:
+              payload = json.load(response)
+
+          results = payload.get("results", [])
+          survey = os.environ["SURVEY"]
+          requested_res = float(os.environ["RESOLUTION"])
+
+          candidates = []
+          for r in results:
+              text = json.dumps(r)
+              p = r.get("product", {})
+              t = r.get("tile", {})
+              pid = str(p.get("id", "")).lower()
+              year = p.get("year", r.get("year"))
+              res = p.get("resolution", r.get("resolution"))
+              if isinstance(year, dict):
+                  year = year.get("id")
+              if isinstance(res, dict):
+                  res = res.get("id")
+              if "national_lidar_programme" not in pid:
+                  continue
+              if pid not in {"national_lidar_programme_dtm", "national_lidar_programme_dsm"}:
+                  continue
+              try:
+                  res_ok = abs(float(res) - requested_res) < 1e-9
+              except (TypeError, ValueError):
+                  res_ok = False
+              if not res_ok:
+                  continue
+              if survey not in text:
+                  continue
+              candidates.append({
+                  "product": p.get("id"),
+                  "year": str(year),
+                  "resolution": float(res),
+                  "tile": t.get("id"),
+                  "survey": survey,
+                  "raw": r,
+              })
+
+          # Keep one record per product/tile. The survey id is retained as an
+          # explicit provenance check; we never silently substitute another survey.
+          selected = []
+          seen = set()
+          for item in candidates:
+              key = (item["product"], item["tile"])
+              if key not in seen and item["tile"]:
+                  seen.add(key)
+                  selected.append(item)
+
+          print(f"EA search returned {len(results)} records")
+          print(f"National LiDAR candidates for survey={survey}, resolution={requested_res}:")
+          for item in selected:
+              print(
+                  f"  product={item['product']} year={item['year']} "
+                  f"res={item['resolution']} tile={item['tile']} survey={survey}"
+              )
+
+          products = {str(x["product"]).lower() for x in selected}
+          tiles = {x["tile"] for x in selected}
+          required = {"national_lidar_programme_dtm", "national_lidar_programme_dsm"}
+          if not required.issubset(products):
+              raise SystemExit(
+                  "Did not discover both National LiDAR DTM and DSM products for "
+                  f"survey={survey}. Discovered products={sorted(products)}"
+              )
+          if not {"SP8060", "SP8065"}.issubset(tiles):
+              raise SystemExit(
+                  "Did not discover both expected Overstone tiles SP8060/SP8065. "
+                  f"Discovered tiles={sorted(tiles)}"
+              )
+
+          discovery = {
+              "schema": "uido.course.ea-lidar-discovery.v0.1",
+              "course": os.environ["COURSE"],
+              "survey": survey,
+              "resolution_m": requested_res,
+              "tiles": selected,
+          }
+          (path := __import__("pathlib").Path("build/ea-lidar/discovery.json")).write_text(
+              json.dumps(discovery, indent=2) + "\n"
+          )
+          PY
+
+          cat build/ea-lidar/discovery.json
+
+      - name: Download discovered EA LiDAR packages
+        env:
+          COURSE: ${{ inputs.course }}
+        run: |
+          set -euo pipefail
+
+          python3 - <<'PY'
+          import hashlib, io, json, os, pathlib, time, urllib.request, zipfile
+
+          root = pathlib.Path("build/ea-lidar")
+          discovery = json.loads((root / "discovery.json").read_text())
+          base = "https://environment.data.gov.uk/tiles/collections/survey"
+          key = "dspui"
+
+          packages = root / "packages"
+          sources = root / "sources"
+          packages.mkdir(parents=True, exist_ok=True)
+          sources.mkdir(parents=True, exist_ok=True)
+
+          captured = []
+          for item in discovery["tiles"]:
+              product = item["product"]
+              year = item["year"]
+              resolution = str(item["resolution"]).rstrip("0").rstrip(".")
+              tile = item["tile"]
+              url = f"{base}/{product}/{year}/{resolution}/{tile}?subscription-key={key}"
+              target = packages / f"{product}-{year}-{resolution}m-{tile}.zip"
+
+              last_error = None
+              for attempt in range(1, 5):
+                  try:
+                      print(f"DOWNLOAD {tile} {product} attempt={attempt}", flush=True)
+                      req = urllib.request.Request(
+                          url,
+                          headers={
+                              "Accept": "application/zip,*/*",
+                              "Origin": "https://environment.data.gov.uk",
+                              "Referer": "https://environment.data.gov.uk/survey",
+                              "User-Agent": "UiDo-course-builder/0.1",
+                          },
+                      )
+                      with urllib.request.urlopen(req, timeout=600) as response:
+                          data = response.read()
+
+                      print(f"HTTP=200 SIZE={len(data)}", flush=True)
+                      if len(data) < 1000:
+                          raise RuntimeError(f"response too small: {len(data)} bytes")
+
+                      with zipfile.ZipFile(io.BytesIO(data)) as archive:
+                          names = archive.namelist()
+                          archive.testzip()
+                          rasters = [
+                              n for n in names
+                              if n.lower().endswith((".tif", ".tiff"))
+                          ]
+                          print(
+                              f"ZIP members={len(names)} raster_members={rasters}",
+                              flush=True,
+                          )
+                          if not rasters:
+                              raise RuntimeError("ZIP contains no GeoTIFF raster")
+
+                          target.write_bytes(data)
+                          extract_dir = sources / product / tile
+                          extract_dir.mkdir(parents=True, exist_ok=True)
+                          archive.extractall(extract_dir)
+
+                      captured.append({
+                          "product": product,
+                          "year": year,
+                          "resolution_m": float(item["resolution"]),
+                          "tile": tile,
+                          "survey": item["survey"],
+                          "url": url,
+                          "bytes": len(data),
+                          "sha256": hashlib.sha256(data).hexdigest(),
+                          "raster_members": rasters,
+                      })
+                      break
+
+                  except Exception as exc:
+                      last_error = f"{type(exc).__name__}: {exc}"
+                      print(f"FAILED {tile} {product}: {last_error}", flush=True)
+                      if attempt < 4:
+                          time.sleep(5 * (2 ** (attempt - 1)))
+                      else:
+                          raise SystemExit(
+                              f"EA LiDAR download failed for {tile} {product}: {last_error}"
+                          )
+
+          manifest = {
+              "schema": "uido.course.ea-lidar-acquisition.v0.1",
+              "course": os.environ["COURSE"],
+              "survey": discovery["survey"],
+              "resolution_m": discovery["resolution_m"],
+              "projection": "EPSG:27700",
+              "products": ["national_lidar_programme_dtm", "national_lidar_programme_dsm"],
+              "tiles": captured,
+              "status": "captured",
+          }
+          (root / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+          PY
+
+          find build/ea-lidar/sources -type f | sort
+          du -sh build/ea-lidar
+
+      - name: Build compact terrain layer
+        run: |
+          set -euo pipefail
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends gdal-bin python3-gdal
+
+          mkdir -p build/ea-lidar/render
+          mapfile -t DTMS < <(
+            find build/ea-lidar/sources/national_lidar_programme_dtm -type f \
+              \( -name "*.tif" -o -name "*.tiff" \) | sort
+          )
+          test "${#DTMS[@]}" -ge 2
+
+          gdalbuildvrt -overwrite -resolution highest \
+            -te 480137.4894811138 264803.2820420222 481451.93252437544 266016.1542009115 \
+            build/ea-lidar/render/overstone-dtm.vrt "${DTMS[@]}"
+
+          gdal_translate -of COG \
+            -projwin 480137.4894811138 266016.1542009115 481451.93252437544 264803.2820420222 \
+            -co COMPRESS=LZW -co BIGTIFF=IF_SAFER \
+            build/ea-lidar/render/overstone-dtm.vrt \
+            build/ea-lidar/render/overstone-dtm.tif
+
+          gdal_translate -of PNG \
+            -projwin 480137.4894811138 266016.1542009115 481451.93252437544 264803.2820420222 \
+            -scale \
+            build/ea-lidar/render/overstone-dtm.vrt \
+            build/ea-lidar/render/overstone-dtm.png
+
+          python3 - <<'PY'
+          import json, pathlib
+          root = pathlib.Path("build/ea-lidar/render")
+          info = {
+              "schema": "uido.course.terrain-render.v0.1",
+              "course": "Overstone Park",
+              "source": {
+                  "provider": "Environment Agency",
+                  "product": "National LiDAR Programme DTM",
+                  "survey": "P_10738",
+                  "resolution_m": 1,
+              },
+              "crs": "EPSG:27700",
+              "bounds_m": {
+                  "min_easting": 480137.4894811138,
+                  "min_northing": 264803.2820420222,
+                  "max_easting": 481451.93252437544,
+                  "max_northing": 266016.1542009115,
+              },
+              "outputs": {
+                  "dtm_cog": "overstone-dtm.tif",
+                  "dtm_preview": "overstone-dtm.png",
+              },
+          }
+          (root / "terrain.json").write_text(json.dumps(info, indent=2) + "\n")
+          PY
+
+          ls -lh build/ea-lidar/render
+          du -sh build/ea-lidar/render
+
+      - name: Upload Overstone LiDAR capture
+        uses: actions/upload-artifact@v4
+        with:
+          name: overstone-ea-lidar-capture
+          path: build/ea-lidar/
+          retention-days: 14
