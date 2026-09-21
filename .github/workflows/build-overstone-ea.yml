@@ -30,6 +30,16 @@ on:
           - "0.25"
         default: "0.25"
 
+name: UiDo Course Builder - Overstone EA capture
+# Overstone proof builder
+
+on:
+  push:
+    paths:
+      - ".github/workflows/build-overstone-ea.yml"
+      - "course-packages/README.md"
+  workflow_dispatch:
+
 jobs:
   acquire:
     runs-on: ubuntu-latest
@@ -46,9 +56,9 @@ jobs:
 
       - name: Discover EA aerial tiles for course footprint
         env:
-          COURSE: ${{ inputs.course }}
-          YEAR: ${{ inputs.year }}
-          RESOLUTION: ${{ inputs.resolution }}
+          COURSE: "Overstone Park"
+          YEAR: "2013"
+          RESOLUTION: "0.25"
         run: |
           set -euo pipefail
           mkdir -p build/ea-aerial/packages build/ea-aerial/sources
@@ -257,7 +267,7 @@ jobs:
 
       - name: Discover and download EA National LiDAR terrain
         env:
-          COURSE: ${{ inputs.course || 'Overstone Park' }}
+          COURSE: "Overstone Park"
         run: |
           set -euo pipefail
           mkdir -p build/ea-lidar/packages build/ea-lidar/sources
