@@ -1,0 +1,63 @@
+{
+  "schema": "uido.course.package.v0.1",
+  "description": "Provider-neutral offline course package for UiDo runtime clients.",
+  "required": [
+    "course",
+    "revision",
+    "package",
+    "sources",
+    "layers",
+    "holes",
+    "provenance"
+  ],
+  "course": {
+    "id": "overstone-park",
+    "name": "Overstone Park",
+    "country": "GB"
+  },
+  "revision": {
+    "course_revision": "0.1.0",
+    "schema_revision": "0.1",
+    "status": "review"
+  },
+  "package": {
+    "runtime_min_version": "0.1.0",
+    "offline": true,
+    "crs": "EPSG:4326",
+    "generated_at": null,
+    "content_sha256": null
+  },
+  "sources": [
+    {
+      "id": "osm",
+      "provider": "OpenStreetMap",
+      "role": "course_geometry"
+    },
+    {
+      "id": "ea-aerial",
+      "provider": "Environment Agency",
+      "role": "imagery"
+    },
+    {
+      "id": "ea-lidar",
+      "provider": "Environment Agency",
+      "role": "terrain",
+      "status": "planned"
+    }
+  ],
+  "layers": {
+    "course_model": "course.json",
+    "overview": "layers/overview.webp",
+    "imagery": "layers/imagery/",
+    "terrain": "layers/terrain/",
+    "greens": "layers/greens/"
+  },
+  "holes": {
+    "index": "holes/index.json",
+    "items": "holes/{hole}.json"
+  },
+  "provenance": {
+    "policy": "source_preserved_derived_explicit_verified_never_silent_replace",
+    "review_required_before_publish": true
+  }
+}
