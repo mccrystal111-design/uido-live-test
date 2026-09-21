@@ -641,7 +641,8 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p build/ea-lidar/render
-          mapfile -t DTMS < <(find build/ea-lidar/sources/national_lidar_programme_dtm -type f | grep -Ei '\\.tiff?
+          mapfile -t DTMS < <(find build/ea-lidar/sources/national_lidar_programme_dtm -type f | grep -Ei '\\.tiff?$' | sort)
+          mapfile -t DSMS < <(find build/ea-lidar/sources/national_lidar_programme_dsm -type f | grep -Ei '\\.tiff?$' | sort)
           test "${#DTMS[@]}" -ge 2
           test "${#DSMS[@]}" -ge 2
 
