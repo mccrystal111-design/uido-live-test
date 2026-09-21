@@ -55,3 +55,5 @@ Acquisition is not publication.
 ## Overstone proof
 
 Overstone Park is the first end-to-end acquisition target. The existing provider-neutral course model remains the source of truth for existing course structure; new EA layers are additive and must not silently replace OSM geometry.
+
+<!-- Overstone builder trigger -->
