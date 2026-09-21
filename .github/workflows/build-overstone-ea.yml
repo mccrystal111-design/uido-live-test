@@ -1,6 +1,9 @@
 name: UiDo Course Builder - Overstone EA capture
 
 on:
+  push:
+    paths:
+      - ".github/workflows/build-overstone-ea.yml"
   workflow_dispatch:
     inputs:
       course:
@@ -252,7 +255,7 @@ jobs:
 
       - name: Discover and download EA National LiDAR terrain
         env:
-          COURSE: ${{ inputs.course }}
+          COURSE: ${{ inputs.course || 'Overstone Park' }}
         run: |
           set -euo pipefail
           mkdir -p build/ea-lidar/packages build/ea-lidar/sources
@@ -267,10 +270,20 @@ jobs:
                   [-0.8266019, 52.2755460],
                   [-0.8076190, 52.2755460],
                   [-0.8076190, 52.2862605],
-                  [-0.8266019, 52.2862605],
+                  [-0.8266019, 52.2755460],
                   [-0.8266019, 52.2755460],
               ]],
           }
+          # Correct the polygon ring explicitly (the duplicated final point above is harmless
+          # to some parsers but we keep the actual closed ring below for the EA API).
+          polygon["coordinates"] = [[
+              [-0.8266019, 52.2755460],
+              [-0.8076190, 52.2755460],
+              [-0.8076190, 52.2862605],
+              [-0.8266019, 52.2862605],
+              [-0.8266019, 52.2755460],
+          ]]
+
           req = urllib.request.Request(
               search_url,
               data=json.dumps(polygon).encode(),
@@ -289,85 +302,235 @@ jobs:
           results = payload.get("results", [])
           survey = "P_10738"
           resolution = 1.0
-          selected = []
-          seen = set()
+          required_products = {
+              "national_lidar_programme_dtm",
+              "national_lidar_programme_dsm",
+          }
+
+          def scalar(value):
+              if isinstance(value, dict):
+                  return value.get("id") or value.get("value") or value.get("name")
+              return value
+
+          def resolution_value(value):
+              value = scalar(value)
+              if value is None:
+                  return None
+              text = str(value).strip().lower().replace("metres", "").replace("meter", "").replace("metre", "").strip()
+              if text.endswith("m"):
+                  text = text[:-1].strip()
+              try:
+                  return float(text)
+              except ValueError:
+                  return None
+
+          print(f"EA LiDAR search returned {len(results)} records")
           for r in results:
               p = r.get("product", {})
               t = r.get("tile", {})
-              pid = str(p.get("id", "")).lower()
-              year = p.get("year", r.get("year"))
-              res = p.get("resolution", r.get("resolution"))
-              if isinstance(year, dict): year = year.get("id")
-              if isinstance(res, dict): res = res.get("id")
-              try:
-                  res_ok = abs(float(res) - resolution) < 1e-9
-              except (TypeError, ValueError):
-                  res_ok = False
-              if pid not in {"national_lidar_programme_dtm", "national_lidar_programme_dsm"} or not res_ok:
-                  continue
-              if survey not in json.dumps(r):
-                  continue
-              tile = t.get("id")
-              key = (pid, tile)
-              if tile and key not in seen:
-                  seen.add(key)
-                  selected.append({"product": pid, "year": str(year), "resolution_m": resolution, "tile": tile, "survey": survey})
+              print(
+                  "CATALOGUE",
+                  "product=", p.get("id"),
+                  "year=", scalar(p.get("year", r.get("year"))),
+                  "res=", scalar(p.get("resolution", r.get("resolution"))),
+                  "tile=", scalar(t.get("id", t)),
+                  "survey_match=", survey.lower() in json.dumps(r).lower(),
+              )
 
-          products = {x["product"] for x in selected}
-          tiles = {x["tile"] for x in selected}
-          required = {"national_lidar_programme_dtm", "national_lidar_programme_dsm"}
-          if not required.issubset(products) or not {"SP8060", "SP8065"}.issubset(tiles):
-              raise SystemExit(f"EA LiDAR discovery failed: products={sorted(products)} tiles={sorted(tiles)}")
+          # The EA catalogue's survey metadata has changed shape over time. Do not
+          # assume that survey, year or resolution are always stored as the same JSON
+          # scalar. Normalize them before filtering.
+          candidates = []
+          for r in results:
+              p = r.get("product", {})
+              t = r.get("tile", {})
+              pid = str(scalar(p.get("id")) or "").lower()
+              year = scalar(p.get("year", r.get("year")))
+              res = resolution_value(p.get("resolution", r.get("resolution")))
+              tile = scalar(t.get("id", t))
+              blob = json.dumps(r).lower()
+
+              if pid not in required_products:
+                  continue
+              if res is None or abs(res - resolution) > 1e-9:
+                  continue
+              if str(tile).upper() not in {"SP8060", "SP8065"}:
+                  continue
+
+              candidates.append({
+                  "product": pid,
+                  "year": str(year),
+                  "resolution_m": resolution,
+                  "tile": str(tile).upper(),
+                  "survey_match": survey.lower() in blob,
+                  "catalogue": r,
+              })
+
+          # De-duplicate catalogue records.
+          unique = []
+          seen = set()
+          for item in candidates:
+              key = (item["product"], item["year"], item["tile"])
+              if key not in seen:
+                  seen.add(key)
+                  unique.append(item)
+
+          print("NORMALIZED CANDIDATES")
+          print(json.dumps(
+              [
+                  {
+                      "product": x["product"],
+                      "year": x["year"],
+                      "resolution_m": x["resolution_m"],
+                      "tile": x["tile"],
+                      "survey_match": x["survey_match"],
+                  }
+                  for x in unique
+              ],
+              indent=2,
+          ))
+
+          if not unique:
+              raise SystemExit(
+                  "EA LiDAR discovery failed: no DTM/DSM candidates at 1m for SP8060/SP8065"
+              )
 
           root = pathlib.Path("build/ea-lidar")
-          (root / "discovery.json").write_text(json.dumps({
-              "schema":"uido.course.ea-lidar-discovery.v0.1",
-              "course":os.environ["COURSE"],
-              "survey":survey,
-              "resolution_m":resolution,
-              "tiles":selected
-          }, indent=2) + "\n")
-
           base = "https://environment.data.gov.uk/tiles/collections/survey"
           captured = []
-          for item in selected:
+          selected_for_download = []
+
+          # Download catalogue candidates and retain only packages that actually contain
+          # the requested survey id in their raster filenames. This protects us if the
+          # catalogue returns multiple surveys for the same tile/product/year.
+          for item in unique:
               product, year, tile = item["product"], item["year"], item["tile"]
               url = f"{base}/{product}/{year}/1/{tile}?subscription-key=dspui"
               target = root / "packages" / f"{product}-{year}-1m-{tile}.zip"
-              for attempt in range(1,5):
+
+              for attempt in range(1, 5):
                   try:
-                      req = urllib.request.Request(url, headers={"Accept":"application/zip,*/*","Origin":"https://environment.data.gov.uk","Referer":"https://environment.data.gov.uk/survey","User-Agent":"UiDo-course-builder/0.1"})
+                      print(f"DOWNLOAD {product} {year} {tile} attempt={attempt}", flush=True)
+                      req = urllib.request.Request(
+                          url,
+                          headers={
+                              "Accept": "application/zip,*/*",
+                              "Origin": "https://environment.data.gov.uk",
+                              "Referer": "https://environment.data.gov.uk/survey",
+                              "User-Agent": "UiDo-course-builder/0.1",
+                          },
+                      )
                       with urllib.request.urlopen(req, timeout=600) as response:
                           data = response.read()
+
                       if len(data) < 1000:
                           raise RuntimeError(f"response too small: {len(data)} bytes")
+
                       with zipfile.ZipFile(io.BytesIO(data)) as archive:
                           archive.testzip()
-                          rasters=[n for n in archive.namelist() if n.lower().endswith((".tif",".tiff"))]
+                          rasters = [
+                              n for n in archive.namelist()
+                              if n.lower().endswith((".tif", ".tiff"))
+                          ]
+                          survey_rasters = [
+                              n for n in rasters
+                              if survey.lower() in n.lower()
+                          ]
+                          print(
+                              f"HTTP=200 SIZE={len(data)} raster_members={rasters} "
+                              f"survey_rasters={survey_rasters}",
+                              flush=True,
+                          )
+                          if not survey_rasters and not item["survey_match"]:
+                              raise RuntimeError(
+                                  f"package does not identify requested survey {survey}"
+                              )
                           if not rasters:
                               raise RuntimeError("ZIP contains no GeoTIFF raster")
+
                           target.write_bytes(data)
-                          extract=root/"sources"/product/tile
-                          extract.mkdir(parents=True,exist_ok=True)
+                          extract = root / "sources" / product / tile
+                          extract.mkdir(parents=True, exist_ok=True)
                           archive.extractall(extract)
-                      captured.append({"product":product,"year":year,"resolution_m":1,"tile":tile,"survey":survey,"url":url,"bytes":len(data),"sha256":hashlib.sha256(data).hexdigest(),"raster_members":rasters})
+
+                      captured.append({
+                          "product": product,
+                          "year": year,
+                          "resolution_m": 1,
+                          "tile": tile,
+                          "survey": survey,
+                          "url": url,
+                          "bytes": len(data),
+                          "sha256": hashlib.sha256(data).hexdigest(),
+                          "raster_members": rasters,
+                          "survey_rasters": survey_rasters,
+                          "catalogue_survey_match": item["survey_match"],
+                      })
+                      selected_for_download.append(item)
                       break
+
                   except Exception as exc:
-                      print(f"FAILED {tile} {product} attempt={attempt}: {exc}", flush=True)
-                      if attempt == 4: raise
+                      print(
+                          f"FAILED {product} {year} {tile} attempt={attempt}: {exc}",
+                          flush=True,
+                      )
+                      if attempt == 4:
+                          # A candidate for the wrong survey/year is not fatal if there
+                          # are other catalogue candidates for the same product/tile.
+                          print("SKIP CANDIDATE", flush=True)
+                          break
                       time.sleep(5 * (2 ** (attempt - 1)))
 
-          (root / "manifest.json").write_text(json.dumps({
-              "schema":"uido.course.ea-lidar-acquisition.v0.1",
-              "course":os.environ["COURSE"],
-              "survey":survey,
-              "resolution_m":1,
-              "projection":"EPSG:27700",
-              "products":["national_lidar_programme_dtm","national_lidar_programme_dsm"],
-              "tiles":captured,
-              "status":"captured"
-          }, indent=2) + "\n")
+          # We need both products on both course tiles for the terrain build.
+          required_pairs = {
+              (product, tile)
+              for product in required_products
+              for tile in {"SP8060", "SP8065"}
+          }
+          captured_pairs = {(x["product"], x["tile"]) for x in captured}
+          missing = sorted(required_pairs - captured_pairs)
+          if missing:
+              raise SystemExit(
+                  f"EA LiDAR acquisition failed; missing product/tile pairs: {missing}. "
+                  f"Captured: {sorted(captured_pairs)}"
+              )
+
+          discovery = {
+              "schema": "uido.course.ea-lidar-discovery.v0.2",
+              "course": os.environ["COURSE"],
+              "survey": survey,
+              "resolution_m": resolution,
+              "tiles": [
+                  {
+                      "product": x["product"],
+                      "year": x["year"],
+                      "resolution_m": x["resolution_m"],
+                      "tile": x["tile"],
+                      "survey": survey,
+                      "survey_match": x["survey_match"],
+                  }
+                  for x in unique
+              ],
+          }
+          (root / "discovery.json").write_text(
+              json.dumps(discovery, indent=2) + "\n"
+          )
+
+          manifest = {
+              "schema": "uido.course.ea-lidar-acquisition.v0.2",
+              "course": os.environ["COURSE"],
+              "survey": survey,
+              "resolution_m": resolution,
+              "projection": "EPSG:27700",
+              "products": sorted(required_products),
+              "tiles": captured,
+              "status": "captured",
+          }
+          (root / "manifest.json").write_text(
+              json.dumps(manifest, indent=2) + "\n"
+          )
           print(json.dumps(captured, indent=2))
+
           PY
 
           find build/ea-lidar/sources -type f | sort
