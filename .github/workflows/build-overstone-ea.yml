@@ -31,6 +31,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Restore GDAL source/build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            /tmp/gdal-src
+            /tmp/gdal-build
+          key: ${{ runner.os }}-uido-gdal-3.8.4-ecw-build-v1
+
       - name: Discover EA aerial tiles for course footprint
         env:
           COURSE: ${{ inputs.course }}
@@ -259,7 +267,6 @@ jobs:
           echo "System GDAL version: ${GDAL_VERSION}"
           test "${GDAL_VERSION}" = "3.8.4"
 
-          rm -rf /tmp/gdal-src /tmp/gdal-build /opt/libecwj2-3.3 /opt/gdal-ecw
           mkdir -p /tmp/gdal-src
 
           curl -L --fail --retry 3 \
