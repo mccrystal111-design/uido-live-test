@@ -12,7 +12,9 @@ This is the first file a fresh UiDo session should read. It records authoritativ
 
 The successful end-to-end proof is workflow run `35608919741` on commit `2c4697c77fbceeec2d8789245570668f1a513f7e`. Its four unexpired artifacts are recorded below. These are real GitHub Actions artifacts, not screenshots or inferred outputs.
 
-The **current** workflow head is commit `9ca6c0974a3928eba3d9b7aadf4d97254ef673ea`. Its latest Overstone run `35627704315` still reaches EA aerial acquisition, LiDAR acquisition, compact aerial rendering and terrain assembly successfully, but currently fails at **Acquire Overstone OSM golf source** because the Overpass request returns HTTP `406`. This is a current workflow/integration blocker, not a failure of the EA data path or terrain path.
+The **current repository head** is commit `b71a974c771852be7a3382bfd6a368672f353379` (`Add Lo Flag Icon asset`). This latest asset commit does not change the Overstone builder status. The latest verified Overstone run remains `35627704315` on commit `9ca6c0974a3928eba3d9b7aadf4d97254ef673ea`; it reaches EA aerial acquisition, LiDAR acquisition, compact aerial rendering and terrain assembly successfully, but currently fails at **Acquire Overstone OSM golf source** because the Overpass request returns HTTP `406`. This is a current workflow/integration blocker, not a failure of the EA data path or terrain path.
+
+**Recent UI asset work:** `assets/Lo_Flag_Icon.svg` is now committed at `b71a974c771852be7a3382bfd6a368672f353379`. This is a completed asset addition only; it does not supersede any existing UI source-of-truth blueprint or alter the course-data pipeline.
 
 **Do not start another visual prototype.** The next product-engineering slice is now the hand-off from the successful Overstone course package into the UiDo course loader, as defined by GitHub Issue #2.
 
@@ -28,7 +30,7 @@ Do not ask the user to re-upload the OSM capture.
 - GitHub identity lock: `course-models/OVERSTONE_OSM_SOURCE_LOCK.json`
 - GitHub manifest: `course-models/OVERSTONE_SOURCE_MANIFEST.json`
 
-Source counts: 18 holes, 18 pins, 20 greens, 30 tees, 17 fairways, 31 bunkers, 23 rough, 17 paths, 2 water hazards, 1 driving range; 177 features total. Only `golf=hole` features carry explicit `ref=1..18`; other feature classes must be associated spatially/derived, never by feature order.
+Library search reconfirms this file is present and indexed. Source counts: 18 holes, 18 pins, 20 greens, 30 tees, 17 fairways, 31 bunkers, 23 rough, 17 paths, 2 water hazards, 1 driving range; 177 features total. Only `golf=hole` features carry explicit `ref=1..18`; other feature classes must be associated spatially/derived, never by feature order.
 
 ### Normalised source — authoritative derived artifact
 
@@ -37,6 +39,8 @@ Source counts: 18 holes, 18 pins, 20 greens, 30 tees, 17 fairways, 31 bunkers, 2
 - Schema: `uido.course.source-normalized.v0.1`
 - SHA-256: `876eb808a978f577057747f71cca759d4032ed5cc776c3bf036eb126ce6b28e9`
 - Status: **complete**; source geometry unchanged; no invented hole assignments.
+
+Library search reconfirms this file is present and indexed.
 
 ## Course model state
 
@@ -84,7 +88,7 @@ Unexpired artifacts as of 2026-09-21:
 
 ### Current builder regression
 
-Run `35627704315` on current head `9ca6c0974a3928eba3d9b7aadf4d97254ef673ea` completed the following successfully before failing:
+Run `35627704315` on commit `9ca6c0974a3928eba3d9b7aadf4d97254ef673ea` completed the following successfully before failing:
 
 - EA aerial discovery/download;
 - EA LiDAR discovery/download/extraction;
@@ -112,6 +116,8 @@ Established refinement remains two-pass: whole-course maintained-surface discove
 ## UI / product state
 
 The Library remains the source of truth for the current UI: premium golf instrument aesthetic, light/dark system, persistent navigation icon language and the GPS/Yardage/Wind/Lie/Start Line/Shape/Strike live shot flow. Strategy stays out of the live flow until SmartShot is ready.
+
+The current Library also contains approved UI source-of-truth blueprints for the premium aesthetic, live round flow, Shape tile and Putts/Score tile. The newly committed `assets/Lo_Flag_Icon.svg` is an asset addition, not a replacement for those blueprints.
 
 ## Beta environment discrepancy
 
@@ -154,6 +160,7 @@ Separately, fix the current builder's Overpass 406 only as a contained acquisiti
 15. Do not declare the provider-neutral package/loader contract verified until the actual successful package and review artifacts have been inspected.
 16. Do not treat the stale beta catalog as evidence that a second course package exists.
 17. Do not rebuild the entire Overstone pipeline because of the current Overpass 406; repair only the failing OSM acquisition step.
+18. Do not treat the `Lo_Flag_Icon.svg` asset commit as evidence that the Overstone/course-loader state has changed.
 
 ## Change discipline
 
