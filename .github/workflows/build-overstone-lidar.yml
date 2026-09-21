@@ -1,6 +1,9 @@
 name: UiDo Course Builder - Overstone EA LiDAR capture
 
 on:
+  push:
+    paths:
+      - ".github/workflows/build-overstone-lidar.yml"
   workflow_dispatch:
     inputs:
       course:
