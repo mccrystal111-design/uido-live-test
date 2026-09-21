@@ -665,14 +665,14 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p build/osm
-          QUERY='[out:json][timeout:120];(nwr["golf"~"^(hole|pin|tee|green|bunker|rough|fairway|water_hazard|cartpath|path|wood|woodland|driving_range)$"](${OVERSTONE_BBOX_SOUTH},${OVERSTONE_BBOX_WEST},${OVERSTONE_BBOX_NORTH},${OVERSTONE_BBOX_EAST}););convert item ::=::,::geom=geom(),_osm_type=type();out geom;'
+          QUERY='[out:json][timeout:120];(nwr["golf"~"^(hole|pin|tee|green|bunker|rough|fairway|water_hazard|cartpath|path|wood|woodland|driving_range)$"](52.2755460,-0.8266019,52.2862605,-0.8076190););convert item ::=::,::geom=geom(),_osm_type=type();out geom;'
           curl -fsSL --retry 3 --data-urlencode "data=$QUERY" https://overpass-api.de/api/interpreter -o build/osm/overstone-golf.geojson
           python3 - <<'PY'
           import hashlib,json,pathlib
           p=pathlib.Path("build/osm/overstone-golf.geojson")
           d=json.loads(p.read_text())
           assert d.get("elements"), "Overpass returned no derived OSM elements"
-          manifest={"schema":"uido.course.osm-capture.v0.1","provider":"OpenStreetMap","endpoint":"https://overpass-api.de/api/interpreter","bbox":[${OVERSTONE_BBOX_SOUTH},${OVERSTONE_BBOX_WEST},${OVERSTONE_BBOX_NORTH},${OVERSTONE_BBOX_EAST}],"elements":len(d["elements"]),"sha256":hashlib.sha256(p.read_bytes()).hexdigest(),"osm_timestamp":d.get("osm3s",{}).get("timestamp_osm_base")}
+          manifest={"schema":"uido.course.osm-capture.v0.1","provider":"OpenStreetMap","endpoint":"https://overpass-api.de/api/interpreter","bbox":[52.2755460,-0.8266019,52.2862605,-0.8076190],"elements":len(d["elements"]),"sha256":hashlib.sha256(p.read_bytes()).hexdigest(),"osm_timestamp":d.get("osm3s",{}).get("timestamp_osm_base")}
           pathlib.Path("build/osm/manifest.json").write_text(json.dumps(manifest,indent=2)+"\n")
           print(json.dumps(manifest,indent=2))
           PY
@@ -817,7 +817,7 @@ jobs:
           REVIEW="build/overstone-course-review"
           rm -rf "$REVIEW"
           mkdir -p "$REVIEW/course-model" "$REVIEW/aerial" "$REVIEW/terrain" "$REVIEW/manifests"
-          cp course-models/overstone-park-v0.1.json "$REVIEW/course-model/overstone-park-v0.1.json"
+          cp build/overstone-course-model.json "$REVIEW/course-model/overstone-course-model.json"
           cp build/ea-aerial/render/overstone-overview.webp "$REVIEW/aerial/overstone-overview.webp"
           cp build/ea-aerial/render/overstone-overview.jpg "$REVIEW/aerial/overstone-overview.jpg"
           cp build/ea-aerial/render/render.json "$REVIEW/aerial/render.json"
