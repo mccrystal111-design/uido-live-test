@@ -643,6 +643,42 @@ jobs:
           du -sh "$PACKAGE"
           find "$PACKAGE" -maxdepth 3 -type f | sort
 
+      - name: Assemble Overstone human review bundle
+        run: |
+          set -euo pipefail
+          REVIEW="build/overstone-course-review"
+          rm -rf "$REVIEW"
+          mkdir -p "$REVIEW/course-model" "$REVIEW/aerial" "$REVIEW/terrain" "$REVIEW/manifests"
+          cp course-models/overstone-park-v0.1.json "$REVIEW/course-model/overstone-park-v0.1.json"
+          cp build/ea-aerial/render/overstone-overview.webp "$REVIEW/aerial/overstone-overview.webp"
+          cp build/ea-aerial/render/overstone-overview.jpg "$REVIEW/aerial/overstone-overview.jpg"
+          cp build/ea-aerial/render/render.json "$REVIEW/aerial/render.json"
+          cp build/ea-lidar/render/overstone-dtm.png "$REVIEW/terrain/dtm-preview.png"
+          cp build/ea-lidar/render/overstone-dsm.png "$REVIEW/terrain/dsm-preview.png"
+          cp build/ea-lidar/render/terrain.json "$REVIEW/terrain/terrain.json"
+          cp build/ea-aerial/discovery.json "$REVIEW/manifests/ea-aerial-discovery.json"
+          cp build/ea-aerial/manifest.json "$REVIEW/manifests/ea-aerial-manifest.json"
+          cp build/ea-lidar/discovery.json "$REVIEW/manifests/ea-lidar-discovery.json"
+          cp build/ea-lidar/manifest.json "$REVIEW/manifests/ea-lidar-manifest.json"
+          cp build/uido-course-package/review/review.json "$REVIEW/review.json"
+          printf '%s\n' "UiDo Overstone Park course review bundle" "Review the course model, aerial coverage, DTM/DSM previews, and source manifests before publication." "This is a review artifact; raw provider data is not part of the phone runtime package." > "$REVIEW/README.txt"
+          find "$REVIEW" -type f | sort
+          du -sh "$REVIEW"
+
+      - name: Upload Overstone human review bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: overstone-course-review
+          path: build/overstone-course-review/
+          retention-days: 14
+
+      - name: Upload captured EA LiDAR dataset
+        uses: actions/upload-artifact@v4
+        with:
+          name: overstone-ea-lidar-capture
+          path: build/ea-lidar/
+          retention-days: 14
+
       - name: Upload UiDo offline course package
         uses: actions/upload-artifact@v4
         with:
