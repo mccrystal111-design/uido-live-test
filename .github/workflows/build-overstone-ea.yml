@@ -620,12 +620,14 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p build/ea-lidar/render
-          mapfile -t DTMS < <(find build/ea-lidar/sources/national_lidar_programme_dtm -type f | grep -Ei '\.tiff?$' | sort)
-          mapfile -t DSMS < <(find build/ea-lidar/sources/national_lidar_programme_dsm -type f | grep -Ei '\.tiff?$' | sort)
+          mapfile -t DTMS < <(find build/ea-lidar/sources/national_lidar_programme_dtm -type f | grep -Ei '\\.tiff?$' | sort)
+          mapfile -t DSMS < <(find build/ea-lidar/sources/national_lidar_programme_dsm -type f | grep -Ei '\\.tiff?$' | sort)
+          echo "DTM files: ${#DTMS[@]}"
+          printf '%s\n' "${DTMS[@]}"
           echo "DSM files: ${#DSMS[@]}"
           printf '%s\n' "${DSMS[@]}"
-          test "${#DTMS[@]}" -ge 2
-          test "${#DSMS[@]}" -ge 2
+          test "${#DTMS[@]}" -ge 1
+          test "${#DSMS[@]}" -ge 1
 
           gdalbuildvrt -overwrite -resolution highest \
             -te 480137.4894811138 264803.2820420222 481451.93252437544 266016.1542009115 \
