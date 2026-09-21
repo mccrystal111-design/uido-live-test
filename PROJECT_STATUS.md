@@ -8,15 +8,9 @@ This is the first file a fresh UiDo session should read. It records authoritativ
 
 ## Current state
 
-**Course data foundation: READY.** Overstone's authoritative OSM capture has been recovered, identity-locked and deterministically normalised. The provider-neutral course model and measured-registration tooling exist. Public EA source resolution is complete. **Raw EA raster/LAZ acquisition is still the remaining source-data gate.**
+**Course data foundation: READY.** Overstone's authoritative OSM capture is recovered and identity-locked; deterministic normalisation and the provider-neutral course model exist. Public EA source resolution is complete. **EA aerial acquisition is now proven end-to-end. LiDAR acquisition, raster post-render and the final provider-neutral course package remain outstanding.**
 
-**Do not start another visual prototype.** The immediate priority is the public-source data/model pipeline.
-
-## Core pipeline
-
-`source capture -> deterministic normalisation -> provider-neutral course model -> measured OSM/satellite registration -> satellite refinement -> LiDAR enrichment -> verification/fusion -> phone/watch/renderers`
-
-Data policy: **source preserved -> derived explicit -> verified -> never silently replaced**.
+**Do not start another visual prototype.** The immediate priority is the public-source data/model pipeline and course-package build.
 
 ## Authoritative Overstone source
 
@@ -30,9 +24,7 @@ Do not ask the user to re-upload the OSM capture.
 - GitHub identity lock: `course-models/OVERSTONE_OSM_SOURCE_LOCK.json`
 - GitHub manifest: `course-models/OVERSTONE_SOURCE_MANIFEST.json`
 
-Source counts: 18 holes, 18 pins, 20 greens, 30 tees, 17 fairways, 31 bunkers, 23 rough, 17 paths, 2 water hazards, 1 driving range; 177 features total.
-
-Only `golf=hole` features carry explicit `ref=1..18`. Other feature classes are not hole-numbered at source. Preserve them as source geometry; hole association must be spatial/derived, never inferred from feature order.
+Source counts: 18 holes, 18 pins, 20 greens, 30 tees, 17 fairways, 31 bunkers, 23 rough, 17 paths, 2 water hazards, 1 driving range; 177 features total. Only `golf=hole` features carry explicit `ref=1..18`; other feature classes must be associated spatially/derived, never by feature order. fileciteturn239file1
 
 ### Normalised source — authoritative derived artifact
 
@@ -40,7 +32,7 @@ Only `golf=hole` features carry explicit `ref=1..18`. Other feature classes are 
 - Library file id: `file_0000000052948210969af327286d4488`
 - Schema: `uido.course.source-normalized.v0.1`
 - SHA-256: `876eb808a978f577057747f71cca759d4032ed5cc776c3bf036eb126ce6b28e9`
-- Status: **complete**; source geometry unchanged; no invented hole assignments.
+- Status: **complete**; source geometry unchanged; no invented hole assignments. Library report confirms 177 features and 141 non-explicit-hole features. fileciteturn239file4
 
 ## Course model state
 
@@ -51,131 +43,99 @@ Only `golf=hole` features carry explicit `ref=1..18`. Other feature classes are 
 - Contains all 18 green F/M/B anchors.
 - Registration transform/metrics remain null until measured control points are used.
 
-### Library discrepancy to preserve, not overwrite
+### Library discrepancy — preserve, do not overwrite
 
-Library contains a newer generated artifact:
+Library contains `/UiDo/UiDo_Overstone_Course_Model_v0.4.json`, a newer generated model with source-preserving geometry, derived hole associations and registration/refinement gates. It is **not promoted as the GitHub canonical model**. Reconcile/version the promotion explicitly; do not delete, recreate or silently replace v0.1.
 
-- `/UiDo/UiDo_Overstone_Course_Model_v0.4.json`
-- Schema/capture version: `0.4.0`
-- Model status: `STRUCTURAL_MODEL_READY_IMAGERY_REFINEMENT_GATED`
-- It contains source-preserving geometry plus derived hole associations and registration/refinement gates.
+## EA public-source state
 
-This v0.4 Library artifact is **not yet promoted as the GitHub canonical course model**. Do not delete or recreate it, and do not silently replace the GitHub v0.1 model with it. Reconcile the two explicitly when the next model promotion is undertaken.
+### Catalogue resolution — COMPLETE
 
-## Existing tooling / work already completed
+Exact Overstone EA coverage is resolved in EPSG:27700.
 
-- `tools/course-model/build_overstone_model.py` — deterministic source normalisation.
-- `tools/course-model/register_affine.py` — measured affine registration; reports residuals/RMS/max error.
-- `tools/course-model/ea_source_acquisition.py` — EA catalogue resolver/acquisition adapter scaffold.
-- `tools/course-model/resolve_overstone_public_sources.py` — public-source catalogue resolution.
-- `course-models/OVERSTONE_ACQUISITION_MANIFEST.json` — acquisition manifest.
-- `course-models/OVERSTONE_PUBLIC_SOURCE_RESOLUTION.json` — exact resolved EA source records.
-- `docs/OVERSTONE_DATASET_PROCESSING.md` — dataset processing rules.
-- `docs/UI_DO_COURSE_MODEL_V0.1.md` and related extraction/pixel/provenance docs.
-- Whole-course satellite viewer and historical Earth Studio/Hole 1/Hole 2 experiments exist. Do not rebuild them merely because a fresh chat cannot see an old conversation.
+**Aerial:** 2013, 0.25 m, product `vertical_aerial_photography_tiles_night_time`. Required source ECWs are:
+- SP8064 — `P00055683`
+- SP8065 — `P00055670`
+- SP8164 — `P00055697`
+- SP8165 — `P00055618`
 
-### New EA acquisition runner — implemented, not yet proven
-
-`.github/workflows/build-overstone-ea.yml` is now the active manual acquisition runner. It:
-
-- discovers the actual EA aerial product/tiles for the fixed Overstone footprint through the EA survey catalogue;
-- requests the discovered ZIP packages using the EA survey download endpoint and public survey key;
-- validates ZIP integrity and raster members;
-- retries failed downloads;
-- records URLs, byte counts and SHA-256 hashes in `uido.course.ea-acquisition.v0.2` manifest output;
-- uploads the captured source package as a GitHub Actions artifact when successful.
-
-A manual run of the earlier implementation failed before producing an artifact. The failure was an acquisition-path assumption, not evidence that the EA data is absent. The runner was then changed to catalogue discovery plus retries in commit `95409ef365371972eff35a9b2f8db3e54ffbfaed`.
-
-**Important:** no successful end-to-end raw EA aerial capture has yet been recorded after this fix. Do not mark acquisition complete until a successful artifact is inspected.
-
-## Public-source acquisition state
-
-### EA catalogue resolution — COMPLETE
-
-The EA Vertical Aerial Photography and National LiDAR catalogue services are machine-queryable in EPSG:27700. Exact Overstone source coverage is resolved.
-
-**Aerial:** four 1 km 2013 25 cm RGB tiles:
-- SP8064 — `Ortho_NightTime_P00055683_20130218_20130218_25cm_res.ecw`
-- SP8065 — `Ortho_NightTime_P00055670_20130218_20130218_25cm_res.ecw`
-- SP8164 — `Ortho_NightTime_P00055697_20130218_20130218_25cm_res.ecw`
-- SP8165 — `Ortho_NightTime_P00055618_20130218_20130218_25cm_res.ecw`
-
-**LiDAR:** 1 m survey `P_10738`, flown 2020-01-29 and 2020-03-06, requiring 5 km tiles SP8060 and SP8065. Required DSM, DTM, FZ DSM, intensity, LAZ and VOM filenames are recorded in `course-models/OVERSTONE_PUBLIC_SOURCE_RESOLUTION.json`.
+**LiDAR:** 1 m survey `P_10738`, flown 2020-01-29 and 2020-03-06; required tiles SP8060 and SP8065, with DSM, DTM, FZ DSM, intensity, LAZ and VOM records already resolved in the repository manifests.
 
 Course footprint: EPSG:27700 E 480137.49–481451.93 / N 264803.28–266016.15.
 
-### Automated acquisition — aerial runner awaiting proof
+### Automated aerial acquisition — PROVEN
 
-The GitHub main branch contains both the catalogue connectivity test and the new manual acquisition runner. The catalogue path is proven in code, but **raw raster/LAZ acquisition is not yet proven end-to-end**.
+`.github/workflows/build-overstone-ea.yml` is the active manual acquisition runner. It discovers the EA product/tiles from the fixed Overstone footprint, downloads the EA survey ZIPs, validates ZIP/raster contents, retries failures, records URLs/byte counts/SHA-256 and uploads an artifact.
 
-The earlier direct-download implementation was manually triggered and failed in 12 seconds with exit code 1 and no artifact. The failure was recorded before the runner was changed to discover the product/tiles from the EA catalogue. The corrected runner is commit `95409ef365371972eff35a9b2f8db3e54ffbfaed` and is awaiting a fresh manual run.
+**Successful proof:** workflow run `35545736650` / commit `75d4c9d9ee5e74de395483c2e1b4c3d6a291b5b2`. Both download steps succeeded and the artifact `overstone-ea-aerial-capture` was created. Artifact id `10616132263`, size 24,883,030 bytes, SHA-256 `90efebca7e9a2980256a1c95389052978e137d01da7b544ec7cd4fe53be22208`, expiry 2026-10-04.
 
-Draft PR #1 (`test/ea-machine-acquisition`) is open and unmerged. Do not treat the PR as production acquisition.
+The artifact contains the two required download blocks SP8060/SP8065 and all four required Overstone ECWs (`P00055683`, `P00055670`, `P00055697`, `P00055618`). The acquisition manifest records schema `uido.course.ea-acquisition.v0.2`, product/year/resolution and source hashes. **Do not call aerial acquisition unproven anymore.**
 
-A headless Selenium EA Survey Download workaround remains available as fallback if the corrected direct survey endpoint fails. It has not yet been adapted/tested against the Overstone Vertical Aerial Photography product.
+The earlier 12-second failure was a pre-fix product-id assumption. It is retained only as history and is not evidence of EA unavailability.
 
-### Production architecture decision
+### Post-render — IMPLEMENTED, NOT YET PROVEN
 
-Do not make the phone download raw EA/OSM/LiDAR data. Central UiDo acquisition/processing should build a compact provider-neutral course package; phone/watch clients consume that package.
+Commit `44b3fdbbccaf90d2399a7250017f63f536cd945d` adds a compact Overstone render stage after acquisition. It attempts to enable ECW/GDAL, build a VRT over the fixed course footprint, and output approximately 0.5 m/pixel WebP/JPEG overview imagery plus a render manifest.
 
-Provider-agnostic architecture:
+No successful post-render run/artifact has yet been recorded. **Do not claim phone-ready rendering is proven until the next workflow run is inspected.**
 
-`course footprint -> provider adapter -> source catalogue -> source download -> raw source archive -> processing -> UiDo course package -> API/CDN -> phone/watch`
+### LiDAR — NOT YET ACQUIRED
 
-Manual EA portal downloads may be a development fallback, but are **not** production-approved.
+Catalogue records are resolved, but no successful automated LiDAR acquisition artifact is recorded. The next LiDAR work must reuse the resolved SP8060/SP8065 records and the existing acquisition architecture; do not rediscover the source manually.
 
-## Registration state
+### Production architecture
 
-Measured OSM-to-raster registration is a separate stage.
+Phone/watch clients should **not** download raw EA/OSM/LiDAR. Central UiDo acquisition/processing should build a compact provider-neutral course package, then the client downloads that package for offline/on-course use.
 
-Do not invent a transform, reconstruct one from screenshots, use validation GPS as candidate-generation geometry, or silently reuse an old/unmeasured transform.
+`course footprint -> provider adapter -> source catalogue -> source download -> raw archive -> processing/render -> UiDo course package -> API/CDN -> phone/watch`
 
-`course-models/OVERSTONE_REGISTRATION_CONTROL_POINTS.json` is the control-point template. The next registration step is to obtain/locate real measured control points against the fixed acquired raster, then run `register_affine.py` and record residuals/registration version.
+Manual EA portal downloads are development fallback only, not production-approved.
 
-## Feature refinement / LiDAR
+## Registration / refinement state
 
-Established refinement approach is two-pass:
+Measured OSM-to-raster registration is still a separate stage. `course-models/OVERSTONE_REGISTRATION_CONTROL_POINTS.json` is the control-point template. Do not invent/reuse a transform or use validation GPS as candidate-generation geometry. After fixed raster acquisition, obtain real measured control points, run `register_affine.py`, and record residuals/RMS/max error.
 
-1. Whole-course maintained-surface discovery.
-2. Hole-specific refinement constrained by OSM/source ROIs.
-
-Use feature-specific local signatures and retain provenance/confidence. Do not turn visual experiments into authoritative geometry without validation.
-
-LiDAR has **not** yet been ingested into the canonical GitHub course model. Its intended role is terrain/elevation, vegetation/tree structure, height/visibility context and ambiguous geometry refinement.
+Established refinement remains two-pass: whole-course maintained-surface discovery, then hole-specific refinement constrained by source ROIs. Preserve feature provenance/confidence. LiDAR is intended for terrain/elevation, vegetation/tree structure, height/visibility context and ambiguous geometry refinement.
 
 ## UI / product state
 
-The Library contains current UI source-of-truth documents, including the revised premium-golf aesthetic, light/dark system, tile navigation language and agreed live-test round flow. The current primary path is GPS/course recognition -> Yardage -> Wind -> Lie -> Start Line -> Shape -> Strike -> Shot Recorded -> Score/round review. The live-test flow deliberately keeps SmartShot strategy out until the engine is ready. Do not redesign screens from memory; use the current Library blueprint for each screen.
+The Library remains the source of truth for the current UI: premium golf instrument aesthetic, light/dark system, persistent navigation icon language and the GPS/Yardage/Wind/Lie/Start Line/Shape/Strike live shot flow. The agreed round flow deliberately keeps SmartShot strategy out until the engine is ready. Do not redesign from memory. fileciteturn237file0 fileciteturn237file4
+
+The current UI implementation blueprint explicitly locks shared theme tokens, icon component, tile shell, tile migration, radial navigation and phone/watch continuity before independent tile redesign. fileciteturn237file9
+
+## Outstanding work
+
+1. Prove the new post-render stage on the successful aerial acquisition path.
+2. Inspect render output size, runtime, visual extent and georeferencing; determine whether a compact offline course image/tile package is practical for phone download.
+3. Build/prove automated EA LiDAR acquisition for SP8060/SP8065.
+4. Establish measured OSM-to-raster control points and registration metrics.
+5. Build the provider-neutral UiDo course package and review/verification layer.
+6. Reconcile Library v0.4 against GitHub v0.1 deliberately before promoting a new canonical model version.
 
 ## EXACT NEXT STEP
 
-**Run the corrected `.github/workflows/build-overstone-ea.yml` manually for Overstone Park / 2013 / 0.25 m and inspect the resulting job/artifact.**
+**Run `.github/workflows/build-overstone-ea.yml` again using the existing Overstone Park / 2013 / 0.25 m defaults, then inspect the new post-render step and artifact.** The acquisition portion is already proven; this run is specifically to prove the compact render stage. Do not change the source data or manually download EA files.
 
-1. Trigger the workflow with the existing defaults.
-2. If it succeeds, inspect the artifact contents and manifest; verify the four required aerial tiles, raster members, hashes and georeferencing.
-3. If it fails, capture the exact catalogue/download response and fix the runner; do not switch to manual downloads merely to make the status green.
-4. Once aerial acquisition is proven, add/prove the corresponding LiDAR acquisition for SP8060/SP8065.
-5. Only after fixed raster acquisition succeeds: establish measured control points, run `register_affine.py`, record residuals, then proceed to refinement/LiDAR fusion.
+If the render fails, capture the exact GDAL/ECW error and fix only that stage. If it succeeds, measure the resulting package size/runtime and use that evidence to design the first offline UiDo course-package format.
 
 ## DO NOT REBUILD
 
-1. **Do not ask for `export (1).geojson` again.** It is recovered and persisted.
-2. Do not recreate the Overstone OSM capture from screenshots or memory.
-3. Do not recreate the normalised source; it is complete and persisted.
-4. Do not invent an 18th fairway or collapse the 30 tee polygons to force symmetry.
-5. Do not replace source geometry with derived geometry or silently overwrite verified/source features.
-6. Do not invent/reuse an unmeasured OSM-to-satellite transform.
-7. Do not use validation GPS as candidate-generation geometry.
-8. Do not generate PNGs merely to demonstrate progress.
-9. Do not treat screenshots/diagnostics as the source of truth when underlying data exists.
-10. Do not ask the user to repeat information already recorded in this document, the source manifests/locks, the course model or the Library.
-11. If an artifact appears missing from GitHub, check the Library/conversation sources before declaring it lost.
-12. Do not silently promote Library v0.4 to replace GitHub v0.1; reconcile and version the promotion explicitly.
-13. Do not treat EA catalogue connectivity as equivalent to successful raw-data acquisition.
-14. Do not treat the failed pre-fix EA workflow run as proof that the EA source is unavailable.
-15. Do not replace the corrected acquisition runner with manual portal steps unless the automated route has been conclusively tested and documented as blocked.
+1. **Do not ask for `export (1).geojson` again.** The authoritative OSM capture is recovered and persisted.
+2. Do not recreate the normalised source; it is complete and persisted.
+3. Do not recreate the course model from screenshots or memory.
+4. Do not replace source geometry with derived geometry or silently overwrite verified/source features.
+5. Do not invent an OSM-to-raster transform or reuse an unmeasured one.
+6. Do not use validation GPS as candidate-generation geometry.
+7. Do not generate PNGs merely to demonstrate progress.
+8. Do not treat screenshots/diagnostics as the source of truth when underlying data exists.
+9. Do not ask the user to repeat information already recorded here, in source manifests/locks, the course model or the Library.
+10. If a GitHub artifact appears missing, check its recorded Library/conversation sources and GitHub artifact history before declaring it lost.
+11. Do not silently promote Library v0.4 over GitHub v0.1; reconcile and version the promotion explicitly.
+12. Do not treat EA catalogue connectivity as equivalent to acquisition — **aerial acquisition is now proven; LiDAR remains unproven**.
+13. Do not treat the pre-fix EA failure as a current blocker.
+14. Do not replace the working EA aerial runner with manual portal steps.
+15. Do not declare the post-render or phone-ready course package complete until an actual successful render artifact has been inspected.
 
 ## Change discipline
 
-Whenever meaningful UiDo work changes the project state, update this document. If GitHub and Library disagree, inspect both authoritative artifacts, record the discrepancy explicitly, and resolve it deliberately. Never guess or silently overwrite.
+Whenever meaningful UiDo work changes project state, update this document. If GitHub and Library disagree, inspect both authoritative artifacts, record the discrepancy explicitly, and resolve it deliberately. Never guess or silently overwrite source data.
