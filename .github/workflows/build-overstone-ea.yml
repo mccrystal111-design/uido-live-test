@@ -246,72 +246,48 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Ubuntu GDAL does not ship ECW support. Build only the standalone ECW plugin.
           sudo apt-get update -y
           sudo apt-get install -y --no-install-recommends gdal-bin libgdal-dev cmake curl unzip python3-gdal
 
-          GDAL_VERSION="${GDAL_VERSION:-$(gdal-config --version)}"
+          GDAL_VERSION="$(gdal-config --version)"
           echo "System GDAL version: ${GDAL_VERSION}"
 
-          rm -rf /tmp/gdal-src /tmp/ecw-build
-          mkdir -p /tmp/gdal-src /tmp/ecw-build
-
-          curl -L --fail --retry 3             "https://github.com/OSGeo/gdal/archive/refs/tags/v${GDAL_VERSION}.tar.gz"             -o /tmp/gdal.tar.gz
+          rm -rf /tmp/gdal-src /opt/libecwj2-3.3
+          mkdir -p /tmp/gdal-src
+          curl -L --fail --retry 3 "https://github.com/OSGeo/gdal/archive/refs/tags/v${GDAL_VERSION}.tar.gz" -o /tmp/gdal.tar.gz
           tar -xzf /tmp/gdal.tar.gz -C /tmp/gdal-src --strip-components=1
-
-          curl -L --fail --retry 3             "https://github.com/rouault/libecwj2-3.3-builds/releases/download/v1/install-libecwj2-3.3-ubuntu-20.04.tar.gz"             -o /tmp/libecwj2.tar.gz
+          curl -L --fail --retry 3 "https://github.com/rouault/libecwj2-3.3-builds/releases/download/v1/install-libecwj2-3.3-ubuntu-20.04.tar.gz" -o /tmp/libecwj2.tar.gz
           sudo tar -xzf /tmp/libecwj2.tar.gz -C /opt
           sudo ldconfig
 
-          cmake -S /tmp/gdal-src/frmts/ecw -B /tmp/ecw-build             -DCMAKE_PREFIX_PATH=/usr             -DECW_ROOT=/opt/libecwj2-3.3
-          cmake --build /tmp/ecw-build --parallel 2
+          # The standalone driver CMake must be configured from a build directory inside the GDAL source tree.
+          mkdir -p /tmp/gdal-src/build_ecw
+          cmake -S /tmp/gdal-src/frmts/ecw -B /tmp/gdal-src/build_ecw -DCMAKE_PREFIX_PATH=/usr -DECW_ROOT=/opt/libecwj2-3.3
+          cmake --build /tmp/gdal-src/build_ecw --parallel 2
 
-          ECW_PLUGIN="$(find /tmp/ecw-build -type f -name '*ECW*.so' | head -n 1)"
+          ECW_PLUGIN="$(find /tmp/gdal-src/build_ecw -type f -name "gdal_ECW_JP2ECW.so" | head -n 1)"
           test -n "${ECW_PLUGIN}"
-          sudo mkdir -p /usr/lib/gdalplugins
-          sudo cp "${ECW_PLUGIN}" /usr/lib/gdalplugins/
-          export GDAL_DRIVER_PATH=/usr/lib/gdalplugins
-
-          echo "Checking ECW driver"
-          gdalinfo --formats | grep -E 'ECW|JP2ECW'
+          sudo mkdir -p /usr/lib/x86_64-linux-gnu/gdalplugins
+          sudo cp "${ECW_PLUGIN}" /usr/lib/x86_64-linux-gnu/gdalplugins/
+          export GDAL_DRIVER_PATH=/usr/lib/x86_64-linux-gnu/gdalplugins
+          gdalinfo --formats | grep -E "ECW|JP2ECW"
 
           mkdir -p build/ea-aerial/render
-          mapfile -t ECWS < <(find build/ea-aerial/sources -type f -name '*.ecw' | sort)
+          mapfile -t ECWS < <(find build/ea-aerial/sources -type f -name "*.ecw" | sort)
           test "${#ECWS[@]}" -gt 0
-
-          gdalbuildvrt -overwrite             -resolution highest             -te 480137.4894811138 264803.2820420222 481451.93252437544 266016.1542009115             build/ea-aerial/render/overstone.vrt             "${ECWS[@]}"
-
-          gdal_translate             -of WEBP             -projwin 480137.4894811138 266016.1542009115 481451.93252437544 264803.2820420222             -outsize 2629 2426             -co QUALITY=82             build/ea-aerial/render/overstone.vrt             build/ea-aerial/render/overstone-overview.webp
-
-          gdal_translate             -of JPEG             -projwin 480137.4894811138 266016.1542009115 481451.93252437544 264803.2820420222             -outsize 2629 2426             -co QUALITY=82             build/ea-aerial/render/overstone.vrt             build/ea-aerial/render/overstone-overview.jpg
+          gdalbuildvrt -overwrite -resolution highest -te 480137.4894811138 264803.2820420222 481451.93252437544 266016.1542009115 build/ea-aerial/render/overstone.vrt "${ECWS[@]}"
+          gdal_translate -of WEBP -projwin 480137.4894811138 266016.1542009115 481451.93252437544 264803.2820420222 -outsize 2629 2426 -co QUALITY=82 build/ea-aerial/render/overstone.vrt build/ea-aerial/render/overstone-overview.webp
+          gdal_translate -of JPEG -projwin 480137.4894811138 266016.1542009115 481451.93252437544 264803.2820420222 -outsize 2629 2426 -co QUALITY=82 build/ea-aerial/render/overstone.vrt build/ea-aerial/render/overstone-overview.jpg
 
           python3 - <<'PY'
-          import json, os
-          out = {
-              "schema": "uido.course.render.v0.1",
-              "course": "Overstone Park",
-              "crs": "EPSG:27700",
-              "bounds_m": {
-                  "min_easting": 480137.4894811138,
-                  "min_northing": 264803.2820420222,
-                  "max_easting": 481451.93252437544,
-                  "max_northing": 266016.1542009115,
-              },
-              "output": {
-                  "width_px": 2629,
-                  "height_px": 2426,
-                  "approx_resolution_m": 0.5,
-                  "webp": "overstone-overview.webp",
-                  "jpeg": "overstone-overview.jpg",
-              },
-              "source_ecw_count": len([p for p in os.listdir("build/ea-aerial/sources/SP8060") if p.endswith(".ecw")]) + len([p for p in os.listdir("build/ea-aerial/sources/SP8065") if p.endswith(".ecw")]),
-          }
-          with open("build/ea-aerial/render/render.json", "w") as f:
-              json.dump(out, f, indent=2)
+          import json, pathlib
+          root = pathlib.Path("build/ea-aerial/render")
+          out = {"schema":"uido.course.render.v0.1","course":"Overstone Park","crs":"EPSG:27700","bounds_m":{"min_easting":480137.4894811138,"min_northing":264803.2820420222,"max_easting":481451.93252437544,"max_northing":266016.1542009115},"output":{"width_px":2629,"height_px":2426,"approx_resolution_m":0.5,"webp":"overstone-overview.webp","jpeg":"overstone-overview.jpg"},"source_ecw_count":len(list(pathlib.Path("build/ea-aerial/sources").rglob("*.ecw")))}
+          (root / "render.json").write_text(json.dumps(out, indent=2) + "\n")
           PY
-
           ls -lh build/ea-aerial/render/
           du -sh build/ea-aerial/render/
-
       - name: Build UiDo offline course package
         run: |
           set -euo pipefail
