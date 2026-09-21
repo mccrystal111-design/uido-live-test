@@ -59,3 +59,5 @@ Overstone Park is the first end-to-end acquisition target. The existing provider
 <!-- Overstone builder trigger -->
 <!-- terrain discovery syntax fixed -->
 <!-- trigger cleaned workflow header -->
+
+<!-- Overstone EA build trigger -->
