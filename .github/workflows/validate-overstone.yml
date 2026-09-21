@@ -1,0 +1,26 @@
+name: Validate Overstone workflow
+
+on:
+  push:
+    paths:
+      - "course-packages/README.md"
+      - ".github/workflows/build-overstone-ea.yml"
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse Overstone workflow YAML
+        run: |
+          python -m pip install --quiet pyyaml
+          python - <<'PY'
+          import yaml
+          path = ".github/workflows/build-overstone-ea.yml"
+          with open(path, "r", encoding="utf-8") as f:
+              data = yaml.safe_load(f)
+          print("YAML parsed successfully")
+          print("Top-level keys:", list(data.keys()))
+          print("Jobs:", list(data.get("jobs", {}).keys()))
+          PY
