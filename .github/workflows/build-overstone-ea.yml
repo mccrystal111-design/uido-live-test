@@ -270,10 +270,18 @@ jobs:
           curl -L --fail --retry 3 \
             "https://github.com/rouault/libecwj2-3.3-builds/releases/download/v1/install-libecwj2-3.3-ubuntu-20.04.tar.gz" \
             -o /tmp/libecwj2.tar.gz
-          sudo tar -xzf /tmp/libecwj2.tar.gz -C /opt
+          # The release archive contains an absolute /opt/libecwj2-3.3 tree,
+          # so extract it at filesystem root (the same layout used by GDAL's
+          # official full Ubuntu image).
+          sudo tar -xzf /tmp/libecwj2.tar.gz -C /
+          test -d /opt/libecwj2-3.3
+          test -d /opt/libecwj2-3.3/include
+          test -d /opt/libecwj2-3.3/lib
 
           # Make the legacy ECW runtime libraries visible to the linker.
-          sudo cp /opt/libecwj2-3.3/lib/*.so* /usr/lib/x86_64-linux-gnu/
+          for lib in /opt/libecwj2-3.3/lib/*.so*; do
+            sudo ln -sf "$lib" "/usr/lib/x86_64-linux-gnu/$(basename "$lib")"
+          done
           sudo ldconfig
 
           echo "ECW SDK layout:"
