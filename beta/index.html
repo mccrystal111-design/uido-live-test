@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>UiDo Beta</title>
+  <style>
+    body{font-family:system-ui,sans-serif;max-width:720px;margin:40px auto;padding:0 20px}
+    h1{margin-bottom:4px}.muted{opacity:.65}
+    .course{border:1px solid #ddd;border-radius:12px;padding:16px;margin:16px 0}
+    a{display:inline-block;margin-top:8px}
+  </style>
+</head>
+<body>
+  <h1>UiDo Beta</h1>
+  <p class="muted">Temporary course delivery environment.</p>
+  <div id="courses"></div>
+  <script>
+    fetch('./catalog.json').then(function(r){return r.json();}).then(function(catalog){
+      document.getElementById('courses').innerHTML=catalog.courses.map(function(c){
+        return '<div class="course"><strong>'+c.name+'</strong><div>Status: '+c.status+'</div>'+
+          (c.package_url ? '<a href="'+c.package_url+'">Download course package</a>' : '')+
+          '</div>';
+      }).join('');
+    });
+  </script>
+</body>
+</html>
