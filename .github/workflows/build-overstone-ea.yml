@@ -1,36 +1,4 @@
 name: UiDo Course Builder - Overstone EA capture
-# automatic push execution enabled
-
-on:
-  push:
-    paths:
-      - ".github/workflows/build-overstone-ea.yml"
-      - "course-packages/README.md"
-  workflow_dispatch:
-    inputs:
-      course:
-        description: "Course name"
-        required: true
-        type: choice
-        options:
-          - "Overstone Park"
-        default: "Overstone Park"
-      year:
-        description: "EA aerial survey year"
-        required: true
-        type: choice
-        options:
-          - "2013"
-        default: "2013"
-      resolution:
-        description: "EA aerial resolution (metres)"
-        required: true
-        type: choice
-        options:
-          - "0.25"
-        default: "0.25"
-
-name: UiDo Course Builder - Overstone EA capture
 # Overstone proof builder
 
 on:
