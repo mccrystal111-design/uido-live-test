@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Render a Poult Wood source skeleton for human geometry QA.
 
-This pass is deliberately geometry-first. It resolves OSM fairway multipolygon
-relations into their source polygons, selects the documented 18-hole target
-routes, and draws the surrounding golf features without inventing, smoothing,
-or moving source geometry.
+This pass follows the proven Overstone source-model pattern. OSM remains the
+structural source of truth: select the documented target hole routes, associate
+source features deterministically to those routes, and preserve the original
+geometry. Poult Wood fairways are OSM multipolygon relations, so relation members
+are resolved only as a display representation; no geometry is invented, smoothed,
+or moved.
 
 Colour is intentionally restrained at this stage; the UiDo presentation palette
 is applied only after the source skeleton is visually accepted.
@@ -166,8 +168,9 @@ def fairway_sources(all_elements, fairway_elements, target_holes):
     all_way_index = build_way_index(all_elements)
     fairway_way_index = build_way_index(fairway_elements)
 
-    # The focused relation query includes member ways. Prefer those exact
-    # members, but fall back to the complete golf source when necessary.
+    # Follow the Overstone rule: the complete OSM capture is authoritative;
+    # the focused relation query is only a convenient way to retrieve the
+    # relation members needed to reconstruct the source fairway geometry.
     way_index = dict(all_way_index)
     way_index.update(fairway_way_index)
 
