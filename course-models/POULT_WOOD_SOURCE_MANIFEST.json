@@ -1,0 +1,72 @@
+{
+  "schema_version": "uido.course-source-manifest.v0.1",
+  "course": "poult-wood",
+  "target_course": {
+    "name": "Poult Wood Golf Course - 18 Hole",
+    "address": "Higham Lane, Tonbridge, Kent, TN11 9QR",
+    "holes": 18,
+    "par": 68,
+    "boundary": {
+      "west": 0.2958967,
+      "south": 51.2184284,
+      "east": 0.3095094,
+      "north": 51.2276149,
+      "crs": "EPSG:4326"
+    }
+  },
+  "identity_validation": {
+    "official_source": "tmactive",
+    "official_source_confirms": [
+      "Poult Wood has separate 18-hole and 9-hole courses",
+      "18-hole course is at Higham Lane, Tonbridge, Kent, TN11 9QR"
+    ],
+    "osm_source_bounds": {
+      "west": 0.2948716,
+      "south": 51.2191428,
+      "east": 0.3091756,
+      "north": 51.2273875
+    },
+    "osm_features_inside_target_boundary": 142,
+    "target_18_hole_routes": 18,
+    "additional_hole_routes_in_facility_source": 6,
+    "identity_result": "PASS"
+  },
+  "osm_capture": {
+    "artifact": "Poult Wood.geojson",
+    "sha256": "dd4a89406a1c047fb336a7096112c61e49522369fca0affbc2e335a457e1aaaa",
+    "feature_count": 142,
+    "golf_feature_counts": {
+      "hole": 24,
+      "tee": 27,
+      "green": 23,
+      "fairway": 1,
+      "rough": 0,
+      "bunker": 54,
+      "water_hazard": 13,
+      "cartpath": 0,
+      "pin": 0,
+      "driving_range": 0
+    },
+    "target_18_hole_refs": [
+      "1","2","3","4","5","6","7","8","9",
+      "10","11","12","13","14","15","16","17","18"
+    ],
+    "status": "raw source retained; no geometry invented"
+  },
+  "openyardage_reference": {
+    "role": "independent sense check",
+    "basis": "OpenStreetMap",
+    "mapped_holes": 18,
+    "par": 68,
+    "playing_length_yards": 5219,
+    "green_depths": "available for all 18 holes",
+    "hazard_carry_measurements": "available for mapped bunkers/water",
+    "fairway_use": "visual/geometry cross-check only; do not treat OpenYardage as UiDo source geometry"
+  },
+  "next_stage": [
+    "associate the 18 target hole routes with tees/greens/hazards",
+    "use OpenYardage measurements as a line-of-play sense check",
+    "identify OSM fairway coverage gaps",
+    "use EA aerial imagery to refine fairway boundaries rather than importing third-party geometry"
+  ]
+}
