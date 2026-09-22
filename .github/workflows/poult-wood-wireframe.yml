@@ -52,3 +52,5 @@ jobs:
           name: poult-wood-18-hole-wireframe
           path: build/poult-wood-wireframe/
           retention-days: 14
+
+# Re-run source skeleton QA after renderer fixes.
