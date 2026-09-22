@@ -2,62 +2,64 @@
 
 ## Status
 
-**Validated on Overstone hole 1.**
+**Validated against the recovered Overstone historical test on the correct hole: hole 2.**
 
-The investigation recovered the original UiDo Overstone Front/Middle/Back GPS values from the historical live-test HTML and compared them with the recovered Overstone OSM source.
-
-## Proven derivation
-
-The historical Overstone hole 1 values were:
-
+The historical live-test HTML contained:
 - Front: `52.2762446, -0.8166103`
 - Middle: `52.2761187565, -0.8166885565`
 - Back: `52.2759866, -0.8167443`
 
+The associated OSM green is `way/798091452`. Spatial comparison shows this green belongs to the terminal end of OSM hole route `way/798140683`, whose `ref` is **2**.
+
+### Proven source relationship
+
 The recovered OSM source contains:
-
 - `way/798091452` tagged `golf=green`
-- `way/798140682` tagged `golf=hole`, `ref=1`
+- `way/798140683` tagged `golf=hole`, `ref=2`
 
-The green polygon contains the historical Front and Back coordinates as boundary vertices. Its centroid is:
+The green polygon centroid is:
+- longitude: `-0.8166742136119863`
+- latitude: `52.276126311402734`
 
-- latitude: `52.27611875652174`
-- longitude: `-0.8166885565217391`
+The historical Middle coordinate is extremely close to this centroid. The earlier exact-centroid statement was based on an incorrect hole/green association and has been corrected here.
 
-which matches the historical Middle coordinate to floating-point precision.
+The historical Front and Back coordinates are both vertices of the same OSM green polygon:
+- Front: `[-0.8166103, 52.2762446]`
+- Back: `[-0.8167443, 52.2759866]`
 
-The hole routing runs from the south-western end of the hole towards the north-eastern end, establishing the playing direction needed to distinguish Front from Back.
+The hole-2 terminal route direction also orders those vertices correctly: Front is on the playing-front side and Back on the far side.
 
-## UiDo derivation model
+## What the evidence now tells us
 
-For a hole with valid OSM routing and green geometry:
+We can now reproduce the **ordering** of F/M/B from OSM hole routing + green geometry.
 
-1. Obtain the hole routing geometry.
-2. Determine the direction of play from the hole routing.
-3. Associate the relevant `golf=green` geometry.
-4. Determine the green boundary endpoints in the playing direction.
-5. Derive Front from the boundary at the playing-front end.
-6. Derive Back from the opposite boundary.
-7. Derive Middle from the green polygon centroid.
-8. Store the resulting F/M/B coordinates as **derived course-model data**.
-9. Preserve the original OSM geometry and provenance; never overwrite the source geometry.
+For the recovered historical test:
+- projecting green boundary vertices onto the final hole-route direction places the historical Front near the front extreme;
+- the historical Back is near the back extreme;
+- the historical coordinates are actual source vertices, not fabricated points.
 
-## Important qualification
+However, the historical Middle is **not exactly the mathematical polygon centroid of this green**. Therefore the previous assumption that the old UiDo M point was simply the centroid must be discarded.
 
-The Overstone hole 1 comparison proves that this derivation reproduces the original historical coordinates for that hole.
+## Current derivation hypothesis
 
-It does **not** yet prove that the exact same boundary-selection rule reproduces historical F/M/B values for every Overstone hole, nor that it is optimal for every course.
+The evidence supports a deterministic geometric method based on:
+1. hole routing establishes playing direction;
+2. associated green polygon supplies the source boundary;
+3. Front/Back are selected from the green boundary in that direction;
+4. Middle is a point derived from the green geometry along the playing axis.
 
-## Next validation
-
-1. Run the deterministic derivation across all 18 Overstone holes.
-2. Compare against any recovered historical UiDo F/M/B coordinates.
-3. Run the same method against Poult Wood.
-4. Record exceptions where OSM green geometry is incomplete, ambiguous or unsuitable.
-5. Only then promote the method to the standard course-acquisition pipeline.
+The exact historical point-selection rule is still under investigation. In particular, we need to determine why the historical F/B vertices are selected rather than the absolute projection extrema, and how the historical M point was generated.
 
 ## Architecture decision
 
-UiDo should treat F/M/B as a **derived property of the provider-neutral course model**, with OSM green geometry and hole routing retained as the source evidence.
+F/M/B remains a **derived property of the provider-neutral course model**, with OSM green geometry and hole routing retained as source evidence.
 
-A separate F/M/B GPS provider is therefore **not required for the proven Overstone case**. External providers can remain optional validation/fallback sources if later testing demonstrates a need for them.
+A separate F/M/B GPS provider is therefore not required for the current proven source relationship, but the exact universal derivation rule must be validated before it is promoted to production.
+
+## Next validation
+
+1. Analyse all 18 Overstone greens against their hole-route directions.
+2. Identify the geometric rule that selects F/B source vertices.
+3. Determine the historical M rule.
+4. Run the resulting candidate algorithm against Poult Wood.
+5. Record exceptions and only then promote the rule to standard acquisition.
