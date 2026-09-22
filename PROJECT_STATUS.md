@@ -8,17 +8,29 @@ This is the first file a fresh UiDo session should read. It records authoritativ
 
 ## Current state
 
-**Overstone data foundation: READY.** The authoritative OSM capture and deterministic normalised source remain locked and unchanged. The provider-neutral v0.1 course model remains the GitHub canonical model. EA aerial acquisition is proven. A later successful combined build also completed EA LiDAR acquisition, terrain assembly, compact aerial rendering, the UiDo offline course package and the human-review bundle.
+**Overstone data foundation: READY, but Stage 1 Step 1 is not yet closed.** The authoritative OSM capture and deterministic normalised source remain locked and present in the UiDo Library. The GitHub provider-neutral v0.1 model remains canonical. EA aerial, LiDAR and terrain acquisition/assembly are proven. A successful combined build (`35608919741`) produced the offline course package and human-review bundle.
 
-The successful end-to-end proof is workflow run `35608919741` on commit `2c4697c77fbceeec2d8789245570668f1a513f7e`. Its four unexpired artifacts are recorded below. These are real GitHub Actions artifacts, not screenshots or inferred outputs.
+The repository has since advanced beyond the previously recorded head. Current head is `4c097a8ad0b9e835df6fda94cee6eb72c0617a1c` (`Run Poult Wood full-course wireframe QA`). Recent commits also refactored the Poult Wood skeleton to align with the Overstone source model and fixed single-line fairway relation unions.
 
-The **current repository head** is commit `b50084a0291b4a23f7b1da822e17acc461e48fb0` (`Update source of truth with current head and recovered UI asset state`). The latest verified Overstone run remains `35627704315` on commit `9ca6c0974a3928eba3d9b7aadf4d97254ef673ea`; it reaches EA aerial acquisition, LiDAR acquisition, compact aerial rendering and terrain assembly successfully, but currently fails at **Acquire Overstone OSM golf source** because the Overpass request returns HTTP `406`. This is a current workflow/integration blocker, not a failure of the EA data path or terrain path.
+The latest known Overstone builder regression remains run `35627704315` on commit `9ca6c0974a3928eba3d9b7aadf4d97254ef673ea`: EA aerial, LiDAR, compact aerial rendering and terrain all complete; the run fails only at **Acquire Overstone OSM golf source** with Overpass HTTP 406. Do not replace the authoritative OSM source because of this acquisition regression.
 
-**Stage 1 Step 1 investigation is now recorded:** Issue #2 has one implementation comment documenting the root cause of the earlier empty-hole-geometry problem. The provider-neutral model used by the package was still green-anchor-only; the authoritative OSM capture contains the missing course structure. A deterministic `tools/course-model/build_overstone_model.py` fix was applied to normalise the OSM source and associate routing, tees, fairways, rough, hazards and paths to holes while preserving source geometry and association evidence. The builder now hard-fails unless all 18 holes have routing, tee and fairway geometry. The fix is present in the repository, but it is **not yet proven in a successful new package build** because the latest run stops at the Overpass HTTP 406 before the rebuilt model can be produced. fileciteturn10file0L3-L23
+## Recent course-model findings
 
-**Recent UI asset work:** `assets/Lo_Flag_Icon.svg` is committed at `b71a974c771852be7a3382bfd6a368672f353379`. This is a completed asset addition only; it does not supersede any existing UI source-of-truth blueprint or alter the course-data pipeline.
+### F/M/B derivation — corrected and still under investigation
 
-**Do not start another visual prototype.** The next product-engineering slice is the hand-off from the successful Overstone course package into the UiDo course loader, as defined by GitHub Issue #2.
+`course-models/FMB_DERIVATION.md` is now corrected to the proper historical association: the recovered historical F/M/B test belongs to **Overstone hole 2**, not hole 1. The OSM green/route relationship and Front/Back source vertices are proven, but the exact historical point-selection algorithm is **not** proven. The earlier exact-centroid claim has been discarded. fileciteturn5file0L1-L6
+
+Required next validation: analyse all 18 Overstone greens to identify the common F/B/M construction rule before testing Poult Wood. Do not promote a universal F/M/B derivation yet.
+
+### Hole orientation / OpenYardage sense check
+
+`course-models/HOLE_ORIENTATION_SENSE_CHECK.md` now defines the intended local frame: Y = forward along play, X = left/right, while preserving underlying geospatial geometry. OpenYardage is an independent golf-useful sense check only; large discrepancies become QA warnings, not automatic geometry edits. fileciteturn10file0L1-L6
+
+### Poult Wood — source identity confirmed; QA work active
+
+`course-models/POULT_WOOD_SOURCE_MANIFEST.json` records an identity PASS for the 18-hole Poult Wood target and retains the raw OSM source without invented geometry. It identifies 18 target hole refs and 24 hole routes in the facility source, with 6 additional routes outside the target 18-hole set. OpenYardage is explicitly a sense-check, not UiDo source geometry. fileciteturn11file0L1-L6
+
+The latest Poult Wood workflow commit changes the QA pass to render the **complete 18-hole footprint on one consistent map**. This is QA/source inspection work, not permission to overwrite course geometry. fileciteturn7file0L3-L11
 
 ## Authoritative Overstone source
 
@@ -32,7 +44,7 @@ Do not ask the user to re-upload the OSM capture.
 - GitHub identity lock: `course-models/OVERSTONE_OSM_SOURCE_LOCK.json`
 - GitHub manifest: `course-models/OVERSTONE_SOURCE_MANIFEST.json`
 
-Library folder listing on 2026-09-22 reconfirms this file is present at the canonical source path. Source counts: 18 holes, 18 pins, 20 greens, 30 tees, 17 fairways, 31 bunkers, 23 rough, 17 paths, 2 water hazards, 1 driving range; 177 features total. Only `golf=hole` features carry explicit `ref=1..18`; other feature classes must be associated spatially/derived, never by feature order. fileciteturn8file0L1-L6
+Library search on 2026-09-22 reconfirms the authoritative OSM capture is present. fileciteturn12file1L156-L163
 
 ### Normalised source — authoritative derived artifact
 
@@ -40,137 +52,89 @@ Library folder listing on 2026-09-22 reconfirms this file is present at the cano
 - Library file id: `file_0000000052948210969af327286d4488`
 - Schema: `uido.course.source-normalized.v0.1`
 - SHA-256: `876eb808a978f577057747f71cca759d4032ed5cc776c3bf036eb126ce6b28e9`
-- Status: **complete**; source geometry unchanged; no invented hole assignments.
+- Status: **complete**; source geometry unchanged.
 
-Library folder listing on 2026-09-22 reconfirms this file is present and also shows its `.report.json` companion. fileciteturn8file1L7-L18
+Library search on 2026-09-22 reconfirms this file is present. fileciteturn12file0L1-L8
 
-## Course model state
+### Library v0.4 discrepancy
 
-### GitHub canonical model
+A previously recorded `/UiDo/UiDo_Overstone_Course_Model_v0.4.json` is still not surfaced by the current Library search. Treat v0.4 as **unlocated/not verified**, not deleted. Do not recreate it or silently promote it over the GitHub v0.1 model.
 
-- `course-models/overstone-park-v0.1.json`
-- Schema: `uido.course.v0.1`
-- Contains all 18 green F/M/B anchors.
-- Registration transform/metrics remain null until measured control points are used.
+## Overstone model-generation fix
 
-### Builder model-generation fix — present, not yet proven in package
+`tools/course-model/build_overstone_model.py` now builds provider-neutral course geometry from the authoritative OSM capture plus existing green anchors. It preserves source geometry/provenance, records deterministic association evidence and hard-fails unless all 18 holes have routing, tee and fairway geometry.
 
-- `tools/course-model/build_overstone_model.py` now builds provider-neutral v0.2 course geometry from the authoritative OSM capture and existing green anchors.
-- It preserves OSM geometry/provenance, records deterministic association evidence, keeps unassigned features visible, and asserts routing + tee + fairway geometry for all 18 holes.
-- This is a derived-build tool change, not permission to overwrite the authoritative source or promote v0.2 as the canonical published model.
+The fix is **present but not proven in a successful post-fix package build** because the latest builder run is blocked before model generation by Overpass HTTP 406. The older successful package predates this fix and therefore cannot be used as proof that the fix is incorporated.
 
-### Library discrepancy — preserve, do not overwrite
+## Successful combined Overstone build
 
-A previously recorded Library `/UiDo/UiDo_Overstone_Course_Model_v0.4.json` is still not surfaced by current Library folder/search results. Treat v0.4 as **unlocated/not verified**, not deleted. Do not recreate it, promote it, or overwrite v0.1 until the actual artifact is located and compared.
-
-## EA public-source state
-
-### Catalogue resolution — COMPLETE
-
-Exact Overstone EA coverage is resolved in EPSG:27700.
-
-- Aerial: 2013, 0.25 m, product `vertical_aerial_photography_tiles_night_time`; required ECWs are P00055683, P00055670, P00055697 and P00055618.
-- LiDAR: 1 m survey `P_10738`, flown 2020-01-29 and 2020-03-06; required tiles SP8060/SP8065 with DTM/DSM and related records resolved in repository manifests.
-- Course footprint: E 480137.49–481451.93 / N 264803.28–266016.15, EPSG:27700.
-
-### Successful combined build — PROVEN
-
-Workflow run `35608919741` / commit `2c4697c77fbceeec2d8789245570668f1a513f7e` completed every build step successfully, including:
+Workflow run `35608919741` / commit `2c4697c77fbceeec2d8789245570668f1a513f7e` completed:
 
 1. EA aerial acquisition;
 2. EA LiDAR acquisition;
 3. compact aerial render;
-4. compact terrain layer;
+4. terrain layer;
 5. UiDo offline course package;
-6. Overstone human-review bundle;
+6. human-review bundle;
 7. artifact uploads.
 
-Unexpired artifacts verified on 2026-09-22:
+Known unexpired artifacts (verified 2026-09-22) include `overstone-uido-course-package`, `overstone-course-review`, `overstone-ea-lidar-capture` and `overstone-ea-aerial-capture`, all expiring 2026-10-05. Their existence is verified; their contents still require deliberate inspection before the package → loader contract is declared verified.
 
-- `overstone-uido-course-package` — artifact `10643427997`, 14,378,531 bytes, digest `sha256:f5d9bbc1e8974c83edb0f3ca335606c477101451b477baf7ea4e1a74dba3b147`, expires 2026-10-05.
-- `overstone-course-review` — artifact `10644240369`, 691,380 bytes, digest `sha256:9116bb8a8e477660c38c6b849a58b9c4b387ddacd3822928bdba576c3c53e950`, expires 2026-10-05.
-- `overstone-ea-lidar-capture` — artifact `10644520389`, 565,217,647 bytes, digest `sha256:9cbd7c44e5a86b4aa8ad4de5ab081103621218f72102ee6d457662147466433f`, expires 2026-10-05.
-- `overstone-ea-aerial-capture` — artifact `10643772746`, 24,929,315 bytes, digest `sha256:cf67ac99802888ecab5a9ee9825893e3d074ec832a7c1617cdb4598502f5ed2c`, expires 2026-10-05.
+## Issue #2 / build sequence
 
-**Important:** the existence and successful creation of these artifacts is verified. The final package/review contents still need deliberate inspection before calling the package contract verified/publishable. The package is the known-good input for Issue #2 Step 1, but its current contents are not proof that the new OSM model-generation fix has been incorporated.
+GitHub Issue #2 remains the active vertical-slice build contract: Overstone course loader → player position → shot situation model → SmartPoint → SmartShot → Caddie → shot lifecycle → playable hole → 18-hole round → live course testing.
 
-### Current builder regression
+Engineering rules: deterministic fixtures before live sensors; test each component before integration; do not change two layers simultaneously while debugging; keep Parking Lot features out of this phase. The immediate Overstone hand-off remains package → course-loader contract → one real populated hole.
 
-Run `35627704315` on commit `9ca6c0974a3928eba3d9b7aadf4d97254ef673ea` completed the following successfully before failing:
+## Registration / refinement
 
-- EA aerial discovery/download;
-- EA LiDAR discovery/download/extraction;
-- ECW/GDAL compact aerial render;
-- DTM/DSM terrain VRT + COG + previews.
-
-It failed at **Acquire Overstone OSM golf source** with `curl: (22) The requested URL returned error: 406` from `https://overpass-api.de/api/interpreter`. Therefore the EA acquisition/terrain path is not the blocker. The existing authoritative OSM source must not be recreated just to work around this regression.
-
-The previous terrain `find` syntax failure is **not** a current blocker; the current run proves the terrain fix works.
-
-## Issue #2 build contract
-
-GitHub Issue #2 is the active build sequence: **vertical slices**, each with data → UI → decision/state and a test harness before integration. Its immediate task remains to define and verify the contract between the successful Overstone course-builder output and the UiDo course loader before building the decision engine. fileciteturn6file0L2-L7
-
-Sequence: Overstone course loader → player position → shot situation model → SmartPoint → SmartShot → Caddie → shot lifecycle → playable hole → 18-hole round → live course testing.
-
-Engineering rules: deterministic fixtures before live sensors; test each component before integration; do not change two layers simultaneously while debugging; keep Parking Lot features out of this phase.
-
-## Registration / refinement state
-
-Measured OSM-to-raster registration is still a separate stage. `course-models/OVERSTONE_REGISTRATION_CONTROL_POINTS.json` is the control-point template. Do not invent/reuse a transform or use validation GPS as candidate-generation geometry. After the package/loader contract is verified, obtain real measured control points, run `register_affine.py`, and record residuals/RMS/max error.
-
-Established refinement remains two-pass: whole-course maintained-surface discovery, then hole-specific refinement constrained by source ROIs. Preserve feature provenance/confidence. LiDAR is intended for terrain/elevation, vegetation/tree structure, height/visibility context and ambiguous geometry refinement.
+Measured OSM-to-raster registration remains a separate stage. `course-models/OVERSTONE_REGISTRATION_CONTROL_POINTS.json` is the control-point template. Do not invent/reuse a transform or use validation GPS as candidate-generation geometry.
 
 ## UI / product state
 
-The Library remains the source of truth for the current UI: premium golf instrument aesthetic, light/dark system, persistent navigation icon language and the GPS/Yardage/Wind/Lie/Start Line/Shape/Strike live shot flow. Strategy stays out of the live flow until SmartShot is ready. The current Library specifications explicitly keep strategy out of the live-test flow until SmartShot is ready. fileciteturn3file0L13-L16
+The Library remains the UI source of truth: premium golf instrument aesthetic, light/dark system, persistent navigation icon language and the GPS/Yardage/Wind/Lie/Start Line/Shape/Strike live shot flow. Strategy remains out of the live flow until SmartShot is ready. fileciteturn3file0L11-L33 fileciteturn3file1L62-L70
 
-The current Library also contains approved UI source-of-truth blueprints for the premium aesthetic, live round flow, Shape tile and Putts/Score tile. The revised aesthetic remains premium golf heritage + modern digital clarity + caddie-like calm, not a rewrite of the product architecture. fileciteturn3file1L94-L123 fileciteturn3file9L505-L508
+The committed `assets/Lo_Flag_Icon.svg` remains an asset addition only and does not replace the UI blueprints or change course-data authority.
 
-The newly committed `assets/Lo_Flag_Icon.svg` is an asset addition, not a replacement for those blueprints. fileciteturn4file0L1-L6
+## Beta discrepancy
 
-## Beta environment discrepancy
-
-Current `beta/catalog.json` still says the second course is generic `Second course` with no package URL, while a later commit is explicitly titled `Use Poult Wood as second beta course`. Treat the catalog as **stale beta metadata**, not as proof that a second course package exists. This is separate from the Overstone package work.
+`beta/catalog.json` still carries generic `Second course` metadata with no package URL while later repository work names Poult Wood as the second beta course. Treat the catalogue as stale beta metadata, not proof of a published second-course package.
 
 ## Outstanding work
 
-1. **Inspect the successful `overstone-uido-course-package` and `overstone-course-review` artifacts from run `35608919741` and define/verify the loader contract.**
-2. Repair the Overpass HTTP 406 in the OSM acquisition step, then run the existing model-generation fix and prove a populated 18-hole package is produced; do not replace the authoritative OSM source.
-3. Build the Overstone course-loader vertical slice and prove one real hole renders from the verified package.
-4. Verify player-position/distance fixtures against the real course package.
-5. Establish measured OSM-to-raster control points and registration metrics.
-6. Locate and deliberately reconcile Library v0.4 before promoting a new course-model version.
-7. Keep beta metadata/package links aligned once an approved package is published.
+1. **Inspect the successful Overstone package/review artifacts from run `35608919741` and define the exact package → UiDo course-loader contract.**
+2. Repair only the Overpass HTTP 406 acquisition step; then run the existing model-generation fix and prove a populated 18-hole post-fix package.
+3. Build/test the Overstone course-loader vertical slice and render one real hole with populated routing/tee/fairway geometry.
+4. Complete F/M/B rule analysis across all 18 Overstone greens; only then test Poult Wood and consider promotion.
+5. Continue Poult Wood full-course wireframe QA and identify OSM fairway coverage gaps; use EA imagery for refinement rather than importing third-party geometry.
+6. Establish measured OSM-to-raster control points and registration metrics.
+7. Locate/reconcile Library v0.4 before any model-version promotion.
+8. Align beta metadata once an approved second-course package exists.
 
 ## EXACT NEXT STEP
 
-**First, inspect the successful `overstone-uido-course-package` and `overstone-course-review` artifacts from run `35608919741` and define the exact package → UiDo course-loader contract. In parallel, repair only the Overpass 406 acquisition step so the existing Stage 1 Step 1 model-generation fix can run; then use that rebuilt package to prove one real Overstone hole renders with populated routing/tee/fairway geometry.**
-
-Do **not** rebuild the authoritative course data. Do **not** wait for a new EA acquisition design: the successful package already exists and is unexpired, while the new builder fix can be exercised once only the OSM acquisition regression is repaired.
+**Inspect the existing successful Overstone course-package and review artifacts, define the package → UiDo course-loader contract, and use the deterministic package fixture for the first loader test. Separately, repair only the Overpass 406 so the post-fix Overstone model can be built and compared. Continue F/M/B analysis as a validation task, not as permission to rewrite source geometry.**
 
 ## DO NOT REBUILD
 
-1. **Do not ask for `export (1).geojson` again.** The authoritative OSM capture is recovered and persisted.
-2. Do not recreate the normalised source; it is complete and persisted.
-3. Do not recreate the course model from screenshots, memory or an unrelated fresh OSM scrape. Use the authoritative source plus the existing deterministic model-generation tool.
-4. Do not replace source geometry with derived geometry or silently overwrite verified/source features.
-5. Do not invent an OSM-to-raster transform or reuse an unmeasured one.
-6. Do not use validation GPS as candidate-generation geometry.
-7. Do not generate PNGs merely to demonstrate progress.
-8. Do not treat screenshots/diagnostics as the source of truth when underlying data exists.
-9. Do not ask the user to repeat information already recorded here, in source manifests/locks, the course model or the Library.
-10. If a GitHub artifact appears missing, check its artifact history and Library/conversation sources before declaring it lost.
-11. Do not silently promote Library v0.4 over GitHub v0.1; the current Library index does not surface v0.4, so locate it before any promotion decision.
-12. Do not treat EA catalogue connectivity as equivalent to acquisition; both aerial and LiDAR acquisition are proven.
-13. Do not treat the old pre-fix terrain failure as a current blocker; the successful run proves terrain assembly works.
-14. Do not replace the working EA aerial/LiDAR runner with manual portal steps.
-15. Do not declare the provider-neutral package/loader contract verified until the actual successful package and review artifacts have been inspected.
-16. Do not treat the stale beta catalog as evidence that a second course package exists.
-17. Do not rebuild the entire Overstone pipeline because of the current Overpass 406; repair only the failing OSM acquisition step.
-18. Do not treat the `Lo_Flag_Icon.svg` asset commit as evidence that the Overstone/course-loader state has changed.
-19. Do not treat the Stage 1 Step 1 model-generation fix as proven until a successful post-fix package build is inspected; the existing successful package predates that fix.
-20. Do not overwrite or recreate the Library OSM/normalised source merely because the current Overpass acquisition is failing.
+1. Do not ask for or recreate the authoritative Overstone OSM capture.
+2. Do not recreate the complete normalised source; it is present and authoritative.
+3. Do not recreate or promote Library v0.4 without locating and comparing the actual artifact.
+4. Do not rebuild the entire Overstone pipeline because of Overpass HTTP 406; repair only the failing acquisition step.
+5. Do not treat the old terrain `find` failure as current; terrain assembly is proven.
+6. Do not replace EA aerial/LiDAR acquisition with manual portal steps.
+7. Do not invent an OSM-to-raster transform or reuse an unmeasured one.
+8. Do not use validation GPS as candidate-generation geometry.
+9. Do not generate PNGs merely to demonstrate progress.
+10. Do not treat screenshots/diagnostics as source of truth when underlying data exists.
+11. Do not silently overwrite verified/source geometry with derived geometry.
+12. Do not treat the old successful package as proof that the new model-generation fix is incorporated.
+13. Do not promote the F/M/B derivation to a universal rule; the exact point-selection algorithm is still under investigation.
+14. Do not treat OpenYardage as UiDo source geometry; it is an independent sense check only.
+15. Do not treat Poult Wood wireframe QA as a replacement for the Overstone Stage 1 contract.
+16. Do not treat stale beta catalogue metadata as evidence of a published second-course package.
+17. If a GitHub artifact appears missing, check artifact history and Library/conversation sources before declaring it lost.
+18. Do not ask the user to repeat information already recorded here or in the source manifests/locks/course model/Library.
 
 ## Change discipline
 
