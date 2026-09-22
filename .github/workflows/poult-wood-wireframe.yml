@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install render dependency
-        run: python3 -m pip install --disable-pip-version-check matplotlib
+        run: python3 -m pip install --disable-pip-version-check matplotlib shapely
 
       - name: Acquire complete OSM golf source
         run: |
