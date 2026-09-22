@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Render a read-only Poult Wood source wireframe for human QA.
 
+Current QA pass: use the newly acquired Poult Wood OSM source.
+
 OSM geometry is plotted as acquired. Fairway multipolygon relations are resolved
 through their member ways; no geometry is invented, smoothed, or rewritten.
 """
