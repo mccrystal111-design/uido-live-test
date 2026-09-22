@@ -1,4 +1,5 @@
 name: UiDo Poult Wood Wireframe QA
+# Triggered for the current Poult Wood OSM wireframe QA pass.
 
 on:
   workflow_dispatch:
