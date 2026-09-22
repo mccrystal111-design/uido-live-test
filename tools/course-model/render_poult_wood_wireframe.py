@@ -135,13 +135,19 @@ def relation_polygons(relation, way_index):
     if not outers:
         return []
 
-    outer_lines = linemerge(unary_union(outers))
+    outer_union = unary_union(outers)
+    outer_lines = linemerge(outer_union) if outer_union.geom_type != "LineString" else outer_union
     outer_polys = list(polygonize(outer_lines))
 
     if not outer_polys:
         return []
 
-    inner_polys = list(polygonize(linemerge(unary_union(inners)))) if inners else []
+    if inners:
+        inner_union = unary_union(inners)
+        inner_lines = linemerge(inner_union) if inner_union.geom_type != "LineString" else inner_union
+        inner_polys = list(polygonize(inner_lines))
+    else:
+        inner_polys = []
     result = []
 
     for poly in outer_polys:
