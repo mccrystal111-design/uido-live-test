@@ -21,8 +21,8 @@ jobs:
           ALL='[out:json][timeout:180];nwr["golf"](51.2184284,0.2958967,51.2276149,0.3095094);out geom;'
           FAIRWAYS='[out:json][timeout:180];nwr["golf"="fairway"](51.2184284,0.2958967,51.2276149,0.3095094);out geom;'
 
-          curl -fsSL --retry 4 --data-urlencode "data=$ALL"             https://overpass-api.de/api/interpreter             -o build/poult-wood-fairways/osm-all-golf.json
-          curl -fsSL --retry 4 --data-urlencode "data=$FAIRWAYS"             https://overpass-api.de/api/interpreter             -o build/poult-wood-fairways/osm-fairways.json
+          curl -fsSL --retry 4 --data-urlencode "data=$ALL" https://overpass-api.de/api/interpreter -o build/poult-wood-fairways/osm-all-golf.json
+          curl -fsSL --retry 4 --data-urlencode "data=$FAIRWAYS" https://overpass-api.de/api/interpreter -o build/poult-wood-fairways/osm-fairways.json
 
           python3 - <<'PY'
           import json, hashlib, pathlib
@@ -78,8 +78,7 @@ jobs:
           greens=[e for e in d["elements"] if e.get("tags",{}).get("golf")=="green"]
 
           def points(e):
-            g=e.get("geometry",[])
-            return [(p["lon"],p["lat"]) for p in g]
+            return [(p["lon"],p["lat"]) for p in e.get("geometry",[])]
 
           def centroid(e):
             p=points(e)
@@ -90,10 +89,7 @@ jobs:
             hp=points(h)
             if len(hp)<2: continue
             start,end=hp[0],hp[-1]
-            gx,gy=min(
-              (centroid(g) for g in greens),
-              key=lambda c:(c[0]-end[0])**2+(c[1]-end[1])**2
-            )
+            gx,gy=min((centroid(g) for g in greens),key=lambda c:(c[0]-end[0])**2+(c[1]-end[1])**2)
             lat=math.radians((start[1]+end[1])/2)
             dx=(gx-start[0])*math.cos(lat)
             dy=gy-start[1]
