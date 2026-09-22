@@ -1,0 +1,175 @@
+name: UiDo Poult Wood Fairway Discovery
+
+on:
+  push:
+    paths:
+      - ".github/workflows/poult-wood-fairway-discovery.yml"
+      - "course-models/POULT_WOOD_SOURCE_MANIFEST.json"
+  workflow_dispatch:
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Acquire all OSM golf fairway elements
+        run: |
+          set -euo pipefail
+          mkdir -p build/poult-wood-fairways
+
+          QUERY='[out:json][timeout:180];nwr["golf"="fairway"](51.2184284,0.2958967,51.2276149,0.3095094);out geom;'
+          curl -fsSL --retry 4 --data-urlencode "data=$QUERY"             https://overpass-api.de/api/interpreter             -o build/poult-wood-fairways/osm-fairways.json
+
+          python3 - <<'PY'
+          import json, hashlib, pathlib
+          p = pathlib.Path("build/poult-wood-fairways/osm-fairways.json")
+          d = json.loads(p.read_text())
+          elements = d.get("elements", [])
+          print("OSM golf=fairway elements:", len(elements))
+          for e in elements:
+              print(e.get("type"), e.get("id"), e.get("tags", {}))
+
+          manifest = {
+              "schema": "uido.poult-wood.fairway-discovery.v0.1",
+              "course": "poult-wood",
+              "boundary": {
+                  "west": 0.2958967,
+                  "south": 51.2184284,
+                  "east": 0.3095094,
+                  "north": 51.2276149
+              },
+              "query": "nwr[golf=fairway] within confirmed 18-hole target boundary",
+              "element_count": len(elements),
+              "elements": [
+                  {
+                      "type": e.get("type"),
+                      "id": e.get("id"),
+                      "tags": e.get("tags", {}),
+                      "geometry_points": len(e.get("geometry", []))
+                  }
+                  for e in elements
+              ],
+              "sha256": hashlib.sha256(p.read_bytes()).hexdigest(),
+              "status": "source_discovery"
+          }
+          pathlib.Path("build/poult-wood-fairways/manifest.json").write_text(
+              json.dumps(manifest, indent=2) + "\n"
+          )
+          PY
+
+      - name: Build hole-direction search corridors
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, math, pathlib
+          from statistics import mean
+
+          src = json.load(open("Poult Wood.geojson"))
+          holes = [
+              f for f in src["features"]
+              if f.get("properties", {}).get("golf") == "hole"
+              and str(f.get("properties", {}).get("ref", "")).isdigit()
+              and 1 <= int(f["properties"]["ref"]) <= 18
+          ]
+          greens = [
+              f for f in src["features"]
+              if f.get("properties", {}).get("golf") == "green"
+          ]
+
+          def pts(feature):
+              g = feature["geometry"]
+              if g["type"] == "LineString":
+                  return g["coordinates"]
+              if g["type"] == "Polygon":
+                  return g["coordinates"][0]
+              return []
+
+          def centroid(feature):
+              p = pts(feature)
+              return (mean(x for x,y in p[:-1]), mean(y for x,y in p[:-1]))
+
+          # For each target hole, use the route's terminal point and nearest green
+          # centroid to establish playing direction. The corridor is diagnostic only:
+          # it never changes source geometry.
+          records = []
+          for h in sorted(holes, key=lambda f:int(f["properties"]["ref"])):
+              hp = pts(h)
+              if len(hp) < 2:
+                  continue
+              start, end = hp[0], hp[-1]
+              gx, gy = min(
+                  (centroid(g) for g in greens),
+                  key=lambda c:(c[0]-end[0])**2+(c[1]-end[1])**2
+              )
+              # Approximate local bearing using equirectangular scaling.
+              lat = math.radians((start[1]+end[1])/2)
+              dx = (gx-start[0]) * math.cos(lat)
+              dy = (gy-start[1])
+              bearing = (math.degrees(math.atan2(dx,dy)) + 360) % 360
+              records.append({
+                  "hole": int(h["properties"]["ref"]),
+                  "route_id": h["properties"].get("@id"),
+                  "start": start,
+                  "terminal": end,
+                  "green_centroid": [gx,gy],
+                  "playing_bearing_deg": round(bearing,2),
+                  "method": "OSM hole route + nearest terminal green"
+              })
+
+          pathlib.Path("build/poult-wood-fairways/hole-directions.json").write_text(
+              json.dumps({
+                  "schema":"uido.poult-wood.hole-direction.v0.1",
+                  "purpose":"diagnostic search frame for missing fairway discovery",
+                  "holes":records
+              },indent=2)+"\n"
+          )
+          print(json.dumps(records, indent=2))
+          PY
+
+      - name: Build discovery report
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, pathlib
+
+          f = json.load(open("build/poult-wood-fairways/manifest.json"))
+          current = json.load(open("Poult Wood.geojson"))
+          explicit = [
+              x for x in current["features"]
+              if x.get("properties", {}).get("golf") == "fairway"
+          ]
+
+          report = {
+              "schema": "uido.poult-wood.fairway-discovery-report.v0.1",
+              "course": "poult-wood",
+              "confirmed_target_holes": list(range(1,19)),
+              "current_capture": {
+                  "explicit_fairway_features": len(explicit)
+              },
+              "live_osm_fairway_query": {
+                  "nwr_golf_fairway_elements": f["element_count"],
+                  "elements": f["elements"]
+              },
+              "finding": (
+                  "OSM fairway discovery must include nodes, ways and relations. "
+                  "If the live nwr query still returns only one fairway element, "
+                  "the remaining hole fairways are genuinely absent from the OSM "
+                  "fairway tag within the confirmed course boundary and should be "
+                  "recovered from aerial refinement rather than fabricated."
+              ),
+              "next_source": "EA aerial refinement",
+              "openyardage_role": "independent sense check only"
+          }
+          pathlib.Path("build/poult-wood-fairways/report.json").write_text(
+              json.dumps(report,indent=2)+"\n"
+          )
+          print(json.dumps(report,indent=2))
+          PY
+
+      - name: Upload discovery bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: poult-wood-fairway-discovery
+          path: build/poult-wood-fairways/
+          retention-days: 14
