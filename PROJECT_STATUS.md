@@ -10,7 +10,7 @@ This is the first file a fresh UiDo session should read. It records authoritativ
 
 **Overstone data foundation: READY, but Stage 1 Step 1 is not yet closed.** The authoritative OSM capture and deterministic normalised source remain locked and present in the UiDo Library. The GitHub provider-neutral v0.1 model remains canonical. EA aerial, LiDAR and terrain acquisition/assembly are proven. A successful combined build (`35608919741`) produced the offline course package and human-review bundle.
 
-The repository has since advanced beyond the previously recorded head. Current head is `4c097a8ad0b9e835df6fda94cee6eb72c0617a1c` (`Run Poult Wood full-course wireframe QA`). Recent commits also refactored the Poult Wood skeleton to align with the Overstone source model and fixed single-line fairway relation unions.
+The repository is now at commit `7e7fca3f6889bbecd3aa52ded6575efdbd01530f` (`Reconcile source of truth with latest course-model QA`). This commit is a source-of-truth reconciliation only; it does not change the authoritative course data or claim a new successful Overstone package build. Its parent was `4c097a8ad0b9e835df6fda94cee6eb72c0617a1c` (`Run Poult Wood full-course wireframe QA`). Recent course-model work refactored the Poult Wood skeleton to align with the Overstone source model and fixed single-line fairway relation unions.
 
 The latest known Overstone builder regression remains run `35627704315` on commit `9ca6c0974a3928eba3d9b7aadf4d97254ef673ea`: EA aerial, LiDAR, compact aerial rendering and terrain all complete; the run fails only at **Acquire Overstone OSM golf source** with Overpass HTTP 406. Do not replace the authoritative OSM source because of this acquisition regression.
 
@@ -133,7 +133,7 @@ The committed `assets/Lo_Flag_Icon.svg` remains an asset addition only and does 
 14. Do not treat OpenYardage as UiDo source geometry; it is an independent sense check only.
 15. Do not treat Poult Wood wireframe QA as a replacement for the Overstone Stage 1 contract.
 16. Do not treat stale beta catalogue metadata as evidence of a published second-course package.
-17. If a GitHub artifact appears missing, check artifact history and Library/conversation sources before declaring it lost.
+17. If a GitHub artifact appears missing, check artifact history and Library/conversation sources before declaring it missing.
 18. Do not ask the user to repeat information already recorded here or in the source manifests/locks/course model/Library.
 
 ## Change discipline
