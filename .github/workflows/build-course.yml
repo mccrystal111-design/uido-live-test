@@ -8,10 +8,7 @@ on:
       course:
         description: "Registered UiDo course id"
         required: true
-        type: choice
-        options:
-          - overstone-park
-          - poult-wood
+        type: string
         default: overstone-park
 
 jobs:
