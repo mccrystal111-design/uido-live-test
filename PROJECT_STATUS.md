@@ -165,9 +165,26 @@ Build:
 - registry state/lifecycle such as discovered → registered → acquisition-ready → acquired → QA → wireframe/model → UiDo-ready;
 - UK/GB import capability without hard-coding UK into the underlying acquisition engine.
 
-### 3. Northampton Golf Club — first genuinely new end-to-end course
+### 3. New-course one-ping end-to-end test
 
-**Status: REGISTRATION + SCORECARD GREEN; PHYSICAL ACQUISITION NEXT**
+**Status: READY TO RUN**
+
+A reusable test workflow chains:
+**GolfCourseAPI discovery (one search) → candidate selection → registration (one detail pull, no refresh) → canonical scorecard → physical acquisition → packet QA → packet-driven wireframe.**
+
+New workflow:
+- `.github/workflows/test-new-course.yml`
+- Default test query: **Kettering Golf Club**
+- The discovery job selects a candidate locally from the single search response; it does not hydrate every result.
+- Registration uses the selected provider ID and the existing cache-first registration path.
+- Physical acquisition now supports newly registered courses without a pre-authored source manifest: it discovers the OSM `leisure=golf_course` footprint around the provider coordinate, fails closed on ambiguous identity, and uses that OSM footprint only to define the acquisition boundary.
+- GolfCourseAPI is not used by physical acquisition or downstream processing.
+
+**API budget rule:** first clean run = one `/v1/search` request + one `/v1/courses/{provider_id}` request. Do not enable `refresh_provider`. Once the provider snapshot exists, subsequent registration attempts are cache-first and make no GolfCourseAPI detail request.
+
+### 4. Northampton Golf Club — first genuinely new end-to-end course
+
+**Status: REGISTRATION + SCORECARD GREEN; retained as the cache-first registration reference course**
 
 Use Northampton Golf Club as the first fresh course that has not been manually built into the pipeline.
 
@@ -176,7 +193,7 @@ Run it through:
 
 This is the key proof that the architecture is genuinely agnostic rather than Poult/Overstone-specific.
 
-### 4. GPS-aware nearest-course selection in the app
+### 5. GPS-aware nearest-course selection in the app
 
 **Status: FUTURE TODO**
 
@@ -192,7 +209,7 @@ On app launch:
 
 This is a later player-facing feature; do not mix it into the acquisition refactor.
 
-### 5. Overstone acquisition repair + post-fix proof
+### 6. Overstone acquisition repair + post-fix proof
 
 **Status: PARALLEL / SEPARATE**
 
@@ -200,7 +217,7 @@ Repair only the Overpass HTTP 406 acquisition failure. Then run the existing mod
 
 Do not rebuild the wider pipeline because of this one acquisition failure.
 
-### 6. F/M/B validation
+### 7. F/M/B validation
 
 **Status: VALIDATION TASK**
 
@@ -208,7 +225,7 @@ Analyse all 18 Overstone greens to identify the common historical F/M/B construc
 
 F/M/B investigation is **not** permission to rewrite source geometry.
 
-### 7. Registration / refinement
+### 8. Registration / refinement
 
 **Status: LATER**
 
@@ -216,7 +233,7 @@ Establish measured OSM-to-raster control points and registration metrics. Preser
 
 ## EXACT NEXT STEP
 
-**Run the cache-first Northampton registration once after the latest validator/registry-link changes, confirm the canonical scorecard validator is green, then build the Northampton physical source manifest/boundary and take it through Course Acquisition → Packet QA → packet-driven wireframe. Do not enable provider refresh; the captured GolfCourseAPI snapshot is already the source for registration/scorecard processing.**
+**Run `.github/workflows/test-new-course.yml` with the default Kettering Golf Club inputs. Do not enable any provider refresh. The first clean run should consume one GolfCourseAPI search request and one detail request, then use the cached provider snapshot plus OSM/EA for everything downstream.**
 
 ## DO NOT REBUILD
 
