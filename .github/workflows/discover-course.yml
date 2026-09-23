@@ -50,7 +50,7 @@ jobs:
               print(f"### {i}. {course.get('name') or 'Unnamed course'}")
               print(f"- GolfCourseAPI ID: `{course.get('provider_id')}`")
               print(f"- Club: {course.get('club_name') or '—'}")
-              print(f"- Location: {loc.get('city') or '—'}, {loc.get('state') or '—'}, {loc.get('country') or '—'}")
+              print(f"- Location: {loc.get('city') or '—'}, {loc.get('state') or '—'}, {course.get("location_country") or "—"}")
               print(f"- Coordinates: `{loc.get('latitude')}`, `{loc.get('longitude')}`")
               print(f"- Holes / par: {course.get('holes') or '—'} / {course.get('par') or '—'}")
               print()
