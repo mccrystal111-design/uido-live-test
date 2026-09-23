@@ -1,0 +1,49 @@
+{
+  "schema_version": "uido.course-registry.v0.1",
+  "courses": {
+    "overstone-park": {
+      "name": "Overstone Park Golf Club",
+      "holes": 18,
+      "par": 72,
+      "boundary": {
+        "west": -0.8266019,
+        "south": 52.2755460,
+        "east": -0.8076190,
+        "north": 52.2862605,
+        "crs": "EPSG:4326"
+      },
+      "source_manifest": "course-models/OVERSTONE_SOURCE_MANIFEST.json",
+      "acquisition": {
+        "aerial": {
+          "preferred_year": "2013",
+          "preferred_resolution_m": 0.25
+        },
+        "lidar": {
+          "max_resolution_m": 1.0
+        }
+      }
+    },
+    "poult-wood": {
+      "name": "Poult Wood Golf Course - 18 Hole",
+      "holes": 18,
+      "par": 68,
+      "boundary": {
+        "west": 0.2958967,
+        "south": 51.2184284,
+        "east": 0.3095094,
+        "north": 51.2276149,
+        "crs": "EPSG:4326"
+      },
+      "source_manifest": "course-models/POULT_WOOD_SOURCE_MANIFEST.json",
+      "acquisition": {
+        "aerial": {
+          "preferred_year": "2013",
+          "preferred_resolution_m": 0.25
+        },
+        "lidar": {
+          "max_resolution_m": 1.0
+        }
+      }
+    }
+  }
+}
