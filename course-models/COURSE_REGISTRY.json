@@ -65,6 +65,28 @@
       "lifecycle": {
         "status": "registered"
       }
+    },
+    "kettering": {
+      "identity": {
+        "uido_id": "uido-course-5017b6bb-1bba-5dc1-b792-2efc46e65950",
+        "provider": "golfcourseapi",
+        "provider_id": "gqws4dtx"
+      },
+      "name": "Kettering",
+      "club_name": "Kettering Golf Club",
+      "holes": 18,
+      "par": 69,
+      "scorecard_packet": "course-models/scorecards/gqws4dtx.json",
+      "location": {
+        "latitude": 52.3826484,
+        "longitude": -0.7331323,
+        "city": "Kettering",
+        "state": "NTH",
+        "country": "United Kingdom"
+      },
+      "lifecycle": {
+        "status": "registered"
+      }
     }
   }
 }
