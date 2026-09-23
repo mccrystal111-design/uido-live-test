@@ -1,5 +1,5 @@
 {
-  "schema_version": "uido.course-registry.v0.1",
+  "schema_version": "uido.course-registry.v0.2",
   "courses": {
     "overstone-park": {
       "name": "Overstone Park Golf Club",
@@ -7,8 +7,8 @@
       "par": 72,
       "boundary": {
         "west": -0.8266019,
-        "south": 52.2755460,
-        "east": -0.8076190,
+        "south": 52.275546,
+        "east": -0.807619,
         "north": 52.2862605,
         "crs": "EPSG:4326"
       },
@@ -43,6 +43,27 @@
         "lidar": {
           "max_resolution_m": 1.0
         }
+      }
+    },
+    "northampton": {
+      "identity": {
+        "uido_id": "uido-course-155908ce-4995-5906-a11b-d59a559dcae3",
+        "provider": "golfcourseapi",
+        "provider_id": "51sjdksg"
+      },
+      "name": "Northampton",
+      "club_name": "Northampton Golf Club",
+      "holes": null,
+      "par": null,
+      "location": {
+        "latitude": 52.27360729999999,
+        "longitude": -0.9750302,
+        "city": "Northampton",
+        "state": "NTH",
+        "country": "United Kingdom"
+      },
+      "lifecycle": {
+        "status": "registered"
       }
     }
   }
