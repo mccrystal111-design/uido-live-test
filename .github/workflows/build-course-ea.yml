@@ -1,6 +1,7 @@
 name: UiDo Course Builder - Agnostic EA acquisition
 
-# Manual course selector for the provider-neutral acquisition layer.
+# Provider-neutral course acquisition layer.
+# Can run standalone or as a reusable stage inside the master course pipeline.
 # This deliberately stops before course-specific model generation.
 on:
   workflow_dispatch:
@@ -13,6 +14,12 @@ on:
           - overstone-park
           - poult-wood
         default: overstone-park
+  workflow_call:
+    inputs:
+      course:
+        description: "Registered UiDo course id"
+        required: true
+        type: string
 
 jobs:
   acquire:
