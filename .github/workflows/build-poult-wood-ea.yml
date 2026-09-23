@@ -1,0 +1,238 @@
+name: UiDo Course Builder - Poult Wood
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/build-poult-wood-ea.yml"
+      - "tools/course-model/render_poult_wood_wireframe.py"
+      - "course-models/POULT_WOOD_SOURCE_MANIFEST.json"
+
+env:
+  COURSE: "Poult Wood Golf Course - 18 Hole"
+  COURSE_ID: "poult-wood"
+  WEST: "0.2958967"
+  SOUTH: "51.2184284"
+  EAST: "0.3095094"
+  NORTH: "51.2276149"
+
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install source/render dependencies
+        run: python3 -m pip install --disable-pip-version-check matplotlib shapely
+
+      - name: Acquire complete Poult Wood OSM golf source
+        run: |
+          set -euo pipefail
+          mkdir -p build/poult-wood/osm build/poult-wood/wireframe
+          QUERY='[out:json][timeout:180];nwr["golf"](51.2184284,0.2958967,51.2276149,0.3095094);out geom;'
+          RELS='[out:json][timeout:180];relation["golf"="fairway"](51.2184284,0.2958967,51.2276149,0.3095094);(._;>;);out geom;'
+          ENDPOINTS=(
+            "https://overpass-api.de/api/interpreter"
+            "https://overpass.kumi.systems/api/interpreter"
+          )
+          fetch() {
+            local q="$1" out="$2"
+            for ep in "${ENDPOINTS[@]}"; do
+              echo "Trying $ep"
+              if curl -fsSL --retry 3 --connect-timeout 20 --max-time 240                 -A "UiDo-course-builder/1.0 (+https://github.com/mccrystal111-design/uido-live-test)"                 -H "Accept: application/json"                 --data-urlencode "data=$q" "$ep" -o "$out"; then
+                return 0
+              fi
+            done
+            return 1
+          }
+          fetch "$QUERY" build/poult-wood/osm/poult-wood-golf.json
+          fetch "$RELS" build/poult-wood/osm/poult-wood-fairway-relations.json
+
+          python3 - <<'PY'
+          import hashlib, json, pathlib
+          root = pathlib.Path("build/poult-wood/osm")
+          for name in ("poult-wood-golf.json","poult-wood-fairway-relations.json"):
+              p=root/name
+              d=json.loads(p.read_text())
+              assert d.get("elements"), f"{name}: no OSM elements"
+          raw=root/"poult-wood-golf.json"
+          d=json.loads(raw.read_text())
+          holes=[e for e in d["elements"] if e.get("tags",{}).get("golf")=="hole" and str(e.get("tags",{}).get("ref","")).isdigit()]
+          targets={str(e["tags"]["ref"]) for e in holes if 1 <= int(e["tags"]["ref"]) <= 18}
+          manifest={
+            "schema":"uido.course.osm-capture.v0.2",
+            "course":"Poult Wood Golf Course - 18 Hole",
+            "bbox":[51.2184284,0.2958967,51.2276149,0.3095094],
+            "elements":len(d["elements"]),
+            "target_hole_refs":sorted(targets,key=int),
+            "sha256":hashlib.sha256(raw.read_bytes()).hexdigest()
+          }
+          (root/"manifest.json").write_text(json.dumps(manifest,indent=2)+"\n")
+          print(json.dumps(manifest,indent=2))
+          assert targets == {str(i) for i in range(1,19)}
+          PY
+
+      - name: Render full-course Poult Wood source wireframe
+        run: |
+          set -euo pipefail
+          python3 tools/course-model/render_poult_wood_wireframe.py             --all build/poult-wood/osm/poult-wood-golf.json             --fairways build/poult-wood/osm/poult-wood-fairway-relations.json             --out build/poult-wood/wireframe/poult-wood-18-hole-wireframe.png
+
+      - name: Acquire EA aerial source tiles
+        run: |
+          set -euo pipefail
+          mkdir -p build/poult-wood/ea-aerial/packages build/poult-wood/ea-aerial/sources
+          python3 - <<'PY'
+          import io, json, pathlib, urllib.request, zipfile, hashlib, time
+          search_url="https://environment.data.gov.uk/backend/catalog/api/tiles/collections/survey/search"
+          polygon={"type":"Polygon","coordinates":[[
+            [0.2958967,51.2184284],[0.3095094,51.2184284],
+            [0.3095094,51.2276149],[0.2958967,51.2276149],
+            [0.2958967,51.2184284]
+          ]]}
+          req=urllib.request.Request(search_url,data=json.dumps(polygon).encode(),
+            headers={"Content-Type":"application/geo+json","Accept":"*/*",
+                     "Origin":"https://environment.data.gov.uk","Referer":"https://environment.data.gov.uk/survey",
+                     "User-Agent":"UiDo-course-builder/1.0"},method="POST")
+          with urllib.request.urlopen(req,timeout=120) as r: payload=json.load(r)
+          results=payload.get("results",[])
+          candidates=[]
+          for r in results:
+            p=r.get("product",{}); t=r.get("tile",{})
+            pid=str(p.get("id",""))
+            year=p.get("year",r.get("year")); res=p.get("resolution",r.get("resolution"))
+            if isinstance(year,dict): year=year.get("id")
+            if isinstance(res,dict): res=res.get("id")
+            try: rv=float(res)
+            except: continue
+            if pid=="vertical_aerial_photography_tiles_night_time":
+              candidates.append((str(year),rv,str(t.get("id",""))))
+          # Prefer the same 2013 / 0.25m class used by the Overstone acquisition,
+          # otherwise fall back to the highest-resolution catalogue coverage.
+          preferred=[x for x in candidates if x[0]=="2013" and abs(x[1]-0.25)<1e-9 and x[2]]
+          if not preferred:
+            candidates=[x for x in candidates if x[2]]
+            if not candidates: raise SystemExit("No EA vertical aerial tiles found for Poult Wood")
+            best_res=min(x[1] for x in candidates)
+            best_year=max(x[0] for x in candidates if abs(x[1]-best_res)<1e-9)
+            preferred=[x for x in candidates if x[0]==best_year and abs(x[1]-best_res)<1e-9]
+          base="https://environment.data.gov.uk/tiles/collections/survey"
+          captured=[]
+          for year,res,tile in preferred:
+            url=f"{base}/vertical_aerial_photography_tiles_night_time/{year}/{str(res).rstrip('0').rstrip('.')}/{tile}?subscription-key=dspui"
+            target=pathlib.Path("build/poult-wood/ea-aerial/packages")/f"{tile}.zip"
+            last=None
+            for attempt in range(1,5):
+              try:
+                req=urllib.request.Request(url,headers={"Accept":"application/zip,*/*","User-Agent":"UiDo-course-builder/1.0"})
+                with urllib.request.urlopen(req,timeout=600) as rr: data=rr.read()
+                if len(data)<1000: raise RuntimeError(f"response too small: {len(data)}")
+                with zipfile.ZipFile(io.BytesIO(data)) as z:
+                  z.testzip(); names=z.namelist(); z.extractall(pathlib.Path("build/poult-wood/ea-aerial/sources")/tile)
+                target.write_bytes(data)
+                captured.append({"year":year,"resolution_m":res,"tile":tile,"url":url,"bytes":len(data),"sha256":hashlib.sha256(data).hexdigest()})
+                break
+              except Exception as e:
+                last=str(e)
+                if attempt<4: time.sleep(5*2**(attempt-1))
+                else: raise SystemExit(f"EA aerial download failed for {tile}: {last}")
+          pathlib.Path("build/poult-wood/ea-aerial/manifest.json").write_text(json.dumps({
+            "schema":"uido.course.ea-aerial-acquisition.v0.1","course":"Poult Wood Golf Course - 18 Hole",
+            "status":"captured","tiles":captured
+          },indent=2)+"\n")
+          print(json.dumps(captured,indent=2))
+          PY
+
+      - name: Acquire EA National LiDAR DTM and DSM
+        run: |
+          set -euo pipefail
+          mkdir -p build/poult-wood/ea-lidar/packages build/poult-wood/ea-lidar/sources
+          python3 - <<'PY'
+          import io, json, pathlib, urllib.request, zipfile, hashlib, time
+          search_url="https://environment.data.gov.uk/backend/catalog/api/tiles/collections/survey/search"
+          polygon={"type":"Polygon","coordinates":[[
+            [0.2958967,51.2184284],[0.3095094,51.2184284],
+            [0.3095094,51.2276149],[0.2958967,51.2276149],
+            [0.2958967,51.2184284]
+          ]]}
+          req=urllib.request.Request(search_url,data=json.dumps(polygon).encode(),
+            headers={"Content-Type":"application/geo+json","Accept":"*/*",
+                     "Origin":"https://environment.data.gov.uk","Referer":"https://environment.data.gov.uk/survey",
+                     "User-Agent":"UiDo-course-builder/1.0"},method="POST")
+          with urllib.request.urlopen(req,timeout=120) as r: payload=json.load(r)
+          wanted={"national_lidar_programme_dtm","national_lidar_programme_dsm"}
+          candidates=[]
+          for r in payload.get("results",[]):
+            p=r.get("product",{}); t=r.get("tile",{})
+            pid=str(p.get("id","")).lower(); year=p.get("year",r.get("year")); res=p.get("resolution",r.get("resolution")); tile=t.get("id")
+            if isinstance(year,dict): year=year.get("id")
+            if isinstance(res,dict): res=res.get("id")
+            try: rv=float(res)
+            except: continue
+            if pid in wanted and rv <= 1.0 and tile:
+              candidates.append({"product":pid,"year":str(year),"resolution_m":rv,"tile":str(tile)})
+          if not candidates: raise SystemExit("No EA National LiDAR DTM/DSM candidates found for Poult Wood")
+          # Prefer the highest-resolution (smallest metre value) coverage and newest year
+          minres=min(x["resolution_m"] for x in candidates)
+          candidates=[x for x in candidates if abs(x["resolution_m"]-minres)<1e-9]
+          maxyear=max(x["year"] for x in candidates)
+          candidates=[x for x in candidates if x["year"]==maxyear]
+          base="https://environment.data.gov.uk/tiles/collections/survey"
+          captured=[]
+          for item in candidates:
+            url=f"{base}/{item['product']}/{item['year']}/{str(item['resolution_m']).rstrip('0').rstrip('.')}/{item['tile']}?subscription-key=dspui"
+            target=pathlib.Path("build/poult-wood/ea-lidar/packages")/f"{item['product']}-{item['year']}-{item['tile']}.zip"
+            for attempt in range(1,5):
+              try:
+                req=urllib.request.Request(url,headers={"Accept":"application/zip,*/*","User-Agent":"UiDo-course-builder/1.0"})
+                with urllib.request.urlopen(req,timeout=600) as rr: data=rr.read()
+                if len(data)<1000: raise RuntimeError(f"response too small: {len(data)}")
+                with zipfile.ZipFile(io.BytesIO(data)) as z:
+                  z.testzip(); names=[n for n in z.namelist() if n.lower().endswith((".tif",".tiff"))]; z.extractall(pathlib.Path("build/poult-wood/ea-lidar/sources")/item["product"]/item["tile"])
+                target.write_bytes(data)
+                captured.append({**item,"url":url,"bytes":len(data),"sha256":hashlib.sha256(data).hexdigest(),"rasters":names})
+                break
+              except Exception as e:
+                if attempt==4: raise SystemExit(f"EA LiDAR download failed for {item}: {e}")
+                time.sleep(5*2**(attempt-1))
+          pathlib.Path("build/poult-wood/ea-lidar/manifest.json").write_text(json.dumps({
+            "schema":"uido.course.ea-lidar-acquisition.v0.1","course":"Poult Wood Golf Course - 18 Hole",
+            "status":"captured","products":["national_lidar_programme_dtm","national_lidar_programme_dsm"],
+            "tiles":captured
+          },indent=2)+"\n")
+          print(json.dumps(captured,indent=2))
+          PY
+
+      - name: Build Poult Wood acquisition manifest
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, pathlib
+          root=pathlib.Path("build/poult-wood")
+          source=json.loads(pathlib.Path("course-models/POULT_WOOD_SOURCE_MANIFEST.json").read_text())
+          manifest={
+            "schema":"uido.course.acquisition.v0.1",
+            "course":"Poult Wood Golf Course - 18 Hole",
+            "course_id":"poult-wood",
+            "source_manifest":"course-models/POULT_WOOD_SOURCE_MANIFEST.json",
+            "source_policy":"OSM geometry retained; EA aerial/LiDAR are refinement and terrain evidence; no third-party geometry imported as UiDo source.",
+            "fmb":"Use the established Poult Wood F/M/B dataset as course-model input; this acquisition pass does not overwrite or invent F/M/B points.",
+            "inputs":{
+              "osm":"osm/manifest.json",
+              "wireframe":"wireframe/poult-wood-18-hole-wireframe.png",
+              "ea_aerial":"ea-aerial/manifest.json",
+              "ea_lidar":"ea-lidar/manifest.json"
+            },
+            "target":source["target_course"],
+            "identity_validation":source["identity_validation"]
+          }
+          (root/"manifest.json").write_text(json.dumps(manifest,indent=2)+"\n")
+          PY
+          find build/poult-wood -maxdepth 3 -type f | sort
+          du -sh build/poult-wood
+
+      - name: Upload Poult Wood course acquisition dataset
+        uses: actions/upload-artifact@v4
+        with:
+          name: poult-wood-course-acquisition
+          path: build/poult-wood/
+          retention-days: 14
