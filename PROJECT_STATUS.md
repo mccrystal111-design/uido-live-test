@@ -8,19 +8,21 @@ This is the first file a fresh UiDo session should read. It records authoritativ
 
 ## Current state
 
-**Unified course acquisition → packet pipeline: VALIDATED.**
+**Course acquisition → packet pipeline: VALIDATED. Wireframe stage: IMPLEMENTED, NOT YET PROVEN IN THE MASTER RUN.**
 
-Master workflow run `35849229103` successfully validated the combined acquisition packet for Poult Wood. The canonical packet hand-off is now proven for the acquisition stage.
+Master workflow run `35849229103` successfully completed **Stage 1 acquisition** and **Stage 2 packet QA** for Poult Wood. Its artifacts `uido-course-acquisition-poult-wood` and `uido-course-packet-poult-wood` are present and unexpired. The run's actual job list contains only acquisition and packet-QA jobs; there is **no Stage 3 wireframe job in that run**. Do not describe that run as proof of packet-driven wireframe output.
 
-The repository is now using a modular course pipeline:
+Current repository head is `9734dc0e1011d1c35b716208a66a9f82ba870d10` (`Harden wireframe fairway source handling`). That commit hardens the downstream renderer so focused fairway queries treat relations as authoritative features and member ways only as reconstruction inputs, preventing duplicate rendering/counting. It also fails closed if the packet does not contain all 18 target hole routes.
+
+The repository is using a modular course pipeline:
 - `.github/workflows/build-course-ea.yml` — reusable/manual acquisition.
 - `.github/workflows/build-course.yml` — master orchestration.
 - `course-models/COURSE_PIPELINE.md` — architecture contract.
 - `PROJECT_STATUS.md` — human handover/source of truth.
 
-**Current active job: validate the refactored wireframe stage consuming the canonical course packet.**
+**Current active job: run the current master pipeline for Poult Wood and prove Stage 3 wireframe consumes the canonical Course Packet.**
 
-Acquisition and downstream processing remain separate. Once acquired and QA'd, the Course Packet is the persisted hand-off/memory layer. Downstream stages must not silently re-query or recapture OSM/EA data.
+Acquisition and downstream processing remain separate. Once acquired and QA'd, the Course Packet is the persisted hand-off/memory layer. Downstream stages must not silently re-query or recapture OSM/EA data. The architecture contract explicitly requires downstream stages to consume the packet rather than recapturing source data. fileciteturn3file0
 
 ## Recent course-model findings
 
@@ -60,6 +62,8 @@ Do not ask the user to re-upload the OSM capture.
 - SHA-256: `876eb808a978f577057747f71cca759d4032ed5cc776c3bf036eb126ce6b28e9`
 - Status: **complete**; source geometry unchanged.
 
+Library retrieval reconfirms both authoritative Overstone files are present. fileciteturn7file0 fileciteturn7file1
+
 ### Library v0.4 discrepancy
 
 A previously recorded `/UiDo/UiDo_Overstone_Course_Model_v0.4.json` is still not surfaced by the current Library search. Treat v0.4 as **unlocated/not verified**, not deleted. Do not recreate it or silently promote it over the GitHub v0.1 model.
@@ -97,7 +101,7 @@ Measured OSM-to-raster registration remains a separate stage. `course-models/OVE
 
 ## UI / product state
 
-The Library remains the UI source of truth: premium golf instrument aesthetic, light/dark system, persistent navigation icon language and the GPS/Yardage/Wind/Lie/Start Line/Shape/Strike live shot flow. Strategy remains out of the live flow until SmartShot is ready.
+The Library remains the UI source of truth: premium golf instrument aesthetic, light/dark system, persistent navigation icon language and the GPS/Yardage/Wind/Lie/Start Line/Shape/Strike live shot flow. Strategy remains out of the live flow until SmartShot is ready. The current Library design direction explicitly keeps the live sequence as GPS/Yardage → Wind → Lie → Start Line → Shape → Strike, with a premium golf-instrument aesthetic rather than a generic software dashboard. fileciteturn6file4
 
 ## Unified course pipeline
 
@@ -110,7 +114,7 @@ The separate capture pots are now joined through a modular master pipeline.
 - Downstream processing must not silently recapture OSM/EA data.
 - Acquisition and processing can therefore be iterated independently without losing the captured source state.
 
-The master pipeline was validated on run **`35849229103`**. This closes the acquisition → packet QA foundation. The wireframe stage has now been refactored to consume that packet and is wired into the master pipeline; the next validation run must prove the packet-driven wireframe output matches the trusted Poult Wood QA behaviour.
+The master pipeline's Poult Wood run `35849229103` proved the **acquisition → packet QA foundation**, not Stage 3. The current wireframe refactor is present on `main` but requires a fresh master run to prove packet-driven execution.
 
 ## JOBS TO DO — fresh-chat handover
 
@@ -121,6 +125,12 @@ The master pipeline was validated on run **`35849229103`**. This closes the acqu
 **Status: IMPLEMENTED — READY TO RUN**
 
 The wireframe workflow and renderer have now been refactored so the downstream stage consumes `uido-course-packet-<course-id>` rather than independently querying Overpass.
+
+Recent hardening on `main`:
+- fairway **relations** are treated as the authoritative fairway features;
+- member ways are reconstruction inputs only;
+- duplicate rendering/counting of relation + member geometry is prevented;
+- the stage fails closed if the packet lacks any of the 18 target hole routes.
 
 Requirements:
 - Keep the current Poult Wood wireframe/fairway association logic.
@@ -195,7 +205,9 @@ Establish measured OSM-to-raster control points and registration metrics. Preser
 
 ## EXACT NEXT STEP
 
-**Run the master course pipeline for Poult Wood and validate Stage 3 — wireframe — from the canonical Course Packet. Confirm the output and fairway association report match the trusted previous behaviour. If green, move to GolfCourseAPI discovery/import.**
+**Run the current `main` master course pipeline for Poult Wood using the canonical Course Packet flow and verify Stage 3 — wireframe — actually executes from the packet. Confirm the wireframe output and fairway association report match the trusted previous Poult Wood QA behaviour. If green, move to GolfCourseAPI discovery/import.**
+
+If the master run does not invoke Stage 3, treat that as a workflow wiring discrepancy and repair only the orchestration; do not recapture source data.
 
 ## DO NOT REBUILD
 
@@ -216,6 +228,7 @@ Establish measured OSM-to-raster control points and registration metrics. Preser
 15. Do not treat stale beta catalogue metadata as evidence of a published second-course package.
 16. If a GitHub artifact appears missing, check artifact history and Library/conversation sources before declaring it missing.
 17. Do not ask the user to repeat information already recorded here or in the source manifests/locks/course model/Library.
+18. Do not treat run `35849229103` as proof of Stage 3 wireframe; its verified jobs only cover acquisition and packet QA.
 
 ## Change discipline
 
