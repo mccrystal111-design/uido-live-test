@@ -24,7 +24,6 @@ from shapely.geometry import LineString, Polygon
 from shapely.ops import linemerge, polygonize, unary_union
 
 
-BOUNDARY = (0.2958967, 51.2184284, 0.3095094, 51.2276149)
 EARTH_M_PER_DEG_LAT = 111_320.0
 
 
@@ -252,8 +251,8 @@ def plot_geometry(ax, geom, **kwargs):
             plot_geometry(ax, part, **kwargs)
 
 
-def draw_scale_bar(ax, metres=500):
-    west, south, east, north = BOUNDARY
+def draw_scale_bar(ax, boundary, metres=500):
+    west, south, east, north = boundary
     lat = (south + north) * 0.5
     deg_lon = metres / (EARTH_M_PER_DEG_LAT * math.cos(math.radians(lat)))
     x0 = west + (east - west) * 0.055
@@ -264,8 +263,8 @@ def draw_scale_bar(ax, metres=500):
     ax.text(x0 + deg_lon / 2, y0 + 0.00018, f"{metres} m", ha="center", va="bottom", fontsize=8)
 
 
-def draw_north(ax):
-    west, south, east, north = BOUNDARY
+def draw_north(ax, boundary):
+    west, south, east, north = boundary
     x = east - (east - west) * 0.055
     y = north - (north - south) * 0.09
     ax.annotate(
@@ -284,11 +283,18 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--all", required=True)
     ap.add_argument("--fairways", required=True)
+    ap.add_argument("--manifest", required=True, help="Canonical course acquisition manifest")
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
 
     all_elements = json.loads(Path(args.all).read_text()).get("elements", [])
     fairway_elements = json.loads(Path(args.fairways).read_text()).get("elements", [])
+    acquisition = json.loads(Path(args.manifest).read_text())
+    course_name = acquisition.get("course", acquisition.get("course_id", "UiDo course"))
+    osm_manifest_path = Path(args.all).with_name("manifest.json")
+    osm_manifest = json.loads(osm_manifest_path.read_text())
+    south, west, north, east = osm_manifest["bbox"]
+    boundary = (west, south, east, north)
 
     target_holes, excluded_holes = select_target_holes(all_elements)
 
@@ -410,7 +416,7 @@ def main():
             )
 
     # Acquisition boundary, north arrow, grid and scale.
-    west, south, east, north = BOUNDARY
+    west, south, east, north = boundary
     ax.plot(
         [west, east, east, west, west],
         [south, south, north, north, south],
@@ -426,8 +432,8 @@ def main():
     ax.grid(True, color="#d7d5cf", linewidth=0.45, alpha=0.65)
     ax.tick_params(labelsize=7)
 
-    draw_north(ax)
-    draw_scale_bar(ax)
+    draw_north(ax, boundary)
+    draw_scale_bar(ax, boundary)
 
     legend = [
         Patch(facecolor="#e8e6df", edgecolor="#7b7971", label="OSM fairway source"),
@@ -438,7 +444,7 @@ def main():
     ax.legend(handles=legend, loc="lower right", frameon=True, framealpha=0.92, fontsize=8)
 
     fig.suptitle(
-        "UiDo — Poult Wood 18-hole source skeleton QA",
+        f"UiDo — {course_name} 18-hole source skeleton QA",
         fontsize=15,
         fontweight="bold",
         y=0.975,
@@ -446,7 +452,7 @@ def main():
     fig.text(
         0.5,
         0.945,
-        "OSM geometry only • fairway multipolygons resolved from source members • no invented or smoothed geometry",
+        "Canonical Course Packet • OSM geometry only • fairway multipolygons resolved from source members • no invented or smoothed geometry",
         ha="center",
         fontsize=9,
     )
