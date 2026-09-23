@@ -18,7 +18,7 @@ The repository is now using a modular course pipeline:
 - `course-models/COURSE_PIPELINE.md` — architecture contract.
 - `PROJECT_STATUS.md` — human handover/source of truth.
 
-**Current active job: refactor the wireframe stage to consume the canonical course packet.**
+**Current active job: validate the refactored wireframe stage consuming the canonical course packet.**
 
 Acquisition and downstream processing remain separate. Once acquired and QA'd, the Course Packet is the persisted hand-off/memory layer. Downstream stages must not silently re-query or recapture OSM/EA data.
 
@@ -110,17 +110,17 @@ The separate capture pots are now joined through a modular master pipeline.
 - Downstream processing must not silently recapture OSM/EA data.
 - Acquisition and processing can therefore be iterated independently without losing the captured source state.
 
-The master pipeline was validated on run **`35849229103`**. This closes the acquisition → packet QA foundation.
+The master pipeline was validated on run **`35849229103`**. This closes the acquisition → packet QA foundation. The wireframe stage has now been refactored to consume that packet and is wired into the master pipeline; the next validation run must prove the packet-driven wireframe output matches the trusted Poult Wood QA behaviour.
 
 ## JOBS TO DO — fresh-chat handover
 
 **This section is the persistent working queue. A new chat should start here rather than reconstructing the plan from conversation history.**
 
-### 1. NEXT — Refactor wireframe to consume canonical Course Packet
+### 1. NEXT — Validate packet-driven wireframe stage
 
-**Status: READY TO START**
+**Status: IMPLEMENTED — READY TO RUN**
 
-Refactor the existing Poult Wood wireframe QA stage so it consumes `uido-course-packet-poult-wood` rather than independently querying Overpass.
+The wireframe workflow and renderer have now been refactored so the downstream stage consumes `uido-course-packet-<course-id>` rather than independently querying Overpass.
 
 Requirements:
 - Keep the current Poult Wood wireframe/fairway association logic.
@@ -195,7 +195,7 @@ Establish measured OSM-to-raster control points and registration metrics. Preser
 
 ## EXACT NEXT STEP
 
-**Refactor the Poult Wood wireframe workflow into a reusable downstream processor that consumes the canonical Course Packet produced by the master pipeline. Preserve the existing fairway relation/association logic. Then wire that processor into the master pipeline and validate the result before moving on to GolfCourseAPI discovery/import.**
+**Run the master course pipeline for Poult Wood and validate Stage 3 — wireframe — from the canonical Course Packet. Confirm the output and fairway association report match the trusted previous behaviour. If green, move to GolfCourseAPI discovery/import.**
 
 ## DO NOT REBUILD
 
