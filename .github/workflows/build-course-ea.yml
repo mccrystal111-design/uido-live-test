@@ -206,8 +206,15 @@ jobs:
               print(json.dumps(manifest, indent=2))
               raise SystemExit(0)
           root = pathlib.Path("build") / os.environ["COURSE_ID"] / "ea-aerial"
-          base = "https://environment.data.gov.uk/tiles/collections/survey"
           captured = []
+          unique = []
+          seen = set()
+          for x in preferred:
+              key = (x["product"], x["year"], x["resolution_m"], x["tile"])
+              if key not in seen:
+                  seen.add(key)
+                  unique.append(x)
+          base = "https://environment.data.gov.uk/tiles/collections/survey"
           for x in unique:
               product = x.get("product") or "vertical_aerial_photography_tiles_night_time"
               res = str(x["resolution_m"]).rstrip("0").rstrip(".")
@@ -280,30 +287,37 @@ jobs:
               key=(x["product"],x["year"],x["resolution_m"],x["tile"])
               if key not in seen: seen.add(key); unique.append(x)
           root = pathlib.Path("build") / os.environ["COURSE_ID"] / "ea-lidar"
-          base = "https://environment.data.gov.uk/tiles/collections/survey"
+          bases = [
+              ("EA", "https://environment.data.gov.uk/tiles/collections/survey", "dspui"),
+              ("Agrimetrics", "https://api.agrimetrics.co.uk/tiles/collections/survey", "public"),
+          ]
           captured=[]
           failed=[]
           for x in unique:
               res=str(x["resolution_m"]).rstrip("0").rstrip(".")
-              url=f"{base}/{x['product']}/{x['year']}/{res}/{x['tile']}?subscription-key=dspui"
               target=root/"packages"/f"{x['product']}-{x['year']}-{x['tile']}.zip"
               last_error=None
-              for attempt in range(1,5):
-                  try:
-                      req=urllib.request.Request(url,headers={"Accept":"application/zip,*/*","Origin":"https://environment.data.gov.uk","Referer":"https://environment.data.gov.uk/survey","User-Agent":"UiDo-course-builder/1.0"})
-                      with urllib.request.urlopen(req,timeout=600) as rr: data=rr.read()
-                      if len(data)<1000: raise RuntimeError(f"response too small: {len(data)}")
-                      with zipfile.ZipFile(io.BytesIO(data)) as z:
-                          z.testzip(); names=[n for n in z.namelist() if n.lower().endswith((".tif",".tiff"))]
-                          z.extractall(root/"sources"/x["product"]/x["tile"])
-                      target.write_bytes(data)
-                      captured.append({**x,"url":url,"bytes":len(data),"sha256":hashlib.sha256(data).hexdigest(),"rasters":names})
+              for source_name, base, key in bases:
+                  url=f"{base}/{x['product']}/{x['year']}/{res}/{x['tile']}?subscription-key={key}"
+                  for attempt in range(1,5):
+                      try:
+                          req=urllib.request.Request(url,headers={"Accept":"application/zip,*/*","Origin":"https://environment.data.gov.uk","Referer":"https://environment.data.gov.uk/survey","User-Agent":"UiDo-course-builder/1.0"})
+                          with urllib.request.urlopen(req,timeout=600) as rr: data=rr.read()
+                          if len(data)<1000: raise RuntimeError(f"response too small: {len(data)}")
+                          with zipfile.ZipFile(io.BytesIO(data)) as z:
+                              z.testzip(); names=[n for n in z.namelist() if n.lower().endswith((".tif",".tiff"))]
+                              z.extractall(root/"sources"/x["product"]/x["tile"])
+                          target.write_bytes(data)
+                          captured.append({**x,"source":source_name,"url":url,"bytes":len(data),"sha256":hashlib.sha256(data).hexdigest(),"rasters":names})
+                          last_error=None
+                          break
+                      except Exception as exc:
+                          last_error=f"{source_name}: {exc}"
+                          if attempt<4: time.sleep(5*2**(attempt-1))
+                  if any(y["product"]==x["product"] and y["tile"]==x["tile"] for y in captured):
                       break
-                  except Exception as exc:
-                      last_error=str(exc)
-                      if attempt<4: time.sleep(5*2**(attempt-1))
               if last_error and not any(y["product"]==x["product"] and y["tile"]==x["tile"] for y in captured):
-                  failed.append({**x,"url":url,"error":last_error})
+                  failed.append({**x,"error":last_error})
 
           # The EA catalogue can expose valid LiDAR coverage metadata before the
           # corresponding tile-download endpoint is available. Preserve that
