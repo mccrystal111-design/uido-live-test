@@ -1,0 +1,134 @@
+name: UiDo New Course End-to-End Test
+
+# One deliberate GolfCourseAPI discovery call + one detail pull, then all
+# downstream work uses the captured snapshot and OSM/EA physical sources.
+on:
+  workflow_dispatch:
+    inputs:
+      query:
+        description: "Exact-ish course or club name to discover"
+        required: true
+        default: "Kettering Golf Club"
+        type: string
+      expected_name:
+        description: "Name used to select the closest search candidate"
+        required: true
+        default: "Kettering Golf Club"
+        type: string
+      country:
+        description: "Country filter"
+        required: true
+        default: "United Kingdom"
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  discovery:
+    name: 1. Discover course (one search call)
+    runs-on: ubuntu-latest
+    outputs:
+      provider_id: ${{ steps.select.outputs.provider_id }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Search GolfCourseAPI once
+        env:
+          GOLFCOURSEAPI_API_KEY: ${{ secrets.GOLFCOURSEAPI_API_KEY }}
+        run: |
+          set -euo pipefail
+          python3 tools/course-discovery/search_golfcourseapi.py "${{ inputs.query }}" --country "${{ inputs.country }}" --limit 10 > discovery-results.json
+          cat discovery-results.json
+      - name: Select one candidate without another API call
+        id: select
+        env:
+          EXPECTED_NAME: ${{ inputs.expected_name }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, re
+          data=json.load(open("discovery-results.json"))
+          courses=data.get("courses",[])
+          if not courses:
+              raise SystemExit("Discovery returned no matching course candidates.")
+          def tokens(value):
+              return set(re.sub(r"[^a-z0-9]+"," ",value.casefold()).split())
+          wanted=tokens(os.environ["EXPECTED_NAME"])
+          def score(course):
+              name=tokens(str(course.get("name") or ""))
+              club=tokens(str(course.get("club_name") or ""))
+              overlap=max(
+                  len(wanted & name)/max(1,len(wanted|name)),
+                  len(wanted & club)/max(1,len(wanted|club)),
+              )
+              return overlap
+          ranked=sorted(courses,key=score,reverse=True)
+          selected=ranked[0]
+          if not selected.get("provider_id"):
+              raise SystemExit("Selected discovery candidate has no provider_id.")
+          if score(selected) < 0.5:
+              raise SystemExit(f"Discovery candidate is not a confident match: {selected}")
+          with open(os.environ["GITHUB_OUTPUT"],"a") as f:
+              f.write(f"provider_id={selected['provider_id']}\n")
+          print(json.dumps({"selected":selected,"selection_score":score(selected)},indent=2))
+          PY
+
+  registration:
+    name: 2. Register + scorecard (one detail pull)
+    needs: discovery
+    runs-on: ubuntu-latest
+    outputs:
+      course_id: ${{ steps.result.outputs.course_id }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Register selected course without refresh
+        env:
+          GOLFCOURSEAPI_API_KEY: ${{ secrets.GOLFCOURSEAPI_API_KEY }}
+        run: |
+          set -euo pipefail
+          python3 tools/course-discovery/register_course.py "${{ needs.discovery.outputs.provider_id }}" --expected-country "${{ inputs.country }}" | tee registration-result.json
+      - name: Build canonical scorecard packet
+        run: |
+          set -euo pipefail
+          python3 tools/course-discovery/build_scorecard_packet.py             "course-models/provider-data/golfcourseapi/${{ needs.discovery.outputs.provider_id }}.json"             "course-models/scorecards/${{ needs.discovery.outputs.provider_id }}.json"
+      - name: Validate registry
+        run: python3 tools/course-discovery/validate_registry.py
+      - name: Validate canonical scorecard
+        run: |
+          set -euo pipefail
+          python3 tools/course-discovery/validate_scorecard_packet.py             "course-models/scorecards/${{ needs.discovery.outputs.provider_id }}.json"
+      - name: Capture registered course id
+        id: result
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          d=json.load(open("registration-result.json"))
+          if d.get("status") == "already-registered":
+              course_id=d.get("course_id")
+          else:
+              course_id=d.get("course_id")
+          if not course_id:
+              raise SystemExit(f"Registration did not return a course_id: {d}")
+          print(f"course_id={course_id}")
+          PY
+      - name: Commit registration and scorecard
+        run: |
+          set -euo pipefail
+          git add course-models/COURSE_REGISTRY.json course-models/provider-data/golfcourseapi course-models/scorecards
+          if git diff --cached --quiet; then
+            echo "No registration changes required."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Register end-to-end test course ${{ needs.discovery.outputs.provider_id }}"
+          git push
+
+  pipeline:
+    name: 3. Physical acquisition → QA → wireframe
+    needs: registration
+    uses: ./.github/workflows/build-course.yml
+    with:
+      course: ${{ needs.registration.outputs.course_id }}
+    secrets: inherit
