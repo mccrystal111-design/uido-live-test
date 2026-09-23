@@ -5,6 +5,7 @@ import argparse, hashlib, json, os, re, urllib.error, urllib.request, uuid
 from pathlib import Path
 from typing import Any
 BASE_URL="https://api.golfcourseapi.com"; REGISTRY=Path("course-models/COURSE_REGISTRY.json")
+PROVIDER_DIR=Path("course-models/provider-data/golfcourseapi")
 UIDO_NAMESPACE=uuid.UUID("7b5f9c2d-8b3d-4e68-9a0f-0c8c1f7b6a21")
 
 def api_json(path: str) -> dict[str, Any]:
@@ -32,8 +33,9 @@ def main()->int:
     parser.add_argument("--expected-country",help="Refuse registration if the detailed record is not in this country.")
     args=parser.parse_args()
     detail=api_json(f"/v1/courses/{args.provider_id}")
-    location=detail.get("location") or {}
-    name=detail.get("course_name") or detail.get("name") or detail.get("club_name")
+    provider_record=detail.get("course") if isinstance(detail.get("course"),dict) else detail
+    location=provider_record.get("location") or {}
+    name=provider_record.get("course_name") or provider_record.get("name") or provider_record.get("club_name")
     if not name: raise SystemExit("GolfCourseAPI course detail contains no course name")
     actual_country=str(location.get("country") or detail.get("country") or location.get("country_code") or detail.get("country_code") or "").strip()
     if args.expected_country:
@@ -45,7 +47,7 @@ def main()->int:
         accepted = aliases.get(expected, {expected})
         if actual_country.casefold() not in accepted:
         raise SystemExit(f"Course {args.provider_id} is in {actual_country or 'an unknown country'}, not the expected country {args.expected_country}")
-    provider_id=str(detail.get("id",args.provider_id))
+    provider_id=str(provider_record.get("id",args.provider_id))
     course_id=slugify(name)
     registry=json.loads(REGISTRY.read_text()); courses=registry.setdefault("courses",{})
     for existing_id,existing in courses.items():
@@ -53,10 +55,19 @@ def main()->int:
             print(json.dumps({"status":"already-registered","course_id":existing_id},indent=2)); return 0
     if course_id in courses: course_id=f"{course_id}-{hashlib.sha1(provider_id.encode()).hexdigest()[:8]}"
     record={"identity":{"uido_id":stable_uido_id(provider_id),"provider":"golfcourseapi","provider_id":provider_id},
-            "name":name,"club_name":detail.get("club_name"),"holes":detail.get("holes"),"par":detail.get("par"),
+            "name":name,"club_name":provider_record.get("club_name"),"holes":provider_record.get("holes"),"par":provider_record.get("par"),
             "location":{k:location.get(k) for k in ("latitude","longitude","city","state","country")},
             "lifecycle":{"status":"registered"}}
-    courses[course_id]=record; registry["schema_version"]="uido.course-registry.v0.2"
+    courses[course_id]=record
+    registry["schema_version"]="uido.course-registry.v0.2"
+    PROVIDER_DIR.mkdir(parents=True, exist_ok=True)
+    provider_path=PROVIDER_DIR / f"{provider_id}.json"
+    provider_path.write_text(json.dumps({
+        "provider": "golfcourseapi",
+        "provider_id": provider_id,
+        "endpoint": f"/v1/courses/{provider_id}",
+        "captured_course": provider_record,
+    }, indent=2) + "\n")
     REGISTRY.write_text(json.dumps(registry,indent=2)+"\n")
-    print(json.dumps({"status":"registered","course_id":course_id,"record":record},indent=2)); return 0
+    print(json.dumps({"status":"registered","course_id":course_id,"provider_snapshot":str(provider_path),"record":record},indent=2)); return 0
 if __name__=="__main__": raise SystemExit(main())
