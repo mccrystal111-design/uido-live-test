@@ -209,7 +209,7 @@ jobs:
                   "catalogue_product_ids":sorted(product_ids),
                   "tiles":[]
               }
-              (root / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\\n")
+              (root / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
               print(json.dumps(manifest, indent=2))
               raise SystemExit(0)
           root = pathlib.Path("build") / os.environ["COURSE_ID"] / "ea-aerial"
