@@ -45,7 +45,14 @@ def normalise(course: dict[str, Any]) -> dict[str, Any]:
 def hydrate(provider_id: str) -> dict[str, Any]:
     detail = request_json(f"/v1/courses/{urllib.parse.quote(provider_id, safe='')}")
     if not isinstance(detail, dict): raise SystemExit(f"GolfCourseAPI returned unexpected detail for {provider_id}")
-    return normalise(detail)
+    # GolfCourseAPI wraps the detailed record in {"course": ...}.
+    # Accept the wrapper explicitly and fail closed if the payload is malformed.
+    record = detail.get("course") if isinstance(detail.get("course"), dict) else detail
+    if not isinstance(record, dict): raise SystemExit(f"GolfCourseAPI returned malformed detail for {provider_id}")
+    if record.get("id") is None:
+        record = dict(record)
+        record["id"] = provider_id
+    return normalise(record)
 
 def main() -> int:
     parser = argparse.ArgumentParser()
