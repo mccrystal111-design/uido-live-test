@@ -11,7 +11,10 @@ import argparse, json, math, re, urllib.parse, urllib.request
 from pathlib import Path
 
 REGISTRY = Path("course-models/COURSE_REGISTRY.json")
+# Prefer the current UK-capable Private.coffee instance. Keep global
+# fallbacks because public Overpass capacity can be transiently unavailable.
 ENDPOINTS = [
+    "https://overpass.private.coffee/api/interpreter",
     "https://overpass-api.de/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
 ]
@@ -46,22 +49,30 @@ def query_overpass(lat: float, lon: float) -> dict:
         f'nwr["leisure"="golf_course"](around:5000,{lat},{lon});'
         'out center geom;'
     )
+    body = urllib.parse.urlencode({"data": query}).encode()
     for endpoint in ENDPOINTS:
-        try:
-            url = endpoint + "?" + urllib.parse.urlencode({"data": query})
-            req = urllib.request.Request(
-                url,
-                headers={
-                    "Accept": "application/json",
-                    "User-Agent": "UiDo-course-builder/1.0 (+https://github.com/mccrystal111-design/uido-live-test)",
-                },
-            )
-            with urllib.request.urlopen(req, timeout=150) as response:
-                payload = json.load(response)
-            if isinstance(payload, dict):
-                return payload
-        except Exception as exc:
-            print(f"OSM discovery endpoint failed: {endpoint}: {exc}")
+        last_error = None
+        for attempt in range(1, 4):
+            try:
+                req = urllib.request.Request(
+                    endpoint,
+                    data=body,
+                    headers={
+                        "Accept": "application/json",
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "User-Agent": "UiDo-course-builder/1.0 (+https://github.com/mccrystal111-design/uido-live-test)",
+                    },
+                    method="POST",
+                )
+                with urllib.request.urlopen(req, timeout=180) as response:
+                    payload = json.load(response)
+                if isinstance(payload, dict):
+                    return payload
+                raise RuntimeError("Overpass returned a non-object response")
+            except Exception as exc:
+                last_error = exc
+                print(f"OSM discovery endpoint failed: {endpoint} (attempt {attempt}/3): {exc}")
+        print(f"Moving to next Overpass endpoint after retries: {endpoint}: {last_error}")
     raise SystemExit("Unable to discover an OSM golf-course footprint from the available Overpass endpoints.")
 
 def main() -> int:
