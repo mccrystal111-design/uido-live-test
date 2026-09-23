@@ -46,7 +46,7 @@ def main()->int:
         expected = args.expected_country.strip().casefold()
         accepted = aliases.get(expected, {expected})
         if actual_country.casefold() not in accepted:
-        raise SystemExit(f"Course {args.provider_id} is in {actual_country or 'an unknown country'}, not the expected country {args.expected_country}")
+            raise SystemExit(f"Course {args.provider_id} is in {actual_country or 'an unknown country'}, not the expected country {args.expected_country}")
     provider_id=str(provider_record.get("id",args.provider_id))
     course_id=slugify(name)
     registry=json.loads(REGISTRY.read_text()); courses=registry.setdefault("courses",{})
