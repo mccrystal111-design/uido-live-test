@@ -50,7 +50,8 @@ def main()->int:
     location=provider_record.get("location") or {}
     name=provider_record.get("course_name") or provider_record.get("name") or provider_record.get("club_name")
     if not name: raise SystemExit("GolfCourseAPI course detail contains no course name")
-    detail_meta = detail if isinstance(detail, dict) else {}\n    actual_country=str(location.get("country") or detail_meta.get("country") or location.get("country_code") or detail_meta.get("country_code") or "").strip()
+    detail_meta = detail if isinstance(detail, dict) else {}
+    actual_country=str(location.get("country") or detail_meta.get("country") or location.get("country_code") or detail_meta.get("country_code") or "").strip()
     if args.expected_country:
         aliases = {
             "united kingdom": {"united kingdom", "uk", "great britain", "gb", "gbr", "england", "scotland", "wales", "northern ireland"},
