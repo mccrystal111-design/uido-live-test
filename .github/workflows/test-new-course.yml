@@ -79,7 +79,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       course_id: ${{ steps.result.outputs.course_id }}
-      source_ref: ${{ steps.result.outputs.source_ref }}
+      source_ref: ${{ steps.commit.outputs.source_ref }}
     steps:
       - uses: actions/checkout@v4
       - name: Register selected course without refresh
@@ -100,22 +100,25 @@ jobs:
           python3 tools/course-discovery/validate_scorecard_packet.py             "course-models/scorecards/${{ needs.discovery.outputs.provider_id }}.json"
       - name: Capture registered course id
         id: result
+        env:
+          PROVIDER_ID: ${{ needs.discovery.outputs.provider_id }}
         run: |
           set -euo pipefail
           python3 - <<'PY' >> "$GITHUB_OUTPUT"
-          import json
-          d=json.load(open("registration-result.json"))
-          if d.get("status") == "already-registered":
-              course_id=d.get("course_id")
-          else:
-              course_id=d.get("course_id")
-          if not course_id:
-              raise SystemExit(f"Registration did not return a course_id: {d}")
-          print(f"course_id={course_id}")
-          import subprocess
-          print(f"source_ref={subprocess.check_output(["git","rev-parse","HEAD"], text=True).strip()}")
+          import json, os
+          registry=json.load(open("course-models/COURSE_REGISTRY.json"))
+          provider=os.environ["PROVIDER_ID"]
+          matches=[
+              (course_id, course)
+              for course_id, course in registry.get("courses", {}).items()
+              if str(course.get("provider_id")) == provider
+          ]
+          if len(matches) != 1:
+              raise SystemExit(f"Expected exactly one registered course for provider {provider}, found {len(matches)}")
+          print(f"course_id={matches[0][0]}")
           PY
       - name: Commit registration and scorecard
+        id: commit
         run: |
           set -euo pipefail
           git add course-models/COURSE_REGISTRY.json course-models/provider-data/golfcourseapi course-models/scorecards
