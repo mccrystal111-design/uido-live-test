@@ -79,6 +79,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       course_id: ${{ steps.result.outputs.course_id }}
+      source_ref: ${{ steps.result.outputs.source_ref }}
     steps:
       - uses: actions/checkout@v4
       - name: Register selected course without refresh
@@ -111,6 +112,8 @@ jobs:
           if not course_id:
               raise SystemExit(f"Registration did not return a course_id: {d}")
           print(f"course_id={course_id}")
+          import subprocess
+          print(f"source_ref={subprocess.check_output(["git","rev-parse","HEAD"], text=True).strip()}")
           PY
       - name: Commit registration and scorecard
         run: |
@@ -124,6 +127,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "Register end-to-end test course ${{ needs.discovery.outputs.provider_id }}"
           git push
+          echo "source_ref=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
   pipeline:
     name: 3. Physical acquisition → QA → wireframe
@@ -131,4 +135,5 @@ jobs:
     uses: ./.github/workflows/build-course.yml
     with:
       course: ${{ needs.registration.outputs.course_id }}
+      ref: ${{ needs.registration.outputs.source_ref }}
     secrets: inherit
