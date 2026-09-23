@@ -32,7 +32,15 @@ def normalise(course: dict[str, Any]) -> dict[str, Any]:
             "club_name": course.get("club_name"),
             "location": {k: loc_value(k) for k in ("latitude","longitude","city","state")},
             "location_country": country,
-            "holes": course.get("holes"), "par": course.get("par")}
+            "holes": course.get("holes"), "par": course.get("par"),
+            "_diagnostics": {
+                "top_level_keys": sorted(course.keys()),
+                "location_keys": sorted(location.keys()),
+                "location_country_raw": location.get("country"),
+                "top_level_country_raw": course.get("country"),
+                "location_country_code_raw": location.get("country_code"),
+                "top_level_country_code_raw": course.get("country_code"),
+            }}
 
 def hydrate(provider_id: str) -> dict[str, Any]:
     detail = request_json(f"/v1/courses/{urllib.parse.quote(provider_id, safe='')}")
