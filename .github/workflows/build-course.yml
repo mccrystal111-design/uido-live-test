@@ -10,6 +10,15 @@ on:
         required: true
         type: string
         default: overstone-park
+  workflow_call:
+    inputs:
+      course:
+        description: "Registered UiDo course id"
+        required: true
+        type: string
+    secrets:
+      inherit:
+        required: false
 
 jobs:
   acquisition:
@@ -131,3 +140,4 @@ jobs:
             echo "### Next stage"
             echo "Continue with reusable downstream course processing, then GolfCourseAPI discovery/import."
           } >> "$GITHUB_STEP_SUMMARY"
+        
