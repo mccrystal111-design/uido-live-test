@@ -173,6 +173,27 @@ def fairway_sources(all_elements, fairway_elements, target_holes):
     way_index = dict(all_way_index)
     way_index.update(fairway_way_index)
 
+    # Some Poult Wood fairways are complete standalone OSM ways rather than
+    # multipolygon relations. The main golf capture contains these ways, but
+    # the focused fairway query only returns relations. Treat standalone
+    # fairway ways as authoritative source features when they are not members
+    # of a fairway relation; this preserves complete source geometry without
+    # duplicating relation member ways.
+    fairway_relation_member_ids = {
+        member.get("ref")
+        for relation in fairway_elements
+        if relation.get("type") == "relation"
+        for member in relation.get("members", [])
+        if member.get("type") == "way"
+    }
+    standalone_fairways = [
+        element
+        for element in all_elements
+        if element.get("type") == "way"
+        and element.get("tags", {}).get("golf") == "fairway"
+        and element.get("id") not in fairway_relation_member_ids
+    ]
+
     target_routes = {
         ref: points(h)
         for ref, h in target_holes.items()
@@ -229,6 +250,46 @@ def fairway_sources(all_elements, fairway_elements, target_holes):
                 "nearest_target_distance_m": round(nearest_target_distance, 2),
                 "nearest_other_hole_distance_m": round(other_distance, 2),
                 "target_associated": target_associated,
+            }
+        )
+
+    # Preserve complete standalone fairway ways from the main OSM golf
+    # capture. Closed ways are rendered directly as source polygons.
+    for element in standalone_fairways:
+        p = points(element)
+        if len(p) < 3:
+            continue
+        if p[0] != p[-1]:
+            p = p + [p[0]]
+        geom = Polygon(p)
+        if geom.is_empty:
+            continue
+
+        representative = geom.representative_point()
+        rep = (representative.x, representative.y)
+        target_distances = {
+            ref: nearest_distance_to_route(rep, route)
+            for ref, route in target_routes.items()
+        }
+        other_distance = (
+            min(nearest_distance_to_route(rep, route) for route in other_routes)
+            if other_routes
+            else float("inf")
+        )
+        nearest_target_ref = min(target_distances, key=target_distances.get)
+        nearest_target_distance = target_distances[nearest_target_ref]
+        target_associated = nearest_target_distance <= other_distance
+
+        sources.append(
+            {
+                "id": f"{element.get('type')}/{element.get('id')}",
+                "element": element,
+                "geometries": [geom],
+                "nearest_target_hole": nearest_target_ref,
+                "nearest_target_distance_m": round(nearest_target_distance, 2),
+                "nearest_other_hole_distance_m": round(other_distance, 2),
+                "target_associated": target_associated,
+                "source_type": "standalone_way",
             }
         )
 
@@ -472,7 +533,7 @@ def main():
     plt.close(fig)
 
     report = {
-        "schema": "uido.poult-wood.wireframe-qa.v0.2",
+        "schema": "uido.poult-wood.wireframe-qa.v0.3",
         "target_holes_requested": 18,
         "target_holes_rendered": sorted(target_holes),
         "duplicate_facility_hole_routes_excluded": excluded_holes,
