@@ -247,6 +247,9 @@ def plot_geometry(ax, geom, **kwargs):
         x, y = geom.xy
         line_kwargs = dict(kwargs)
         line_kwargs.pop("facecolor", None)
+        line_kwargs.pop("edgecolor", None)
+        if "color" not in line_kwargs:
+            line_kwargs["color"] = kwargs.get("edgecolor", "#555555")
         ax.plot(x, y, **line_kwargs)
     elif geom.geom_type in ("MultiPolygon", "MultiLineString", "GeometryCollection"):
         for part in geom.geoms:
