@@ -20,7 +20,7 @@ The repository is using a modular course pipeline:
 - `course-models/COURSE_PIPELINE.md` — architecture contract.
 - `PROJECT_STATUS.md` — human handover/source of truth.
 
-**Current active job: add the GolfCourseAPI key to GitHub Actions and run the new Course Discovery workflow against a real course.**
+**Current active job: validate the canonical GolfCourseAPI registration/scorecard packet, then move Northampton into the physical acquisition pipeline.**
 
 Acquisition and downstream processing remain separate. Once acquired and QA'd, the Course Packet is the persisted hand-off/memory layer. Downstream stages must not silently re-query or recapture OSM/EA data. The architecture contract explicitly requires downstream stages to consume the packet rather than recapturing source data. fileciteturn3file0
 
@@ -145,7 +145,7 @@ Requirements:
 
 ### 2. Add GolfCourseAPI discovery/import layer
 
-**Status: IMPLEMENTED — PENDING LIVE API TEST**
+**Status: IMPLEMENTED — NORTHAMPTON LIVE TEST GREEN**
 
 Use GolfCourseAPI as the discovery/index front door, not as physical geometry authority.
 
@@ -167,7 +167,7 @@ Build:
 
 ### 3. Northampton Golf Club — first genuinely new end-to-end course
 
-**Status: PLANNED AFTER #2 LIVE VALIDATION**
+**Status: REGISTRATION + SCORECARD GREEN; PHYSICAL ACQUISITION NEXT**
 
 Use Northampton Golf Club as the first fresh course that has not been manually built into the pipeline.
 
@@ -216,7 +216,7 @@ Establish measured OSM-to-raster control points and registration metrics. Preser
 
 ## EXACT NEXT STEP
 
-**Add the `GOLFCOURSEAPI_API_KEY` GitHub Actions secret, run `UiDo Course Discovery` with `Northampton Golf Club`, inspect the candidates, then use `UiDo Register Course` with the selected GolfCourseAPI ID. Validate the resulting registry entry before moving to Northampton end-to-end acquisition.**
+**Run the cache-first Northampton registration once after the latest validator/registry-link changes, confirm the canonical scorecard validator is green, then build the Northampton physical source manifest/boundary and take it through Course Acquisition → Packet QA → packet-driven wireframe. Do not enable provider refresh; the captured GolfCourseAPI snapshot is already the source for registration/scorecard processing.**
 
 ## DO NOT REBUILD
 
