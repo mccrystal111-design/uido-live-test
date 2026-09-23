@@ -3,6 +3,13 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
+    paths:
+      - "android/**"
+      - "index.html"
+      - "scorecard.js"
+      - "manifest-v3.webmanifest"
+      - "uido-icon-v3.svg"
+      - ".github/workflows/build-uido-apk.yml"
 permissions:
   contents: read
 jobs:
