@@ -1,10 +1,7 @@
 name: Tune UiDo Home Target
+# Legacy one-shot patch. Keep available for manual recovery only.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
-permissions:
-  contents: read
 jobs:
   tune:
     if: ${{ false }}
