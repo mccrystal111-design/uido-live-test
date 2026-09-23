@@ -1,0 +1,119 @@
+name: UiDo Course Pipeline
+
+# Master orchestration layer.
+# Each stage remains modular; the course packet is the persisted hand-off.
+on:
+  workflow_dispatch:
+    inputs:
+      course:
+        description: "Registered UiDo course id"
+        required: true
+        type: choice
+        options:
+          - overstone-park
+          - poult-wood
+        default: overstone-park
+
+jobs:
+  acquisition:
+    name: 1. Acquire course packet
+    uses: ./.github/workflows/build-course-ea.yml
+    with:
+      course: ${{ inputs.course }}
+    secrets: inherit
+
+  packet-qa:
+    name: 2. Validate course packet
+    needs: acquisition
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download acquisition artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: uido-course-acquisition-${{ inputs.course }}
+          path: build/${{ inputs.course }}
+
+      - name: Validate packet contract
+        env:
+          COURSE_ID: ${{ inputs.course }}
+        run: |
+          set -euo pipefail
+          ROOT="build/$COURSE_ID"
+          test -f "$ROOT/acquisition-manifest.json"
+          test -f "$ROOT/osm/manifest.json"
+          test -f "$ROOT/osm/golf.json"
+          test -f "$ROOT/osm/fairway-relations.json"
+          test -f "$ROOT/ea-aerial/manifest.json"
+          test -f "$ROOT/ea-lidar/manifest.json"
+
+          python3 - <<'PY'
+          import json, os, pathlib
+          root = pathlib.Path("build") / os.environ["COURSE_ID"]
+          acquisition = json.loads((root / "acquisition-manifest.json").read_text())
+          osm = json.loads((root / "osm" / "manifest.json").read_text())
+          aerial = json.loads((root / "ea-aerial" / "manifest.json").read_text())
+          lidar = json.loads((root / "ea-lidar" / "manifest.json").read_text())
+
+          expected = {
+              "acquisition-manifest.json",
+              "osm/manifest.json",
+              "osm/golf.json",
+              "osm/fairway-relations.json",
+              "ea-aerial/manifest.json",
+              "ea-lidar/manifest.json",
+          }
+          missing = [p for p in expected if not (root / p).is_file()]
+          if missing:
+              raise SystemExit(f"Missing packet files: {missing}")
+
+          target = acquisition.get("target", {})
+          if acquisition.get("course_id") != os.environ["COURSE_ID"]:
+              raise SystemExit("Acquisition manifest course id mismatch")
+          if int(target.get("holes", 0)) != 18:
+              raise SystemExit(f"Expected an 18-hole course packet, got {target.get('holes')}")
+
+          required_refs = {str(i) for i in range(1, 19)}
+          actual_refs = set(osm.get("target_hole_refs", []))
+          if actual_refs != required_refs:
+              raise SystemExit(f"OSM target hole refs mismatch: {sorted(actual_refs)}")
+
+          if osm.get("fairway_relation_elements", 0) <= 0:
+              raise SystemExit("No fairway relation data captured")
+
+          if lidar.get("status") == "unavailable":
+              raise SystemExit("LiDAR packet is unavailable")
+
+          print("COURSE PACKET QA: PASS")
+          print(f"course={acquisition['course_id']}")
+          print(f"holes={target['holes']}")
+          print(f"osm_elements={osm.get('elements')}")
+          print(f"fairway_relation_elements={osm.get('fairway_relation_elements')}")
+          print(f"aerial_status={aerial.get('status')}")
+          print(f"lidar_status={lidar.get('status')}")
+          PY
+
+      - name: Publish canonical course packet
+        uses: actions/upload-artifact@v4
+        with:
+          name: uido-course-packet-${{ inputs.course }}
+          path: build/${{ inputs.course }}/
+          retention-days: 14
+
+      - name: Write pipeline summary
+        env:
+          COURSE_ID: ${{ inputs.course }}
+        run: |
+          {
+            echo "## UiDo Course Pipeline"
+            echo
+            echo "**Course:** $COURSE_ID"
+            echo
+            echo "### Stage 1 — Acquisition"
+            echo "PASS — reusable acquisition workflow completed."
+            echo
+            echo "### Stage 2 — Course Packet QA"
+            echo "PASS — canonical packet contract validated."
+            echo
+            echo "### Next stage"
+            echo "The packet is ready for downstream processing. Wireframe/model stages must consume this packet rather than recapturing source data."
+          } >> "$GITHUB_STEP_SUMMARY"
