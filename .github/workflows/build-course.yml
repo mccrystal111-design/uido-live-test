@@ -16,6 +16,11 @@ on:
         description: "Registered UiDo course id"
         required: true
         type: string
+      ref:
+        description: "Optional repository ref containing the registered course"
+        required: false
+        type: string
+        default: ""
     secrets:
       inherit:
         required: false
@@ -26,6 +31,7 @@ jobs:
     uses: ./.github/workflows/build-course-ea.yml
     with:
       course: ${{ inputs.course }}
+      ref: ${{ inputs.ref }}
     secrets: inherit
 
   packet-qa:
