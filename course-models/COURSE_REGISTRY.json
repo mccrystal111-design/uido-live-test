@@ -19,7 +19,7 @@
           "preferred_resolution_m": 0.25
         },
         "lidar": {
-          "max_resolution_m": 1.0
+          "max_resolution_m": 1
         }
       }
     },
@@ -41,7 +41,7 @@
           "preferred_resolution_m": 0.25
         },
         "lidar": {
-          "max_resolution_m": 1.0
+          "max_resolution_m": 1
         }
       }
     },
@@ -53,8 +53,8 @@
       },
       "name": "Northampton",
       "club_name": "Northampton Golf Club",
-      "holes": null,
-      "par": null,
+      "holes": 18,
+      "par": 72,
       "location": {
         "latitude": 52.27360729999999,
         "longitude": -0.9750302,
@@ -64,7 +64,8 @@
       },
       "lifecycle": {
         "status": "registered"
-      }
+      },
+      "scorecard_packet": "course-models/scorecards/51sjdksg.json"
     },
     "kettering": {
       "identity": {
