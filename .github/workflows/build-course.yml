@@ -99,6 +99,18 @@ jobs:
           path: build/${{ inputs.course }}/
           retention-days: 14
 
+  wireframe:
+    name: 3. Process wireframe from course packet
+    needs: packet-qa
+    uses: ./.github/workflows/poult-wood-wireframe.yml
+    with:
+      course: ${{ inputs.course }}
+
+  pipeline-summary:
+    name: 4. Pipeline summary
+    needs: [packet-qa, wireframe]
+    runs-on: ubuntu-latest
+    steps:
       - name: Write pipeline summary
         env:
           COURSE_ID: ${{ inputs.course }}
@@ -114,6 +126,11 @@ jobs:
             echo "### Stage 2 — Course Packet QA"
             echo "PASS — canonical packet contract validated."
             echo
+            echo "### Stage 3 — Wireframe"
+            echo "PASS — wireframe consumed the canonical Course Packet."
+            echo
+            echo "No downstream source recapture was performed."
+            echo
             echo "### Next stage"
-            echo "The packet is ready for downstream processing. Wireframe/model stages must consume this packet rather than recapturing source data."
+            echo "Continue with reusable downstream course processing, then GolfCourseAPI discovery/import."
           } >> "$GITHUB_STEP_SUMMARY"
