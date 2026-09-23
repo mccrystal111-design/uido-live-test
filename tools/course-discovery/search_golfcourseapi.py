@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Search GolfCourseAPI, hydrate candidates, and apply optional country filtering."""
 from __future__ import annotations
-import argparse, json, os, sys, urllib.error, urllib.parse, urllib.request
+import argparse, json, os, re, sys, urllib.error, urllib.parse, urllib.request
 from typing import Any
 BASE_URL = "https://api.golfcourseapi.com"
 
@@ -15,6 +15,12 @@ def request_json(path: str, params: dict[str, Any] | None = None) -> Any:
     except urllib.error.HTTPError as exc:
         raise SystemExit(f"GolfCourseAPI returned HTTP {exc.code}: {exc.read().decode('utf-8', errors='replace')}") from exc
     except urllib.error.URLError as exc: raise SystemExit(f"GolfCourseAPI request failed: {exc}") from exc
+
+def clean_query(value: str) -> str:
+    value = value.strip().lower()
+    value = re.sub(r"[^a-z0-9]+", " ", value)
+    stop_words = {"golf", "course", "club"}
+    return " ".join(part for part in value.split() if part not in stop_words)
 
 def normalise(course: dict[str, Any]) -> dict[str, Any]:
     location = course.get("location") or {}
@@ -58,42 +64,21 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("query")
     parser.add_argument("--limit", type=int, default=10)
-    parser.add_argument("--country", help="Exact country filter applied to detailed course records.")
+    parser.add_argument("--country", help="Country filter applied to search results.")
     args = parser.parse_args()
-    response = request_json("/v1/search", {"search_query": args.query})
+    query = clean_query(args.query)
+    if not query:
+        raise SystemExit("Course search query is empty after normalization.")
+    response = request_json("/v1/search", {"search_query": query})
     courses = response.get("courses", []) if isinstance(response, dict) else []
-    hydrated, detail_errors = [], []
-    for course in courses[:max(0, args.limit)]:
-        if course.get("id") is None: continue
-        try: hydrated.append(hydrate(str(course["id"])))
-        except SystemExit as exc: detail_errors.append({"provider_id": str(course["id"]), "error": str(exc)})
-    candidates = hydrated
+    normalized = [normalise(course) for course in courses[:max(0, args.limit)] if isinstance(course, dict) and course.get("id") is not None]
+    candidates = normalized
     if args.country:
-        aliases = {
-            "united kingdom": {"united kingdom", "uk", "great britain", "gb", "gbr", "england", "scotland", "wales", "northern ireland"},
-            "usa": {"usa", "us", "united states", "united states of america"},
-        }
+        aliases = {"united kingdom": {"united kingdom", "uk", "great britain", "gb", "gbr", "england", "scotland", "wales", "northern ireland"}, "usa": {"usa", "us", "united states", "united states of america"}}
         expected = args.country.strip().casefold()
         accepted = aliases.get(expected, {expected})
-        hydrated = [
-            c for c in candidates
-            if str(c.get("location_country") or "").strip().casefold() in accepted
-        ]
-    print(json.dumps({
-        "query": args.query,
-        "country_filter": args.country,
-        "count": len(hydrated),
-        "courses": hydrated,
-        "candidate_diagnostics": [
-            {
-                "provider_id": c.get("provider_id"),
-                "name": c.get("name"),
-                "location_country": c.get("location_country"),
-                "diagnostics": c.get("_diagnostics"),
-            }
-            for c in candidates
-        ],
-        "detail_errors": detail_errors,
-    }, indent=2))
+        candidates = [c for c in normalized if str(c.get("location_country") or "").strip().casefold() in accepted]
+    print(json.dumps({"query": args.query, "normalized_query": query, "country_filter": args.country, "count": len(candidates), "courses": candidates, "detail_lookup": "deferred_until_registration"}, indent=2))
     return 0
+
 if __name__ == "__main__": sys.exit(main())
