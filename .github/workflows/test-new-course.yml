@@ -111,7 +111,7 @@ jobs:
           matches=[
               (course_id, course)
               for course_id, course in registry.get("courses", {}).items()
-              if str(course.get("provider_id")) == provider
+              if str((course.get("identity") or {}).get("provider_id")) == provider
           ]
           if len(matches) != 1:
               raise SystemExit(f"Expected exactly one registered course for provider {provider}, found {len(matches)}")
