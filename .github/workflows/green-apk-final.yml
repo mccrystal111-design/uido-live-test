@@ -1,8 +1,15 @@
 name: UiDo Green APK Final
 on:
+  workflow_dispatch:
   push:
     branches: [main]
-  workflow_dispatch:
+    paths:
+      - "android/**"
+      - "index.html"
+      - "scorecard.js"
+      - "manifest-v3.webmanifest"
+      - "uido-icon-v3.svg"
+      - ".github/workflows/green-apk-final.yml"
 permissions:
   contents: read
 jobs:
