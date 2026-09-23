@@ -1,0 +1,296 @@
+name: UiDo Course Builder - Agnostic EA acquisition
+
+# Manual course selector for the provider-neutral acquisition layer.
+# This deliberately stops before course-specific model generation.
+on:
+  workflow_dispatch:
+    inputs:
+      course:
+        description: "Course to acquire"
+        required: true
+        type: choice
+        options:
+          - overstone-park
+          - poult-wood
+        default: overstone-park
+
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    env:
+      COURSE_ID: ${{ inputs.course }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve selected course from registry
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, pathlib
+          registry = json.loads(pathlib.Path("course-models/COURSE_REGISTRY.json").read_text())
+          course_id = os.environ["COURSE_ID"]
+          try:
+              course = registry["courses"][course_id]
+          except KeyError:
+              raise SystemExit(f"Unknown course id: {course_id}")
+          b = course["boundary"]
+          lines = [
+              f"COURSE_NAME={course['name']}",
+              f"COURSE_HOLES={course['holes']}",
+              f"COURSE_PAR={course['par']}",
+              f"WEST={b['west']}",
+              f"SOUTH={b['south']}",
+              f"EAST={b['east']}",
+              f"NORTH={b['north']}",
+              f"SOURCE_MANIFEST={course['source_manifest']}",
+              f"AERIAL_YEAR={course['acquisition']['aerial']['preferred_year']}",
+              f"AERIAL_RES={course['acquisition']['aerial']['preferred_resolution_m']}",
+              f"LIDAR_MAX_RES={course['acquisition']['lidar']['max_resolution_m']}",
+          ]
+          with open(os.environ["GITHUB_ENV"], "a") as f:
+              f.write("\n".join(lines) + "\n")
+          print(json.dumps(course, indent=2))
+          PY
+
+      - name: Validate source manifest
+        run: |
+          set -euo pipefail
+          test -f "$SOURCE_MANIFEST"
+          python3 - <<'PY'
+          import json, os, pathlib
+          course = json.loads(pathlib.Path(os.environ["SOURCE_MANIFEST"]).read_text())
+          print(json.dumps(course, indent=2))
+          if course["target_course"]["holes"] != int(os.environ["COURSE_HOLES"]):
+              raise SystemExit("Registry/source manifest hole count mismatch")
+          if course["target_course"]["par"] != int(os.environ["COURSE_PAR"]):
+              raise SystemExit("Registry/source manifest par mismatch")
+          PY
+
+      - name: Acquire OSM golf source
+        run: |
+          set -euo pipefail
+          mkdir -p "build/$COURSE_ID/osm"
+          QUERY="[out:json][timeout:180];nwr[\"golf\"]($SOUTH,$WEST,$NORTH,$EAST);out geom;"
+          RELS="[out:json][timeout:180];relation[\"golf\"=\"fairway\"]($SOUTH,$WEST,$NORTH,$EAST);(._;>;);out geom;"
+          ENDPOINTS=(
+            "https://overpass-api.de/api/interpreter"
+            "https://overpass.kumi.systems/api/interpreter"
+          )
+          fetch() {
+            local q="$1" out="$2"
+            for ep in "${ENDPOINTS[@]}"; do
+              echo "Trying $ep"
+              if curl -fsSL --retry 3 --connect-timeout 20 --max-time 240                 -A "UiDo-course-builder/1.0 (+https://github.com/mccrystal111-design/uido-live-test)"                 -H "Accept: application/json"                 --data-urlencode "data=$q" "$ep" -o "$out"; then
+                return 0
+              fi
+            done
+            return 1
+          }
+          fetch "$QUERY" "build/$COURSE_ID/osm/golf.json"
+          fetch "$RELS" "build/$COURSE_ID/osm/fairway-relations.json"
+
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib
+          root = pathlib.Path("build") / os.environ["COURSE_ID"] / "osm"
+          golf = json.loads((root / "golf.json").read_text())
+          fairways = json.loads((root / "fairway-relations.json").read_text())
+          elements = golf.get("elements", [])
+          holes = {
+              str(e.get("tags", {}).get("ref"))
+              for e in elements
+              if e.get("tags", {}).get("golf") == "hole"
+              and str(e.get("tags", {}).get("ref", "")).isdigit()
+              and 1 <= int(e["tags"]["ref"]) <= 18
+          }
+          if holes != {str(i) for i in range(1,19)}:
+              raise SystemExit(f"Expected target hole refs 1..18, found {sorted(holes, key=lambda x:int(x))}")
+          manifest = {
+              "schema": "uido.course.osm-capture.v0.2",
+              "course_id": os.environ["COURSE_ID"],
+              "course": os.environ["COURSE_NAME"],
+              "bbox": [float(os.environ["SOUTH"]), float(os.environ["WEST"]), float(os.environ["NORTH"]), float(os.environ["EAST"])],
+              "elements": len(elements),
+              "fairway_relation_elements": len(fairways.get("elements", [])),
+              "target_hole_refs": sorted(holes, key=int),
+              "sha256": hashlib.sha256((root / "golf.json").read_bytes()).hexdigest()
+          }
+          (root / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+          print(json.dumps(manifest, indent=2))
+          PY
+
+      - name: Acquire EA aerial source
+        run: |
+          set -euo pipefail
+          mkdir -p "build/$COURSE_ID/ea-aerial/packages" "build/$COURSE_ID/ea-aerial/sources"
+          python3 - <<'PY'
+          import hashlib, io, json, os, pathlib, time, urllib.request, zipfile
+          search_url = "https://environment.data.gov.uk/backend/catalog/api/tiles/collections/survey/search"
+          west, south, east, north = map(float, [os.environ["WEST"], os.environ["SOUTH"], os.environ["EAST"], os.environ["NORTH"]])
+          polygon = {"type":"Polygon","coordinates":[[[west,south],[east,south],[east,north],[west,north],[west,south]]]}
+          req = urllib.request.Request(
+              search_url, data=json.dumps(polygon).encode(),
+              headers={"Content-Type":"application/geo+json","Accept":"*/*",
+                       "Origin":"https://environment.data.gov.uk","Referer":"https://environment.data.gov.uk/survey",
+                       "User-Agent":"UiDo-course-builder/1.0"}, method="POST")
+          with urllib.request.urlopen(req, timeout=120) as r:
+              results = json.load(r).get("results", [])
+          preferred_year = os.environ["AERIAL_YEAR"]
+          preferred_res = float(os.environ["AERIAL_RES"])
+          candidates = []
+          for r in results:
+              p, t = r.get("product", {}), r.get("tile", {})
+              pid = str(p.get("id", ""))
+              year, res = p.get("year", r.get("year")), p.get("resolution", r.get("resolution"))
+              if isinstance(year, dict): year = year.get("id")
+              if isinstance(res, dict): res = res.get("id")
+              try: res = float(res)
+              except (TypeError, ValueError): continue
+              tile = str(t.get("id", ""))
+              if pid == "vertical_aerial_photography_tiles_night_time" and tile:
+                  candidates.append({"year":str(year), "resolution_m":res, "tile":tile})
+          preferred = [x for x in candidates if x["year"] == preferred_year and abs(x["resolution_m"] - preferred_res) < 1e-9]
+          if not preferred:
+              if not candidates:
+                  raise SystemExit("No EA aerial coverage found")
+              best_res = min(x["resolution_m"] for x in candidates)
+              best_year = max(x["year"] for x in candidates if abs(x["resolution_m"] - best_res) < 1e-9)
+              preferred = [x for x in candidates if x["year"] == best_year and abs(x["resolution_m"] - best_res) < 1e-9]
+          unique = []
+          seen = set()
+          for x in preferred:
+              key = (x["year"], x["resolution_m"], x["tile"])
+              if key not in seen:
+                  seen.add(key); unique.append(x)
+          root = pathlib.Path("build") / os.environ["COURSE_ID"] / "ea-aerial"
+          base = "https://environment.data.gov.uk/tiles/collections/survey/vertical_aerial_photography_tiles_night_time"
+          captured = []
+          for x in unique:
+              res = str(x["resolution_m"]).rstrip("0").rstrip(".")
+              url = f"{base}/{x['year']}/{res}/{x['tile']}?subscription-key=dspui"
+              target = root / "packages" / f"{x['tile']}.zip"
+              for attempt in range(1,5):
+                  try:
+                      req = urllib.request.Request(url, headers={"Accept":"application/zip,*/*","User-Agent":"UiDo-course-builder/1.0"})
+                      with urllib.request.urlopen(req, timeout=600) as rr: data = rr.read()
+                      if len(data) < 1000: raise RuntimeError(f"response too small: {len(data)}")
+                      with zipfile.ZipFile(io.BytesIO(data)) as z:
+                          z.testzip(); names = z.namelist()
+                          z.extractall(root / "sources" / x["tile"])
+                      target.write_bytes(data)
+                      captured.append({**x, "url":url, "bytes":len(data), "sha256":hashlib.sha256(data).hexdigest(), "members":names})
+                      break
+                  except Exception as exc:
+                      if attempt == 4: raise SystemExit(f"EA aerial download failed for {x['tile']}: {exc}")
+                      time.sleep(5 * 2 ** (attempt-1))
+          (root / "manifest.json").write_text(json.dumps({
+              "schema":"uido.course.ea-aerial-acquisition.v0.1",
+              "course_id":os.environ["COURSE_ID"], "course":os.environ["COURSE_NAME"],
+              "status":"captured", "tiles":captured
+          }, indent=2) + "\n")
+          print(json.dumps(captured, indent=2))
+          PY
+
+      - name: Acquire EA National LiDAR
+        run: |
+          set -euo pipefail
+          mkdir -p "build/$COURSE_ID/ea-lidar/packages" "build/$COURSE_ID/ea-lidar/sources"
+          python3 - <<'PY'
+          import hashlib, io, json, os, pathlib, time, urllib.request, zipfile
+          search_url = "https://environment.data.gov.uk/backend/catalog/api/tiles/collections/survey/search"
+          west, south, east, north = map(float, [os.environ["WEST"], os.environ["SOUTH"], os.environ["EAST"], os.environ["NORTH"]])
+          polygon = {"type":"Polygon","coordinates":[[[west,south],[east,south],[east,north],[west,north],[west,south]]]}
+          req = urllib.request.Request(
+              search_url, data=json.dumps(polygon).encode(),
+              headers={"Content-Type":"application/geo+json","Accept":"*/*",
+                       "Origin":"https://environment.data.gov.uk","Referer":"https://environment.data.gov.uk/survey",
+                       "User-Agent":"UiDo-course-builder/1.0"}, method="POST")
+          with urllib.request.urlopen(req, timeout=120) as r:
+              results = json.load(r).get("results", [])
+          wanted = {"national_lidar_programme_dtm","national_lidar_programme_dsm"}
+          max_res = float(os.environ["LIDAR_MAX_RES"])
+          candidates = []
+          for r in results:
+              p, t = r.get("product", {}), r.get("tile", {})
+              pid = str(p.get("id", "")).lower()
+              year, res = p.get("year", r.get("year")), p.get("resolution", r.get("resolution"))
+              if isinstance(year, dict): year = year.get("id")
+              if isinstance(res, dict): res = res.get("id")
+              try: res = float(res)
+              except (TypeError, ValueError): continue
+              tile = str(t.get("id", ""))
+              if pid in wanted and tile and res <= max_res:
+                  candidates.append({"product":pid,"year":str(year),"resolution_m":res,"tile":tile})
+          if not candidates:
+              raise SystemExit("No EA National LiDAR DTM/DSM coverage found")
+          best_res = min(x["resolution_m"] for x in candidates)
+          best_year = max(x["year"] for x in candidates if abs(x["resolution_m"] - best_res) < 1e-9)
+          selected = [x for x in candidates if abs(x["resolution_m"] - best_res) < 1e-9 and x["year"] == best_year]
+          unique=[]; seen=set()
+          for x in selected:
+              key=(x["product"],x["year"],x["resolution_m"],x["tile"])
+              if key not in seen: seen.add(key); unique.append(x)
+          root = pathlib.Path("build") / os.environ["COURSE_ID"] / "ea-lidar"
+          base = "https://environment.data.gov.uk/tiles/collections/survey"
+          captured=[]
+          for x in unique:
+              res=str(x["resolution_m"]).rstrip("0").rstrip(".")
+              url=f"{base}/{x['product']}/{x['year']}/{res}/{x['tile']}?subscription-key=dspui"
+              target=root/"packages"/f"{x['product']}-{x['year']}-{x['tile']}.zip"
+              for attempt in range(1,5):
+                  try:
+                      req=urllib.request.Request(url,headers={"Accept":"application/zip,*/*","User-Agent":"UiDo-course-builder/1.0"})
+                      with urllib.request.urlopen(req,timeout=600) as rr: data=rr.read()
+                      if len(data)<1000: raise RuntimeError(f"response too small: {len(data)}")
+                      with zipfile.ZipFile(io.BytesIO(data)) as z:
+                          z.testzip(); names=[n for n in z.namelist() if n.lower().endswith((".tif",".tiff"))]
+                          z.extractall(root/"sources"/x["product"]/x["tile"])
+                      target.write_bytes(data)
+                      captured.append({**x,"url":url,"bytes":len(data),"sha256":hashlib.sha256(data).hexdigest(),"rasters":names})
+                      break
+                  except Exception as exc:
+                      if attempt==4: raise SystemExit(f"EA LiDAR download failed for {x['product']} {x['tile']}: {exc}")
+                      time.sleep(5*2**(attempt-1))
+          products={x["product"] for x in captured}
+          if products != wanted:
+              raise SystemExit(f"Expected DTM and DSM, captured: {sorted(products)}")
+          (root/"manifest.json").write_text(json.dumps({
+              "schema":"uido.course.ea-lidar-acquisition.v0.1",
+              "course_id":os.environ["COURSE_ID"], "course":os.environ["COURSE_NAME"],
+              "status":"captured","resolution_m":best_res,"year":best_year,"tiles":captured
+          },indent=2)+"\n")
+          print(json.dumps(captured,indent=2))
+          PY
+
+      - name: Write acquisition manifest and summary
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, pathlib
+          root = pathlib.Path("build") / os.environ["COURSE_ID"]
+          source = json.loads(pathlib.Path(os.environ["SOURCE_MANIFEST"]).read_text())
+          manifest = {
+              "schema":"uido.course.acquisition.v0.2",
+              "course_id":os.environ["COURSE_ID"],
+              "course":os.environ["COURSE_NAME"],
+              "target":source["target_course"],
+              "registry":"course-models/COURSE_REGISTRY.json",
+              "source_manifest":os.environ["SOURCE_MANIFEST"],
+              "inputs":{
+                  "osm":"osm/manifest.json",
+                  "ea_aerial":"ea-aerial/manifest.json",
+                  "ea_lidar":"ea-lidar/manifest.json"
+              },
+              "scope":"provider-neutral source acquisition only; course-specific model generation remains a separate stage"
+          }
+          (root/"acquisition-manifest.json").write_text(json.dumps(manifest,indent=2)+"\n")
+          print(json.dumps(manifest,indent=2))
+          PY
+          find "build/$COURSE_ID" -maxdepth 4 -type f | sort
+          du -sh "build/$COURSE_ID"
+
+      - name: Upload course acquisition dataset
+        uses: actions/upload-artifact@v4
+        with:
+          name: uido-course-acquisition-${{ inputs.course }}
+          path: build/${{ inputs.course }}/
+          retention-days: 14
