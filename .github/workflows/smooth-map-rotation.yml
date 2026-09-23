@@ -1,10 +1,8 @@
 name: UiDo smooth map rotation
 
+# Legacy one-shot patch. Keep available for manual recovery only.
 on:
-  push:
-    paths:
-      - '.github/workflows/smooth-map-rotation.yml'
-
+  workflow_dispatch:
 jobs:
   patch:
     runs-on: ubuntu-latest
