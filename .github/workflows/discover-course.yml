@@ -7,8 +7,13 @@ on:
         description: "Course name, club name, town or area to search"
         required: true
         type: string
+      country:
+        description: "Country to match against the detailed course record"
+        required: true
+        default: "United Kingdom"
+        type: string
       limit:
-        description: "Maximum candidates to show"
+        description: "Maximum search candidates to hydrate"
         required: true
         default: "10"
         type: string
@@ -22,14 +27,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Search courses
+      - name: Search and hydrate courses
         env:
           GOLFCOURSEAPI_API_KEY: ${{ secrets.GOLFCOURSEAPI_API_KEY }}
         run: |
           set -euo pipefail
-          python3 tools/course-discovery/search_golfcourseapi.py "${{ inputs.query }}" --limit "${{ inputs.limit }}" | tee discovery-results.json
-
+          python3 tools/course-discovery/search_golfcourseapi.py "${{ inputs.query }}" --country "${{ inputs.country }}" --limit "${{ inputs.limit }}" | tee discovery-results.json
       - name: Publish search results
         run: |
           set -euo pipefail
@@ -39,7 +42,9 @@ jobs:
           print("## GolfCourseAPI discovery")
           print()
           print(f"Query: **{data['query']}**")
+          print(f"Country filter: **{data.get('country_filter') or 'none'}**")
           print()
+          if not data["courses"]: print("**No candidates matched the requested country.**")
           for i, course in enumerate(data["courses"], 1):
               loc = course.get("location") or {}
               print(f"### {i}. {course.get('name') or 'Unnamed course'}")
@@ -47,8 +52,11 @@ jobs:
               print(f"- Club: {course.get('club_name') or '—'}")
               print(f"- Location: {loc.get('city') or '—'}, {loc.get('state') or '—'}, {loc.get('country') or '—'}")
               print(f"- Coordinates: `{loc.get('latitude')}`, `{loc.get('longitude')}`")
+              print(f"- Holes / par: {course.get('holes') or '—'} / {course.get('par') or '—'}")
               print()
+          if data.get("detail_errors"):
+              print("### Detail lookup warnings")
+              for item in data["detail_errors"]: print(f"- `{item['provider_id']}`: {item['error']}")
           PY
-
       - name: Validate registry
         run: python3 tools/course-discovery/validate_registry.py
