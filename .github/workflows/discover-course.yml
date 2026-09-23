@@ -1,0 +1,54 @@
+name: UiDo Course Discovery
+
+on:
+  workflow_dispatch:
+    inputs:
+      query:
+        description: "Course name, club name, town or area to search"
+        required: true
+        type: string
+      limit:
+        description: "Maximum candidates to show"
+        required: true
+        default: "10"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  search:
+    name: Search GolfCourseAPI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Search courses
+        env:
+          GOLFCOURSEAPI_API_KEY: ${{ secrets.GOLFCOURSEAPI_API_KEY }}
+        run: |
+          set -euo pipefail
+          python3 tools/course-discovery/search_golfcourseapi.py "${{ inputs.query }}" --limit "${{ inputs.limit }}" | tee discovery-results.json
+
+      - name: Publish search results
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          data = json.load(open("discovery-results.json"))
+          print("## GolfCourseAPI discovery")
+          print()
+          print(f"Query: **{data['query']}**")
+          print()
+          for i, course in enumerate(data["courses"], 1):
+              loc = course.get("location") or {}
+              print(f"### {i}. {course.get('name') or 'Unnamed course'}")
+              print(f"- GolfCourseAPI ID: `{course.get('provider_id')}`")
+              print(f"- Club: {course.get('club_name') or '—'}")
+              print(f"- Location: {loc.get('city') or '—'}, {loc.get('state') or '—'}, {loc.get('country') or '—'}")
+              print(f"- Coordinates: `{loc.get('latitude')}`, `{loc.get('longitude')}`")
+              print()
+          PY
+
+      - name: Validate registry
+        run: python3 tools/course-discovery/validate_registry.py
