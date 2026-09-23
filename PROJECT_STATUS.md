@@ -8,9 +8,9 @@ This is the first file a fresh UiDo session should read. It records authoritativ
 
 ## Current state
 
-**Course acquisition → packet pipeline: VALIDATED. Wireframe stage: IMPLEMENTED, NOT YET PROVEN IN THE MASTER RUN.**
+**Course acquisition → packet pipeline: VALIDATED. Packet-driven wireframe stage: VALIDATED in the master run. GolfCourseAPI discovery/registration: IMPLEMENTED, pending API-key-backed live test.**
 
-Master workflow run `35849229103` successfully completed **Stage 1 acquisition** and **Stage 2 packet QA** for Poult Wood. Its artifacts `uido-course-acquisition-poult-wood` and `uido-course-packet-poult-wood` are present and unexpired. The run's actual job list contains only acquisition and packet-QA jobs; there is **no Stage 3 wireframe job in that run**. Do not describe that run as proof of packet-driven wireframe output.
+Master workflow run `35851974870` successfully completed **Stage 1 acquisition**, **Stage 2 packet QA**, **Stage 3 packet-driven wireframe**, and **Stage 4 pipeline summary** for Poult Wood. This is the current verified end-to-end course-pipeline run.
 
 Current repository head is `9734dc0e1011d1c35b716208a66a9f82ba870d10` (`Harden wireframe fairway source handling`). That commit hardens the downstream renderer so focused fairway queries treat relations as authoritative features and member ways only as reconstruction inputs, preventing duplicate rendering/counting. It also fails closed if the packet does not contain all 18 target hole routes.
 
@@ -20,7 +20,7 @@ The repository is using a modular course pipeline:
 - `course-models/COURSE_PIPELINE.md` — architecture contract.
 - `PROJECT_STATUS.md` — human handover/source of truth.
 
-**Current active job: run the current master pipeline for Poult Wood and prove Stage 3 wireframe consumes the canonical Course Packet.**
+**Current active job: add the GolfCourseAPI key to GitHub Actions and run the new Course Discovery workflow against a real course.**
 
 Acquisition and downstream processing remain separate. Once acquired and QA'd, the Course Packet is the persisted hand-off/memory layer. Downstream stages must not silently re-query or recapture OSM/EA data. The architecture contract explicitly requires downstream stages to consume the packet rather than recapturing source data. fileciteturn3file0
 
@@ -120,9 +120,9 @@ The master pipeline's Poult Wood run `35849229103` proved the **acquisition → 
 
 **This section is the persistent working queue. A new chat should start here rather than reconstructing the plan from conversation history.**
 
-### 1. NEXT — Validate packet-driven wireframe stage
+### 1. Packet-driven wireframe stage
 
-**Status: IMPLEMENTED — READY TO RUN**
+**Status: VALIDATED — GREEN**
 
 The wireframe workflow and renderer have now been refactored so the downstream stage consumes `uido-course-packet-<course-id>` rather than independently querying Overpass.
 
@@ -131,6 +131,8 @@ Recent hardening on `main`:
 - member ways are reconstruction inputs only;
 - duplicate rendering/counting of relation + member geometry is prevented;
 - the stage fails closed if the packet lacks any of the 18 target hole routes.
+
+Verified in master run `35851974870`.
 
 Requirements:
 - Keep the current Poult Wood wireframe/fairway association logic.
@@ -143,9 +145,18 @@ Requirements:
 
 ### 2. Add GolfCourseAPI discovery/import layer
 
-**Status: PLANNED**
+**Status: IMPLEMENTED — PENDING LIVE API TEST**
 
 Use GolfCourseAPI as the discovery/index front door, not as physical geometry authority.
+
+Implemented:
+- `tools/course-discovery/search_golfcourseapi.py`
+- `tools/course-discovery/register_course.py`
+- `tools/course-discovery/validate_registry.py`
+- `.github/workflows/discover-course.yml`
+- `.github/workflows/register-course.yml`
+
+The workflows use the `GOLFCOURSEAPI_API_KEY` GitHub Actions secret and never store the API key in source control.
 
 Build:
 - course discovery/import;
@@ -156,7 +167,7 @@ Build:
 
 ### 3. Northampton Golf Club — first genuinely new end-to-end course
 
-**Status: PLANNED AFTER #2**
+**Status: PLANNED AFTER #2 LIVE VALIDATION**
 
 Use Northampton Golf Club as the first fresh course that has not been manually built into the pipeline.
 
