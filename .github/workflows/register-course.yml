@@ -29,19 +29,26 @@ jobs:
           set -euo pipefail
           python3 tools/course-discovery/register_course.py "${{ inputs.provider_id }}" | tee registration-result.json
 
+      - name: Build canonical scorecard packet
+        run: |
+          set -euo pipefail
+          python3 tools/course-discovery/build_scorecard_packet.py \
+            "course-models/provider-data/golfcourseapi/${{ inputs.provider_id }}.json" \
+            "course-models/scorecards/${{ inputs.provider_id }}.json"
+
       - name: Validate registry
         run: python3 tools/course-discovery/validate_registry.py
 
       - name: Commit registry update
         run: |
           set -euo pipefail
-          if git diff --quiet -- course-models/COURSE_REGISTRY.json course-models/provider-data/golfcourseapi; then
+          if git diff --quiet -- course-models/COURSE_REGISTRY.json course-models/provider-data/golfcourseapi course-models/scorecards; then
             echo "No registry change required."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add course-models/COURSE_REGISTRY.json course-models/provider-data/golfcourseapi
+          git add course-models/COURSE_REGISTRY.json course-models/provider-data/golfcourseapi course-models/scorecards
           git commit -m "Register GolfCourseAPI course ${{ inputs.provider_id }}"
           git push
 
