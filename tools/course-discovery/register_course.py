@@ -35,8 +35,15 @@ def main()->int:
     location=detail.get("location") or {}
     name=detail.get("course_name") or detail.get("name") or detail.get("club_name")
     if not name: raise SystemExit("GolfCourseAPI course detail contains no course name")
-    actual_country=str(location.get("country") or "").strip()
-    if args.expected_country and actual_country.casefold()!=args.expected_country.strip().casefold():
+    actual_country=str(location.get("country") or detail.get("country") or location.get("country_code") or detail.get("country_code") or "").strip()
+    if args.expected_country:
+        aliases = {
+            "united kingdom": {"united kingdom", "uk", "great britain", "gb", "gbr", "england", "scotland", "wales", "northern ireland"},
+            "usa": {"usa", "us", "united states", "united states of america"},
+        }
+        expected = args.expected_country.strip().casefold()
+        accepted = aliases.get(expected, {expected})
+        if actual_country.casefold() not in accepted:
         raise SystemExit(f"Course {args.provider_id} is in {actual_country or 'an unknown country'}, not the expected country {args.expected_country}")
     provider_id=str(detail.get("id",args.provider_id))
     course_id=slugify(name)
