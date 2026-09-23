@@ -188,13 +188,14 @@ def fairway_sources(all_elements, fairway_elements, target_holes):
 
     sources = []
 
+    # The focused fairway query returns relations plus their member ways.
+    # Relations are the authoritative fairway features; member ways are only
+    # inputs used to reconstruct those relations. Do not render both, or the
+    # same source geometry is counted/rendered twice.
     for element in fairway_elements:
-        if element.get("type") == "way" and points(element):
-            geoms = [LineString(points(element))]
-        elif element.get("type") == "relation":
-            geoms = relation_polygons(element, way_index)
-        else:
+        if element.get("type") != "relation":
             continue
+        geoms = relation_polygons(element, way_index)
 
         if not geoms:
             continue
@@ -302,6 +303,9 @@ def main():
     boundary = (west, south, east, north)
 
     target_holes, excluded_holes = select_target_holes(all_elements)
+    if set(target_holes) != set(range(1, 19)):
+        missing = sorted(set(range(1, 19)) - set(target_holes))
+        raise SystemExit(f"Source packet is missing target hole routes: {missing}")
 
     greens = [e for e in all_elements if e.get("tags", {}).get("golf") == "green"]
     tees = [e for e in all_elements if e.get("tags", {}).get("golf") == "tee"]
