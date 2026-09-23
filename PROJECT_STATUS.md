@@ -113,6 +113,18 @@ The committed `assets/Lo_Flag_Icon.svg` remains an asset addition only and does 
 7. Locate/reconcile Library v0.4 before any model-version promotion.
 8. Align beta metadata once an approved second-course package exists.
 
+### Unified course pipeline — added 2026-09-23
+
+The separate capture pots are now being joined through a modular master pipeline.
+
+- `.github/workflows/build-course-ea.yml` is now both manually runnable and reusable via `workflow_call`.
+- `.github/workflows/build-course.yml` is the master orchestration workflow.
+- The master calls acquisition, downloads the resulting acquisition artifact, validates the standard packet contract, and republishes the validated packet as `uido-course-packet-<course-id>`.
+- `course-models/COURSE_PIPELINE.md` is the architecture contract: course packet is the hand-off between acquisition and every downstream processing stage.
+- Downstream processing must not silently recapture OSM/EA data.
+
+This is deliberately an incremental foundation. The existing Poult Wood wireframe QA still recaptures OSM independently and has **not** yet been joined to the packet. The next downstream build is to make the wireframe stage consume the canonical packet.
+
 ### Agnostic course acquisition layer — added 2026-09-23
 
 A provider-neutral course registry and manual acquisition workflow are now present:
@@ -126,7 +138,7 @@ The intended progression is now: **one agnostic acquisition layer → test Overs
 
 ## EXACT NEXT STEP
 
-**Run the new agnostic acquisition workflow first for Overstone, then for Poult Wood, and compare the resulting acquisition manifests/artifacts. Once both pass the common acquisition contract, use the same course registry to drive the player-facing course selector and course-loader test. Separately, repair only the Overpass 406 so the post-fix Overstone model can be built and compared. Continue F/M/B analysis as a validation task, not as permission to rewrite source geometry.**
+**Run the new master course pipeline for Poult Wood and verify that acquisition → packet QA passes. Then refactor the wireframe stage into a reusable packet consumer. After that, add the GolfCourseAPI discovery/import stage and use Northampton Golf Club as the first genuinely new end-to-end course test. Separately, repair only the Overpass 406 so the post-fix Overstone model can be built and compared. Continue F/M/B analysis as a validation task, not as permission to rewrite source geometry.**
 
 ## DO NOT REBUILD
 
