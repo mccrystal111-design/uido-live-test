@@ -113,9 +113,20 @@ The committed `assets/Lo_Flag_Icon.svg` remains an asset addition only and does 
 7. Locate/reconcile Library v0.4 before any model-version promotion.
 8. Align beta metadata once an approved second-course package exists.
 
+### Agnostic course acquisition layer — added 2026-09-23
+
+A provider-neutral course registry and manual acquisition workflow are now present:
+- course-models/COURSE_REGISTRY.json defines Overstone Park and Poult Wood using the same course schema, including boundary, source manifest and EA acquisition preferences.
+- .github/workflows/build-course-ea.yml is manual-only and presents a **Course** dropdown with `overstone-park` and `poult-wood`.
+- The workflow acquires OSM golf/fairway source, EA aerial and EA National LiDAR from the selected course footprint and writes a course-specific acquisition manifest/artifact.
+- This layer deliberately stops before course-specific model generation. The existing Overstone proof workflow and Poult-specific QA workflow remain intact while the common acquisition contract is tested.
+- Poult Wood remains subject to the existing rule: no invented F/M/B points and no promotion of wireframe QA to authoritative course geometry.
+
+The intended progression is now: **one agnostic acquisition layer → test Overstone → test Poult Wood → feed both through the same course-loader contract → then expose the same course registry to the player-facing course selector.**
+
 ## EXACT NEXT STEP
 
-**Inspect the existing successful Overstone course-package and review artifacts, define the package → UiDo course-loader contract, and use the deterministic package fixture for the first loader test. Separately, repair only the Overpass 406 so the post-fix Overstone model can be built and compared. Continue F/M/B analysis as a validation task, not as permission to rewrite source geometry.**
+**Run the new agnostic acquisition workflow first for Overstone, then for Poult Wood, and compare the resulting acquisition manifests/artifacts. Once both pass the common acquisition contract, use the same course registry to drive the player-facing course selector and course-loader test. Separately, repair only the Overpass 406 so the post-fix Overstone model can be built and compared. Continue F/M/B analysis as a validation task, not as permission to rewrite source geometry.**
 
 ## DO NOT REBUILD
 
