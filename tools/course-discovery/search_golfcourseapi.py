@@ -43,8 +43,16 @@ def main() -> int:
         try: hydrated.append(hydrate(str(course["id"])))
         except SystemExit as exc: detail_errors.append({"provider_id": str(course["id"]), "error": str(exc)})
     if args.country:
-        expected = args.country.casefold()
-        hydrated = [c for c in hydrated if str((c.get("location") or {}).get("country") or "").casefold() == expected]
+        aliases = {
+            "united kingdom": {"united kingdom", "uk", "great britain", "gb", "gbr"},
+            "usa": {"usa", "us", "united states", "united states of america"},
+        }
+        expected = args.country.strip().casefold()
+        accepted = aliases.get(expected, {expected})
+        hydrated = [
+            c for c in hydrated
+            if str((c.get("location") or {}).get("country") or "").strip().casefold() in accepted
+        ]
     print(json.dumps({"query": args.query, "country_filter": args.country, "count": len(hydrated), "courses": hydrated, "detail_errors": detail_errors}, indent=2))
     return 0
 if __name__ == "__main__": sys.exit(main())
