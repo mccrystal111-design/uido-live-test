@@ -136,25 +136,59 @@ jobs:
               results = json.load(r).get("results", [])
           preferred_year = os.environ["AERIAL_YEAR"]
           preferred_res = float(os.environ["AERIAL_RES"])
+          # The EA catalogue has changed metadata shape over time. Keep the
+          # exact known product when present, but tolerate renamed aerial-product ids
+          # as long as the catalogue identifies them as aerial photography.
+          def scalar(value):
+              if isinstance(value, dict):
+                  return value.get("id") or value.get("value") or value.get("name")
+              return value
+
+          print(f"EA aerial catalogue returned {len(results)} records")
           candidates = []
+          product_ids = set()
           for r in results:
               p, t = r.get("product", {}), r.get("tile", {})
-              pid = str(p.get("id", ""))
-              year, res = p.get("year", r.get("year")), p.get("resolution", r.get("resolution"))
-              if isinstance(year, dict): year = year.get("id")
-              if isinstance(res, dict): res = res.get("id")
-              try: res = float(res)
-              except (TypeError, ValueError): continue
-              tile = str(t.get("id", ""))
-              if pid == "vertical_aerial_photography_tiles_night_time" and tile:
-                  candidates.append({"year":str(year), "resolution_m":res, "tile":tile})
-          preferred = [x for x in candidates if x["year"] == preferred_year and abs(x["resolution_m"] - preferred_res) < 1e-9]
+              pid = str(scalar(p.get("id")) or "")
+              product_ids.add(pid)
+              year = scalar(p.get("year", r.get("year")))
+              res = scalar(p.get("resolution", r.get("resolution")))
+              tile = scalar(t.get("id", t))
+              try:
+                  res = float(res)
+              except (TypeError, ValueError):
+                  continue
+              if not tile:
+                  continue
+              low = pid.lower()
+              if pid == "vertical_aerial_photography_tiles_night_time" or ("aerial" in low and "photograph" in low):
+                  candidates.append({"product":pid, "year":str(year), "resolution_m":res, "tile":str(tile)})
+
+          print("EA aerial product ids:")
+          for pid in sorted(product_ids):
+              print(f"  {pid}")
+
+          preferred = [
+              x for x in candidates
+              if x["year"] == preferred_year
+              and abs(x["resolution_m"] - preferred_res) < 1e-9
+          ]
           if not preferred:
               if not candidates:
-                  raise SystemExit("No EA aerial coverage found")
+                  raise SystemExit(
+                      "No EA aerial coverage found. Catalogue product ids did not identify "
+                      "an aerial-photography product for this footprint."
+                  )
               best_res = min(x["resolution_m"] for x in candidates)
-              best_year = max(x["year"] for x in candidates if abs(x["resolution_m"] - best_res) < 1e-9)
-              preferred = [x for x in candidates if x["year"] == best_year and abs(x["resolution_m"] - best_res) < 1e-9]
+              best_year = max(
+                  x["year"] for x in candidates
+                  if abs(x["resolution_m"] - best_res) < 1e-9
+              )
+              preferred = [
+                  x for x in candidates
+                  if x["year"] == best_year
+                  and abs(x["resolution_m"] - best_res) < 1e-9
+              ]
           unique = []
           seen = set()
           for x in preferred:
@@ -162,15 +196,21 @@ jobs:
               if key not in seen:
                   seen.add(key); unique.append(x)
           root = pathlib.Path("build") / os.environ["COURSE_ID"] / "ea-aerial"
-          base = "https://environment.data.gov.uk/tiles/collections/survey/vertical_aerial_photography_tiles_night_time"
+          base = "https://environment.data.gov.uk/tiles/collections/survey"
           captured = []
           for x in unique:
+              product = x.get("product") or "vertical_aerial_photography_tiles_night_time"
               res = str(x["resolution_m"]).rstrip("0").rstrip(".")
-              url = f"{base}/{x['year']}/{res}/{x['tile']}?subscription-key=dspui"
+              url = f"{base}/{product}/{x['year']}/{res}/{x['tile']}?subscription-key=dspui"
               target = root / "packages" / f"{x['tile']}.zip"
               for attempt in range(1,5):
                   try:
-                      req = urllib.request.Request(url, headers={"Accept":"application/zip,*/*","User-Agent":"UiDo-course-builder/1.0"})
+                      req = urllib.request.Request(url, headers={
+                          "Accept":"application/zip,*/*",
+                          "Origin":"https://environment.data.gov.uk",
+                          "Referer":"https://environment.data.gov.uk/survey",
+                          "User-Agent":"UiDo-course-builder/1.0"
+                      })
                       with urllib.request.urlopen(req, timeout=600) as rr: data = rr.read()
                       if len(data) < 1000: raise RuntimeError(f"response too small: {len(data)}")
                       with zipfile.ZipFile(io.BytesIO(data)) as z:
