@@ -68,7 +68,9 @@ def main()->int:
             print(json.dumps({"status":"already-registered","course_id":existing_id},indent=2)); return 0
     if course_id in courses: course_id=f"{course_id}-{hashlib.sha1(provider_id.encode()).hexdigest()[:8]}"
     record={"identity":{"uido_id":stable_uido_id(provider_id),"provider":"golfcourseapi","provider_id":provider_id},
-            "name":name,"club_name":provider_record.get("club_name"),"holes":provider_record.get("holes"),"par":provider_record.get("par"),
+            "name":name,"club_name":provider_record.get("club_name"),"holes": next((tee.get("number_of_holes") for category in ("male","female") for tee in (provider_record.get("tees") or {}).get(category, []) if tee.get("number_of_holes")), provider_record.get("holes")),
+            "par":provider_record.get("par"),
+            "scorecard_packet":f"course-models/scorecards/{provider_id}.json",
             "location":{k:location.get(k) for k in ("latitude","longitude","city","state","country")},
             "lifecycle":{"status":"registered"}}
     courses[course_id]=record
