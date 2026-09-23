@@ -7,6 +7,11 @@ on:
         description: "GolfCourseAPI course ID from the discovery workflow"
         required: true
         type: string
+      refresh_provider:
+        description: "Force a fresh GolfCourseAPI detail pull (uses another API call)"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -27,7 +32,11 @@ jobs:
           GOLFCOURSEAPI_API_KEY: ${{ secrets.GOLFCOURSEAPI_API_KEY }}
         run: |
           set -euo pipefail
-          python3 tools/course-discovery/register_course.py "${{ inputs.provider_id }}" | tee registration-result.json
+          refresh_args=()
+          if [[ "${{ inputs.refresh_provider }}" == "true" ]]; then
+            refresh_args+=(--refresh)
+          fi
+          python3 tools/course-discovery/register_course.py "${{ inputs.provider_id }}" "${refresh_args[@]}" | tee registration-result.json
 
       - name: Build canonical scorecard packet
         run: |
