@@ -18,10 +18,20 @@ def request_json(path: str, params: dict[str, Any] | None = None) -> Any:
 
 def normalise(course: dict[str, Any]) -> dict[str, Any]:
     location = course.get("location") or {}
+    # GolfCourseAPI has used both nested and top-level location fields across
+    # responses. Keep the provider adapter tolerant, while preserving one
+    # canonical UiDo shape downstream.
+    def loc_value(key: str):
+        return location.get(key) if location.get(key) is not None else course.get(key)
+
+    country = loc_value("country")
+    if country is None:
+        country = location.get("country_code") or course.get("country_code")
     return {"provider_id": str(course.get("id")) if course.get("id") is not None else None,
             "name": course.get("course_name") or course.get("name") or course.get("club_name"),
             "club_name": course.get("club_name"),
-            "location": {k: location.get(k) for k in ("latitude","longitude","city","state","country")},
+            "location": {k: loc_value(k) for k in ("latitude","longitude","city","state")},
+            "location_country": country,
             "holes": course.get("holes"), "par": course.get("par")}
 
 def hydrate(provider_id: str) -> dict[str, Any]:
@@ -44,14 +54,14 @@ def main() -> int:
         except SystemExit as exc: detail_errors.append({"provider_id": str(course["id"]), "error": str(exc)})
     if args.country:
         aliases = {
-            "united kingdom": {"united kingdom", "uk", "great britain", "gb", "gbr"},
+            "united kingdom": {"united kingdom", "uk", "great britain", "gb", "gbr", "england", "scotland", "wales", "northern ireland"},
             "usa": {"usa", "us", "united states", "united states of america"},
         }
         expected = args.country.strip().casefold()
         accepted = aliases.get(expected, {expected})
         hydrated = [
             c for c in hydrated
-            if str((c.get("location") or {}).get("country") or "").strip().casefold() in accepted
+            if str(c.get("location_country") or "").strip().casefold() in accepted
         ]
     print(json.dumps({"query": args.query, "country_filter": args.country, "count": len(hydrated), "courses": hydrated, "detail_errors": detail_errors}, indent=2))
     return 0
