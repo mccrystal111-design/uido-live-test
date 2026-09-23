@@ -60,6 +60,7 @@ def main() -> int:
         if course.get("id") is None: continue
         try: hydrated.append(hydrate(str(course["id"])))
         except SystemExit as exc: detail_errors.append({"provider_id": str(course["id"]), "error": str(exc)})
+    candidates = hydrated
     if args.country:
         aliases = {
             "united kingdom": {"united kingdom", "uk", "great britain", "gb", "gbr", "england", "scotland", "wales", "northern ireland"},
@@ -68,9 +69,24 @@ def main() -> int:
         expected = args.country.strip().casefold()
         accepted = aliases.get(expected, {expected})
         hydrated = [
-            c for c in hydrated
+            c for c in candidates
             if str(c.get("location_country") or "").strip().casefold() in accepted
         ]
-    print(json.dumps({"query": args.query, "country_filter": args.country, "count": len(hydrated), "courses": hydrated, "detail_errors": detail_errors}, indent=2))
+    print(json.dumps({
+        "query": args.query,
+        "country_filter": args.country,
+        "count": len(hydrated),
+        "courses": hydrated,
+        "candidate_diagnostics": [
+            {
+                "provider_id": c.get("provider_id"),
+                "name": c.get("name"),
+                "location_country": c.get("location_country"),
+                "diagnostics": c.get("_diagnostics"),
+            }
+            for c in candidates
+        ],
+        "detail_errors": detail_errors,
+    }, indent=2))
     return 0
 if __name__ == "__main__": sys.exit(main())
