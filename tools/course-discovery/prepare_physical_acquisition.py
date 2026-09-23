@@ -20,7 +20,9 @@ ENDPOINTS = [
 ]
 
 def clean(value: str) -> str:
-    return re.sub(r"[^a-z0-9]+", " ", value.casefold()).strip()
+    parts = re.sub(r"[^a-z0-9]+", " ", value.casefold()).split()
+    stop_words = {"golf", "course", "club"}
+    return " ".join(part for part in parts if part not in stop_words)
 
 def similarity(target: str, candidate: str) -> float:
     a, b = set(clean(target).split()), set(clean(candidate).split())
