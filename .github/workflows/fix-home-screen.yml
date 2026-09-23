@@ -1,9 +1,7 @@
 name: Fix UiDo Home Screen
+# Legacy one-shot patch. Keep available for manual recovery only.
 on:
-  push:
-    branches: [main]
-permissions:
-  contents: write
+  workflow_dispatch:
 jobs:
   fix:
     if: ${{ false }}
