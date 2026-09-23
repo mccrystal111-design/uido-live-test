@@ -41,9 +41,17 @@ jobs:
           osm = json.loads((root / "osm" / "manifest.json").read_text())
           if set(osm.get("target_hole_refs", [])) != {str(i) for i in range(1, 19)}:
               raise SystemExit("Packet target hole refs are not exactly 1..18")
-          if osm.get("fairway_relation_elements", 0) <= 0:
-              raise SystemExit("Packet contains no fairway relation data")
-          print("WIREframe PACKET HAND-OFF: PASS")
+          relation_count = osm.get("fairway_relation_elements", 0)
+          golf = json.loads((root / "osm" / "golf.json").read_text())
+          standalone_fairways = sum(
+              1
+              for element in golf.get("elements", [])
+              if element.get("type") == "way"
+              and element.get("tags", {}).get("golf") == "fairway"
+          )
+          if relation_count <= 0 and standalone_fairways <= 0:
+              raise SystemExit("Packet contains no fairway source data")
+          print(f"WIREframe PACKET HAND-OFF: PASS (relations={relation_count}, standalone_fairway_ways={standalone_fairways})")
           PY
 
       - name: Install render dependency
@@ -55,7 +63,7 @@ jobs:
         run: |
           set -euo pipefail
           ROOT="build/$COURSE_ID"
-          python3 tools/course-model/render_poult_wood_wireframe.py \
+          python3 tools/course-model/render_course_wireframe.py \
             --all "$ROOT/osm/golf.json" \
             --fairways "$ROOT/osm/fairway-relations.json" \
             --manifest "$ROOT/acquisition-manifest.json" \
