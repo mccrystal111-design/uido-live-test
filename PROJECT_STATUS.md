@@ -4,258 +4,142 @@
 **Repository:** `mccrystal111-design/uido-live-test`  
 **Canonical project:** UiDo golf decision engine / virtual caddie / SmartShot intelligence.
 
-This is the first file a fresh UiDo session should read. It records authoritative data, completed work, current blockers, exact next step, and what must not be rebuilt.
+This is the first file a fresh UiDo session should read. It records authoritative data, verified work, current blockers, exact next step, and what must not be rebuilt.
 
-## Current state
+## CURRENT STATE
 
-**Course acquisition → packet pipeline: VALIDATED. Packet-driven wireframe stage: VALIDATED in the master run. GolfCourseAPI discovery/registration: IMPLEMENTED, pending API-key-backed live test.**
+**Poult Wood course acquisition → Course Packet → packet-driven wireframe: VALIDATED.**
+**GolfCourseAPI discovery/registration: IMPLEMENTED; Northampton registry metadata is complete and identity validation is GREEN.**
+**Northampton physical acquisition: BLOCKED by incomplete OSM hole coverage.**
 
-Master workflow run `35851974870` successfully completed **Stage 1 acquisition**, **Stage 2 packet QA**, **Stage 3 packet-driven wireframe**, and **Stage 4 pipeline summary** for Poult Wood. This is the current verified end-to-end course-pipeline run.
+Current `main` head: `60836d469270b30506cad8bfc98cefa15d3914dd` (`Allow standalone fairways in packet QA`).
 
-Current repository head is `9734dc0e1011d1c35b716208a66a9f82ba870d10` (`Harden wireframe fairway source handling`). That commit hardens the downstream renderer so focused fairway queries treat relations as authoritative features and member ways only as reconstruction inputs, preventing duplicate rendering/counting. It also fails closed if the packet does not contain all 18 target hole routes.
+The latest master run is `35895454637` (2026-09-23). It was a **Northampton** test. Physical source preparation generated and identity-validated the Northampton boundary, but the OSM query ultimately returned hole refs **1–3 and 5–18; hole 4 was absent**, so acquisition failed closed. Stages 2–4 were correctly skipped. This is now the active blocker; it is not evidence that the course is missing or that source data should be recreated.
 
-The repository is using a modular course pipeline:
-- `.github/workflows/build-course-ea.yml` — reusable/manual acquisition.
-- `.github/workflows/build-course.yml` — master orchestration.
-- `course-models/COURSE_PIPELINE.md` — architecture contract.
-- `PROJECT_STATUS.md` — human handover/source of truth.
+The run also exercised the new resilient Overpass endpoint list. The first endpoint returned 504/timeouts, after which the query progressed far enough to produce OSM data but failed the required 18-hole identity check. Do not treat this as a generic Overpass outage without checking the returned course data.
 
-**Current active job: validate the canonical GolfCourseAPI registration/scorecard packet, then move Northampton into the physical acquisition pipeline.**
+## VERIFIED RECENT WORK
 
-Acquisition and downstream processing remain separate. Once acquired and QA'd, the Course Packet is the persisted hand-off/memory layer. Downstream stages must not silently re-query or recapture OSM/EA data. The architecture contract explicitly requires downstream stages to consume the packet rather than recapturing source data. fileciteturn3file0
+- `ed0dc127…` added resilient Overpass endpoint fallback.
+- `60836d469…` relaxed packet QA so a course may use standalone fairway ways when no fairway relations exist; it still requires fairway source data.
+- Poult Wood master run `35851974870` remains the verified end-to-end reference: Stage 1 acquisition, Stage 2 packet QA, Stage 3 packet-driven wireframe, Stage 4 summary all succeeded.
+- The wireframe renderer treats fairway relations as authoritative features and member ways as reconstruction inputs only, preventing duplicate rendering/counting and failing closed if all 18 target hole routes are not present.
+- GolfCourseAPI discovery/import and registry workflows are implemented. Northampton metadata now contains a valid provider identity and an OSM identity match; the remaining Northampton proof is physical acquisition → packet → wireframe.
 
-## Recent course-model findings
+## AUTHORITATIVE OVERSTONE SOURCE
 
-### F/M/B derivation — corrected and still under investigation
+Raw OSM and normalised source are still authoritative and present in the UiDo Library; they must not be recreated or replaced.
 
-`course-models/FMB_DERIVATION.md` is corrected to the proper historical association: the recovered historical F/M/B test belongs to **Overstone hole 2**, not hole 1. The OSM green/route relationship and Front/Back source vertices are proven, but the exact historical point-selection algorithm is **not** proven.
+- Raw OSM: `/UiDo/Overstone/source/overstone-park-osm-capture-v0.2.geojson`
+  - Library file id: `file_00000000e32481f4a00f707344416e79`
+  - SHA-256: `e1eebf606f5e2767cfdf2af3951f7e2f50660b5b6b75ff2567af5c755a01b16e`
+- Normalised: `/UiDo/Overstone/source/overstone-source-normalized-v0.1.json`
+  - Library file id: `file_0000000052948210969af327286d4488`
+  - SHA-256: `876eb808a978f577057747f71cca759d4032ed5cc776c3bf036eb126ce6b28e9`
+  - Schema: `uido.course.source-normalized.v0.1`
 
-Required validation: analyse all 18 Overstone greens to identify the common F/B/M construction rule before testing Poult Wood. Do not promote a universal F/M/B derivation yet.
-
-### Hole orientation / OpenYardage sense check
-
-`course-models/HOLE_ORIENTATION_SENSE_CHECK.md` defines the intended local frame: Y = forward along play, X = left/right, while preserving underlying geospatial geometry. OpenYardage is an independent golf-useful sense check only; discrepancies become QA warnings, not automatic geometry edits.
-
-### Poult Wood — source identity confirmed; QA work active
-
-`course-models/POULT_WOOD_SOURCE_MANIFEST.json` records the 18-hole Poult Wood target and retains the raw OSM source without invented geometry.
-
-The existing Poult Wood fairway association logic is important and must be preserved when the wireframe workflow is refactored. It reconstructs OSM fairway multipolygon relations from their members and associates them to the target 18 holes without inventing, smoothing or moving geometry.
-
-## Authoritative Overstone source
-
-### Raw OSM — authoritative
-
-Do not ask the user to re-upload the OSM capture.
-
-- Library: `/UiDo/Overstone/source/overstone-park-osm-capture-v0.2.geojson`
-- Library file id: `file_00000000e32481f4a00f707344416e79`
-- SHA-256: `e1eebf606f5e2767cfdf2af3951f7e2f50660b5b6b75ff2567af5c755a01b16e`
-- GitHub identity lock: `course-models/OVERSTONE_OSM_SOURCE_LOCK.json`
-- GitHub manifest: `course-models/OVERSTONE_SOURCE_MANIFEST.json`
-
-### Normalised source — authoritative derived artifact
-
-- Library: `/UiDo/Overstone/source/overstone-source-normalized-v0.1.json`
-- Library file id: `file_0000000052948210969af327286d4488`
-- Schema: `uido.course.source-normalized.v0.1`
-- SHA-256: `876eb808a978f577057747f71cca759d4032ed5cc776c3bf036eb126ce6b28e9`
-- Status: **complete**; source geometry unchanged.
-
-Library retrieval reconfirms both authoritative Overstone files are present. fileciteturn7file0 fileciteturn7file1
+Library retrieval still confirms the normalised source retains 18 hole features and preserves source geometry exactly. fileciteturn9file0
 
 ### Library v0.4 discrepancy
 
-A previously recorded `/UiDo/UiDo_Overstone_Course_Model_v0.4.json` is still not surfaced by the current Library search. Treat v0.4 as **unlocated/not verified**, not deleted. Do not recreate it or silently promote it over the GitHub v0.1 model.
+Previously recorded `/UiDo/UiDo_Overstone_Course_Model_v0.4.json` remains **unlocated/not verified**. Do not recreate it or assume deletion. Do not promote it over the verified GitHub model without locating and comparing the actual artifact.
 
-## Overstone model-generation / acquisition issue
+## OVERSTONE BUILDER STATUS
 
-The latest known Overstone builder regression remains run `35627704315` on commit `9ca6c0974a3928eba3d9b7aadf4d97254ef673ea`: EA aerial, LiDAR, compact aerial rendering and terrain complete; the run fails only at **Acquire Overstone OSM golf source** with Overpass HTTP 406.
+The earlier Overstone acquisition regression remains a separate, contained issue: run `35627704315` failed at Overpass HTTP 406 after EA aerial, LiDAR, compact aerial and terrain completed. The successful combined run `35608919741` remains the known-good fixture for those acquisition/downstream stages.
 
-The model-generation fix is present but not proven in a successful post-fix package build because acquisition is blocked before model generation.
+The newer model-generation fix is still not proven in a successful post-fix Overstone package build. Repair the acquisition issue only when returning to that track.
 
-Do not replace the authoritative OSM source because of this acquisition regression. Repair only the failing acquisition step, then prove the post-fix model build.
+## COURSE PIPELINE CONTRACT
 
-## Successful combined Overstone build
+The architecture is modular:
 
-Workflow run `35608919741` / commit `2c4697c77fbceeec2d8789245570668f1a513f7e` completed:
-1. EA aerial acquisition;
-2. EA LiDAR acquisition;
-3. compact aerial render;
-4. terrain layer;
-5. UiDo offline course package;
-6. human-review bundle;
-7. artifact uploads.
+- `.github/workflows/build-course-ea.yml` — reusable/manual physical acquisition.
+- `.github/workflows/build-course.yml` — master orchestration.
+- `course-models/COURSE_PIPELINE.md` — Course Packet hand-off contract.
+- `PROJECT_STATUS.md` — source of truth.
 
-The existence of the old package does not prove the newer model-generation fix is incorporated.
+Once acquired and QA'd, the **Course Packet is the persisted hand-off layer**. Downstream stages must consume the packet and must not silently re-query or recapture OSM/EA data.
 
-## Issue #2 / build sequence
+Poult Wood run `35851974870` is the proof that this packet-driven wireframe path works end-to-end. The Library wireframe artifact also exists as QA output; it is not source geometry. fileciteturn9file4
 
-GitHub Issue #2 remains the active vertical-slice build contract: Overstone course loader → player position → shot situation model → SmartPoint → SmartShot → Caddie → shot lifecycle → playable hole → 18-hole round → live course testing.
+## COURSE-MODEL FINDINGS
 
-Engineering rules: deterministic fixtures before live sensors; test each component before integration; do not change two layers simultaneously while debugging; keep Parking Lot features out of this phase.
+### F/M/B
 
-## Registration / refinement
+`course-models/FMB_DERIVATION.md` is correctly associated with historical **Overstone hole 2**. The OSM green/route relationship and source F/B vertices are proven; the exact historical point-selection algorithm is not. Analyse all 18 Overstone greens before promoting a universal F/M/B rule.
 
-Measured OSM-to-raster registration remains a separate stage. `course-models/OVERSTONE_REGISTRATION_CONTROL_POINTS.json` is the control-point template. Do not invent/reuse a transform or use validation GPS as candidate-generation geometry.
+### Hole orientation
 
-## UI / product state
+`course-models/HOLE_ORIENTATION_SENSE_CHECK.md`: Y = direction of play, X = left/right. OpenYardage is an independent sense check only; discrepancies are QA warnings, not automatic geometry edits.
 
-The Library remains the UI source of truth: premium golf instrument aesthetic, light/dark system, persistent navigation icon language and the GPS/Yardage/Wind/Lie/Start Line/Shape/Strike live shot flow. Strategy remains out of the live flow until SmartShot is ready. The current Library design direction explicitly keeps the live sequence as GPS/Yardage → Wind → Lie → Start Line → Shape → Strike, with a premium golf-instrument aesthetic rather than a generic software dashboard. fileciteturn6file4
+### Poult Wood
 
-## Unified course pipeline
+`course-models/POULT_WOOD_SOURCE_MANIFEST.json` remains the source identity record. Preserve existing fairway multipolygon reconstruction and hole association logic. Do not invent, smooth, move or replace source geometry.
 
-The separate capture pots are now joined through a modular master pipeline.
+## NORTHAMPTON — ACTIVE NEW-COURSE TEST
 
-- `.github/workflows/build-course-ea.yml` is manually runnable and reusable via `workflow_call`.
-- `.github/workflows/build-course.yml` is the master orchestration workflow.
-- The master calls acquisition, downloads the resulting acquisition artifact, validates the standard packet contract, and republishes the validated packet as `uido-course-packet-<course-id>`.
-- `course-models/COURSE_PIPELINE.md` is the architecture contract: the Course Packet is the hand-off between acquisition and every downstream processing stage.
-- Downstream processing must not silently recapture OSM/EA data.
-- Acquisition and processing can therefore be iterated independently without losing the captured source state.
+Registry identity is GREEN: provider `golfcourseapi`, provider id `51sjdksg`, OSM candidate `way/472178757`, similarity `1.0`, ~176.5 m from provider coordinates. The physical-source manifest was generated successfully.
 
-The master pipeline's Poult Wood run `35849229103` proved the **acquisition → packet QA foundation**, not Stage 3. The current wireframe refactor is present on `main` but requires a fresh master run to prove packet-driven execution.
+The current failure is precise: the OSM `golf=hole` query returned **17 target refs and omitted hole 4**. The acquisition workflow correctly stopped before EA/LiDAR and before packet publication. This must be resolved by inspecting why hole 4 is absent from the physical OSM query/boundary/identity selection; do not invent hole 4 geometry.
 
-## JOBS TO DO — fresh-chat handover
+## UI / PRODUCT STATE
 
-**This section is the persistent working queue. A new chat should start here rather than reconstructing the plan from conversation history.**
+Library UI source of truth remains the premium golf-instrument direction, with light/dark system, persistent navigation icon language and the live flow GPS/Yardage → Wind → Lie → Start Line → Shape → Strike. The UI blueprint explicitly calls for shared theme tokens, one icon family, reusable tile shell, then tile migration and radial navigation. fileciteturn10file2 fileciteturn10file4
 
-### 1. Packet-driven wireframe stage
+Strategy remains outside the live capture flow until SmartShot is ready.
 
-**Status: VALIDATED — GREEN**
+## JOBS TO DO — FRESH-CHAT HANDOVER
 
-The wireframe workflow and renderer have now been refactored so the downstream stage consumes `uido-course-packet-<course-id>` rather than independently querying Overpass.
+### 1. Northampton one-ping course test
+**STATUS: BLOCKED AT PHYSICAL OSM ACQUISITION**
 
-Recent hardening on `main`:
-- fairway **relations** are treated as the authoritative fairway features;
-- member ways are reconstruction inputs only;
-- duplicate rendering/counting of relation + member geometry is prevented;
-- the stage fails closed if the packet lacks any of the 18 target hole routes.
+Fix only the Northampton OSM acquisition/identity problem that causes hole 4 to be absent. Re-run the existing `test-new-course.yml` path only after the failure mode is understood. The intended chain remains:
+**GolfCourseAPI discovery → registration → physical acquisition → Course Packet → packet QA → packet-driven wireframe.**
 
-Verified in master run `35851974870`.
+API budget rule remains: first clean provider run = one `/v1/search` + one `/v1/courses/{provider_id}` request; do not enable provider refresh. Cached provider data must be reused thereafter.
 
-Requirements:
-- Keep the current Poult Wood wireframe/fairway association logic.
-- Preserve OSM fairway multipolygon relation reconstruction.
-- Do not invent, smooth, move or replace source geometry.
-- Do not silently recapture OSM/EA if packet data is available.
-- Make the wireframe workflow reusable against any valid Course Packet.
-- Have the master pipeline invoke the wireframe stage after packet QA.
-- The resulting wireframe should be a downstream processing artifact, not a new source of truth.
+### 2. Northampton downstream proof
+After physical acquisition succeeds, prove Course Packet QA and packet-driven wireframe using the existing master pipeline. Do not introduce a new source format.
 
-### 2. Add GolfCourseAPI discovery/import layer
+### 3. Overstone acquisition repair + post-fix proof
+Separate track. Repair the Overpass 406 only when returning to Overstone, then prove the existing model-generation fix in a populated 18-hole package.
 
-**Status: IMPLEMENTED — NORTHAMPTON LIVE TEST GREEN**
+### 4. F/M/B validation
+Analyse all 18 Overstone greens and identify the common historical construction rule before testing Poult Wood F/M/B derivation.
 
-Use GolfCourseAPI as the discovery/index front door, not as physical geometry authority.
+### 5. Registration / refinement
+Later: establish measured OSM-to-raster control points and registration metrics while retaining OSM geometry and provenance.
 
-Implemented:
-- `tools/course-discovery/search_golfcourseapi.py`
-- `tools/course-discovery/register_course.py`
-- `tools/course-discovery/validate_registry.py`
-- `.github/workflows/discover-course.yml`
-- `.github/workflows/register-course.yml`
-
-The workflows use the `GOLFCOURSEAPI_API_KEY` GitHub Actions secret and never store the API key in source control.
-
-Build:
-- course discovery/import;
-- provider-neutral course registry;
-- normalised course identity and metadata;
-- registry state/lifecycle such as discovered → registered → acquisition-ready → acquired → QA → wireframe/model → UiDo-ready;
-- UK/GB import capability without hard-coding UK into the underlying acquisition engine.
-
-### 3. New-course one-ping end-to-end test
-
-**Status: READY TO RUN**
-
-A reusable test workflow chains:
-**GolfCourseAPI discovery (one search) → candidate selection → registration (one detail pull, no refresh) → canonical scorecard → physical acquisition → packet QA → packet-driven wireframe.**
-
-New workflow:
-- `.github/workflows/test-new-course.yml`
-- Default test query: **Kettering Golf Club**
-- The discovery job selects a candidate locally from the single search response; it does not hydrate every result.
-- Registration uses the selected provider ID and the existing cache-first registration path.
-- Physical acquisition now supports newly registered courses without a pre-authored source manifest: it discovers the OSM `leisure=golf_course` footprint around the provider coordinate, fails closed on ambiguous identity, and uses that OSM footprint only to define the acquisition boundary.
-- GolfCourseAPI is not used by physical acquisition or downstream processing.
-
-**API budget rule:** first clean run = one `/v1/search` request + one `/v1/courses/{provider_id}` request. Do not enable `refresh_provider`. Once the provider snapshot exists, subsequent registration attempts are cache-first and make no GolfCourseAPI detail request.
-
-### 4. Northampton Golf Club — first genuinely new end-to-end course
-
-**Status: REGISTRATION + SCORECARD GREEN; retained as the cache-first registration reference course**
-
-Use Northampton Golf Club as the first fresh course that has not been manually built into the pipeline.
-
-Run it through:
-**GolfCourseAPI discovery → registry → acquisition → Course Packet → packet QA → wireframe → downstream course model/loader.**
-
-This is the key proof that the architecture is genuinely agnostic rather than Poult/Overstone-specific.
-
-### 5. GPS-aware nearest-course selection in the app
-
-**Status: FUTURE TODO**
-
-On app launch:
-- request GPS permission;
-- obtain a usable location lock;
-- use lat/long against the UiDo Course Registry;
-- calculate nearest courses;
-- show nearby courses sorted by distance in a dropdown/list;
-- distinguish registered/acquired courses from **UiDo-ready** courses;
-- allow manual search if GPS is unavailable, permission is denied, or no nearby course is found;
-- avoid repeatedly requesting GPS once a usable location has been established.
-
-This is a later player-facing feature; do not mix it into the acquisition refactor.
-
-### 6. Overstone acquisition repair + post-fix proof
-
-**Status: PARALLEL / SEPARATE**
-
-Repair only the Overpass HTTP 406 acquisition failure. Then run the existing model-generation fix and prove a populated 18-hole post-fix package.
-
-Do not rebuild the wider pipeline because of this one acquisition failure.
-
-### 7. F/M/B validation
-
-**Status: VALIDATION TASK**
-
-Analyse all 18 Overstone greens to identify the common historical F/M/B construction rule. Only after the rule is proven should Poult Wood be tested.
-
-F/M/B investigation is **not** permission to rewrite source geometry.
-
-### 8. Registration / refinement
-
-**Status: LATER**
-
-Establish measured OSM-to-raster control points and registration metrics. Preserve OSM geometry and provenance while storing refined UiDo geometry separately.
+### 6. Player-facing GPS course selection
+Later: nearest-course selection from the UiDo Course Registry. Do not mix this into the current acquisition fix.
 
 ## EXACT NEXT STEP
 
-**Run `.github/workflows/test-new-course.yml` with the default Kettering Golf Club inputs. Do not enable any provider refresh. The first clean run should consume one GolfCourseAPI search request and one detail request, then use the cached provider snapshot plus OSM/EA for everything downstream.**
+**Inspect the Northampton acquisition result and determine why the physical OSM query/boundary produced refs 1–3 and 5–18 but not hole 4. Repair only that acquisition/identity path, without inventing or replacing source geometry. Then rerun the existing Northampton one-ping pipeline and prove Course Packet → packet QA → wireframe.**
 
 ## DO NOT REBUILD
 
 1. Do not ask for or recreate the authoritative Overstone OSM capture.
-2. Do not recreate the complete normalised source; it is present and authoritative.
+2. Do not recreate the complete Overstone normalised source; it is present and authoritative.
 3. Do not recreate or promote Library v0.4 without locating and comparing the actual artifact.
-4. Do not rebuild the entire Overstone pipeline because of Overpass HTTP 406; repair only the failing acquisition step.
+4. Do not rebuild the entire Overstone pipeline because of the historical Overpass 406; repair only its acquisition step.
 5. Do not replace EA aerial/LiDAR acquisition with manual portal steps.
 6. Do not invent an OSM-to-raster transform or reuse an unmeasured one.
 7. Do not use validation GPS as candidate-generation geometry.
 8. Do not generate PNGs merely to demonstrate progress.
 9. Do not treat screenshots/diagnostics as source of truth when underlying data exists.
 10. Do not silently overwrite verified/source geometry with derived geometry.
-11. Do not treat the old successful package as proof that the new model-generation fix is incorporated.
-12. Do not promote the F/M/B derivation to a universal rule; the exact point-selection algorithm is still under investigation.
-13. Do not treat OpenYardage as UiDo source geometry; it is an independent sense check only.
-14. Do not treat Poult Wood wireframe QA as a replacement for the Overstone Stage 1 contract.
-15. Do not treat stale beta catalogue metadata as evidence of a published second-course package.
-16. If a GitHub artifact appears missing, check artifact history and Library/conversation sources before declaring it missing.
+11. Do not treat the old successful Overstone package as proof that the newer model-generation fix is incorporated.
+12. Do not promote F/M/B to a universal rule before all-18 validation.
+13. Do not treat OpenYardage as UiDo source geometry; it is a sense check only.
+14. Do not treat Poult Wood wireframe QA as replacement source geometry.
+15. Do not treat stale catalogue metadata as evidence of a published second course.
+16. Do not declare an artifact missing until GitHub history, workflow artifacts and the UiDo Library have been checked.
 17. Do not ask the user to repeat information already recorded here or in the source manifests/locks/course model/Library.
-18. Do not treat run `35849229103` as proof of Stage 3 wireframe; its verified jobs only cover acquisition and packet QA.
+18. Do not rerun Northampton blindly: the current failure is specifically **missing OSM hole 4**, not a generic endpoint failure.
+19. Do not relax the 18-hole identity check just to make the pipeline pass.
 
-## Change discipline
+## CHANGE DISCIPLINE
 
 Whenever meaningful UiDo work changes project state, update this document. If GitHub and Library disagree, inspect both authoritative artifacts, record the discrepancy explicitly, and resolve it deliberately. Never guess or silently overwrite source data.
