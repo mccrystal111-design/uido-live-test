@@ -1,6 +1,6 @@
 # UiDo — Project Source of Truth
 
-**Last updated:** 2026-09-22  
+**Last updated:** 2026-09-23  
 **Repository:** `mccrystal111-design/uido-live-test`  
 **Canonical project:** UiDo golf decision engine / virtual caddie / SmartShot intelligence.
 
@@ -10,7 +10,7 @@ This is the first file a fresh UiDo session should read. It records authoritativ
 
 **Overstone data foundation: READY, but Stage 1 Step 1 is not yet closed.** The authoritative OSM capture and deterministic normalised source remain locked and present in the UiDo Library. The GitHub provider-neutral v0.1 model remains canonical. EA aerial, LiDAR and terrain acquisition/assembly are proven. A successful combined build (`35608919741`) produced the offline course package and human-review bundle.
 
-The repository is now at commit `7e7fca3f6889bbecd3aa52ded6575efdbd01530f` (`Reconcile source of truth with latest course-model QA`). This commit is a source-of-truth reconciliation only; it does not change the authoritative course data or claim a new successful Overstone package build. Its parent was `4c097a8ad0b9e835df6fda94cee6eb72c0617a1c` (`Run Poult Wood full-course wireframe QA`). Recent course-model work refactored the Poult Wood skeleton to align with the Overstone source model and fixed single-line fairway relation unions.
+The repository is now at commit `09e1f268756531372afede92fb785a8fd33900a7` (`Refresh source of truth at current main head`). This commit is a source-of-truth reconciliation only; it does not change authoritative course data or claim a new successful Overstone package build. Its parent is `7e7fca3f6889bbecd3aa52ded6575efdbd01530f`. Recent course-model work refactored the Poult Wood skeleton to align with the Overstone source model, fixed single-line fairway relation unions, and ran full-course wireframe QA.
 
 The latest known Overstone builder regression remains run `35627704315` on commit `9ca6c0974a3928eba3d9b7aadf4d97254ef673ea`: EA aerial, LiDAR, compact aerial rendering and terrain all complete; the run fails only at **Acquire Overstone OSM golf source** with Overpass HTTP 406. Do not replace the authoritative OSM source because of this acquisition regression.
 
@@ -18,19 +18,19 @@ The latest known Overstone builder regression remains run `35627704315` on commi
 
 ### F/M/B derivation — corrected and still under investigation
 
-`course-models/FMB_DERIVATION.md` is now corrected to the proper historical association: the recovered historical F/M/B test belongs to **Overstone hole 2**, not hole 1. The OSM green/route relationship and Front/Back source vertices are proven, but the exact historical point-selection algorithm is **not** proven. The earlier exact-centroid claim has been discarded. fileciteturn5file0L1-L6
+`course-models/FMB_DERIVATION.md` is now corrected to the proper historical association: the recovered historical F/M/B test belongs to **Overstone hole 2**, not hole 1. The OSM green/route relationship and Front/Back source vertices are proven, but the exact historical point-selection algorithm is **not** proven. The earlier exact-centroid claim has been discarded.
 
 Required next validation: analyse all 18 Overstone greens to identify the common F/B/M construction rule before testing Poult Wood. Do not promote a universal F/M/B derivation yet.
 
 ### Hole orientation / OpenYardage sense check
 
-`course-models/HOLE_ORIENTATION_SENSE_CHECK.md` now defines the intended local frame: Y = forward along play, X = left/right, while preserving underlying geospatial geometry. OpenYardage is an independent golf-useful sense check only; large discrepancies become QA warnings, not automatic geometry edits. fileciteturn10file0L1-L6
+`course-models/HOLE_ORIENTATION_SENSE_CHECK.md` defines the intended local frame: Y = forward along play, X = left/right, while preserving underlying geospatial geometry. OpenYardage is an independent golf-useful sense check only; large discrepancies become QA warnings, not automatic geometry edits.
 
 ### Poult Wood — source identity confirmed; QA work active
 
-`course-models/POULT_WOOD_SOURCE_MANIFEST.json` records an identity PASS for the 18-hole Poult Wood target and retains the raw OSM source without invented geometry. It identifies 18 target hole refs and 24 hole routes in the facility source, with 6 additional routes outside the target 18-hole set. OpenYardage is explicitly a sense-check, not UiDo source geometry. fileciteturn11file0L1-L6
+`course-models/POULT_WOOD_SOURCE_MANIFEST.json` records an identity PASS for the 18-hole Poult Wood target and retains the raw OSM source without invented geometry. It identifies 18 target hole refs and 24 hole routes in the facility source, with 6 additional routes outside the target 18-hole set. OpenYardage is explicitly a sense-check, not UiDo source geometry.
 
-The latest Poult Wood workflow commit changes the QA pass to render the **complete 18-hole footprint on one consistent map**. This is QA/source inspection work, not permission to overwrite course geometry. fileciteturn7file0L3-L11
+The latest Poult Wood workflow changes the QA pass to render the **complete 18-hole footprint on one consistent map**. The UiDo Library also now contains the resulting full-course wireframe QA outputs and earlier source-only wireframes. These are QA/visual inspection artifacts, not replacements for source geometry. fileciteturn9file6L21-L26 fileciteturn9file14L81-L88
 
 ## Authoritative Overstone source
 
@@ -44,7 +44,7 @@ Do not ask the user to re-upload the OSM capture.
 - GitHub identity lock: `course-models/OVERSTONE_OSM_SOURCE_LOCK.json`
 - GitHub manifest: `course-models/OVERSTONE_SOURCE_MANIFEST.json`
 
-Library search on 2026-09-22 reconfirms the authoritative OSM capture is present. fileciteturn12file1L156-L163
+Library search on 2026-09-23 reconfirms the authoritative OSM capture is present. fileciteturn7file1L157-L163
 
 ### Normalised source — authoritative derived artifact
 
@@ -54,7 +54,7 @@ Library search on 2026-09-22 reconfirms the authoritative OSM capture is present
 - SHA-256: `876eb808a978f577057747f71cca759d4032ed5cc776c3bf036eb126ce6b28e9`
 - Status: **complete**; source geometry unchanged.
 
-Library search on 2026-09-22 reconfirms this file is present. fileciteturn12file0L1-L8
+Library search on 2026-09-23 reconfirms this file is present. fileciteturn7file0L1-L8
 
 ### Library v0.4 discrepancy
 
@@ -92,7 +92,9 @@ Measured OSM-to-raster registration remains a separate stage. `course-models/OVE
 
 ## UI / product state
 
-The Library remains the UI source of truth: premium golf instrument aesthetic, light/dark system, persistent navigation icon language and the GPS/Yardage/Wind/Lie/Start Line/Shape/Strike live shot flow. Strategy remains out of the live flow until SmartShot is ready. fileciteturn3file0L11-L33 fileciteturn3file1L62-L70
+The Library remains the UI source of truth: premium golf instrument aesthetic, light/dark system, persistent navigation icon language and the GPS/Yardage/Wind/Lie/Start Line/Shape/Strike live shot flow. Strategy remains out of the live flow until SmartShot is ready.
+
+Recent Library additions on 2026-09-22 include the full-course Poult Wood wireframe QA output plus additional Poult Wood source-only QA maps, and new LÅG brand/SmartPoint concept boards. These are recorded as design/QA artifacts only; they do not alter course-data authority or replace the approved UiDo UI blueprints. fileciteturn9file6L21-L26 fileciteturn9file7L28-L34 fileciteturn9file10L49-L56 fileciteturn9file12L65-L72
 
 The committed `assets/Lo_Flag_Icon.svg` remains an asset addition only and does not replace the UI blueprints or change course-data authority.
 
