@@ -245,7 +245,9 @@ def plot_geometry(ax, geom, **kwargs):
             ax.plot(rx, ry, color=kwargs.get("edgecolor", "#555555"), linewidth=0.5)
     elif geom.geom_type in ("LineString", "LinearRing"):
         x, y = geom.xy
-        ax.plot(x, y, **kwargs)
+        line_kwargs = dict(kwargs)
+        line_kwargs.pop("facecolor", None)
+        ax.plot(x, y, **line_kwargs)
     elif geom.geom_type in ("MultiPolygon", "MultiLineString", "GeometryCollection"):
         for part in geom.geoms:
             plot_geometry(ax, part, **kwargs)
