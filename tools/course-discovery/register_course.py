@@ -31,9 +31,22 @@ def main()->int:
     parser=argparse.ArgumentParser()
     parser.add_argument("provider_id",help="GolfCourseAPI course id")
     parser.add_argument("--expected-country",help="Refuse registration if the detailed record is not in this country.")
+    parser.add_argument("--refresh",action="store_true",help="Force a fresh GolfCourseAPI detail pull and replace the cached provider snapshot.")
     args=parser.parse_args()
-    detail=api_json(f"/v1/courses/{args.provider_id}")
-    provider_record=detail.get("course") if isinstance(detail.get("course"),dict) else detail
+    provider_id_arg=str(args.provider_id)
+    provider_path=PROVIDER_DIR / f"{provider_id_arg}.json"
+    detail=None
+    provider_record=None
+    if provider_path.exists() and not args.refresh:
+        cached=json.loads(provider_path.read_text())
+        provider_record=cached.get("captured_course") if isinstance(cached,dict) else None
+        if isinstance(provider_record,dict):
+            print(f"Using cached GolfCourseAPI snapshot: {provider_path}")
+        else:
+            raise SystemExit(f"Cached provider snapshot is invalid: {provider_path}. Re-run with --refresh.")
+    else:
+        detail=api_json(f"/v1/courses/{provider_id_arg}")
+        provider_record=detail.get("course") if isinstance(detail.get("course"),dict) else detail
     location=provider_record.get("location") or {}
     name=provider_record.get("course_name") or provider_record.get("name") or provider_record.get("club_name")
     if not name: raise SystemExit("GolfCourseAPI course detail contains no course name")
@@ -47,7 +60,7 @@ def main()->int:
         accepted = aliases.get(expected, {expected})
         if actual_country.casefold() not in accepted:
             raise SystemExit(f"Course {args.provider_id} is in {actual_country or 'an unknown country'}, not the expected country {args.expected_country}")
-    provider_id=str(provider_record.get("id",args.provider_id))
+    provider_id=str(provider_record.get("id",provider_id_arg))
     course_id=slugify(name)
     registry=json.loads(REGISTRY.read_text()); courses=registry.setdefault("courses",{})
     for existing_id,existing in courses.items():
@@ -62,12 +75,13 @@ def main()->int:
     registry["schema_version"]="uido.course-registry.v0.2"
     PROVIDER_DIR.mkdir(parents=True, exist_ok=True)
     provider_path=PROVIDER_DIR / f"{provider_id}.json"
-    provider_path.write_text(json.dumps({
+    if args.refresh or not provider_path.exists():
+        provider_path.write_text(json.dumps({
         "provider": "golfcourseapi",
         "provider_id": provider_id,
         "endpoint": f"/v1/courses/{provider_id}",
         "captured_course": provider_record,
-    }, indent=2) + "\n")
+        }, indent=2) + "\n")
     REGISTRY.write_text(json.dumps(registry,indent=2)+"\n")
     print(json.dumps({"status":"registered","course_id":course_id,"provider_snapshot":str(provider_path),"record":record},indent=2)); return 0
 if __name__=="__main__": raise SystemExit(main())
