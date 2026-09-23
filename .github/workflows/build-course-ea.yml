@@ -9,10 +9,7 @@ on:
       course:
         description: "Course to acquire"
         required: true
-        type: choice
-        options:
-          - overstone-park
-          - poult-wood
+        type: string
         default: overstone-park
   workflow_call:
     inputs:
@@ -29,6 +26,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Prepare physical acquisition metadata
+        run: |
+          set -euo pipefail
+          python3 tools/course-discovery/prepare_physical_acquisition.py "$COURSE_ID"
+
       - name: Resolve selected course from registry
         run: |
           set -euo pipefail
@@ -40,23 +42,34 @@ jobs:
               course = registry["courses"][course_id]
           except KeyError:
               raise SystemExit(f"Unknown course id: {course_id}")
-          b = course["boundary"]
+          physical = pathlib.Path("build") / course_id / "physical-source-manifest.json"
+          if physical.is_file():
+              source_manifest = physical
+              source = json.loads(physical.read_text())
+          else:
+              source_manifest = pathlib.Path(course["source_manifest"])
+              source = json.loads(source_manifest.read_text())
+          b = source["target_course"]["boundary"]
+          acquisition = course.get("acquisition") or {
+              "aerial": {"preferred_year": "2013", "preferred_resolution_m": 0.25},
+              "lidar": {"max_resolution_m": 1.0},
+          }
           lines = [
               f"COURSE_NAME={course['name']}",
-              f"COURSE_HOLES={course['holes']}",
-              f"COURSE_PAR={course['par']}",
+              f"COURSE_HOLES={source['target_course']['holes']}",
+              f"COURSE_PAR={source['target_course']['par']}",
               f"WEST={b['west']}",
               f"SOUTH={b['south']}",
               f"EAST={b['east']}",
               f"NORTH={b['north']}",
-              f"SOURCE_MANIFEST={course['source_manifest']}",
-              f"AERIAL_YEAR={course['acquisition']['aerial']['preferred_year']}",
-              f"AERIAL_RES={course['acquisition']['aerial']['preferred_resolution_m']}",
-              f"LIDAR_MAX_RES={course['acquisition']['lidar']['max_resolution_m']}",
+              f"SOURCE_MANIFEST={source_manifest}",
+              f"AERIAL_YEAR={acquisition['aerial']['preferred_year']}",
+              f"AERIAL_RES={acquisition['aerial']['preferred_resolution_m']}",
+              f"LIDAR_MAX_RES={acquisition['lidar']['max_resolution_m']}",
           ]
           with open(os.environ["GITHUB_ENV"], "a") as f:
               f.write("\n".join(lines) + "\n")
-          print(json.dumps(course, indent=2))
+          print(json.dumps(source, indent=2))
           PY
 
       - name: Validate source manifest
