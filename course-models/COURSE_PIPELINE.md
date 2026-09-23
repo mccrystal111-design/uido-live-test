@@ -10,6 +10,9 @@ UiDo captures course information from several independent sources. This document
    - `tools/course-discovery/search_golfcourseapi.py` queries GolfCourseAPI using the `GOLFCOURSEAPI_API_KEY` secret.
    - `.github/workflows/discover-course.yml` provides the GitHub Actions search front door.
    - `.github/workflows/register-course.yml` registers a selected provider course and commits the normalised registry record.
+   - Registration captures the complete GolfCourseAPI detail response under `course-models/provider-data/golfcourseapi/` and builds the canonical UiDo scorecard/tee packet under `course-models/scorecards/`.
+   - Registration is cache-first: an existing provider snapshot is reused without another GolfCourseAPI call. A fresh provider pull requires the explicit `refresh_provider` workflow input.
+   - `tools/course-discovery/validate_scorecard_packet.py` validates 18-hole structure, hole numbering, tee totals and provider provenance before a registration run can commit.
    - UiDo registry stores a stable UiDo identity, provider identity, location metadata and lifecycle state.
    - Discovery/registration does not invent a physical boundary or silently acquire geometry.
 2. **Course Acquisition**
