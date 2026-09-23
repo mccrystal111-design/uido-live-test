@@ -216,9 +216,7 @@ Establish measured OSM-to-raster control points and registration metrics. Preser
 
 ## EXACT NEXT STEP
 
-**Run the current `main` master course pipeline for Poult Wood using the canonical Course Packet flow and verify Stage 3 — wireframe — actually executes from the packet. Confirm the wireframe output and fairway association report match the trusted previous Poult Wood QA behaviour. If green, move to GolfCourseAPI discovery/import.**
-
-If the master run does not invoke Stage 3, treat that as a workflow wiring discrepancy and repair only the orchestration; do not recapture source data.
+**Add the `GOLFCOURSEAPI_API_KEY` GitHub Actions secret, run `UiDo Course Discovery` with `Northampton Golf Club`, inspect the candidates, then use `UiDo Register Course` with the selected GolfCourseAPI ID. Validate the resulting registry entry before moving to Northampton end-to-end acquisition.**
 
 ## DO NOT REBUILD
 
