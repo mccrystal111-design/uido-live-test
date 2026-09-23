@@ -168,33 +168,43 @@ jobs:
           for pid in sorted(product_ids):
               print(f"  {pid}")
 
+          # Only vertical, orthorectified aerial photography is a valid
+          # registration source. Oblique photography is deliberately excluded.
           preferred = [
               x for x in candidates
               if x["year"] == preferred_year
               and abs(x["resolution_m"] - preferred_res) < 1e-9
           ]
-          if not preferred:
-              if not candidates:
-                  raise SystemExit(
-                      "No EA aerial coverage found. Catalogue product ids did not identify "
-                      "an aerial-photography product for this footprint."
-                  )
+          if not preferred and candidates:
               best_res = min(x["resolution_m"] for x in candidates)
-              best_year = max(
-                  x["year"] for x in candidates
-                  if abs(x["resolution_m"] - best_res) < 1e-9
-              )
-              preferred = [
-                  x for x in candidates
-                  if x["year"] == best_year
-                  and abs(x["resolution_m"] - best_res) < 1e-9
-              ]
-          unique = []
-          seen = set()
-          for x in preferred:
-              key = (x["year"], x["resolution_m"], x["tile"])
-              if key not in seen:
-                  seen.add(key); unique.append(x)
+              same_res = [x for x in candidates if abs(x["resolution_m"] - best_res) < 1e-9]
+              # Ignore records with unusable year metadata when choosing the fallback year.
+              years = [x["year"] for x in same_res if x["year"] and x["year"].lower() not in {"none", "null"}]
+              if years:
+                  best_year = max(years)
+                  preferred = [
+                      x for x in same_res
+                      if x["year"] == best_year
+                  ]
+
+          root = pathlib.Path("build") / os.environ["COURSE_ID"] / "ea-aerial"
+          if not preferred:
+              # Some course footprints have no EA vertical imagery even though the
+              # catalogue returns other aerial products (notably oblique imagery).
+              # Treat that as a legitimate source-availability state, not a build crash.
+              manifest = {
+                  "schema":"uido.course.ea-aerial-acquisition.v0.1",
+                  "course_id":os.environ["COURSE_ID"],
+                  "course":os.environ["COURSE_NAME"],
+                  "status":"unavailable",
+                  "requested":{"year":preferred_year,"resolution_m":preferred_res},
+                  "reason":"No EA vertical aerial photography coverage was returned for this footprint",
+                  "catalogue_product_ids":sorted(product_ids),
+                  "tiles":[]
+              }
+              (root / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\\n")
+              print(json.dumps(manifest, indent=2))
+              raise SystemExit(0)
           root = pathlib.Path("build") / os.environ["COURSE_ID"] / "ea-aerial"
           base = "https://environment.data.gov.uk/tiles/collections/survey"
           captured = []
