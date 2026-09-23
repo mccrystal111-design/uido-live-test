@@ -121,6 +121,7 @@ jobs:
           git add course-models/COURSE_REGISTRY.json course-models/provider-data/golfcourseapi course-models/scorecards
           if git diff --cached --quiet; then
             echo "No registration changes required."
+            echo "source_ref=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git config user.name "github-actions[bot]"
