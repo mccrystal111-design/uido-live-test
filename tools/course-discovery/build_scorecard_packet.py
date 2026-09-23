@@ -22,6 +22,11 @@ def main() -> int:
     }
     for category in ("male", "female"):
         for tee in tees.get(category, []) or []:
+            # GolfCourseAPI can return 9-hole composite/loop tee records alongside
+            # the 18-hole course tees. UiDo's canonical course packet is explicitly
+            # an 18-hole scorecard, so retain only complete 18-hole tee sets.
+            if tee.get("number_of_holes") != 18:
+                continue
             holes = []
             for number, hole in enumerate(tee.get("holes", []) or [], 1):
                 holes.append({
