@@ -104,20 +104,38 @@ def main() -> int:
     except (KeyError, TypeError, ValueError):
         raise SystemExit(f"{args.course_id}: registered course has no usable provider coordinates")
 
-    target_name = str(course.get("name") or course.get("club_name") or args.course_id)
+    target_names = [
+        str(course.get("club_name") or ""),
+        " ".join(
+            part for part in [
+                str(course.get("club_name") or ""),
+                str(course.get("name") or ""),
+            ] if part
+        ),
+        str(course.get("name") or ""),
+        args.course_id,
+    ]
+    target_names = [name for name in target_names if name.strip()]
+    identity_label = next((name for name in target_names if name.strip()), args.course_id)
+
     payload = query_overpass(lat, lon)
     candidates = []
     for element in payload.get("elements", []) or []:
         tags = element.get("tags") or {}
-        name = str(tags.get("name") or "")
+        name = str(tags.get("name") or "").strip()
+        # Unnamed leisure=golf_course geometry is not sufficient evidence for
+        # course identity. Keep the matcher fail-closed rather than allowing an
+        # unnamed polygon to outrank a named course.
+        if not name:
+            continue
         points = geometry_points(element)
         if not points:
             continue
         center_lat = sum(p[0] for p in points) / len(points)
         center_lon = sum(p[1] for p in points) / len(points)
         dist = distance_m(lat, lon, center_lat, center_lon)
-        score = similarity(target_name, name)
-        if name.casefold() == target_name.casefold():
+        score = max(similarity(target, name) for target in target_names)
+        if any(clean(target) == clean(name) for target in target_names):
             score = 1.0
         candidates.append({
             "element": element,
@@ -128,17 +146,17 @@ def main() -> int:
         })
 
     if not candidates:
-        raise SystemExit(f"No OSM leisure=golf_course footprint found near {target_name}")
+        raise SystemExit(f"No OSM leisure=golf_course footprint found near {identity_label}")
 
     candidates.sort(key=lambda x: (-x["similarity"], x["distance_m"]))
     best = candidates[0]
     if best["similarity"] < 0.34:
         raise SystemExit(
-            f"OSM course identity is ambiguous for {target_name}; best candidate "
+            f"OSM course identity is ambiguous for {identity_label}; best candidate "
             f"{best['name']!r} has similarity {best['similarity']:.2f}"
         )
     if len(candidates) > 1 and best["similarity"] == candidates[1]["similarity"] and abs(best["distance_m"] - candidates[1]["distance_m"]) < 100:
-        raise SystemExit(f"OSM course identity is ambiguous for {target_name}")
+        raise SystemExit(f"OSM course identity is ambiguous for {identity_label}")
 
     points = best["points"]
     west = min(p[1] for p in points)
