@@ -1,57 +1,83 @@
-name: UiDo Poult Wood Wireframe QA
-# Triggered for the current Poult Wood OSM wireframe QA pass.
-# Full-course QA: render the complete 18-hole footprint on one consistent map.
+name: UiDo Course Wireframe QA
 
+# Downstream wireframe stage. Source data comes only from the canonical Course Packet.
 on:
-  workflow_dispatch:
-  push:
-    paths:
-      - ".github/workflows/poult-wood-wireframe.yml"
-      - "tools/course-model/render_poult_wood_wireframe.py"
-      - "course-models/POULT_WOOD_SOURCE_MANIFEST.json"
+  workflow_call:
+    inputs:
+      course:
+        description: "Registered UiDo course id"
+        required: true
+        type: string
 
 jobs:
   render:
+    name: Render ${{ inputs.course }} wireframe
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
+      - name: Download canonical course packet
+        uses: actions/download-artifact@v4
+        with:
+          name: uido-course-packet-${{ inputs.course }}
+          path: build/${{ inputs.course }}
+
+      - name: Verify packet hand-off
+        env:
+          COURSE_ID: ${{ inputs.course }}
+        run: |
+          set -euo pipefail
+          ROOT="build/$COURSE_ID"
+          test -f "$ROOT/acquisition-manifest.json"
+          test -f "$ROOT/osm/manifest.json"
+          test -f "$ROOT/osm/golf.json"
+          test -f "$ROOT/osm/fairway-relations.json"
+          python3 - <<'PY'
+          import json, os, pathlib
+          root = pathlib.Path("build") / os.environ["COURSE_ID"]
+          acquisition = json.loads((root / "acquisition-manifest.json").read_text())
+          if acquisition.get("course_id") != os.environ["COURSE_ID"]:
+              raise SystemExit("Packet course id mismatch")
+          osm = json.loads((root / "osm" / "manifest.json").read_text())
+          if set(osm.get("target_hole_refs", [])) != {str(i) for i in range(1, 19)}:
+              raise SystemExit("Packet target hole refs are not exactly 1..18")
+          if osm.get("fairway_relation_elements", 0) <= 0:
+              raise SystemExit("Packet contains no fairway relation data")
+          print("WIREframe PACKET HAND-OFF: PASS")
+          PY
+
       - name: Install render dependency
         run: python3 -m pip install --disable-pip-version-check matplotlib shapely
 
-      - name: Acquire complete OSM golf source
+      - name: Render full-course wireframe from packet
+        env:
+          COURSE_ID: ${{ inputs.course }}
         run: |
           set -euo pipefail
-          mkdir -p build/poult-wood-wireframe
-          QUERY='[out:json][timeout:180];nwr["golf"](51.2184284,0.2958967,51.2276149,0.3095094);out geom;'
-          RELS='[out:json][timeout:180];relation["golf"="fairway"](51.2184284,0.2958967,51.2276149,0.3095094);(._;>;);out geom;'
-          ENDPOINTS=(
-            "https://overpass-api.de/api/interpreter"
-            "https://overpass.kumi.systems/api/interpreter"
-          )
-          fetch() {
-            local q="$1" out="$2"
-            for ep in "${ENDPOINTS[@]}"; do
-              echo "Trying $ep"
-              if curl -fsSL --retry 3 --connect-timeout 20 --max-time 240                 -A "UiDo-course-wireframe/1.0 (+https://github.com/mccrystal111-design/uido-live-test)"                 -H "Accept: application/json"                 --data-urlencode "data=$q" "$ep" -o "$out"; then
-                return 0
-              fi
-            done
-            return 1
-          }
-          fetch "$QUERY" build/poult-wood-wireframe/osm-all-golf.json
-          fetch "$RELS" build/poult-wood-wireframe/osm-fairway-relations.json
+          ROOT="build/$COURSE_ID"
+          python3 tools/course-model/render_poult_wood_wireframe.py \
+            --all "$ROOT/osm/golf.json" \
+            --fairways "$ROOT/osm/fairway-relations.json" \
+            --manifest "$ROOT/acquisition-manifest.json" \
+            --out "$ROOT/wireframe/${COURSE_ID}-18-hole-wireframe.png"
 
-      - name: Render full-course source wireframe
-        run: |
-          set -euo pipefail
-          python3 tools/course-model/render_poult_wood_wireframe.py             --all build/poult-wood-wireframe/osm-all-golf.json             --fairways build/poult-wood-wireframe/osm-fairway-relations.json             --out build/poult-wood-wireframe/poult-wood-18-hole-wireframe.png
-
-      - name: Upload wireframe for human review
+      - name: Upload wireframe QA artifact
         uses: actions/upload-artifact@v4
         with:
-          name: poult-wood-18-hole-wireframe
-          path: build/poult-wood-wireframe/
+          name: uido-wireframe-${{ inputs.course }}
+          path: build/${{ inputs.course }}/wireframe/
           retention-days: 14
 
-# Re-run source skeleton QA after renderer fixes.
+      - name: Write wireframe summary
+        env:
+          COURSE_ID: ${{ inputs.course }}
+        run: |
+          {
+            echo "## UiDo Wireframe"
+            echo
+            echo "**Course:** $COURSE_ID"
+            echo
+            echo "PASS — wireframe consumed the canonical Course Packet."
+            echo
+            echo "No Overpass or EA recapture was performed by this stage."
+          } >> "$GITHUB_STEP_SUMMARY"
