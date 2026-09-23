@@ -7,8 +7,11 @@ UiDo captures course information from several independent sources. This document
 ## Pipeline
 
 1. **Course Discovery**
-   - GolfCourseAPI supplies course identity and metadata.
-   - UiDo registry stores the normalised course record and acquisition requirements.
+   - `tools/course-discovery/search_golfcourseapi.py` queries GolfCourseAPI using the `GOLFCOURSEAPI_API_KEY` secret.
+   - `.github/workflows/discover-course.yml` provides the GitHub Actions search front door.
+   - `.github/workflows/register-course.yml` registers a selected provider course and commits the normalised registry record.
+   - UiDo registry stores a stable UiDo identity, provider identity, location metadata and lifecycle state.
+   - Discovery/registration does not invent a physical boundary or silently acquire geometry.
 2. **Course Acquisition**
    - OSM golf data.
    - OSM fairway multipolygon relations.
@@ -35,6 +38,10 @@ source capture -> packet -> processing -> output
 rather than:
 
 source capture -> processing -> fresh source capture -> output
+
+## Course discovery / registration
+
+GolfCourseAPI is the discovery/index provider, not the physical geometry authority. The provider ID is retained for provenance, while UiDo assigns a deterministic permanent course identity. A newly registered course starts at lifecycle state `registered`; it becomes `acquisition-ready` only after the physical acquisition inputs are resolved.
 
 ## GitHub workflow structure
 
