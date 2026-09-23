@@ -89,8 +89,16 @@ jobs:
           if actual_refs != required_refs:
               raise SystemExit(f"OSM target hole refs mismatch: {sorted(actual_refs)}")
 
-          if osm.get("fairway_relation_elements", 0) <= 0:
-              raise SystemExit("No fairway relation data captured")
+          relation_count = int(osm.get("fairway_relation_elements", 0))
+          golf = json.loads((root / "osm" / "golf.json").read_text())
+          standalone_fairways = sum(
+              1
+              for element in golf.get("elements", [])
+              if element.get("type") == "way"
+              and element.get("tags", {}).get("golf") == "fairway"
+          )
+          if relation_count <= 0 and standalone_fairways <= 0:
+              raise SystemExit("No fairway source data captured")
 
           if lidar.get("status") == "unavailable":
               raise SystemExit("LiDAR packet is unavailable")
