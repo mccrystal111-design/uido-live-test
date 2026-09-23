@@ -1,12 +1,9 @@
 name: UiDo Course Builder - Poult Wood
 
+# Heavy acquisition build is manual only.
+# The lightweight Poult Wood wireframe QA workflow handles push-triggered visual checks.
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - ".github/workflows/build-poult-wood-ea.yml"
-      - "tools/course-model/render_poult_wood_wireframe.py"
-      - "course-models/POULT_WOOD_SOURCE_MANIFEST.json"
 
 env:
   COURSE: "Poult Wood Golf Course - 18 Hole"
