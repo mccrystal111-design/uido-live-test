@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Discover a golf course from OpenStreetMap when the primary provider has no match."""
 from __future__ import annotations
-import argparse, json, re, sys, time, urllib.parse, urllib.request
+import argparse, json, re, urllib.parse, urllib.request
 from pathlib import Path
 
 OVERPASS_ENDPOINTS = [
@@ -10,34 +10,120 @@ OVERPASS_ENDPOINTS = [
     "https://overpass.kumi.systems/api/interpreter",
 ]
 
+
 def get_json(url: str, *, params=None, data=None, headers=None):
     if params:
         url += "?" + urllib.parse.urlencode(params)
     req = urllib.request.Request(
-        url, data=data, headers=headers or {"Accept": "application/json",
-        "User-Agent": "UiDo-course-discovery/1.0 (+https://github.com/mccrystal111-design/uido-live-test)"})
+        url,
+        data=data,
+        headers=headers or {
+            "Accept": "application/json",
+            "User-Agent": "UiDo-course-discovery/1.0 (+https://github.com/mccrystal111-design/uido-live-test)",
+        },
+    )
     with urllib.request.urlopen(req, timeout=120) as r:
         return json.load(r)
 
+
 def tokens(v: str) -> set[str]:
     return set(re.sub(r"[^a-z0-9]+", " ", v.casefold()).split())
+
 
 def score(wanted: set[str], text: str) -> float:
     got = tokens(text)
     return len(wanted & got) / max(1, len(wanted | got))
 
+
 def overpass(query: str):
     for endpoint in OVERPASS_ENDPOINTS:
         try:
             req = urllib.request.Request(
-                endpoint, data=urllib.parse.urlencode({"data": query}).encode(),
-                headers={"Accept":"application/json","Content-Type":"application/x-www-form-urlencoded",
-                         "User-Agent":"UiDo-course-discovery/1.0"})
+                endpoint,
+                data=urllib.parse.urlencode({"data": query}).encode(),
+                headers={
+                    "Accept": "application/json",
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "User-Agent": "UiDo-course-discovery/1.0",
+                },
+            )
             with urllib.request.urlopen(req, timeout=180) as r:
                 return json.load(r), endpoint
         except Exception:
             continue
     raise SystemExit("All Overpass endpoints failed.")
+
+
+def direct_overpass_course(query: str, country: str):
+    """Find a named golf course directly in Overpass when Nominatim fails.
+
+    The fallback deliberately searches the UK OSM area for golf=course features
+    rather than attempting another geocoder. The selected course feature then
+    supplies the centre point used by the normal local hole query.
+    """
+    course_term = " ".join(
+        x for x in query.split()
+        if x.casefold() not in {"golf", "club", "course"}
+    )
+    escaped = re.escape(course_term or query)[:80]
+    area_code = "GB" if country.casefold() in {"uk", "united kingdom", "great britain"} else None
+
+    if area_code:
+        scope = f'area["ISO3166-1"="{area_code}"]->.searchArea;'
+        selector = f'nwr["golf"="course"]["name"~"{escaped}",i](area.searchArea);'
+    else:
+        # Keep the non-UK fallback bounded to the named country where Overpass
+        # exposes a matching ISO country area.
+        scope = (
+            f'area["name"="{country}"]["boundary"="administrative"]->.searchArea;'
+        )
+        selector = f'nwr["golf"="course"]["name"~"{escaped}",i](area.searchArea);'
+
+    q = f"""[out:json][timeout:180];
+{scope}
+{selector}
+out center tags;"""
+    payload, endpoint = overpass(q)
+
+    candidates = []
+    wanted = tokens(query)
+    for element in payload.get("elements", []):
+        tags = element.get("tags") or {}
+        name = str(tags.get("name") or "")
+        center = element.get("center") or {}
+        if center.get("lat") is None or center.get("lon") is None:
+            continue
+        candidates.append((
+            score(wanted, name),
+            element,
+        ))
+
+    if not candidates:
+        raise SystemExit(
+            "OSM/Nominatim returned no usable candidates and direct Overpass "
+            "course discovery found no named golf course."
+        )
+
+    candidates.sort(key=lambda item: item[0], reverse=True)
+    best_score, course = candidates[0]
+    if best_score < 0.25:
+        raise SystemExit(
+            f"Direct Overpass found a golf course, but the best name match "
+            f"was too weak (score={best_score:.2f})."
+        )
+
+    tags = course.get("tags") or {}
+    center = course["center"]
+    place = {
+        "name": tags.get("name"),
+        "display_name": tags.get("name"),
+        "lat": center["lat"],
+        "lon": center["lon"],
+        "osm_type": course.get("type"),
+        "osm_id": course.get("id"),
+    }
+    return place, "overpass", endpoint
+
 
 def main() -> int:
     p = argparse.ArgumentParser()
@@ -47,22 +133,48 @@ def main() -> int:
     args = p.parse_args()
 
     wanted = tokens(args.query)
-    params = {"format":"jsonv2","limit":10,"q":f"{args.query}, {args.country}"}
-    places = get_json("https://nominatim.openstreetmap.org/search", params=params,
-                      headers={"Accept":"application/json","User-Agent":"UiDo-course-discovery/1.0"})
+    params = {
+        "format": "jsonv2",
+        "limit": 10,
+        "q": f"{args.query}, {args.country}",
+    }
+    places = get_json(
+        "https://nominatim.openstreetmap.org/search",
+        params=params,
+        headers={
+            "Accept": "application/json",
+            "User-Agent": "UiDo-course-discovery/1.0",
+        },
+    )
+
     ranked = []
     for x in places if isinstance(places, list) else []:
-        text = " ".join(str(x.get(k) or "") for k in ("name","display_name","type","class"))
+        text = " ".join(
+            str(x.get(k) or "")
+            for k in ("name", "display_name", "type", "class")
+        )
         s = score(wanted, text)
         if x.get("lat") and x.get("lon"):
             ranked.append((s, x))
-    if not ranked:
-        raise SystemExit("OSM/Nominatim returned no usable course candidates.")
-    ranked.sort(key=lambda z: z[0], reverse=True)
-    _, place = ranked[0]
+
+    if ranked:
+        ranked.sort(key=lambda z: z[0], reverse=True)
+        _, place = ranked[0]
+        discovery_source = "nominatim"
+        discovery_endpoint = "https://nominatim.openstreetmap.org/search"
+    else:
+        # Nominatim is a discovery aid, not a hard dependency. If it cannot
+        # return a usable candidate, fall through directly to Overpass.
+        place, discovery_source, discovery_endpoint = direct_overpass_course(
+            args.query, args.country
+        )
+
     lat, lon = float(place["lat"]), float(place["lon"])
 
-    course_term = " ".join(x for x in args.query.split() if x.casefold() not in {"golf","club","course"})
+    course_term = " ".join(
+        x for x in args.query.split()
+        if x.casefold() not in {"golf", "club", "course"}
+    )
     escaped = re.escape(course_term or args.query)[:80]
     q = f"""[out:json][timeout:180];
 (
@@ -74,48 +186,70 @@ out center tags geom;"""
     elements = payload.get("elements", [])
     wanted_holes = []
     course_elements = []
+
     for e in elements:
         tags = e.get("tags") or {}
         if tags.get("golf") == "hole":
             ref = str(tags.get("ref") or "").strip()
-            course_name = str(tags.get("golf:course:name") or "")
             if ref.isdigit() and 1 <= int(ref) <= 18:
                 wanted_holes.append(e)
         if tags.get("golf") == "course":
             course_elements.append(e)
 
     if len(wanted_holes) != 18:
-        # Some OSM mappings put the course name on the course feature rather than
-        # every hole. In that case accept exactly 18 numbered holes only when the
-        # selected course feature itself is a strong name match.
-        strong_course = [e for e in course_elements
-                         if score(wanted, str((e.get("tags") or {}).get("name") or "")) >= 0.5]
+        # Some OSM mappings put the course name on the course feature rather
+        # than every hole. In that case accept exactly 18 numbered holes only
+        # when the selected course feature itself is a strong name match.
+        strong_course = [
+            e for e in course_elements
+            if score(
+                wanted,
+                str((e.get("tags") or {}).get("name") or ""),
+            ) >= 0.5
+        ]
         if not strong_course:
-            raise SystemExit(f"OSM fallback found {len(wanted_holes)} numbered holes; cannot identify an 18-hole course confidently.")
+            raise SystemExit(
+                f"OSM fallback found {len(wanted_holes)} numbered holes; "
+                "cannot identify an 18-hole course confidently."
+            )
 
     points = []
     pars = []
     for e in wanted_holes:
         tags = e.get("tags") or {}
         if tags.get("par") is not None:
-            try: pars.append(int(str(tags["par"]).split(".")[0]))
-            except ValueError: pass
+            try:
+                pars.append(int(str(tags["par"]).split(".")[0]))
+            except ValueError:
+                pass
         for pt in e.get("geometry") or []:
             if "lat" in pt and "lon" in pt:
                 points.append((float(pt["lat"]), float(pt["lon"])))
         c = e.get("center")
         if c and c.get("lat") is not None:
             points.append((float(c["lat"]), float(c["lon"])))
+
     if not points:
         for e in course_elements:
             c = e.get("center")
             if c and c.get("lat") is not None:
                 points.append((float(c["lat"]), float(c["lon"])))
+
     if len(pars) != 18:
-        raise SystemExit(f"OSM fallback identified the course but only {len(pars)} hole pars; refusing to invent par.")
+        raise SystemExit(
+            f"OSM fallback identified the course but only {len(pars)} hole pars; "
+            "refusing to invent par."
+        )
+
     par = sum(pars)
-    west, east = min(x[1] for x in points)-0.0005, max(x[1] for x in points)+0.0005
-    south, north = min(x[0] for x in points)-0.0005, max(x[0] for x in points)+0.0005
+    west, east = (
+        min(x[1] for x in points) - 0.0005,
+        max(x[1] for x in points) + 0.0005,
+    )
+    south, north = (
+        min(x[0] for x in points) - 0.0005,
+        max(x[0] for x in points) + 0.0005,
+    )
 
     course_name = args.query.strip()
     for e in course_elements:
@@ -123,33 +257,59 @@ out center tags geom;"""
         if score(wanted, name) >= 0.5:
             course_name = name
             break
-    source_id = f"osm-{place.get('osm_type','unknown')}-{place.get('osm_id','unknown')}"
-    course_id = re.sub(r"[^a-z0-9]+","-",course_name.casefold()).strip("-")
+
+    source_id = f"osm-{place.get('osm_type', 'unknown')}-{place.get('osm_id', 'unknown')}"
+    course_id = re.sub(r"[^a-z0-9]+", "-", course_name.casefold()).strip("-")
     root = Path("course-models")
     root.mkdir(exist_ok=True)
-    manifest_path = root / f"{course_id.upper().replace('-','_')}_SOURCE_MANIFEST.json"
+    manifest_path = root / f"{course_id.upper().replace('-', '_')}_SOURCE_MANIFEST.json"
     manifest = {
         "schema": "uido.course.source-manifest.v0.2",
         "source": "osm",
         "target_course": {
-            "course_id": course_id, "name": course_name, "holes": 18, "par": par,
-            "boundary": {"west": west, "south": south, "east": east, "north": north, "crs":"EPSG:4326"},
-            "location": {"latitude": lat, "longitude": lon, "country": args.country},
+            "course_id": course_id,
+            "name": course_name,
+            "holes": 18,
+            "par": par,
+            "boundary": {
+                "west": west,
+                "south": south,
+                "east": east,
+                "north": north,
+                "crs": "EPSG:4326",
+            },
+            "location": {
+                "latitude": lat,
+                "longitude": lon,
+                "country": args.country,
+            },
         },
-        "provenance": {"discovery_source":"nominatim", "geometry_source":"overpass",
-                       "overpass_endpoint":endpoint, "primary_provider":"golfcourseapi",
-                       "primary_provider_status":"no_match"},
+        "provenance": {
+            "discovery_source": discovery_source,
+            "discovery_endpoint": discovery_endpoint,
+            "geometry_source": "overpass",
+            "overpass_endpoint": endpoint,
+            "primary_provider": "golfcourseapi",
+            "primary_provider_status": "no_match",
+        },
     }
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
+
     result = {
-        "source":"osm", "provider_id":source_id, "course_id":course_id,
-        "name":course_name, "club_name": place.get("display_name"),
-        "holes":18, "par":par, "location":{"latitude":lat,"longitude":lon},
-        "source_manifest":str(manifest_path)
+        "source": "osm",
+        "provider_id": source_id,
+        "course_id": course_id,
+        "name": course_name,
+        "club_name": place.get("display_name"),
+        "holes": 18,
+        "par": par,
+        "location": {"latitude": lat, "longitude": lon},
+        "source_manifest": str(manifest_path),
     }
     Path(args.output).write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps(result, indent=2))
     return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
