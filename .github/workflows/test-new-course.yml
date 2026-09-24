@@ -32,6 +32,7 @@ jobs:
     outputs:
       provider_ids: ${{ steps.select.outputs.provider_ids }}
       source: ${{ steps.select.outputs.source }}
+      venue: ${{ steps.select.outputs.venue }}
     steps:
       - uses: actions/checkout@v4
       - name: Search GolfCourseAPI once
@@ -107,6 +108,7 @@ jobs:
 
           with open(os.environ["GITHUB_OUTPUT"],"a") as f:
               f.write("provider_ids=" + ",".join(provider_ids) + "\n")
+              f.write("venue=" + venue + "\n")
               f.write("source=golfcourseapi\n")
           PY
 
@@ -176,9 +178,49 @@ jobs:
           git push
           echo "source_ref=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
+  venue-resolution:
+    name: 2b. Resolve venue identity and anchor
+    needs: registration
+    runs-on: ubuntu-latest
+    outputs:
+      anchor: ${{ steps.resolve.outputs.anchor }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.registration.outputs.source_ref }}
+      - name: Resolve venue once
+        id: resolve
+        env:
+          COURSE_IDS: ${{ needs.registration.outputs.course_ids }}
+          VENUE_SELECTION: ${{ inputs.venue_selection }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          from tools.course_discovery.prepare_physical_acquisition import geocode_venue
+
+          course_ids = json.loads(os.environ["COURSE_IDS"])
+          registry = json.load(open("course-models/COURSE_REGISTRY.json"))
+          if not course_ids:
+              raise SystemExit("No registered course ids available for venue resolution")
+          course = registry["courses"][course_ids[0]]
+          lat, lon, anchor = geocode_venue(course, os.environ["VENUE_SELECTION"])
+          anchor["latitude"] = lat
+          anchor["longitude"] = lon
+          print("anchor=" + json.dumps(anchor, separators=(",", ":")))
+          print(json.dumps({
+              "status": "resolved",
+              "venue": course.get("club_name"),
+              "latitude": lat,
+              "longitude": lon,
+              "display_name": anchor.get("display_name"),
+              "selection_score": anchor.get("selection_score")
+          }, indent=2))
+          PY
+
   pipeline:
     name: 3. Physical acquisition → QA → wireframe
-    needs: registration
+    needs: [registration, venue-resolution]
     strategy:
       fail-fast: false
       matrix:
@@ -188,4 +230,5 @@ jobs:
       course: ${{ matrix.course }}
       ref: ${{ needs.registration.outputs.source_ref }}
       venue_selection: ${{ inputs.venue_selection }}
+      venue_anchor: ${{ needs.venue-resolution.outputs.anchor }}
     secrets: inherit
