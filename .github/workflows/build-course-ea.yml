@@ -133,18 +133,43 @@ jobs:
           fairways = json.loads((root / "fairway-relations.json").read_text())
           elements = golf.get("elements", [])
           expected = {str(i) for i in range(1,19)}
+          hole_elements = [
+              e for e in elements
+              if e.get("tags", {}).get("golf") == "hole"
+          ]
           holes = {
               str(e.get("tags", {}).get("ref"))
-              for e in elements
-              if e.get("tags", {}).get("golf") == "hole"
-              and str(e.get("tags", {}).get("ref", "")).isdigit()
+              for e in hole_elements
+              if str(e.get("tags", {}).get("ref", "")).isdigit()
               and 1 <= int(e["tags"]["ref"]) <= 18
           }
+          unreferenced = []
+          for e in hole_elements:
+              tags = e.get("tags", {}) or {}
+              ref = str(tags.get("ref", "")).strip()
+              if ref.isdigit() and 1 <= int(ref) <= 18:
+                  continue
+              geometry = e.get("geometry", []) or []
+              points = [(float(p["lat"]), float(p["lon"])) for p in geometry if "lat" in p and "lon" in p]
+              if points:
+                  centre = {
+                      "latitude": sum(p[0] for p in points) / len(points),
+                      "longitude": sum(p[1] for p in points) / len(points),
+                  }
+              else:
+                  centre = e.get("center")
+              unreferenced.append({
+                  "type": e.get("type"),
+                  "id": e.get("id"),
+                  "tags": tags,
+                  "centre": centre,
+                  "node_count": len(points),
+              })
           missing = sorted(expected - holes, key=int)
           extra = sorted(holes - expected, key=int)
           status = "complete" if not missing and not extra else "incomplete"
           manifest = {
-              "schema": "uido.course.osm-capture.v0.3",
+              "schema": "uido.course.osm-capture.v0.4",
               "course_id": os.environ["COURSE_ID"],
               "course": os.environ["COURSE_NAME"],
               "bbox": [float(os.environ["SOUTH"]), float(os.environ["WEST"]), float(os.environ["NORTH"]), float(os.environ["EAST"])],
@@ -152,6 +177,10 @@ jobs:
               "target_hole_refs": sorted(holes, key=int),
               "missing_hole_refs": missing,
               "unexpected_hole_refs": extra,
+              "hole_geometry": {
+                  "total_golf_hole_elements": len(hole_elements),
+                  "unreferenced_candidates": unreferenced
+              },
               "elements": len(elements),
               "fairway_relation_elements": len(fairways.get("elements", [])),
               "raw_files": {
