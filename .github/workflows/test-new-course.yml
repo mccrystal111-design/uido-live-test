@@ -6,14 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       query:
-        description: "Exact-ish course or club name to discover"
+        description: "Raw venue or course search term; do not add Golf, Club, Course, etc."
         required: true
-        default: "Kettering Golf Club"
-        type: string
-      expected_name:
-        description: "Name used to select the closest search candidate"
-        required: true
-        default: "Kettering Golf Club"
+        default: "Woburn"
         type: string
       country:
         description: "Country filter"
@@ -36,7 +31,7 @@ jobs:
       - name: Search GolfCourseAPI once
         env:
           GOLFCOURSEAPI_API_KEY: ${{ secrets.GOLFCOURSEAPI_API_KEY }}
-          UIDO_DISCOVERY_QUERY: ${{ inputs.expected_name }}
+          UIDO_DISCOVERY_QUERY: ${{ inputs.query }}
         run: |
           set -euo pipefail
           python3 tools/course-discovery/search_golfcourseapi.py "${{ inputs.query }}" --country "${{ inputs.country }}" --limit 10 > discovery-results.json
@@ -44,7 +39,7 @@ jobs:
       - name: Select one candidate without another API call
         id: select
         env:
-          EXPECTED_NAME: ${{ inputs.expected_name }}
+          EXPECTED_NAME: ${{ inputs.query }}
         run: |
           set -euo pipefail
           python3 - <<'PY'
@@ -96,7 +91,7 @@ jobs:
       - name: Register selected course without refresh
         env:
           GOLFCOURSEAPI_API_KEY: ${{ secrets.GOLFCOURSEAPI_API_KEY }}
-          UIDO_DISCOVERY_QUERY: ${{ inputs.expected_name }}
+          UIDO_DISCOVERY_QUERY: ${{ inputs.query }}
         run: |
           set -euo pipefail
           python3 tools/course-discovery/register_course.py "${{ needs.discovery.outputs.provider_id }}" --expected-country "${{ inputs.country }}" | tee registration-result.json
