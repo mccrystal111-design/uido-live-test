@@ -1,7 +1,8 @@
 name: UiDo New Course End-to-End Test
 
-# One deliberate GolfCourseAPI discovery call + one detail pull, then all
-# downstream work uses the captured snapshot and OSM/EA physical sources.
+# One deliberate GolfCourseAPI discovery call, then one detail pull per
+# discovered course. Downstream work uses the captured provider snapshots and
+# OSM/EA physical sources.
 on:
   workflow_dispatch:
     inputs:
@@ -49,10 +50,9 @@ jobs:
           courses=data.get("courses",[])
 
           if not courses:
-              print("GolfCourseAPI: no match. Falling back to OpenStreetMap evidence.")
               raise SystemExit(
-                  "Venue-first multi-course discovery requires provider venue evidence; "
-                  "OSM fallback is not yet wired to enumerate a venue's courses."
+                  "No provider courses found for the search term. "
+                  "Venue-first OSM enumeration is the next fallback slice."
               )
 
           def tokens(value):
@@ -68,11 +68,10 @@ jobs:
               club=tokens(str(course.get("club_name") or ""))
               return max(overlap(wanted, name), overlap(wanted, club))
 
-          # A venue search such as "Woburn" should resolve the venue first.
-          # Once the venue is identified, retain every course returned for
-          # that same venue instead of selecting one course arbitrarily.
+          # Resolve the venue first. A venue search must retain every course
+          # belonging to that venue rather than selecting one course.
           ranked=sorted(courses, key=venue_score, reverse=True)
-          venue=ranked[0].get("club_name") or ranked[0].get("name") or ""
+          venue=ranked[0].get("club_name") or ""
           if not venue:
               raise SystemExit("Discovery returned no usable venue name.")
 
@@ -110,9 +109,12 @@ jobs:
     name: 2. Register all discovered courses
     needs: discovery
     runs-on: ubuntu-latest
+    outputs:
+      course_ids: ${{ steps.result.outputs.course_ids }}
+      source_ref: ${{ steps.commit.outputs.source_ref }}
     steps:
       - uses: actions/checkout@v4
-      - name: Register every discovered course without refresh
+      - name: Register every discovered course
         env:
           GOLFCOURSEAPI_API_KEY: ${{ secrets.GOLFCOURSEAPI_API_KEY }}
           UIDO_DISCOVERY_QUERY: ${{ inputs.query }}
@@ -123,27 +125,61 @@ jobs:
           for provider_id in "${IDS[@]}"; do
             echo "Registering course: $provider_id"
             python3 tools/course-discovery/register_course.py "$provider_id" --expected-country "${{ inputs.country }}"
+            python3 tools/course-discovery/build_scorecard_packet.py               "course-models/provider-data/golfcourseapi/$provider_id.json"               "course-models/scorecards/$provider_id.json"
           done
-      - name: Validate registry
-        run: python3 tools/course-discovery/validate_registry.py
+      - name: Validate registry and scorecards
+        run: |
+          set -euo pipefail
+          python3 tools/course-discovery/validate_registry.py
+          IFS=',' read -ra IDS <<< "${{ needs.discovery.outputs.provider_ids }}"
+          for provider_id in "${IDS[@]}"; do
+            python3 tools/course-discovery/validate_scorecard_packet.py "course-models/scorecards/$provider_id.json"
+          done
+      - name: Capture registered course ids
+        id: result
+        env:
+          PROVIDER_IDS: ${{ needs.discovery.outputs.provider_ids }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          registry=json.load(open("course-models/COURSE_REGISTRY.json"))
+          providers={p for p in os.environ["PROVIDER_IDS"].split(",") if p}
+          matches=[]
+          for course_id, course in registry.get("courses", {}).items():
+              if str((course.get("identity") or {}).get("provider_id")) in providers:
+                  matches.append(course_id)
+          if len(matches) != len(providers):
+              raise SystemExit(
+                  f"Expected {len(providers)} registered courses, found {len(matches)}: {matches}"
+              )
+          print("course_ids=" + json.dumps(sorted(matches)))
+          PY
       - name: Commit registrations
+        id: commit
         run: |
           set -euo pipefail
           git add course-models/COURSE_REGISTRY.json course-models/*_SOURCE_MANIFEST.json course-models/provider-data/golfcourseapi course-models/scorecards
           if git diff --cached --quiet; then
             echo "No registration changes required."
+            echo "source_ref=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "Register venue courses for ${{ inputs.query }}"
           git push
+          echo "source_ref=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
   pipeline:
     name: 3. Physical acquisition → QA → wireframe
     needs: registration
+    strategy:
+      fail-fast: false
+      matrix:
+        course: ${{ fromJSON(needs.registration.outputs.course_ids) }}
     uses: ./.github/workflows/build-course.yml
     with:
-      course: ""
-      ref: main
+      course: ${{ matrix.course }}
+      ref: ${{ needs.registration.outputs.source_ref }}
     secrets: inherit
