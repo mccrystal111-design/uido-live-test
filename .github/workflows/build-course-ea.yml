@@ -33,7 +33,7 @@ jobs:
   acquire:
     runs-on: ubuntu-latest
     env:
-      COURSE_ID: ${{ inputs.course }}
+      COURSE_ID: ${{ inputs.course || 'northampton' }}
     steps:
       - uses: actions/checkout@v4
         with:
