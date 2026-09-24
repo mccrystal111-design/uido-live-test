@@ -54,9 +54,17 @@ def geocode_venue(course: dict) -> tuple[float, float, dict]:
     if not club_name:
         raise SystemExit("Cannot geocode venue anchor: registered course has no club_name")
 
+    # Try the venue identity first, then progressively broader geographic
+    # anchors. A geocoder can legitimately return a neighbouring golf club for
+    # an ambiguous venue name; in that case a locality anchor is safer because
+    # the subsequent OSM step resolves the actual course identity.
+    cleaned_venue = clean(club_name)
     queries = [
         ", ".join(p for p in [club_name, city, country] if p),
         ", ".join(p for p in [club_name, country] if p),
+        ", ".join(p for p in [cleaned_venue, city, country] if p),
+        ", ".join(p for p in [cleaned_venue, city] if p),
+        ", ".join(p for p in [city, country] if p),
         club_name,
     ]
     for query_text in queries:
