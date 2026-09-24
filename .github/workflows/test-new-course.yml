@@ -21,6 +21,11 @@ on:
         required: false
         default: ""
         type: string
+      course_selection:
+        description: "Course selected from the resolved venue; use the canonical UiDo course id."
+        required: true
+        default: "dukes"
+        type: string
 
 permissions:
   contents: write
@@ -231,7 +236,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        course: ${{ fromJSON(needs.registration.outputs.course_ids) }}
+        course: ${{ fromJSON(format('["{0}"]', inputs.course_selection)) }}
     uses: ./.github/workflows/build-course.yml
     with:
       course: ${{ matrix.course }}
