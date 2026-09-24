@@ -34,6 +34,29 @@ def main()->int:
     parser.add_argument("--refresh",action="store_true",help="Force a fresh GolfCourseAPI detail pull and replace the cached provider snapshot.")
     args=parser.parse_args()
     provider_id_arg=str(args.provider_id)
+    if provider_id_arg.startswith("osm-"):
+        import subprocess
+        subprocess.run([
+            "python3","tools/course-discovery/discover_osm_course.py",
+            os.environ.get("UIDO_DISCOVERY_QUERY", provider_id_arg),
+            "--country", args.expected_country or "United Kingdom",
+            "--output","osm-discovery.json"
+        ], check=True)
+        osm=json.loads(Path("osm-discovery.json").read_text())
+        target=json.loads(Path(osm["source_manifest"]).read_text())["target_course"]
+        registry=json.loads(REGISTRY.read_text())
+        course_id=osm["course_id"]
+        registry.setdefault("courses",{})[course_id]={
+            "identity":{"uido_id":stable_uido_id("osm:"+provider_id_arg),"provider":"osm","provider_id":provider_id_arg},
+            "name":target["name"],"club_name":osm.get("club_name"),
+            "holes":target["holes"],"par":target["par"],"location":target["location"],
+            "source_manifest":osm["source_manifest"],"boundary":target["boundary"],
+            "lifecycle":{"status":"registered","registration_method":"osm_fallback"}
+        }
+        registry["schema_version"]="uido.course-registry.v0.2"
+        REGISTRY.write_text(json.dumps(registry,indent=2)+"\\n")
+        print(json.dumps({"status":"registered","course_id":course_id,"provider_snapshot":osm["source_manifest"]},indent=2))
+        return 0
     provider_path=PROVIDER_DIR / f"{provider_id_arg}.json"
     detail=None
     provider_record=None
