@@ -33,6 +33,11 @@ on:
         required: false
         type: string
         default: ""
+      venue_anchor:
+        description: "Pre-resolved venue anchor JSON shared by all course acquisitions"
+        required: false
+        type: string
+        default: ""
 
 jobs:
   acquire:
@@ -47,7 +52,7 @@ jobs:
       - name: Prepare physical acquisition metadata
         run: |
           set -euo pipefail
-          python3 tools/course-discovery/prepare_physical_acquisition.py "$COURSE_ID" --venue-selection "${{ inputs.venue_selection }}"
+          python3 tools/course-discovery/prepare_physical_acquisition.py "$COURSE_ID" --venue-selection "${{ inputs.venue_selection }}" --venue-anchor '${{ inputs.venue_anchor }}'
 
       - name: Resolve selected course from registry
         run: |
