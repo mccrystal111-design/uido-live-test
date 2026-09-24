@@ -46,11 +46,7 @@ def distance_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     return 6371000 * math.sqrt(x*x + y*y)
 
 def geocode_venue(course: dict) -> tuple[float, float, dict]:
-    """Resolve a venue anchor when provider course GPS is absent.
-
-    The anchor is only used to seed local spatial discovery; it is never
-    treated as the course's final coordinates.
-    """
+    """Resolve a venue anchor when provider course GPS is absent."""
     club_name = str(course.get("club_name") or "").strip()
     location = course.get("location") or {}
     city = str(location.get("city") or "").strip()
@@ -58,54 +54,62 @@ def geocode_venue(course: dict) -> tuple[float, float, dict]:
     if not club_name:
         raise SystemExit("Cannot geocode venue anchor: registered course has no club_name")
 
-    query_text = ", ".join(p for p in [club_name, city, country] if p)
-    params = urllib.parse.urlencode({
-        "q": query_text, "format": "jsonv2", "limit": 5, "addressdetails": 1
-    })
-    req = urllib.request.Request(
-        "https://nominatim.openstreetmap.org/search?" + params,
-        headers={
-            "Accept": "application/json",
-            "User-Agent": "UiDo-course-builder/1.0 (+https://github.com/mccrystal111-design/uido-live-test)",
-        },
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=30) as response:
-            results = json.load(response)
-    except Exception as exc:
-        raise SystemExit(f"Venue geocoding failed for {query_text!r}: {exc}") from exc
-
-    ranked = []
-    wanted = clean(club_name)
-    for result in results if isinstance(results, list) else []:
-        if not result.get("lat") or not result.get("lon"):
+    queries = [
+        ", ".join(p for p in [club_name, city, country] if p),
+        ", ".join(p for p in [club_name, country] if p),
+        club_name,
+    ]
+    for query_text in queries:
+        params = urllib.parse.urlencode({
+            "q": query_text, "format": "jsonv2", "limit": 5, "addressdetails": 1
+        })
+        req = urllib.request.Request(
+            "https://nominatim.openstreetmap.org/search?" + params,
+            headers={
+                "Accept": "application/json",
+                "User-Agent": "UiDo-course-builder/1.0 (+https://github.com/mccrystal111-design/uido-live-test)",
+            },
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=30) as response:
+                results = json.load(response)
+        except Exception as exc:
+            print(f"Venue geocoding query failed: {query_text!r}: {exc}")
             continue
-        display = str(result.get("display_name") or "").casefold()
-        name = str(result.get("name") or display)
-        score = similarity(club_name, name)
-        if "golf" in display and "club" in display:
-            score += 0.15
-        ranked.append((score, result))
 
-    if not ranked:
-        raise SystemExit(f"No geocoded venue anchor found for {query_text!r}")
-    ranked.sort(key=lambda item: item[0], reverse=True)
-    best = ranked[0][1]
-    try:
-        lat, lon = float(best["lat"]), float(best["lon"])
-    except (TypeError, ValueError) as exc:
-        raise SystemExit(f"Geocoder returned invalid venue coordinates for {query_text!r}") from exc
+        ranked = []
+        for result in results if isinstance(results, list) else []:
+            if not result.get("lat") or not result.get("lon"):
+                continue
+            display = str(result.get("display_name") or "").casefold()
+            name = str(result.get("name") or display)
+            score = similarity(club_name, name)
+            if "golf" in display and "club" in display:
+                score += 0.15
+            ranked.append((score, result))
 
-    return lat, lon, {
-        "provider": "nominatim",
-        "query": query_text,
-        "display_name": best.get("display_name"),
-        "osm_type": best.get("osm_type"),
-        "osm_id": best.get("osm_id"),
-        "latitude": lat,
-        "longitude": lon,
-        "address": best.get("address") or {},
-    }
+        if ranked:
+            ranked.sort(key=lambda item: item[0], reverse=True)
+            best = ranked[0][1]
+            try:
+                lat, lon = float(best["lat"]), float(best["lon"])
+            except (TypeError, ValueError):
+                continue
+            return lat, lon, {
+                "provider": "nominatim",
+                "query": query_text,
+                "display_name": best.get("display_name"),
+                "osm_type": best.get("osm_type"),
+                "osm_id": best.get("osm_id"),
+                "latitude": lat,
+                "longitude": lon,
+                "address": best.get("address") or {},
+            }
+
+    raise SystemExit(
+        f"No geocoded venue anchor found for {club_name!r}; "
+        "tried venue name with location context and venue name alone"
+    )
 
 def query_overpass(lat: float, lon: float) -> dict:
     query = (
