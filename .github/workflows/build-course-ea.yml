@@ -28,6 +28,11 @@ on:
         required: false
         type: string
         default: ""
+      venue_selection:
+        description: "Exact venue selected during UiDo identity resolution"
+        required: false
+        type: string
+        default: ""
 
 jobs:
   acquire:
@@ -42,7 +47,7 @@ jobs:
       - name: Prepare physical acquisition metadata
         run: |
           set -euo pipefail
-          python3 tools/course-discovery/prepare_physical_acquisition.py "$COURSE_ID"
+          python3 tools/course-discovery/prepare_physical_acquisition.py "$COURSE_ID" --venue-selection "${{ inputs.venue_selection }}"
 
       - name: Resolve selected course from registry
         run: |
