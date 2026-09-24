@@ -45,7 +45,7 @@ def distance_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     y = math.radians(lat2 - lat1)
     return 6371000 * math.sqrt(x*x + y*y)
 
-def geocode_venue(course: dict) -> tuple[float, float, dict]:
+def geocode_venue(course: dict, selection: str = "") -> tuple[float, float, dict]:
     """Resolve a venue anchor when provider course GPS is absent."""
     club_name = str(course.get("club_name") or "").strip()
     location = course.get("location") or {}
@@ -67,6 +67,8 @@ def geocode_venue(course: dict) -> tuple[float, float, dict]:
         ", ".join(p for p in [city, country] if p),
         club_name,
     ]
+    all_candidates = []
+    seen = set()
     for query_text in queries:
         params = urllib.parse.urlencode({
             "q": query_text, "format": "jsonv2", "limit": 5, "addressdetails": 1
@@ -96,28 +98,69 @@ def geocode_venue(course: dict) -> tuple[float, float, dict]:
                 score += 0.15
             ranked.append((score, result))
 
-        if ranked:
-            ranked.sort(key=lambda item: item[0], reverse=True)
-            best = ranked[0][1]
-            try:
-                lat, lon = float(best["lat"]), float(best["lon"])
-            except (TypeError, ValueError):
-                continue
-            return lat, lon, {
-                "provider": "nominatim",
-                "query": query_text,
-                "display_name": best.get("display_name"),
-                "osm_type": best.get("osm_type"),
-                "osm_id": best.get("osm_id"),
-                "latitude": lat,
-                "longitude": lon,
-                "address": best.get("address") or {},
-            }
+        ranked.sort(key=lambda item: item[0], reverse=True)
+        for score, result in ranked:
+            key = (str(result.get("osm_type") or ""), str(result.get("osm_id") or ""))
+            if key not in seen:
+                seen.add(key)
+                all_candidates.append((score, query_text, result))
 
-    raise SystemExit(
-        f"No geocoded venue anchor found for {club_name!r}; "
-        "tried venue name with location context and venue name alone"
-    )
+    if not all_candidates:
+        raise SystemExit(
+            f"No geocoded venue anchor found for {club_name!r}; "
+            "searched venue and locality candidates"
+        )
+
+    all_candidates.sort(key=lambda item: item[0], reverse=True)
+
+    if selection:
+        wanted = clean(selection)
+        matches = [
+            item for item in all_candidates
+            if clean(str(item[2].get("name") or item[2].get("display_name") or "")) == wanted
+        ]
+        if not matches:
+            options = "\n".join(
+                f"  - {item[2].get('name') or item[2].get('display_name')}"
+                for item in all_candidates[:10]
+            )
+            raise SystemExit(
+                f"Venue selection {selection!r} was not found. Candidates were:\n{options}"
+            )
+        chosen = matches[0]
+    else:
+        chosen = all_candidates[0]
+        plausible = [
+            item for item in all_candidates
+            if item[0] >= max(0.35, chosen[0] - 0.20)
+        ]
+        if chosen[0] < 0.75 or len(plausible) > 1:
+            options = "\n".join(
+                f"  - {item[2].get('name') or item[2].get('display_name')} "
+                f"[score {item[0]:.2f}]"
+                for item in all_candidates[:10]
+            )
+            raise SystemExit(
+                f"IDENTITY_CONFIRMATION_REQUIRED for {club_name!r}. "
+                f"Choose one of these venue candidates and rerun with --venue-selection:\n{options}"
+            )
+
+    best_score, query_text, best = chosen
+    try:
+        lat, lon = float(best["lat"]), float(best["lon"])
+    except (TypeError, ValueError):
+        raise SystemExit("Selected venue candidate has no usable coordinates")
+    return lat, lon, {
+        "provider": "nominatim",
+        "query": query_text,
+        "display_name": best.get("display_name"),
+        "osm_type": best.get("osm_type"),
+        "osm_id": best.get("osm_id"),
+        "latitude": lat,
+        "longitude": lon,
+        "address": best.get("address") or {},
+        "selection_score": best_score,
+    }
 
 def query_overpass(lat: float, lon: float) -> dict:
     query = (
@@ -153,7 +196,7 @@ def query_overpass(lat: float, lon: float) -> dict:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("course_id")
+    parser.add_argument("course_id")\n    parser.add_argument("--venue-selection", default="", help="Exact venue name selected during UiDo identity resolution.")
     parser.add_argument("--output", type=Path, default=None)
     args = parser.parse_args()
 
@@ -227,7 +270,7 @@ def main() -> int:
     try:
         lat, lon = float(location["latitude"]), float(location["longitude"])
     except (KeyError, TypeError, ValueError):
-        lat, lon, venue_anchor = geocode_venue(course)
+        lat, lon, venue_anchor = geocode_venue(course, args.venue_selection)
         coordinate_source = "venue_geocode"
 
     target_names = [
