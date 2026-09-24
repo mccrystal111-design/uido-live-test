@@ -16,6 +16,11 @@ on:
         required: true
         default: "United Kingdom"
         type: string
+      venue_selection:
+        description: "Identity resolution: exact venue name selected after UiDo presents candidates; leave blank to auto-resolve."
+        required: false
+        default: ""
+        type: string
 
 permissions:
   contents: write
@@ -182,4 +187,5 @@ jobs:
     with:
       course: ${{ matrix.course }}
       ref: ${{ needs.registration.outputs.source_ref }}
+      venue_selection: ${{ inputs.venue_selection }}
     secrets: inherit
