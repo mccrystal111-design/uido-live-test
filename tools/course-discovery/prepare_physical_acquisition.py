@@ -198,6 +198,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("course_id")
     parser.add_argument("--venue-selection", default="", help="Exact venue name selected during UiDo identity resolution.")
+    parser.add_argument("--venue-anchor", default="", help="Pre-resolved venue anchor JSON; skips per-course geocoding.")
     parser.add_argument("--output", type=Path, default=None)
     args = parser.parse_args()
 
@@ -271,8 +272,16 @@ def main() -> int:
     try:
         lat, lon = float(location["latitude"]), float(location["longitude"])
     except (KeyError, TypeError, ValueError):
-        lat, lon, venue_anchor = geocode_venue(course, args.venue_selection)
-        coordinate_source = "venue_geocode"
+        if args.venue_anchor:
+            try:
+                venue_anchor = json.loads(args.venue_anchor)
+                lat, lon = float(venue_anchor["latitude"]), float(venue_anchor["longitude"])
+            except (TypeError, ValueError, KeyError, json.JSONDecodeError) as exc:
+                raise SystemExit(f"Invalid venue anchor: {exc}")
+            coordinate_source = "resolved_venue_anchor"
+        else:
+            lat, lon, venue_anchor = geocode_venue(course, args.venue_selection)
+            coordinate_source = "venue_geocode"
 
     target_names = [
         str(course.get("club_name") or ""),
