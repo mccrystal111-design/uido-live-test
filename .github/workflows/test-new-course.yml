@@ -36,6 +36,7 @@ jobs:
       - name: Search GolfCourseAPI once
         env:
           GOLFCOURSEAPI_API_KEY: ${{ secrets.GOLFCOURSEAPI_API_KEY }}
+          UIDO_DISCOVERY_QUERY: ${{ inputs.expected_name }}
         run: |
           set -euo pipefail
           python3 tools/course-discovery/search_golfcourseapi.py "${{ inputs.query }}" --country "${{ inputs.country }}" --limit 10 > discovery-results.json
@@ -99,12 +100,14 @@ jobs:
           set -euo pipefail
           python3 tools/course-discovery/register_course.py "${{ needs.discovery.outputs.provider_id }}" --expected-country "${{ inputs.country }}" | tee registration-result.json
       - name: Build canonical scorecard packet
+        if: ${{ needs.discovery.outputs.source == 'golfcourseapi' }}
         run: |
           set -euo pipefail
           python3 tools/course-discovery/build_scorecard_packet.py             "course-models/provider-data/golfcourseapi/${{ needs.discovery.outputs.provider_id }}.json"             "course-models/scorecards/${{ needs.discovery.outputs.provider_id }}.json"
       - name: Validate registry
         run: python3 tools/course-discovery/validate_registry.py
       - name: Validate canonical scorecard
+        if: ${{ needs.discovery.outputs.source == 'golfcourseapi' }}
         run: |
           set -euo pipefail
           python3 tools/course-discovery/validate_scorecard_packet.py             "course-models/scorecards/${{ needs.discovery.outputs.provider_id }}.json"
@@ -131,7 +134,7 @@ jobs:
         id: commit
         run: |
           set -euo pipefail
-          git add course-models/COURSE_REGISTRY.json course-models/provider-data/golfcourseapi course-models/scorecards
+          git add course-models/COURSE_REGISTRY.json course-models/*_SOURCE_MANIFEST.json course-models/provider-data/golfcourseapi course-models/scorecards
           if git diff --cached --quiet; then
             echo "No registration changes required."
             echo "source_ref=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
