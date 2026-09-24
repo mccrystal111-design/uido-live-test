@@ -21,10 +21,10 @@ permissions:
 
 jobs:
   discovery:
-    name: 1. Discover course (one search call)
+    name: 1. Discover venue and all courses
     runs-on: ubuntu-latest
     outputs:
-      provider_id: ${{ steps.select.outputs.provider_id }}
+      provider_ids: ${{ steps.select.outputs.provider_ids }}
       source: ${{ steps.select.outputs.source }}
     steps:
       - uses: actions/checkout@v4
@@ -36,7 +36,7 @@ jobs:
           set -euo pipefail
           python3 tools/course-discovery/search_golfcourseapi.py "${{ inputs.query }}" --country "${{ inputs.country }}" --limit 10 > discovery-results.json
           cat discovery-results.json
-      - name: Select one candidate without another API call
+      - name: Select venue and collect all courses
         id: select
         env:
           EXPECTED_NAME: ${{ inputs.query }}
@@ -44,109 +44,106 @@ jobs:
           set -euo pipefail
           python3 - <<'PY'
           import json, os, re
+
           data=json.load(open("discovery-results.json"))
           courses=data.get("courses",[])
+
           if not courses:
               print("GolfCourseAPI: no match. Falling back to OpenStreetMap evidence.")
-              import subprocess
-              subprocess.run(["python3","tools/course-discovery/discover_osm_course.py",os.environ["EXPECTED_NAME"],"--country","${{ inputs.country }}","--output","osm-discovery.json"],check=True)
-              osm=json.load(open("osm-discovery.json"))
-              with open(os.environ["GITHUB_OUTPUT"],"a") as f:
-                  f.write("provider_id="+osm["provider_id"]+"\n")
-                  f.write("source=osm\n")
-              print(json.dumps({"selected":osm,"selection_score":1.0,"source":"osm"},indent=2))
-              raise SystemExit(0)
+              raise SystemExit(
+                  "Venue-first multi-course discovery requires provider venue evidence; "
+                  "OSM fallback is not yet wired to enumerate a venue's courses."
+              )
+
           def tokens(value):
               return set(re.sub(r"[^a-z0-9]+"," ",value.casefold()).split())
+
           wanted=tokens(os.environ["EXPECTED_NAME"])
-          def score(course):
+
+          def overlap(a, b):
+              return len(a & b) / max(1, len(a | b))
+
+          def venue_score(course):
               name=tokens(str(course.get("name") or ""))
               club=tokens(str(course.get("club_name") or ""))
-              overlap=max(
-                  len(wanted & name)/max(1,len(wanted|name)),
-                  len(wanted & club)/max(1,len(wanted|club)),
-              )
-              return overlap
-          ranked=sorted(courses,key=score,reverse=True)
-          selected=ranked[0]
-          if not selected.get("provider_id"):
-              raise SystemExit("Selected discovery candidate has no provider_id.")
-          if score(selected) < 0.5:
-              raise SystemExit(f"Discovery candidate is not a confident match: {selected}")
+              return max(overlap(wanted, name), overlap(wanted, club))
+
+          # A venue search such as "Woburn" should resolve the venue first.
+          # Once the venue is identified, retain every course returned for
+          # that same venue instead of selecting one course arbitrarily.
+          ranked=sorted(courses, key=venue_score, reverse=True)
+          venue=ranked[0].get("club_name") or ranked[0].get("name") or ""
+          if not venue:
+              raise SystemExit("Discovery returned no usable venue name.")
+
+          venue_courses=[
+              course for course in courses
+              if str(course.get("club_name") or "").casefold() == venue.casefold()
+          ]
+
+          if not venue_courses:
+              raise SystemExit(f"No courses found for discovered venue: {venue}")
+
+          provider_ids=[
+              str(course["provider_id"])
+              for course in venue_courses
+              if course.get("provider_id")
+          ]
+          if len(provider_ids) != len(venue_courses):
+              raise SystemExit("Every discovered course must have a provider_id.")
+
+          print(json.dumps({
+              "search_term": os.environ["EXPECTED_NAME"],
+              "venue": venue,
+              "courses": venue_courses,
+              "provider_ids": provider_ids,
+              "course_count": len(provider_ids),
+              "source": "golfcourseapi",
+          }, indent=2))
+
           with open(os.environ["GITHUB_OUTPUT"],"a") as f:
-              f.write("provider_id="+selected["provider_id"]+"\n")
+              f.write("provider_ids=" + ",".join(provider_ids) + "\n")
               f.write("source=golfcourseapi\n")
-          print(json.dumps({"selected":selected,"selection_score":score(selected),"source":"golfcourseapi"},indent=2))
           PY
 
   registration:
-    name: 2. Register + scorecard (one detail pull)
+    name: 2. Register all discovered courses
     needs: discovery
     runs-on: ubuntu-latest
-    outputs:
-      course_id: ${{ steps.result.outputs.course_id }}
-      source_ref: ${{ steps.commit.outputs.source_ref }}
     steps:
       - uses: actions/checkout@v4
-      - name: Register selected course without refresh
+      - name: Register every discovered course without refresh
         env:
           GOLFCOURSEAPI_API_KEY: ${{ secrets.GOLFCOURSEAPI_API_KEY }}
           UIDO_DISCOVERY_QUERY: ${{ inputs.query }}
+          PROVIDER_IDS: ${{ needs.discovery.outputs.provider_ids }}
         run: |
           set -euo pipefail
-          python3 tools/course-discovery/register_course.py "${{ needs.discovery.outputs.provider_id }}" --expected-country "${{ inputs.country }}" | tee registration-result.json
-      - name: Build canonical scorecard packet
-        if: ${{ needs.discovery.outputs.source == 'golfcourseapi' }}
-        run: |
-          set -euo pipefail
-          python3 tools/course-discovery/build_scorecard_packet.py             "course-models/provider-data/golfcourseapi/${{ needs.discovery.outputs.provider_id }}.json"             "course-models/scorecards/${{ needs.discovery.outputs.provider_id }}.json"
+          IFS=',' read -ra IDS <<< "$PROVIDER_IDS"
+          for provider_id in "${IDS[@]}"; do
+            echo "Registering course: $provider_id"
+            python3 tools/course-discovery/register_course.py "$provider_id" --expected-country "${{ inputs.country }}"
+          done
       - name: Validate registry
         run: python3 tools/course-discovery/validate_registry.py
-      - name: Validate canonical scorecard
-        if: ${{ needs.discovery.outputs.source == 'golfcourseapi' }}
-        run: |
-          set -euo pipefail
-          python3 tools/course-discovery/validate_scorecard_packet.py             "course-models/scorecards/${{ needs.discovery.outputs.provider_id }}.json"
-      - name: Capture registered course id
-        id: result
-        env:
-          PROVIDER_ID: ${{ needs.discovery.outputs.provider_id }}
-        run: |
-          set -euo pipefail
-          python3 - <<'PY' >> "$GITHUB_OUTPUT"
-          import json, os
-          registry=json.load(open("course-models/COURSE_REGISTRY.json"))
-          provider=os.environ["PROVIDER_ID"]
-          matches=[
-              (course_id, course)
-              for course_id, course in registry.get("courses", {}).items()
-              if str((course.get("identity") or {}).get("provider_id")) == provider
-          ]
-          if len(matches) != 1:
-              raise SystemExit(f"Expected exactly one registered course for provider {provider}, found {len(matches)}")
-          print(f"course_id={matches[0][0]}")
-          PY
-      - name: Commit registration and scorecard
-        id: commit
+      - name: Commit registrations
         run: |
           set -euo pipefail
           git add course-models/COURSE_REGISTRY.json course-models/*_SOURCE_MANIFEST.json course-models/provider-data/golfcourseapi course-models/scorecards
           if git diff --cached --quiet; then
             echo "No registration changes required."
-            echo "source_ref=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "Register end-to-end test course ${{ needs.discovery.outputs.provider_id }}"
+          git commit -m "Register venue courses for ${{ inputs.query }}"
           git push
-          echo "source_ref=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
   pipeline:
     name: 3. Physical acquisition → QA → wireframe
     needs: registration
     uses: ./.github/workflows/build-course.yml
     with:
-      course: ${{ needs.registration.outputs.course_id }}
-      ref: ${{ needs.registration.outputs.source_ref }}
+      course: ""
+      ref: main
     secrets: inherit
