@@ -4,6 +4,12 @@ name: UiDo Course Builder - Agnostic EA acquisition
 # Can run standalone or as a reusable stage inside the master course pipeline.
 # This deliberately stops before course-specific model generation.
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-course-ea.yml'
+      - 'tools/course-discovery/**'
+      - 'course-models/**'
   workflow_dispatch:
     inputs:
       course:
