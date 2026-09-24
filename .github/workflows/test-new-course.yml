@@ -30,6 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       provider_id: ${{ steps.select.outputs.provider_id }}
+      source: ${{ steps.select.outputs.source }}
     steps:
       - uses: actions/checkout@v4
       - name: Search GolfCourseAPI once
@@ -50,7 +51,15 @@ jobs:
           data=json.load(open("discovery-results.json"))
           courses=data.get("courses",[])
           if not courses:
-              raise SystemExit("Discovery returned no matching course candidates.")
+              print("GolfCourseAPI: no match. Falling back to OpenStreetMap evidence.")
+              import subprocess
+              subprocess.run(["python3","tools/course-discovery/discover_osm_course.py",os.environ["EXPECTED_NAME"],"--country","${{ inputs.country }}","--output","osm-discovery.json"],check=True)
+              osm=json.load(open("osm-discovery.json"))
+              with open(os.environ["GITHUB_OUTPUT"],"a") as f:
+                  f.write("provider_id="+osm["provider_id"]+"\n")
+                  f.write("source=osm\n")
+              print(json.dumps({"selected":osm,"selection_score":1.0,"source":"osm"},indent=2))
+              raise SystemExit(0)
           def tokens(value):
               return set(re.sub(r"[^a-z0-9]+"," ",value.casefold()).split())
           wanted=tokens(os.environ["EXPECTED_NAME"])
@@ -69,8 +78,9 @@ jobs:
           if score(selected) < 0.5:
               raise SystemExit(f"Discovery candidate is not a confident match: {selected}")
           with open(os.environ["GITHUB_OUTPUT"],"a") as f:
-              f.write(f"provider_id={selected['provider_id']}\n")
-          print(json.dumps({"selected":selected,"selection_score":score(selected)},indent=2))
+              f.write("provider_id="+selected["provider_id"]+"\n")
+              f.write("source=golfcourseapi\n")
+          print(json.dumps({"selected":selected,"selection_score":score(selected),"source":"golfcourseapi"},indent=2))
           PY
 
   registration:
