@@ -54,7 +54,7 @@ def main()->int:
             "lifecycle":{"status":"registered","registration_method":"osm_fallback"}
         }
         registry["schema_version"]="uido.course-registry.v0.2"
-        REGISTRY.write_text(json.dumps(registry,indent=2)+"\\n")
+        REGISTRY.write_text(json.dumps(registry,indent=2)+"\n")
         print(json.dumps({"status":"registered","course_id":course_id,"provider_snapshot":osm["source_manifest"]},indent=2))
         return 0
     provider_path=PROVIDER_DIR / f"{provider_id_arg}.json"
