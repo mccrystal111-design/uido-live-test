@@ -109,11 +109,14 @@ jobs:
             for ep in "${ENDPOINTS[@]}"; do
               echo "Trying $ep"
               if curl -fsSL --retry 3 --connect-timeout 20 --max-time 240                 -A "UiDo-course-builder/1.0 (+https://github.com/mccrystal111-design/uido-live-test)"                 -H "Accept: application/json"                 --data-urlencode "data=$q" "$ep" -o "$out"; then
+                printf '%s\n' "$ep" > "$out.endpoint"
                 return 0
               fi
             done
             return 1
           }
+          printf '%s\n' "$QUERY" > "build/$COURSE_ID/osm/golf.query.txt"
+          printf '%s\n' "$RELS" > "build/$COURSE_ID/osm/fairway-relations.query.txt"
           fetch "$QUERY" "build/$COURSE_ID/osm/golf.json"
           fetch "$RELS" "build/$COURSE_ID/osm/fairway-relations.json"
 
@@ -123,6 +126,7 @@ jobs:
           golf = json.loads((root / "golf.json").read_text())
           fairways = json.loads((root / "fairway-relations.json").read_text())
           elements = golf.get("elements", [])
+          expected = {str(i) for i in range(1,19)}
           holes = {
               str(e.get("tags", {}).get("ref"))
               for e in elements
@@ -130,20 +134,58 @@ jobs:
               and str(e.get("tags", {}).get("ref", "")).isdigit()
               and 1 <= int(e["tags"]["ref"]) <= 18
           }
-          if holes != {str(i) for i in range(1,19)}:
-              raise SystemExit(f"Expected target hole refs 1..18, found {sorted(holes, key=lambda x:int(x))}")
+          missing = sorted(expected - holes, key=int)
+          extra = sorted(holes - expected, key=int)
+          status = "complete" if not missing and not extra else "incomplete"
           manifest = {
-              "schema": "uido.course.osm-capture.v0.2",
+              "schema": "uido.course.osm-capture.v0.3",
               "course_id": os.environ["COURSE_ID"],
               "course": os.environ["COURSE_NAME"],
               "bbox": [float(os.environ["SOUTH"]), float(os.environ["WEST"]), float(os.environ["NORTH"]), float(os.environ["EAST"])],
+              "status": status,
+              "target_hole_refs": sorted(holes, key=int),
+              "missing_hole_refs": missing,
+              "unexpected_hole_refs": extra,
               "elements": len(elements),
               "fairway_relation_elements": len(fairways.get("elements", [])),
-              "target_hole_refs": sorted(holes, key=int),
-              "sha256": hashlib.sha256((root / "golf.json").read_bytes()).hexdigest()
+              "raw_files": {
+                  "golf": "golf.json",
+                  "fairway_relations": "fairway-relations.json",
+                  "golf_query": "golf.query.txt",
+                  "fairway_relations_query": "fairway-relations.query.txt",
+                  "golf_endpoint": "golf.json.endpoint",
+                  "fairway_relations_endpoint": "fairway-relations.json.endpoint"
+              },
+              "sha256": {
+                  "golf": hashlib.sha256((root / "golf.json").read_bytes()).hexdigest(),
+                  "fairway_relations": hashlib.sha256((root / "fairway-relations.json").read_bytes()).hexdigest()
+              }
           }
           (root / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
           print(json.dumps(manifest, indent=2))
+          PY
+
+      - name: Preserve raw OSM capture
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uido-osm-raw-${{ inputs.course }}
+          path: build/${{ inputs.course }}/osm/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Validate OSM target hole refs
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, pathlib
+          manifest = json.loads((pathlib.Path("build") / os.environ["COURSE_ID"] / "osm" / "manifest.json").read_text())
+          if manifest["status"] != "complete":
+              raise SystemExit(
+                  "OSM capture preserved but target hole validation failed: "
+                  f"missing={manifest['missing_hole_refs']} unexpected={manifest['unexpected_hole_refs']}"
+              )
+          print("PASS: OSM capture contains target hole refs 1..18")
           PY
 
       - name: Acquire EA aerial source
