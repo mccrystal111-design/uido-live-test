@@ -96,6 +96,7 @@ jobs:
       - name: Register selected course without refresh
         env:
           GOLFCOURSEAPI_API_KEY: ${{ secrets.GOLFCOURSEAPI_API_KEY }}
+          UIDO_DISCOVERY_QUERY: ${{ inputs.expected_name }}
         run: |
           set -euo pipefail
           python3 tools/course-discovery/register_course.py "${{ needs.discovery.outputs.provider_id }}" --expected-country "${{ inputs.country }}" | tee registration-result.json
