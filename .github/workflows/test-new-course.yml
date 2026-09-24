@@ -196,8 +196,14 @@ jobs:
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import json, os
-          from tools.course_discovery.prepare_physical_acquisition import geocode_venue
+          import importlib.util, json, os
+          spec = importlib.util.spec_from_file_location(
+              "prepare_physical_acquisition",
+              "tools/course-discovery/prepare_physical_acquisition.py",
+          )
+          module = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(module)
+          geocode_venue = module.geocode_venue
 
           course_ids = json.loads(os.environ["COURSE_IDS"])
           registry = json.load(open("course-models/COURSE_REGISTRY.json"))
