@@ -26,6 +26,11 @@ on:
         required: false
         type: string
         default: ""
+      venue_anchor:
+        description: "Pre-resolved venue anchor JSON shared by all course acquisitions"
+        required: false
+        type: string
+        default: ""
     secrets:
       inherit:
         required: false
@@ -38,6 +43,7 @@ jobs:
       course: ${{ inputs.course }}
       ref: ${{ inputs.ref }}
       venue_selection: ${{ inputs.venue_selection }}
+      venue_anchor: ${{ inputs.venue_anchor }}
     secrets: inherit
 
   packet-qa:
