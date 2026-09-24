@@ -55,12 +55,7 @@ def overpass(query: str):
 
 
 def direct_overpass_course(query: str, country: str):
-    """Find a named golf course directly in Overpass when Nominatim fails.
-
-    The fallback deliberately searches the UK OSM area for golf=course features
-    rather than attempting another geocoder. The selected course feature then
-    supplies the centre point used by the normal local hole query.
-    """
+    """Find a named golf course using either OSM course tagging convention."""
     course_term = " ".join(
         x for x in query.split()
         if x.casefold() not in {"golf", "club", "course"}
@@ -70,14 +65,22 @@ def direct_overpass_course(query: str, country: str):
 
     if area_code:
         scope = f'area["ISO3166-1"="{area_code}"]->.searchArea;'
-        selector = f'nwr["golf"="course"]["name"~"{escaped}",i](area.searchArea);'
+        selector = (
+            f'('
+            f'nwr["golf"="course"]["name"~"{escaped}",i](area.searchArea);'
+            f'nwr["leisure"="golf_course"]["name"~"{escaped}",i](area.searchArea);'
+            f');'
+        )
     else:
-        # Keep the non-UK fallback bounded to the named country where Overpass
-        # exposes a matching ISO country area.
         scope = (
             f'area["name"="{country}"]["boundary"="administrative"]->.searchArea;'
         )
-        selector = f'nwr["golf"="course"]["name"~"{escaped}",i](area.searchArea);'
+        selector = (
+            f'('
+            f'nwr["golf"="course"]["name"~"{escaped}",i](area.searchArea);'
+            f'nwr["leisure"="golf_course"]["name"~"{escaped}",i](area.searchArea);'
+            f');'
+        )
 
     q = f"""[out:json][timeout:180];
 {scope}
@@ -93,10 +96,7 @@ out center tags;"""
         center = element.get("center") or {}
         if center.get("lat") is None or center.get("lon") is None:
             continue
-        candidates.append((
-            score(wanted, name),
-            element,
-        ))
+        candidates.append((score(wanted, name), element))
 
     if not candidates:
         raise SystemExit(
@@ -163,8 +163,6 @@ def main() -> int:
         discovery_source = "nominatim"
         discovery_endpoint = "https://nominatim.openstreetmap.org/search"
     else:
-        # Nominatim is a discovery aid, not a hard dependency. If it cannot
-        # return a usable candidate, fall through directly to Overpass.
         place, discovery_source, discovery_endpoint = direct_overpass_course(
             args.query, args.country
         )
@@ -180,6 +178,7 @@ def main() -> int:
 (
   nwr["golf"="hole"]["golf:course:name"~"{escaped}",i](around:5000,{lat},{lon});
   nwr["golf"="course"]["name"~"{escaped}",i](around:5000,{lat},{lon});
+  nwr["leisure"="golf_course"]["name"~"{escaped}",i](around:5000,{lat},{lon});
 );
 out center tags geom;"""
     payload, endpoint = overpass(q)
@@ -193,19 +192,13 @@ out center tags geom;"""
             ref = str(tags.get("ref") or "").strip()
             if ref.isdigit() and 1 <= int(ref) <= 18:
                 wanted_holes.append(e)
-        if tags.get("golf") == "course":
+        if tags.get("golf") == "course" or tags.get("leisure") == "golf_course":
             course_elements.append(e)
 
     if len(wanted_holes) != 18:
-        # Some OSM mappings put the course name on the course feature rather
-        # than every hole. In that case accept exactly 18 numbered holes only
-        # when the selected course feature itself is a strong name match.
         strong_course = [
             e for e in course_elements
-            if score(
-                wanted,
-                str((e.get("tags") or {}).get("name") or ""),
-            ) >= 0.5
+            if score(wanted, str((e.get("tags") or {}).get("name") or "")) >= 0.5
         ]
         if not strong_course:
             raise SystemExit(
@@ -242,14 +235,8 @@ out center tags geom;"""
         )
 
     par = sum(pars)
-    west, east = (
-        min(x[1] for x in points) - 0.0005,
-        max(x[1] for x in points) + 0.0005,
-    )
-    south, north = (
-        min(x[0] for x in points) - 0.0005,
-        max(x[0] for x in points) + 0.0005,
-    )
+    west, east = min(x[1] for x in points) - 0.0005, max(x[1] for x in points) + 0.0005
+    south, north = min(x[0] for x in points) - 0.0005, max(x[0] for x in points) + 0.0005
 
     course_name = args.query.strip()
     for e in course_elements:
@@ -272,17 +259,9 @@ out center tags geom;"""
             "holes": 18,
             "par": par,
             "boundary": {
-                "west": west,
-                "south": south,
-                "east": east,
-                "north": north,
-                "crs": "EPSG:4326",
+                "west": west, "south": south, "east": east, "north": north, "crs": "EPSG:4326"
             },
-            "location": {
-                "latitude": lat,
-                "longitude": lon,
-                "country": args.country,
-            },
+            "location": {"latitude": lat, "longitude": lon, "country": args.country},
         },
         "provenance": {
             "discovery_source": discovery_source,
