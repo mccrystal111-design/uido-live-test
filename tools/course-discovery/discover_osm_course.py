@@ -47,7 +47,10 @@ def name_pattern(text: str) -> str:
 
 
 def overpass(query: str):
+    last_error = None
     for endpoint in OVERPASS_ENDPOINTS:
+        # Public Overpass mirrors can intermittently reject POST while accepting
+        # GET, or vice versa, so try both transports before moving to the next.
         try:
             req = urllib.request.Request(
                 endpoint,
@@ -58,11 +61,24 @@ def overpass(query: str):
                     "User-Agent": "UiDo-course-discovery/1.0",
                 },
             )
-            with urllib.request.urlopen(req, timeout=180) as r:
+            with urllib.request.urlopen(req, timeout=120) as r:
                 return json.load(r), endpoint
-        except Exception:
-            continue
-    raise SystemExit("All Overpass endpoints failed.")
+        except Exception as exc:
+            last_error = exc
+        try:
+            url = endpoint + "?" + urllib.parse.urlencode({"data": query})
+            req = urllib.request.Request(
+                url,
+                headers={
+                    "Accept": "application/json",
+                    "User-Agent": "UiDo-course-discovery/1.0",
+                },
+            )
+            with urllib.request.urlopen(req, timeout=120) as r:
+                return json.load(r), endpoint
+        except Exception as exc:
+            last_error = exc
+    raise SystemExit(f"All Overpass endpoints failed: {last_error}")
 
 
 def direct_overpass_course(query: str, country: str):
@@ -73,19 +89,11 @@ def direct_overpass_course(query: str, country: str):
     than requiring the complete query phrase to appear in the OSM name.
     """
     pattern = name_pattern(query)
-    area_code = "GB" if country.casefold() in {"uk", "united kingdom", "great britain"} else None
-
-    if area_code:
-        scope = f'area["ISO3166-1"="{area_code}"]->.searchArea;'
-        selector = f'nwr["golf"="course"]["name"~"{pattern}",i](area.searchArea);'
-    else:
-        scope = (
-            f'area["name"="{country}"]["boundary"="administrative"]->.searchArea;'
-        )
-        selector = f'nwr["golf"="course"]["name"~"{pattern}",i](area.searchArea);'
-
-    q = f"""[out:json][timeout:180];
-{scope}
+    # A name-filtered search avoids scanning the entire UK administrative
+    # relation, which can time out on public Overpass mirrors. The candidate is
+    # still validated against the full query tokens below.
+    selector = f'nwr["golf"="course"]["name"~"{pattern}",i];'
+    q = f"""[out:json][timeout:120];
 {selector}
 out center tags;"""
     payload, endpoint = overpass(q)
