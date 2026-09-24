@@ -1,6 +1,6 @@
 # UiDo — Project Source of Truth
 
-**Last updated:** 2026-09-23  
+**Last updated:** 2026-09-24  
 **Repository:** `mccrystal111-design/uido-live-test`  
 **Canonical project:** UiDo golf decision engine / virtual caddie / SmartShot intelligence.
 
@@ -12,16 +12,16 @@ This is the first file a fresh UiDo session should read. It records authoritativ
 **GolfCourseAPI discovery/registration: IMPLEMENTED; Northampton registry metadata is complete and identity validation is GREEN.**
 **Northampton physical acquisition: BLOCKED by incomplete OSM hole coverage.**
 
-Current `main` head: `60836d469270b30506cad8bfc98cefa15d3914dd` (`Allow standalone fairways in packet QA`).
+Current `main` head: `27e0df2a11eb14c27434b542b5e75c7eed364b0d` (`Reconcile source of truth with latest Northampton run`). The status file previously lagged this head; this reconciliation corrects that discrepancy. The parent `60836d469…` remains the latest code change allowing standalone fairways in packet QA. fileciteturn7file0 fileciteturn3file0
 
-The latest master run is `35895454637` (2026-09-23). It was a **Northampton** test. Physical source preparation generated and identity-validated the Northampton boundary, but the OSM query ultimately returned hole refs **1–3 and 5–18; hole 4 was absent**, so acquisition failed closed. Stages 2–4 were correctly skipped. This is now the active blocker; it is not evidence that the course is missing or that source data should be recreated.
+The latest master run is `35895454637` (2026-09-23). It was a **Northampton** test. Physical source preparation generated and identity-validated the Northampton boundary, but the OSM acquisition step failed; Stages 2–4 were skipped. The documented failure remains the incomplete OSM hole coverage: refs **1–3 and 5–18; hole 4 absent**. This is now the active blocker; it is not evidence that the course is missing or that source data should be recreated. The job record confirms acquisition failed and downstream stages were correctly skipped.
 
 The run also exercised the new resilient Overpass endpoint list. The first endpoint returned 504/timeouts, after which the query progressed far enough to produce OSM data but failed the required 18-hole identity check. Do not treat this as a generic Overpass outage without checking the returned course data.
 
 ## VERIFIED RECENT WORK
 
 - `ed0dc127…` added resilient Overpass endpoint fallback.
-- `60836d469…` relaxed packet QA so a course may use standalone fairway ways when no fairway relations exist; it still requires fairway source data.
+- `60836d469…` relaxed packet QA so a course may use standalone fairway ways when no fairway relations exist; it still requires fairway source data. fileciteturn3file0
 - Poult Wood master run `35851974870` remains the verified end-to-end reference: Stage 1 acquisition, Stage 2 packet QA, Stage 3 packet-driven wireframe, Stage 4 summary all succeeded.
 - The wireframe renderer treats fairway relations as authoritative features and member ways as reconstruction inputs only, preventing duplicate rendering/counting and failing closed if all 18 target hole routes are not present.
 - GolfCourseAPI discovery/import and registry workflows are implemented. Northampton metadata now contains a valid provider identity and an OSM identity match; the remaining Northampton proof is physical acquisition → packet → wireframe.
@@ -38,7 +38,7 @@ Raw OSM and normalised source are still authoritative and present in the UiDo Li
   - SHA-256: `876eb808a978f577057747f71cca759d4032ed5cc776c3bf036eb126ce6b28e9`
   - Schema: `uido.course.source-normalized.v0.1`
 
-Library retrieval still confirms the normalised source retains 18 hole features and preserves source geometry exactly. fileciteturn9file0
+Library retrieval confirms the normalised source has **18 HOLE features** and preserves source geometry exactly. In particular, the authoritative source contains an explicit hole 4 feature (`way/798140685`), so the Northampton missing-hole-4 failure must not be “fixed” by modifying or copying Overstone geometry. fileciteturn5file0 fileciteturn5file2
 
 ### Library v0.4 discrepancy
 
@@ -61,7 +61,7 @@ The architecture is modular:
 
 Once acquired and QA'd, the **Course Packet is the persisted hand-off layer**. Downstream stages must consume the packet and must not silently re-query or recapture OSM/EA data.
 
-Poult Wood run `35851974870` is the proof that this packet-driven wireframe path works end-to-end. The Library wireframe artifact also exists as QA output; it is not source geometry. fileciteturn9file4
+Poult Wood run `35851974870` is the proof that this packet-driven wireframe path works end-to-end. The Library wireframe artifact also exists as QA output; it is not source geometry. fileciteturn5file1
 
 ## COURSE-MODEL FINDINGS
 
@@ -85,7 +85,7 @@ The current failure is precise: the OSM `golf=hole` query returned **17 target r
 
 ## UI / PRODUCT STATE
 
-Library UI source of truth remains the premium golf-instrument direction, with light/dark system, persistent navigation icon language and the live flow GPS/Yardage → Wind → Lie → Start Line → Shape → Strike. The UI blueprint explicitly calls for shared theme tokens, one icon family, reusable tile shell, then tile migration and radial navigation. fileciteturn10file2 fileciteturn10file4
+Library UI source of truth remains the premium golf-instrument direction, with light/dark system, persistent navigation icon language and the live flow GPS/Yardage → Wind → Lie → Start Line → Shape → Strike. The UI blueprint explicitly calls for shared theme tokens, one icon family, reusable tile shell, then tile migration and radial navigation.
 
 Strategy remains outside the live capture flow until SmartShot is ready.
 
