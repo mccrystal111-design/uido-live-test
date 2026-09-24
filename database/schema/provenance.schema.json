@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uido.golf/schema/provenance.schema.json",
+  "title": "UiDo Provenance",
+  "type": "object",
+  "required": ["provenance_id", "source_id", "source_snapshot_id", "observed_at"],
+  "properties": {
+    "provenance_id": {"type": "string"},
+    "source_id": {"type": "string"},
+    "source_snapshot_id": {"type": "string"},
+    "external_identifier": {"type": ["string", "null"]},
+    "external_url": {"type": ["string", "null"], "format": "uri"},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "ingested_at": {"type": "string", "format": "date-time"},
+    "transformation": {"type": ["string", "null"]},
+    "notes": {"type": ["string", "null"]}
+  },
+  "additionalProperties": false
+}
