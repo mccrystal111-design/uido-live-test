@@ -35,6 +35,17 @@ def score(wanted: set[str], text: str) -> float:
     return len(wanted & got) / max(1, len(wanted | got))
 
 
+def name_pattern(text: str) -> str:
+    """Build an Overpass regex that matches any meaningful name token."""
+    ignored = {"golf", "club", "course"}
+    parts = sorted(
+        {re.escape(token) for token in tokens(text) if token not in ignored},
+        key=len,
+        reverse=True,
+    )
+    return "|".join(parts)[:120] or re.escape(text)[:120]
+
+
 def overpass(query: str):
     for endpoint in OVERPASS_ENDPOINTS:
         try:
@@ -55,32 +66,23 @@ def overpass(query: str):
 
 
 def direct_overpass_course(query: str, country: str):
-    """Find a named golf course using either OSM course tagging convention."""
-    course_term = " ".join(
-        x for x in query.split()
-        if x.casefold() not in {"golf", "club", "course"}
-    )
-    escaped = re.escape(course_term or query)[:80]
+    """Find a named golf course directly in Overpass when Nominatim fails.
+
+    Nominatim is not a prerequisite for OSM discovery. The direct fallback
+    searches golf=course features using the meaningful query tokens rather
+    than requiring the complete query phrase to appear in the OSM name.
+    """
+    pattern = name_pattern(query)
     area_code = "GB" if country.casefold() in {"uk", "united kingdom", "great britain"} else None
 
     if area_code:
         scope = f'area["ISO3166-1"="{area_code}"]->.searchArea;'
-        selector = (
-            f'('
-            f'nwr["golf"="course"]["name"~"{escaped}",i](area.searchArea);'
-            f'nwr["leisure"="golf_course"]["name"~"{escaped}",i](area.searchArea);'
-            f');'
-        )
+        selector = f'nwr["golf"="course"]["name"~"{pattern}",i](area.searchArea);'
     else:
         scope = (
             f'area["name"="{country}"]["boundary"="administrative"]->.searchArea;'
         )
-        selector = (
-            f'('
-            f'nwr["golf"="course"]["name"~"{escaped}",i](area.searchArea);'
-            f'nwr["leisure"="golf_course"]["name"~"{escaped}",i](area.searchArea);'
-            f');'
-        )
+        selector = f'nwr["golf"="course"]["name"~"{pattern}",i](area.searchArea);'
 
     q = f"""[out:json][timeout:180];
 {scope}
@@ -163,22 +165,22 @@ def main() -> int:
         discovery_source = "nominatim"
         discovery_endpoint = "https://nominatim.openstreetmap.org/search"
     else:
+        # Nominatim is a discovery aid, not a hard dependency. If it cannot
+        # return a usable candidate, fall through directly to Overpass.
         place, discovery_source, discovery_endpoint = direct_overpass_course(
             args.query, args.country
         )
 
     lat, lon = float(place["lat"]), float(place["lon"])
 
-    course_term = " ".join(
-        x for x in args.query.split()
-        if x.casefold() not in {"golf", "club", "course"}
-    )
-    escaped = re.escape(course_term or args.query)[:80]
+    # Use the discovered OSM name when available. This matters for courses
+    # whose OSM name is "Dukes" while the input is "Woburn Dukes Golf Club".
+    local_name = str(place.get("name") or args.query)
+    pattern = name_pattern(local_name)
     q = f"""[out:json][timeout:180];
 (
-  nwr["golf"="hole"]["golf:course:name"~"{escaped}",i](around:5000,{lat},{lon});
-  nwr["golf"="course"]["name"~"{escaped}",i](around:5000,{lat},{lon});
-  nwr["leisure"="golf_course"]["name"~"{escaped}",i](around:5000,{lat},{lon});
+  nwr["golf"="hole"]["golf:course:name"~"{pattern}",i](around:5000,{lat},{lon});
+  nwr["golf"="course"]["name"~"{pattern}",i](around:5000,{lat},{lon});
 );
 out center tags geom;"""
     payload, endpoint = overpass(q)
@@ -192,7 +194,7 @@ out center tags geom;"""
             ref = str(tags.get("ref") or "").strip()
             if ref.isdigit() and 1 <= int(ref) <= 18:
                 wanted_holes.append(e)
-        if tags.get("golf") == "course" or tags.get("leisure") == "golf_course":
+        if tags.get("golf") == "course":
             course_elements.append(e)
 
     if len(wanted_holes) != 18:
@@ -235,8 +237,14 @@ out center tags geom;"""
         )
 
     par = sum(pars)
-    west, east = min(x[1] for x in points) - 0.0005, max(x[1] for x in points) + 0.0005
-    south, north = min(x[0] for x in points) - 0.0005, max(x[0] for x in points) + 0.0005
+    west, east = (
+        min(x[1] for x in points) - 0.0005,
+        max(x[1] for x in points) + 0.0005,
+    )
+    south, north = (
+        min(x[0] for x in points) - 0.0005,
+        max(x[0] for x in points) + 0.0005,
+    )
 
     course_name = args.query.strip()
     for e in course_elements:
@@ -244,6 +252,8 @@ out center tags geom;"""
         if score(wanted, name) >= 0.5:
             course_name = name
             break
+    if discovery_source == "overpass" and place.get("name"):
+        course_name = str(place["name"])
 
     source_id = f"osm-{place.get('osm_type', 'unknown')}-{place.get('osm_id', 'unknown')}"
     course_id = re.sub(r"[^a-z0-9]+", "-", course_name.casefold()).strip("-")
@@ -259,9 +269,17 @@ out center tags geom;"""
             "holes": 18,
             "par": par,
             "boundary": {
-                "west": west, "south": south, "east": east, "north": north, "crs": "EPSG:4326"
+                "west": west,
+                "south": south,
+                "east": east,
+                "north": north,
+                "crs": "EPSG:4326",
             },
-            "location": {"latitude": lat, "longitude": lon, "country": args.country},
+            "location": {
+                "latitude": lat,
+                "longitude": lon,
+                "country": args.country,
+            },
         },
         "provenance": {
             "discovery_source": discovery_source,
