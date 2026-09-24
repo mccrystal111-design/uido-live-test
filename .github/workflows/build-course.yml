@@ -21,6 +21,11 @@ on:
         required: false
         type: string
         default: ""
+      venue_selection:
+        description: "Exact venue selected during UiDo identity resolution"
+        required: false
+        type: string
+        default: ""
     secrets:
       inherit:
         required: false
@@ -32,6 +37,7 @@ jobs:
     with:
       course: ${{ inputs.course }}
       ref: ${{ inputs.ref }}
+      venue_selection: ${{ inputs.venue_selection }}
     secrets: inherit
 
   packet-qa:
