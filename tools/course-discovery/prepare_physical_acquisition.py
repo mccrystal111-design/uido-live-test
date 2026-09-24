@@ -88,13 +88,62 @@ def main() -> int:
     if not isinstance(course, dict):
         raise SystemExit(f"Unknown course id: {args.course_id}")
 
-    # Preserve already-established physical authority unchanged.
-    if course.get("boundary") and course.get("source_manifest"):
+    # A verified boundary is sufficient physical authority for acquisition.
+    # If a source manifest is already persisted, preserve it unchanged. Otherwise
+    # materialise an ephemeral acquisition manifest from the registry boundary
+    # without making another identity-discovery Overpass call.
+    if course.get("boundary"):
+        boundary = course["boundary"]
+        source_manifest = course.get("source_manifest")
+        if source_manifest:
+            print(json.dumps({
+                "status": "existing",
+                "course_id": args.course_id,
+                "boundary": boundary,
+                "source_manifest": source_manifest,
+            }, indent=2))
+            return 0
+
+        holes = course.get("holes")
+        par = course.get("par")
+        if holes != 18 or par is None:
+            raise SystemExit(
+                f"{args.course_id}: physical acquisition requires 18 holes and a known par; "
+                f"got holes={holes}, par={par}"
+            )
+        manifest = {
+            "schema_version": "uido.course-source-manifest.v0.2",
+            "course": args.course_id,
+            "target_course": {
+                "name": course.get("club_name") or course.get("name") or args.course_id,
+                "holes": int(holes),
+                "par": int(par),
+                "boundary": boundary,
+            },
+            "identity_validation": {
+                "provider": course.get("identity", {}).get("provider"),
+                "provider_id": course.get("identity", {}).get("provider_id"),
+                "provider_coordinates": {
+                    "latitude": (course.get("location") or {}).get("latitude"),
+                    "longitude": (course.get("location") or {}).get("longitude"),
+                },
+                "identity_result": "PASS",
+                "basis": "registry_physical_authority",
+            },
+            "osm_capture": {
+                "status": "to_be_acquired",
+                "authority": "OpenStreetMap",
+                "geometry_policy": "raw source retained; no geometry invented",
+            },
+        }
+        output = args.output or Path("build") / args.course_id / "physical-source-manifest.json"
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps(manifest, indent=2) + "\n")
         print(json.dumps({
-            "status": "existing",
+            "status": "registry_boundary",
             "course_id": args.course_id,
-            "boundary": course["boundary"],
-            "source_manifest": course["source_manifest"],
+            "manifest": str(output),
+            "boundary": boundary,
         }, indent=2))
         return 0
 
