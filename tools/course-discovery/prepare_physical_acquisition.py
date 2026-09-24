@@ -196,7 +196,8 @@ def query_overpass(lat: float, lon: float) -> dict:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("course_id")\n    parser.add_argument("--venue-selection", default="", help="Exact venue name selected during UiDo identity resolution.")
+    parser.add_argument("course_id")
+    parser.add_argument("--venue-selection", default="", help="Exact venue name selected during UiDo identity resolution.")
     parser.add_argument("--output", type=Path, default=None)
     args = parser.parse_args()
 
