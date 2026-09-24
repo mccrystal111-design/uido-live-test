@@ -65,7 +65,23 @@
       "lifecycle": {
         "status": "registered"
       },
-      "scorecard_packet": "course-models/scorecards/51sjdksg.json"
+      "scorecard_packet": "course-models/scorecards/51sjdksg.json",
+      "boundary": {
+        "west": -0.9923791,
+        "south": 52.2705607,
+        "east": -0.9701698,
+        "north": 52.2786252,
+        "crs": "EPSG:4326"
+      },
+      "acquisition": {
+        "aerial": {
+          "preferred_year": "2013",
+          "preferred_resolution_m": 0.25
+        },
+        "lidar": {
+          "max_resolution_m": 1
+        }
+      }
     },
     "kettering": {
       "identity": {
