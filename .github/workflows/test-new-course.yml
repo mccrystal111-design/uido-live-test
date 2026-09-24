@@ -178,7 +178,7 @@ jobs:
           git push
           echo "source_ref=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
-  venue-resolution:
+  venue_resolution:
     name: 2b. Resolve venue identity and anchor
     needs: registration
     runs-on: ubuntu-latest
@@ -195,7 +195,7 @@ jobs:
           VENUE_SELECTION: ${{ inputs.venue_selection }}
         run: |
           set -euo pipefail
-          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          python3 - <<'PY'
           import json, os
           from tools.course_discovery.prepare_physical_acquisition import geocode_venue
 
@@ -207,7 +207,8 @@ jobs:
           lat, lon, anchor = geocode_venue(course, os.environ["VENUE_SELECTION"])
           anchor["latitude"] = lat
           anchor["longitude"] = lon
-          print("anchor=" + json.dumps(anchor, separators=(",", ":")))
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write("anchor=" + json.dumps(anchor, separators=(",", ":")) + "\n")
           print(json.dumps({
               "status": "resolved",
               "venue": course.get("club_name"),
@@ -220,7 +221,7 @@ jobs:
 
   pipeline:
     name: 3. Physical acquisition → QA → wireframe
-    needs: [registration, venue-resolution]
+    needs: [registration, venue_resolution]
     strategy:
       fail-fast: false
       matrix:
@@ -230,5 +231,5 @@ jobs:
       course: ${{ matrix.course }}
       ref: ${{ needs.registration.outputs.source_ref }}
       venue_selection: ${{ inputs.venue_selection }}
-      venue_anchor: ${{ needs.venue-resolution.outputs.anchor }}
+      venue_anchor: ${{ needs.venue_resolution.outputs.anchor }}
     secrets: inherit
