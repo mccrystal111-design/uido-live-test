@@ -510,82 +510,10 @@ jobs:
       - name: Validate unreferenced hole candidate against independent evidence
         run: |
           set -euo pipefail
-          python3 -m pip install --disable-pip-version-check --quiet rasterio numpy
-          python3 - <<'PY'
-          import json, math, os
-          from pathlib import Path
-          import numpy as np
-          import rasterio
-          from rasterio.warp import transform
-
-          course = os.environ["COURSE_ID"]
-          root = Path("build") / course
-          osm = json.loads((root / "osm" / "golf.json").read_text())
-          holes = [e for e in osm.get("elements", []) if (e.get("tags") or {}).get("golf") == "hole"]
-          candidate = next((e for e in holes if e.get("type") == "way" and e.get("id") == 1227773787), None)
-          if candidate is None:
-              unref = [e for e in holes if not str((e.get("tags") or {}).get("ref", "")).strip().isdigit()]
-              if len(unref) != 1:
-                  raise SystemExit(f"Expected one unreferenced candidate, found {len(unref)}")
-              candidate = unref[0]
-
-          def pts(e):
-              return [(float(p["lat"]), float(p["lon"])) for p in e.get("geometry", []) if "lat" in p and "lon" in p]
-          def hav(a,b):
-              la1,lo1,la2,lo2=map(math.radians,[a[0],a[1],b[0],b[1]])
-              h=math.sin((la2-la1)/2)**2+math.cos(la1)*math.cos(la2)*math.sin((lo2-lo1)/2)**2
-              return 6371008.8*2*math.asin(math.sqrt(h))
-
-          geom=pts(candidate)
-          centre=(sum(p[0] for p in geom)/len(geom),sum(p[1] for p in geom)/len(geom))
-          neighbours={}
-          for ref in ("3","5"):
-              e=next((x for x in holes if str((x.get("tags") or {}).get("ref",""))==ref),None)
-              if e:
-                  g=pts(e)
-                  c=(sum(p[0] for p in g)/len(g),sum(p[1] for p in g)/len(g))
-                  neighbours[ref]={"id":e.get("id"),"centre":{"latitude":c[0],"longitude":c[1]},"distance_from_candidate_centre_m":hav(centre,c)}
-
-          aerial_path=root/"ea-aerial"/"manifest.json"
-          lidar_path=root/"ea-lidar"/"manifest.json"
-          aerial=json.loads(aerial_path.read_text()) if aerial_path.exists() else {"status":"not_run"}
-          lidar_manifest=json.loads(lidar_path.read_text()) if lidar_path.exists() else {"status":"not_run"}
-          lidar={"status":lidar_manifest.get("status"),"year":lidar_manifest.get("year"),"resolution_m":lidar_manifest.get("resolution_m"),"coverage":"not_sampled","tiles":[]}
-          samples=[]
-          for tif in sorted((root/"ea-lidar"/"sources").rglob("*.tif")):
-              with rasterio.open(tif) as ds:
-                  xs,ys=transform("EPSG:4326",ds.crs,[p[1] for p in geom],[p[0] for p in geom])
-                  inside=[ds.bounds.left<=x<=ds.bounds.right and ds.bounds.bottom<=y<=ds.bounds.top for x,y in zip(xs,ys)]
-                  if not any(inside):
-                      continue
-                  vals=[float(v[0]) for v in ds.sample(list(zip(xs,ys)),indexes=1) if np.isfinite(v[0])]
-                  if vals:
-                      samples.extend(vals)
-                      lidar["tiles"].append({"file":str(tif.relative_to(root)),"sample_count":len(vals),"elevation_min_m":min(vals),"elevation_max_m":max(vals),"elevation_range_m":max(vals)-min(vals)})
-
-          if samples:
-              lidar.update({"coverage":"covered","candidate_vertex_samples":len(samples),"elevation_min_m":min(samples),"elevation_max_m":max(samples),"elevation_range_m":max(samples)-min(samples)})
-
-          path_length=sum(hav(geom[i],geom[i+1]) for i in range(len(geom)-1))
-          report={
-              "schema":"uido.course.osm-hole-candidate-validation.v0.1",
-              "course_id":course,
-              "candidate":{"type":candidate.get("type"),"id":candidate.get("id"),"tags":candidate.get("tags",{}),"centre":{"latitude":centre[0],"longitude":centre[1]},"node_count":len(geom),"path_length_m":path_length},
-              "neighbour_context":neighbours,
-              "independent_evidence":{
-                  "aerial":{"status":aerial.get("status"),"reason":aerial.get("reason")},
-                  "lidar":lidar
-              },
-              "assessment":{
-                  "status":"candidate",
-                  "canonical":False,
-                  "reason":"LiDAR coverage confirms the candidate can be independently inspected, but source evidence alone does not prove its Hole 4 identity. Aerial coverage was recorded as returned by the EA acquisition stage."
-              }
-          }
-          out=root/"osm"/"hole-candidate-validation.json"
-          out.write_text(json.dumps(report,indent=2)+"\n")
-          print(json.dumps(report,indent=2))
-          PY
+          if ! python3 -c 'import rasterio, numpy' >/dev/null 2>&1; then
+            python3 -m pip install --disable-pip-version-check --quiet rasterio numpy
+          fi
+          python3 tools/course-discovery/validate_hole_candidate.py
 
       - name: Write acquisition manifest and summary
         run: |
