@@ -1,0 +1,729 @@
+{
+  "schema_version": "uido.scorecard.v0.1",
+  "provider": "golfcourseapi",
+  "provider_id": "v08bjvm5",
+  "course_name": "Marquess",
+  "club_name": "Woburn Golf Club",
+  "tee_sets": [
+    {
+      "category": "male",
+      "tee_name": "Blue",
+      "course_rating": 74.9,
+      "slope_rating": 137,
+      "total_yards": 7218,
+      "total_meters": 6600,
+      "number_of_holes": 18,
+      "par_total": 72,
+      "holes": [
+        {
+          "hole": 1,
+          "par": 4,
+          "yardage": 395,
+          "handicap": null
+        },
+        {
+          "hole": 2,
+          "par": 5,
+          "yardage": 504,
+          "handicap": null
+        },
+        {
+          "hole": 3,
+          "par": 4,
+          "yardage": 473,
+          "handicap": null
+        },
+        {
+          "hole": 4,
+          "par": 4,
+          "yardage": 425,
+          "handicap": null
+        },
+        {
+          "hole": 5,
+          "par": 4,
+          "yardage": 414,
+          "handicap": null
+        },
+        {
+          "hole": 6,
+          "par": 3,
+          "yardage": 159,
+          "handicap": null
+        },
+        {
+          "hole": 7,
+          "par": 5,
+          "yardage": 542,
+          "handicap": null
+        },
+        {
+          "hole": 8,
+          "par": 3,
+          "yardage": 188,
+          "handicap": null
+        },
+        {
+          "hole": 9,
+          "par": 4,
+          "yardage": 473,
+          "handicap": null
+        },
+        {
+          "hole": 10,
+          "par": 4,
+          "yardage": 374,
+          "handicap": null
+        },
+        {
+          "hole": 11,
+          "par": 5,
+          "yardage": 579,
+          "handicap": null
+        },
+        {
+          "hole": 12,
+          "par": 4,
+          "yardage": 345,
+          "handicap": null
+        },
+        {
+          "hole": 13,
+          "par": 4,
+          "yardage": 469,
+          "handicap": null
+        },
+        {
+          "hole": 14,
+          "par": 3,
+          "yardage": 218,
+          "handicap": null
+        },
+        {
+          "hole": 15,
+          "par": 5,
+          "yardage": 575,
+          "handicap": null
+        },
+        {
+          "hole": 16,
+          "par": 4,
+          "yardage": 450,
+          "handicap": null
+        },
+        {
+          "hole": 17,
+          "par": 3,
+          "yardage": 176,
+          "handicap": null
+        },
+        {
+          "hole": 18,
+          "par": 4,
+          "yardage": 459,
+          "handicap": null
+        }
+      ]
+    },
+    {
+      "category": "male",
+      "tee_name": "White",
+      "course_rating": 72.7,
+      "slope_rating": 133,
+      "total_yards": 6748,
+      "total_meters": 6170,
+      "number_of_holes": 18,
+      "par_total": 72,
+      "holes": [
+        {
+          "hole": 1,
+          "par": 4,
+          "yardage": 377,
+          "handicap": null
+        },
+        {
+          "hole": 2,
+          "par": 5,
+          "yardage": 481,
+          "handicap": null
+        },
+        {
+          "hole": 3,
+          "par": 4,
+          "yardage": 449,
+          "handicap": null
+        },
+        {
+          "hole": 4,
+          "par": 4,
+          "yardage": 395,
+          "handicap": null
+        },
+        {
+          "hole": 5,
+          "par": 4,
+          "yardage": 390,
+          "handicap": null
+        },
+        {
+          "hole": 6,
+          "par": 3,
+          "yardage": 156,
+          "handicap": null
+        },
+        {
+          "hole": 7,
+          "par": 5,
+          "yardage": 512,
+          "handicap": null
+        },
+        {
+          "hole": 8,
+          "par": 3,
+          "yardage": 166,
+          "handicap": null
+        },
+        {
+          "hole": 9,
+          "par": 4,
+          "yardage": 441,
+          "handicap": null
+        },
+        {
+          "hole": 10,
+          "par": 4,
+          "yardage": 353,
+          "handicap": null
+        },
+        {
+          "hole": 11,
+          "par": 5,
+          "yardage": 548,
+          "handicap": null
+        },
+        {
+          "hole": 12,
+          "par": 4,
+          "yardage": 305,
+          "handicap": null
+        },
+        {
+          "hole": 13,
+          "par": 4,
+          "yardage": 433,
+          "handicap": null
+        },
+        {
+          "hole": 14,
+          "par": 3,
+          "yardage": 215,
+          "handicap": null
+        },
+        {
+          "hole": 15,
+          "par": 5,
+          "yardage": 558,
+          "handicap": null
+        },
+        {
+          "hole": 16,
+          "par": 4,
+          "yardage": 408,
+          "handicap": null
+        },
+        {
+          "hole": 17,
+          "par": 3,
+          "yardage": 167,
+          "handicap": null
+        },
+        {
+          "hole": 18,
+          "par": 4,
+          "yardage": 394,
+          "handicap": null
+        }
+      ]
+    },
+    {
+      "category": "male",
+      "tee_name": "Yellow",
+      "course_rating": 70.6,
+      "slope_rating": 129,
+      "total_yards": 6332,
+      "total_meters": 5790,
+      "number_of_holes": 18,
+      "par_total": 72,
+      "holes": [
+        {
+          "hole": 1,
+          "par": 4,
+          "yardage": 346,
+          "handicap": null
+        },
+        {
+          "hole": 2,
+          "par": 5,
+          "yardage": 439,
+          "handicap": null
+        },
+        {
+          "hole": 3,
+          "par": 4,
+          "yardage": 420,
+          "handicap": null
+        },
+        {
+          "hole": 4,
+          "par": 4,
+          "yardage": 381,
+          "handicap": null
+        },
+        {
+          "hole": 5,
+          "par": 4,
+          "yardage": 357,
+          "handicap": null
+        },
+        {
+          "hole": 6,
+          "par": 3,
+          "yardage": 143,
+          "handicap": null
+        },
+        {
+          "hole": 7,
+          "par": 5,
+          "yardage": 483,
+          "handicap": null
+        },
+        {
+          "hole": 8,
+          "par": 3,
+          "yardage": 141,
+          "handicap": null
+        },
+        {
+          "hole": 9,
+          "par": 4,
+          "yardage": 427,
+          "handicap": null
+        },
+        {
+          "hole": 10,
+          "par": 4,
+          "yardage": 341,
+          "handicap": null
+        },
+        {
+          "hole": 11,
+          "par": 5,
+          "yardage": 512,
+          "handicap": null
+        },
+        {
+          "hole": 12,
+          "par": 4,
+          "yardage": 272,
+          "handicap": null
+        },
+        {
+          "hole": 13,
+          "par": 4,
+          "yardage": 423,
+          "handicap": null
+        },
+        {
+          "hole": 14,
+          "par": 3,
+          "yardage": 196,
+          "handicap": null
+        },
+        {
+          "hole": 15,
+          "par": 5,
+          "yardage": 532,
+          "handicap": null
+        },
+        {
+          "hole": 16,
+          "par": 4,
+          "yardage": 382,
+          "handicap": null
+        },
+        {
+          "hole": 17,
+          "par": 3,
+          "yardage": 155,
+          "handicap": null
+        },
+        {
+          "hole": 18,
+          "par": 4,
+          "yardage": 382,
+          "handicap": null
+        }
+      ]
+    },
+    {
+      "category": "male",
+      "tee_name": "Red",
+      "course_rating": 68.4,
+      "slope_rating": 120,
+      "total_yards": 5824,
+      "total_meters": 5325,
+      "number_of_holes": 18,
+      "par_total": 70,
+      "holes": [
+        {
+          "hole": 1,
+          "par": 4,
+          "yardage": 306,
+          "handicap": null
+        },
+        {
+          "hole": 2,
+          "par": 4,
+          "yardage": 413,
+          "handicap": null
+        },
+        {
+          "hole": 3,
+          "par": 4,
+          "yardage": 416,
+          "handicap": null
+        },
+        {
+          "hole": 4,
+          "par": 4,
+          "yardage": 362,
+          "handicap": null
+        },
+        {
+          "hole": 5,
+          "par": 4,
+          "yardage": 325,
+          "handicap": null
+        },
+        {
+          "hole": 6,
+          "par": 3,
+          "yardage": 127,
+          "handicap": null
+        },
+        {
+          "hole": 7,
+          "par": 5,
+          "yardage": 454,
+          "handicap": null
+        },
+        {
+          "hole": 8,
+          "par": 3,
+          "yardage": 132,
+          "handicap": null
+        },
+        {
+          "hole": 9,
+          "par": 4,
+          "yardage": 370,
+          "handicap": null
+        },
+        {
+          "hole": 10,
+          "par": 4,
+          "yardage": 291,
+          "handicap": null
+        },
+        {
+          "hole": 11,
+          "par": 5,
+          "yardage": 485,
+          "handicap": null
+        },
+        {
+          "hole": 12,
+          "par": 3,
+          "yardage": 246,
+          "handicap": null
+        },
+        {
+          "hole": 13,
+          "par": 4,
+          "yardage": 380,
+          "handicap": null
+        },
+        {
+          "hole": 14,
+          "par": 3,
+          "yardage": 177,
+          "handicap": null
+        },
+        {
+          "hole": 15,
+          "par": 5,
+          "yardage": 501,
+          "handicap": null
+        },
+        {
+          "hole": 16,
+          "par": 4,
+          "yardage": 356,
+          "handicap": null
+        },
+        {
+          "hole": 17,
+          "par": 3,
+          "yardage": 142,
+          "handicap": null
+        },
+        {
+          "hole": 18,
+          "par": 4,
+          "yardage": 341,
+          "handicap": null
+        }
+      ]
+    },
+    {
+      "category": "female",
+      "tee_name": "Yellow",
+      "course_rating": 76.5,
+      "slope_rating": 138,
+      "total_yards": 6329,
+      "total_meters": 5787,
+      "number_of_holes": 18,
+      "par_total": 73,
+      "holes": [
+        {
+          "hole": 1,
+          "par": 4,
+          "yardage": 346,
+          "handicap": null
+        },
+        {
+          "hole": 2,
+          "par": 5,
+          "yardage": 439,
+          "handicap": null
+        },
+        {
+          "hole": 3,
+          "par": 5,
+          "yardage": 420,
+          "handicap": null
+        },
+        {
+          "hole": 4,
+          "par": 4,
+          "yardage": 381,
+          "handicap": null
+        },
+        {
+          "hole": 5,
+          "par": 4,
+          "yardage": 357,
+          "handicap": null
+        },
+        {
+          "hole": 6,
+          "par": 3,
+          "yardage": 143,
+          "handicap": null
+        },
+        {
+          "hole": 7,
+          "par": 5,
+          "yardage": 483,
+          "handicap": null
+        },
+        {
+          "hole": 8,
+          "par": 3,
+          "yardage": 141,
+          "handicap": null
+        },
+        {
+          "hole": 9,
+          "par": 4,
+          "yardage": 427,
+          "handicap": null
+        },
+        {
+          "hole": 10,
+          "par": 4,
+          "yardage": 341,
+          "handicap": null
+        },
+        {
+          "hole": 11,
+          "par": 5,
+          "yardage": 512,
+          "handicap": null
+        },
+        {
+          "hole": 12,
+          "par": 4,
+          "yardage": 270,
+          "handicap": null
+        },
+        {
+          "hole": 13,
+          "par": 4,
+          "yardage": 422,
+          "handicap": null
+        },
+        {
+          "hole": 14,
+          "par": 3,
+          "yardage": 196,
+          "handicap": null
+        },
+        {
+          "hole": 15,
+          "par": 5,
+          "yardage": 532,
+          "handicap": null
+        },
+        {
+          "hole": 16,
+          "par": 4,
+          "yardage": 382,
+          "handicap": null
+        },
+        {
+          "hole": 17,
+          "par": 3,
+          "yardage": 155,
+          "handicap": null
+        },
+        {
+          "hole": 18,
+          "par": 4,
+          "yardage": 382,
+          "handicap": null
+        }
+      ]
+    },
+    {
+      "category": "female",
+      "tee_name": "Red",
+      "course_rating": 73.8,
+      "slope_rating": 132,
+      "total_yards": 5824,
+      "total_meters": 5325,
+      "number_of_holes": 18,
+      "par_total": 73,
+      "holes": [
+        {
+          "hole": 1,
+          "par": 4,
+          "yardage": 306,
+          "handicap": null
+        },
+        {
+          "hole": 2,
+          "par": 5,
+          "yardage": 413,
+          "handicap": null
+        },
+        {
+          "hole": 3,
+          "par": 5,
+          "yardage": 416,
+          "handicap": null
+        },
+        {
+          "hole": 4,
+          "par": 4,
+          "yardage": 362,
+          "handicap": null
+        },
+        {
+          "hole": 5,
+          "par": 4,
+          "yardage": 325,
+          "handicap": null
+        },
+        {
+          "hole": 6,
+          "par": 3,
+          "yardage": 127,
+          "handicap": null
+        },
+        {
+          "hole": 7,
+          "par": 5,
+          "yardage": 454,
+          "handicap": null
+        },
+        {
+          "hole": 8,
+          "par": 3,
+          "yardage": 132,
+          "handicap": null
+        },
+        {
+          "hole": 9,
+          "par": 4,
+          "yardage": 370,
+          "handicap": null
+        },
+        {
+          "hole": 10,
+          "par": 4,
+          "yardage": 291,
+          "handicap": null
+        },
+        {
+          "hole": 11,
+          "par": 5,
+          "yardage": 485,
+          "handicap": null
+        },
+        {
+          "hole": 12,
+          "par": 4,
+          "yardage": 246,
+          "handicap": null
+        },
+        {
+          "hole": 13,
+          "par": 4,
+          "yardage": 380,
+          "handicap": null
+        },
+        {
+          "hole": 14,
+          "par": 3,
+          "yardage": 177,
+          "handicap": null
+        },
+        {
+          "hole": 15,
+          "par": 5,
+          "yardage": 501,
+          "handicap": null
+        },
+        {
+          "hole": 16,
+          "par": 4,
+          "yardage": 356,
+          "handicap": null
+        },
+        {
+          "hole": 17,
+          "par": 3,
+          "yardage": 142,
+          "handicap": null
+        },
+        {
+          "hole": 18,
+          "par": 4,
+          "yardage": 341,
+          "handicap": null
+        }
+      ]
+    }
+  ]
+}

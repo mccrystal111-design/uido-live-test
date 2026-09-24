@@ -104,6 +104,72 @@
       "lifecycle": {
         "status": "registered"
       }
+    },
+    "the-duchess": {
+      "identity": {
+        "uido_id": "uido-course-a7e119ee-4468-53d2-8c45-91a57b3e0f8f",
+        "provider": "golfcourseapi",
+        "provider_id": "gate54g1"
+      },
+      "name": "The Duchess",
+      "club_name": "Woburn Golf Club",
+      "holes": 18,
+      "par": 72,
+      "scorecard_packet": "course-models/scorecards/gate54g1.json",
+      "location": {
+        "latitude": null,
+        "longitude": null,
+        "city": "Milton Keynes, Buckinghamshire",
+        "state": "BKM",
+        "country": "United Kingdom"
+      },
+      "lifecycle": {
+        "status": "registered"
+      }
+    },
+    "marquess": {
+      "identity": {
+        "uido_id": "uido-course-c9f078ce-4c55-599f-ab88-c980278cf339",
+        "provider": "golfcourseapi",
+        "provider_id": "v08bjvm5"
+      },
+      "name": "Marquess",
+      "club_name": "Woburn Golf Club",
+      "holes": 18,
+      "par": 72,
+      "scorecard_packet": "course-models/scorecards/v08bjvm5.json",
+      "location": {
+        "latitude": null,
+        "longitude": null,
+        "city": "Milton Keynes, Buckinghamshire",
+        "state": "BKM",
+        "country": "United Kingdom"
+      },
+      "lifecycle": {
+        "status": "registered"
+      }
+    },
+    "dukes": {
+      "identity": {
+        "uido_id": "uido-course-034d78ea-8f86-5251-90c6-e2218dffd7a7",
+        "provider": "golfcourseapi",
+        "provider_id": "0t09a72x"
+      },
+      "name": "Dukes",
+      "club_name": "Woburn Golf Club",
+      "holes": 18,
+      "par": 72,
+      "scorecard_packet": "course-models/scorecards/0t09a72x.json",
+      "location": {
+        "latitude": null,
+        "longitude": null,
+        "city": "Milton Keynes, Buckinghamshire",
+        "state": "BKM",
+        "country": "United Kingdom"
+      },
+      "lifecycle": {
+        "status": "registered"
+      }
     }
   }
 }
