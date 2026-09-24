@@ -62,7 +62,8 @@ def main() -> int:
     _, place = ranked[0]
     lat, lon = float(place["lat"]), float(place["lon"])
 
-    escaped = re.escape(args.query.replace("'", ""))[:80]
+    course_term = " ".join(x for x in args.query.split() if x.casefold() not in {"golf","club","course"})
+    escaped = re.escape(course_term or args.query)[:80]
     q = f"""[out:json][timeout:180];
 (
   nwr["golf"="hole"]["golf:course:name"~"{escaped}",i](around:5000,{lat},{lon});
