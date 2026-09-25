@@ -353,6 +353,8 @@ function drawHoleDetail(){
       var anchorX=(frontScreen[0]+backScreen[0])/2;
       var anchorY=(frontScreen[1]+backScreen[1])/2;
       var side=b.side==='left'?-1:1;
+      // Keep the label a fixed screen-space distance from the geo anchor,
+      // regardless of map zoom.
       var labelX=anchorX+side*34;
       var labelY=anchorY;
       var lineStartX=anchorX+side*5;
