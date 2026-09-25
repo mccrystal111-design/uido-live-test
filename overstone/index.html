@@ -104,7 +104,7 @@ var RHB=rotatedHoleBounds();
 var cameraX=0,cameraY=0;
 var bunkerData=D.bunkers||[];
 function bunkerLabel(b){
-  return (b.side==='left'?'L':'R')+' '+Math.round(yd(current,b.front_gps))+'/'+Math.round(yd(current,b.back_gps))+' yd';
+  return Math.round(yd(current,b.front_gps))+'/'+Math.round(yd(current,b.back_gps))+' yd';
 }
 function updateYardageUI(){
   var f=Math.round(yd(current,D.green_fmb.front)),m=Math.round(yd(current,D.green_fmb.middle)),b=Math.round(yd(current,D.green_fmb.back));
