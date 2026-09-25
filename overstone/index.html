@@ -338,11 +338,10 @@ function drawHoleDetail(){
     ctx.fillStyle='#16231b';
     ctx.fillText(Math.round(yd(current,gp.gps)),q[0],q[1]);
   });
+  // Bunker geometry stays fixed to the source polygon. Front/back are derived
+  // live from the player's GPS, while the display combines both yardages into
+  // one compact sand-coloured label on the non-fairway side.
   bunkerData.forEach(function(b){
-    // Bunker geometry stays fixed to the source polygon. Front/back are derived
-    // live from the player's GPS, while the display combines both yardages into
-    // one compact sand-coloured label on the non-fairway side.
-    bunkerData.forEach(function(b){
       var edges=bunkerEdgesFromPlayer(b);
       var frontQ=rotatedLocal(edges.front[0],edges.front[1]);
       var backQ=rotatedLocal(edges.back[0],edges.back[1]);
