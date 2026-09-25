@@ -8,7 +8,7 @@ This is the first file a fresh UiDo session should read. It records authoritativ
 
 ## CURRENT STATE
 
-**Overstone playground navigation:** Hole 1 detail has camera zoom (buttons/wheel), pan, and a minimap that can be toggled. When the minimap is off, the minimap and its viewfinder/window are both removed to reclaim screen space. Camera drag now follows natural map movement (right/down drag moves the map right/down).
+**Overstone playground navigation:** Hole 1 detail has camera zoom (buttons/wheel), pan, and a minimap that can be toggled. When the minimap is off, the minimap and its viewfinder/window are hard-hidden to reclaim screen space. Camera drag uses grab-map behaviour: right/down drag moves the map right/down. Dragging no longer triggers a test-position click.
 
 
 **Overstone course-view playground: full-course context + Hole 1 detail implemented.** The playground now loads an 18-hole course context from the authoritative Overstone OSM hole routes and keeps the existing Hole 1 detailed measurement layer as the active drill-down. The renderer can toggle between full-course overview and Hole 1 detail without changing source geometry.
@@ -17,7 +17,7 @@ This is the first file a fresh UiDo session should read. It records authoritativ
 **GolfCourseAPI discovery/registration: IMPLEMENTED; Northampton registry metadata is complete.**  
 **Northampton physical acquisition: BLOCKED earlier than OSM hole validation by OSM course-identity resolution.**
 
-Current `main` head: `b4ced95e0bf4de0b61dbc9ae3771f0e74ec4a1e8` (`Fix Overstone minimap toggle and camera pan direction`). The previous status file was stale at `27e0df2…`; this reconciliation corrects that discrepancy.
+Current `main` head: `7d72fb8bc010c4370a94bc1a5e7d40cab42d72f5` (`Correct Overstone camera axes and hard-hide minimap`). The previous status file was stale at `27e0df2…`; this reconciliation corrects that discrepancy.
 
 The latest master physical-acquisition run is `35994500134` (2026-09-24). It is a **Northampton** test and failed in `prepare_physical_acquisition.py` before OSM capture. The log records:
 
