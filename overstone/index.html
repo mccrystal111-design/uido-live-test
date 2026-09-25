@@ -358,6 +358,19 @@ function drawHoleDetail(){
     var backOffset=b.side==='left'?-12:12;
     frontScreen[0]+=frontOffset;
     backScreen[0]+=backOffset;
+    // Small sand markers stay exactly on the live geolocated bunker edges.
+    // The labels remain offset independently for readability.
+    [[edges.front,frontScreen],[edges.back,backScreen]].forEach(function(item){
+      var point=item[0],q=rotatedLocal(point[0],point[1]);
+      var dot=[w/2+(q.x-cameraX)/mpp,h/2-(q.y-cameraY)/mpp];
+      ctx.beginPath();
+      ctx.arc(dot[0],dot[1],4,0,Math.PI*2);
+      ctx.fillStyle='#d8bd78';
+      ctx.fill();
+      ctx.strokeStyle='rgba(150,123,67,.9)';
+      ctx.lineWidth=1;
+      ctx.stroke();
+    });
     var align=b.side==='left'?'right':'left';
     ctx.font='600 10px Arial';
     ctx.textAlign=align;
