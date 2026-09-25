@@ -349,24 +349,40 @@ function drawHoleDetail(){
       var frontScreen=[w/2+(frontQ.x-cameraX)/mpp,h/2-(frontQ.y-cameraY)/mpp];
       var backScreen=[w/2+(backQ.x-cameraX)/mpp,h/2-(backQ.y-cameraY)/mpp];
 
-      // The F/M/B markers are anchored to geographic coordinates. Do the
-      // same here: calculate the bunker label anchor in geographic space,
-      // then project it once. Zoom therefore cannot change its relationship
-      // to the bunker.
-      var labelGeo=[
-        (edges.front[0]+edges.back[0])/2,
-        (edges.front[1]+edges.back[1])/2
-      ];
-      var labelQ=rotatedLocal(labelGeo[0],labelGeo[1]);
-      var labelX=w/2+(labelQ.x-cameraX)/mpp;
-      var labelY=h/2-(labelQ.y-cameraY)/mpp;
+      // Anchor the label to the bunker polygon centre, not the midpoint of
+      // the player-relative front/back points. The centre therefore stays
+      // fixed as the player moves. Rotate the two-number stack toward the
+      // player so the label can follow the player's viewpoint without drifting.
+      var ring=bunkerGeometry(b)||[];
+      var centre=[0,0];
+      if(ring.length){
+        ring.forEach(function(p){centre[0]+=p[1];centre[1]+=p[0];});
+        centre[0]/=ring.length;
+        centre[1]/=ring.length;
+      }else{
+        centre=[
+          (edges.front[0]+edges.back[0])/2,
+          (edges.front[1]+edges.back[1])/2
+        ];
+      }
+      var centreQ=rotatedLocal(centre[0],centre[1]);
+      var labelX=w/2+(centreQ.x-cameraX)/mpp;
+      var labelY=h/2-(centreQ.y-cameraY)/mpp;
+      var playerQ=rotatedLocal(current[0],current[1]);
+      var dx=playerQ.x-centreQ.x;
+      var dy=-(playerQ.y-centreQ.y);
+      var labelAngle=Math.atan2(dx,dy);
 
+      ctx.save();
+      ctx.translate(labelX,labelY);
+      ctx.rotate(labelAngle);
       ctx.font='600 10px Arial';
       ctx.textAlign='center';
       ctx.textBaseline='middle';
       ctx.fillStyle='#16231b';
-      ctx.fillText(Math.round(yd(current,edges.back))+'',labelX,labelY-6);
-      ctx.fillText(Math.round(yd(current,edges.front))+'',labelX,labelY+6);
+      ctx.fillText(Math.round(yd(current,edges.back))+'',0,-6);
+      ctx.fillText(Math.round(yd(current,edges.front))+'',0,6);
+      ctx.restore();
       ctx.textAlign='left';
       ctx.textBaseline='alphabetic';
     });
