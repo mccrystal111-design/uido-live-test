@@ -353,6 +353,7 @@ function keepPlayerVisible(){
 }
 function update(pos){
   current=pos.slice();
+  if(detailMode)keepPlayerVisible();
   updateYardageUI();
   document.getElementById('main').textContent='Hole '+holeNumber+' · '+Math.round(yd(pos,D.green_fmb.middle))+' yd to middle';
   document.getElementById('detail').textContent='Live GPS position · Hole '+holeNumber+' · Par '+D.par+' · heading '+Math.round(holeBearingDeg)+'°';
