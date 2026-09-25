@@ -363,13 +363,19 @@ function drawHoleDetail(){
     [[edges.front,frontScreen],[edges.back,backScreen]].forEach(function(item){
       var point=item[0],q=rotatedLocal(point[0],point[1]);
       var dot=[w/2+(q.x-cameraX)/mpp,h/2-(q.y-cameraY)/mpp];
+      var distance=Math.round(yd(current,point));
       ctx.beginPath();
-      ctx.arc(dot[0],dot[1],4,0,Math.PI*2);
+      ctx.arc(dot[0],dot[1],10,0,Math.PI*2);
       ctx.fillStyle='#d8bd78';
       ctx.fill();
-      ctx.strokeStyle='rgba(150,123,67,.9)';
-      ctx.lineWidth=1;
+      ctx.strokeStyle='rgba(150,123,67,.95)';
+      ctx.lineWidth=1.5;
       ctx.stroke();
+      ctx.fillStyle='#16231b';
+      ctx.font='600 8px Arial';
+      ctx.textAlign='center';
+      ctx.textBaseline='middle';
+      ctx.fillText(distance+'',dot[0],dot[1]);
     });
     var align=b.side==='left'?'right':'left';
     ctx.font='600 10px Arial';
