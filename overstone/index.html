@@ -203,8 +203,27 @@ function selectHole(n){
   document.getElementById('status').textContent='Hole '+n+' · authoritative source geometry + live F/M/B';
   draw();
 }
+function bunkerGeometry(b){
+  var feature=(D.features||[]).find(function(f){return f.id===b.id&&f.golf==='bunker'&&f.geometry&&f.geometry.type==='Polygon';});
+  return feature ? feature.geometry.coordinates[0] : null;
+}
+function bunkerEdgesFromPlayer(b){
+  var ring=bunkerGeometry(b);
+  if(!ring||ring.length<2)return {front:b.front_gps,back:b.back_gps};
+  // The bunker remains fixed in geographic space; only its interpretation
+  // changes with the player's GPS. "Front" is the closest boundary point
+  // to the player and "back" is the furthest boundary point.
+  var bestFront=null,bestBack=null,min=Infinity,max=-Infinity;
+  ring.forEach(function(p){
+    var d=yd(current,[p[1],p[0]]);
+    if(d<min){min=d;bestFront=[p[1],p[0]];}
+    if(d>max){max=d;bestBack=[p[1],p[0]];}
+  });
+  return {front:bestFront||b.front_gps,back:bestBack||b.back_gps};
+}
 function bunkerLabel(b){
-  return Math.round(yd(current,b.front_gps))+'/'+Math.round(yd(current,b.back_gps))+' yd';
+  var edges=bunkerEdgesFromPlayer(b);
+  return Math.round(yd(current,edges.front))+'/'+Math.round(yd(current,edges.back))+' yd';
 }
 function updateYardageUI(){}
 
@@ -318,11 +337,14 @@ function drawHoleDetail(){
     ctx.fillText(Math.round(yd(current,gp.gps)),q[0],q[1]);
   });
   bunkerData.forEach(function(b){
-    // Front/back GPS points sit on the fairway-facing edge of the bunker.
+    // Bunker geometry is fixed to its source polygon. Front/back are derived
+    // live from the player's GPS: nearest boundary point = front, furthest =
+    // back. This means the same bunker reinterprets itself as the player moves.
+    var edges=bunkerEdgesFromPlayer(b);
     // Push the labels laterally across the bunker to the non-fairway side,
     // using metres so the placement stays correct as the user zooms.
-    var frontQ=rotatedLocal(b.front_gps[0],b.front_gps[1]);
-    var backQ=rotatedLocal(b.back_gps[0],b.back_gps[1]);
+    var frontQ=rotatedLocal(edges.front[0],edges.front[1]);
+    var backQ=rotatedLocal(edges.back[0],edges.back[1]);
     var lateral=b.side==='left'?-22:22;
     frontQ.x+=lateral;
     backQ.x+=lateral;
@@ -334,8 +356,8 @@ function drawHoleDetail(){
     ctx.textAlign=align;
     ctx.textBaseline='middle';
     ctx.fillStyle='#16231b';
-    ctx.fillText(Math.round(yd(current,b.back_gps))+' yd',backScreen[0],backScreen[1]);
-    ctx.fillText(Math.round(yd(current,b.front_gps))+' yd',frontScreen[0],frontScreen[1]);
+    ctx.fillText(Math.round(yd(current,edges.back))+' yd',backScreen[0],backScreen[1]);
+    ctx.fillText(Math.round(yd(current,edges.front))+' yd',frontScreen[0],frontScreen[1]);
     ctx.textAlign='left';
     ctx.textBaseline='alphabetic';
   });
