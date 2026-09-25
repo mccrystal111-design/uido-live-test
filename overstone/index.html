@@ -367,6 +367,10 @@ function drawHoleDetail(){
       var centreQ=rotatedLocal(centre[0],centre[1]);
       var labelX=w/2+(centreQ.x-cameraX)/mpp;
       var labelY=h/2-(centreQ.y-cameraY)/mpp;
+      // Keep bunker yardages just outside the sand: left bunkers shift left,
+      // right bunkers shift right by 20px in screen space.
+      var sideOffset=(b.side==='left'?-20:(b.side==='right'?20:0));
+      labelX+=sideOffset;
 
       ctx.save();
       ctx.translate(labelX,labelY);
@@ -374,7 +378,7 @@ function drawHoleDetail(){
       ctx.font='600 10px Arial';
       ctx.textAlign='center';
       ctx.textBaseline='middle';
-      ctx.fillStyle='#16231b';
+      ctx.fillStyle='#d8bd78';
       ctx.fillText(Math.round(yd(current,edges.back))+'',0,-6);
       ctx.fillText(Math.round(yd(current,edges.front))+'',0,6);
       ctx.restore();
