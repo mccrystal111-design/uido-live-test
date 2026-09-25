@@ -193,3 +193,15 @@ Whenever meaningful UiDo work changes project state, update this document. If Gi
 - Reverted the quadratic smoothing pass for Holes 2–18 polygons. The renderer now follows the stored source polygon vertices directly, matching the proven Hole 1 rendering approach rather than bending the source geometry at render time.
 - Mobile hole picker width remains at 168px.
 - Commit: `cc7336344825d46bc056043984c9871b69a8f69b`.
+
+
+### 2026-09-25 — Overstone playground clean course-model rebuild
+- Replaced the patched/compact hole-wireframe runtime path with overstone/course-source-model.js generated from the authoritative recovered Overstone OSM capture.
+- All 18 holes now use the same source-derived model shape: hole route, exact OSM feature geometry, green F/M/B anchors, and bunker live-yardage metadata.
+- Feature-to-hole association is resolved once against the nearest authoritative hole route with conservative feature-type distance gates; the recovered source contains 31 bunkers and the rebuilt model assigns all 31 exactly once.
+- Hole 1 bunker front/back/anchor metadata remains the previously verified Hole 1 reference values; its geometry is sourced from the same OSM model as the other holes.
+- The renderer now handles Polygon and LineString source features directly, including fairway, rough, green, bunker, tee, water and cartpath, with no geometry smoothing or compact coordinate reconstruction.
+- The proven camera/projection, GPS, F/M/B yardage, live bunker yardage, hole picker and full-course context were retained.
+- overstone/hole-wireframes.js is no longer loaded and is removed from the runtime tree. hole1-layer.js remains as a historical/reference fixture but is no longer used by the playground runtime.
+- No GitHub Actions run was triggered.
+- Code commit: c9b396ccc451a61a987c1526809ffa3ad5b8f7bc.
