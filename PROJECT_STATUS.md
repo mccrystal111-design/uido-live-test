@@ -8,6 +8,8 @@ This is the first file a fresh UiDo session should read. It records authoritativ
 
 ## CURRENT STATE
 
+**Overstone course-view playground: full-course context + Hole 1 detail implemented.** The playground now loads an 18-hole course context from the authoritative Overstone OSM hole routes and keeps the existing Hole 1 detailed measurement layer as the active drill-down. The renderer can toggle between full-course overview and Hole 1 detail without changing source geometry.
+
 **Poult Wood course acquisition → Course Packet → packet-driven wireframe: VALIDATED.**  
 **GolfCourseAPI discovery/registration: IMPLEMENTED; Northampton registry metadata is complete.**  
 **Northampton physical acquisition: BLOCKED earlier than OSM hole validation by OSM course-identity resolution.**
