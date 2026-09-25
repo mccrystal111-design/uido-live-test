@@ -69,7 +69,7 @@ function resizeCanvas(){
   ctx.setTransform(dpr,0,0,dpr,0,0);
 }
 resizeCanvas();
-var features=D.features||[],tee=D.line_of_play[0].slice(),current=tee.slice(),gpsWatch=null,testMode=true,detailMode=true,zoom=1,dragging=false,moved=false,lastX=0,lastY=0,pointers={},pinchStart=null;
+var features=D.features||[],tee=[D.line_of_play[0][1],D.line_of_play[0][0]],current=tee.slice(),gpsWatch=null,testMode=true,detailMode=true,zoom=1,dragging=false,moved=false,lastX=0,lastY=0,pointers={},pinchStart=null;
 
 function allCourseBounds(){
   var xs=[],ys=[];
@@ -132,7 +132,7 @@ function selectHole(n){
   }
   features=D.features||[];
   bunkerData=D.bunkers||[];
-  tee=D.line_of_play[0].slice();
+  tee=[D.line_of_play[0][1],D.line_of_play[0][0]];
   current=tee.slice();
   rebuildHoleGeometry();
   RHB=rotatedHoleBounds();
