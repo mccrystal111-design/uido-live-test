@@ -25,7 +25,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
 <div id="status" class="panel status">Loading course…</div>
 <div class="panel buttons">
   <button id="courseBtn">Course</button><button id="holeBtn" class="active">Hole 1</button>
-  <button id="gps">Use GPS</button><button id="test" class="active">Test</button>
+  <button id="zoomOut">−</button><button id="zoomIn">+</button><button id="miniBtn" class="active">Mini</button><button id="gps">Use GPS</button><button id="test" class="active">Test</button>
 </div>
 <div class="panel legend">
   <span class="dot fairway"></span>course detail<br>
@@ -51,7 +51,7 @@ if(!D)throw new Error('Hole 1 detail layer did not load');
 
 var canvas=document.getElementById('course'),ctx=canvas.getContext('2d');
 var overview=document.getElementById('overviewCanvas'),ov=overview.getContext('2d');
-var features=D.features||[],tee=[52.2763578,-0.8194224],current=tee.slice(),gpsWatch=null,testMode=true,detailMode=true;
+var features=D.features||[],tee=[52.2763578,-0.8194224],current=tee.slice(),gpsWatch=null,testMode=true,detailMode=true,miniVisible=true,zoom=1,cameraLat=null,cameraLon=null,dragging=false,lastX=0,lastY=0;
 
 function allCourseBounds(){
   var xs=[],ys=[];
@@ -69,8 +69,16 @@ function holeBounds(){
   return {minX:Math.min.apply(null,xs),maxX:Math.max.apply(null,xs),minY:Math.min.apply(null,ys),maxY:Math.max.apply(null,ys)};
 }
 var CB=allCourseBounds(),HB=holeBounds();
+var baseLat=(HB.minY+HB.maxY)/2,baseLon=(HB.minX+HB.maxX)/2;
+cameraLat=baseLat;cameraLon=baseLon;
 
 function project(lat,lon,b,w,h,pad){
+  if(b===HB && detailMode){
+    var spanLon=(HB.maxX-HB.minX)/zoom, spanLat=(HB.maxY-HB.minY)/zoom;
+    var x=w/2+(lon-cameraLon)/spanLon*(w-pad*2);
+    var y=h/2-(lat-cameraLat)/spanLat*(h-pad*2);
+    return [x,y];
+  }
   var x=pad+(lon-b.minX)/(b.maxX-b.minX)*(w-pad*2);
   var y=h-pad-(lat-b.minY)/(b.maxY-b.minY)*(h-pad*2);
   return [x,y];
@@ -131,12 +139,21 @@ function drawHoleDetail(){
 }
 function draw(){
   if(detailMode)drawHoleDetail();else drawFullCourse(ctx,innerWidth,innerHeight,false);
-  var ow=190,oh=150;
-  overview.width=ow*(devicePixelRatio||1);overview.height=oh*(devicePixelRatio||1);overview.style.width=ow+'px';overview.style.height=oh+'px';
-  ov.setTransform(devicePixelRatio||1,0,0,devicePixelRatio||1,0,0);
+  overview.style.display=miniVisible?'block':'none';
+  if(!miniVisible)return;
+  var ow=190,oh=150,dpr=devicePixelRatio||1;
+  overview.width=ow*dpr;overview.height=oh*dpr;
+  overview.style.width=ow+'px';overview.style.height=oh+'px';
+  ov.setTransform(dpr,0,0,dpr,0,0);
   drawFullCourse(ov,ow,oh,true);
   var q=project(current[0],current[1],CB,ow,oh,10);
   ov.beginPath();ov.arc(q[0],q[1],4,0,Math.PI*2);ov.fillStyle='#1c4a31';ov.fill();
+  if(detailMode){
+    var viewLon=(HB.maxX-HB.minX)/zoom, viewLat=(HB.maxY-HB.minY)/zoom;
+    var tl=project(cameraLat+viewLat/2,cameraLon-viewLon/2,CB,ow,oh,10);
+    var br=project(cameraLat-viewLat/2,cameraLon+viewLon/2,CB,ow,oh,10);
+    ov.strokeStyle='#ffd600';ov.lineWidth=2;ov.strokeRect(tl[0],tl[1],br[0]-tl[0],br[1]-tl[1]);
+  }
 }
 function yd(a,b){
   var R=6371000,p=Math.PI/180,d1=(b[0]-a[0])*p,d2=(b[1]-a[1])*p;
@@ -151,6 +168,7 @@ function update(pos){
 }
 function setMode(detail){
   detailMode=detail;
+  if(detail){zoom=1;cameraLat=baseLat;cameraLon=baseLon;}
   document.getElementById('holeBtn').classList.toggle('active',detail);
   document.getElementById('courseBtn').classList.toggle('active',!detail);
   document.getElementById('status').textContent=detail?'Hole 1 detail · full course retained underneath':'Full Overstone course · Hole 1 highlighted';
@@ -167,10 +185,38 @@ function reset(){
 canvas.addEventListener('click',function(e){
   if(!testMode||!detailMode)return;
   var r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,pad=36;
-  var lon=HB.minX+(x-pad)/(innerWidth-pad*2)*(HB.maxX-HB.minX);
-  var lat=HB.minY+(innerHeight-pad-y)/(innerHeight-pad*2)*(HB.maxY-HB.minY);
+  var spanLon=(HB.maxX-HB.minX)/zoom,spanLat=(HB.maxY-HB.minY)/zoom;
+  var lon=cameraLon+(x-innerWidth/2)/(innerWidth-pad*2)*spanLon;
+  var lat=cameraLat-(y-innerHeight/2)/(innerHeight-pad*2)*spanLat;
   update([lat,lon]);
 });
+document.getElementById('zoomIn').onclick=function(){if(!detailMode)return;zoom=Math.min(8,zoom*1.5);draw()};
+document.getElementById('zoomOut').onclick=function(){if(!detailMode)return;zoom=Math.max(1,zoom/1.5);draw()};
+document.getElementById('miniBtn').onclick=function(){
+  miniVisible=!miniVisible;
+  this.classList.toggle('active',miniVisible);
+  draw();
+};
+canvas.addEventListener('wheel',function(e){
+  if(!detailMode)return;
+  e.preventDefault();
+  zoom=e.deltaY<0?Math.min(8,zoom*1.15):Math.max(1,zoom/1.15);
+  draw();
+},{passive:false});
+canvas.addEventListener('pointerdown',function(e){
+  if(!detailMode)return;
+  dragging=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId);
+});
+canvas.addEventListener('pointermove',function(e){
+  if(!dragging||!detailMode)return;
+  var dx=e.clientX-lastX,dy=e.clientY-lastY;
+  var spanLon=(HB.maxX-HB.minX)/zoom,spanLat=(HB.maxY-HB.minY)/zoom;
+  cameraLon-=dx/(innerWidth-72)*spanLon;
+  cameraLat+=dy/(innerHeight-72)*spanLat;
+  lastX=e.clientX;lastY=e.clientY;draw();
+});
+canvas.addEventListener('pointerup',function(){dragging=false});
+canvas.addEventListener('pointercancel',function(){dragging=false});
 document.getElementById('holeBtn').onclick=function(){setMode(true)};
 document.getElementById('courseBtn').onclick=function(){setMode(false)};
 document.getElementById('test').onclick=reset;
