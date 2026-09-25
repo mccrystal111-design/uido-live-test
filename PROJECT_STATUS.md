@@ -8,6 +8,9 @@ This is the first file a fresh UiDo session should read. It records authoritativ
 
 ## CURRENT STATE
 
+**Overstone playground navigation:** Hole 1 detail now has camera zoom (buttons/wheel), pan, and a course minimap that can be toggled. The minimap shows the player's position and the current Hole 1 viewport rectangle so it acts as a viewfinder.
+
+
 **Overstone course-view playground: full-course context + Hole 1 detail implemented.** The playground now loads an 18-hole course context from the authoritative Overstone OSM hole routes and keeps the existing Hole 1 detailed measurement layer as the active drill-down. The renderer can toggle between full-course overview and Hole 1 detail without changing source geometry.
 
 **Poult Wood course acquisition → Course Packet → packet-driven wireframe: VALIDATED.**  
