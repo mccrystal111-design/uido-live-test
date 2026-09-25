@@ -8,7 +8,7 @@ This is the first file a fresh UiDo session should read. It records authoritativ
 
 ## CURRENT STATE
 
-**Overstone playground navigation:** Hole 1 detail has camera zoom (buttons/wheel), pan, and a minimap that can be toggled. When the minimap is off, the minimap and its viewfinder/window are hard-hidden to reclaim screen space. Camera uses a metric, aspect-ratio-preserving projection with Hole 1's direction of play rotated to screen-up. Fit-to-hole now centers on the rotated hole bounds and starts at a wider 0.65 zoom, with manual/pinch/wheel zoom-out available to 0.35 so the complete Hole 1 can be comfortably framed. Panning and pinch zoom use the same camera model, and the minimap viewfinder follows the rotated viewport.
+**Overstone playground navigation:** Hole 1 detail has camera zoom (buttons/wheel), pan, and a minimap that can be toggled. When the minimap is off, the minimap and its viewfinder/window are hard-hidden to reclaim screen space. The Overstone playground now uses a correctly sized device-pixel canvas backing store; the previous CSS-only canvas sizing was stretching the 300×150 default canvas across the phone viewport. The minimap/viewfinder has been removed from the playground. Hole 1 remains on the metric, direction-aligned camera with 0.35–8× zoom. Panning and pinch zoom use the same camera model, and the minimap viewfinder follows the rotated viewport.
 
 
 **Overstone course-view playground: full-course context + Hole 1 detail implemented.** The playground now loads an 18-hole course context from the authoritative Overstone OSM hole routes and keeps the existing Hole 1 detailed measurement layer as the active drill-down. The renderer can toggle between full-course overview and Hole 1 detail without changing source geometry.
@@ -17,7 +17,7 @@ This is the first file a fresh UiDo session should read. It records authoritativ
 **GolfCourseAPI discovery/registration: IMPLEMENTED; Northampton registry metadata is complete.**  
 **Northampton physical acquisition: BLOCKED earlier than OSM hole validation by OSM course-identity resolution.**
 
-Current `main` head: `3cbf5b402ffc420044e8a0f4cffb36f2187f1828` (`Allow deeper Hole 1 zoom-out`). The previous status file was stale at `27e0df2…`; this reconciliation corrects that discrepancy.
+Current `main` head: `3cefcfecb93f523ce55b5f4eb099a532fd8f349f` (`Fix canvas aspect ratio and remove minimap`). The previous status file was stale at `27e0df2…`; this reconciliation corrects that discrepancy.
 
 The latest master physical-acquisition run is `35994500134` (2026-09-24). It is a **Northampton** test and failed in `prepare_physical_acquisition.py` before OSM capture. The log records:
 
