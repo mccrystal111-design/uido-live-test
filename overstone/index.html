@@ -73,8 +73,9 @@ var CB=allCourseBounds(),HB=holeBounds();
 var baseLat=(HB.minY+HB.maxY)/2,baseLon=(HB.minX+HB.maxX)/2;
 var latM=111320,lonM=111320*Math.cos(baseLat*Math.PI/180);
 var holeStart=D.line_of_play[0],holeEnd=D.line_of_play[D.line_of_play.length-1];
-var holeBearing=Math.atan2((holeEnd[0]-holeStart[0])*latM,(holeEnd[1]-holeStart[1])*lonM);
-var holeBearingDeg=(holeBearing*180/Math.PI+360)%360;
+var east=(holeEnd[0]-holeStart[0])*lonM,north=(holeEnd[1]-holeStart[1])*latM;
+var holeAngle=Math.atan2(east,north);
+var holeBearingDeg=(holeAngle*180/Math.PI+360)%360;
 
 function toLocal(lat,lon){
   return {e:(lon-baseLon)*lonM,n:(lat-baseLat)*latM};
@@ -83,7 +84,7 @@ function fromLocal(e,n){
   return [baseLat+n/latM,baseLon+e/lonM];
 }
 function rotatedLocal(lat,lon){
-  var p=toLocal(lat,lon),cb=Math.cos(holeBearing),sb=Math.sin(holeBearing);
+  var p=toLocal(lat,lon),cb=Math.cos(holeAngle),sb=Math.sin(holeAngle);
   return {x:p.e*cb-p.n*sb,y:p.e*sb+p.n*cb};
 }
 function rotatedHoleBounds(){
@@ -98,20 +99,21 @@ function rotatedHoleBounds(){
   return {minX:Math.min.apply(null,xs),maxX:Math.max.apply(null,xs),minY:Math.min.apply(null,ys),maxY:Math.max.apply(null,ys)};
 }
 var RHB=rotatedHoleBounds();
+var cameraX=0,cameraY=0;
+
 function fitCamera(){
-  cameraE=0;cameraN=0;
+  cameraX=(RHB.minX+RHB.maxX)/2;
+  cameraY=(RHB.minY+RHB.maxY)/2;
   zoom=1;
 }
 function metersPerPixel(w,h,pad){
   var spanX=RHB.maxX-RHB.minX,spanY=RHB.maxY-RHB.minY;
-  return Math.max(spanX/(w-pad*2),spanY/(h-pad*2))/zoom;
+  return Math.max(spanX/(w-pad*2),spanY/(h-pad*2))*1.08/zoom;
 }
 function project(lat,lon,b,w,h,pad){
   if(detailMode && b===HB){
     var q=rotatedLocal(lat,lon),mpp=metersPerPixel(w,h,pad);
-    var x=w/2+(q.x-(cameraE*Math.cos(holeBearing)-cameraN*Math.sin(holeBearing)))/mpp;
-    var y=h/2-(q.y-(cameraE*Math.sin(holeBearing)+cameraN*Math.cos(holeBearing)))/mpp;
-    return [x,y];
+    return [w/2+(q.x-cameraX)/mpp,h/2-(q.y-cameraY)/mpp];
   }
   var x=pad+(lon-b.minX)/(b.maxX-b.minX)*(w-pad*2);
   var y=h-pad-(lat-b.minY)/(b.maxY-b.minY)*(h-pad*2);
@@ -200,7 +202,7 @@ function yd(a,b){
 function update(pos){
   current=pos.slice();
   document.getElementById('main').textContent='Hole 1 · '+Math.round(yd(pos,D.green_fmb.middle))+' yd to middle';
-  document.getElementById('detail').textContent='F/M/B '+Math.round(yd(pos,D.green_fmb.front))+' / '+Math.round(yd(pos,D.green_fmb.middle))+' / '+Math.round(yd(pos,D.green_fmb.back))+' yd · view aligned '+Math.round(holeBearingDeg)+'° to Hole 1';
+  document.getElementById('detail').textContent='F/M/B '+Math.round(yd(pos,D.green_fmb.front))+' / '+Math.round(yd(pos,D.green_fmb.middle))+' / '+Math.round(yd(pos,D.green_fmb.back))+' yd · Hole 1 heading '+Math.round(holeBearingDeg)+'°';
   draw();
 }
 function setMode(detail){
@@ -208,7 +210,7 @@ function setMode(detail){
   if(detail){fitCamera();}
   document.getElementById('holeBtn').classList.toggle('active',detail);
   document.getElementById('courseBtn').classList.toggle('active',!detail);
-  document.getElementById('status').textContent=detail?'Hole 1 detail · view aligned to Hole 1 direction':'Full Overstone course · Hole 1 highlighted';
+  document.getElementById('status').textContent=detail?'Hole 1 detail · direction of play aligned up':'Full Overstone course · Hole 1 highlighted';
   draw();
 }
 function reset(){
@@ -224,10 +226,11 @@ canvas.addEventListener('click',function(e){
   if(!testMode||!detailMode)return;
   var r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,pad=36;
   var mpp=metersPerPixel(innerWidth,innerHeight,pad);
-  var sx=(x-innerWidth/2)*mpp,sy=-(y-innerHeight/2)*mpp;
-  var cb=Math.cos(holeBearing),sb=Math.sin(holeBearing);
-  var e=(sx+cameraE*cb-cameraN*sb)*cb+(sy+cameraE*sb+cameraN*cb)*sb;
-  var n=-(sx+cameraE*cb-cameraN*sb)*sb+(sy+cameraE*sb+cameraN*cb)*cb;
+  var rx=cameraX+(x-innerWidth/2)*mpp;
+  var ry=cameraY+(innerHeight/2-y)*mpp;
+  var cb=Math.cos(holeAngle),sb=Math.sin(holeAngle);
+  var e=rx*cb+ry*sb;
+  var n=-rx*sb+ry*cb;
   var pos=fromLocal(e,n);
   update(pos);
 });
@@ -268,11 +271,8 @@ canvas.addEventListener('pointermove',function(e){
   }
   if(!dragging)return;
   var dx=e.clientX-lastX,dy=e.clientY-lastY,mpp=metersPerPixel(innerWidth,innerHeight,36);
-  // Grab-map behaviour: the map follows the finger.
-  var cb=Math.cos(holeBearing),sb=Math.sin(holeBearing);
-  var sx=dx*mpp,sy=-dy*mpp;
-  cameraE-=sx*cb+sy*sb;
-  cameraN-=(-sx*sb+sy*cb);
+  cameraX-=dx*mpp;
+  cameraY+=dy*mpp;
   moved=true;lastX=e.clientX;lastY=e.clientY;draw();
 });
 function endPointer(e){
