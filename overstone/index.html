@@ -339,68 +339,55 @@ function drawHoleDetail(){
     ctx.fillText(Math.round(yd(current,gp.gps)),q[0],q[1]);
   });
   bunkerData.forEach(function(b){
-    // Bunker geometry is fixed to its source polygon. Front/back are derived
-    // live from the player's GPS: nearest boundary point = front, furthest =
-    // back. This means the same bunker reinterprets itself as the player moves.
-    var edges=bunkerEdgesFromPlayer(b);
-    // Push the labels laterally across the bunker to the non-fairway side,
-    // using metres so the placement stays correct as the user zooms.
-    var frontQ=rotatedLocal(edges.front[0],edges.front[1]);
-    var backQ=rotatedLocal(edges.back[0],edges.back[1]);
-    var lateral=b.side==='left'?-22:22;
-    frontQ.x+=lateral;
-    backQ.x+=lateral;
-    // Anchor the labels in geographic space, then give them a small fixed
-    // screen-space breathing room. They therefore stay with the bunker point
-    // when zooming instead of drifting by a scale-dependent amount.
-    var mpp=metersPerPixel(w,h,pad);
-    var frontScreen=[w/2+(frontQ.x-cameraX)/mpp,h/2-(frontQ.y-cameraY)/mpp];
-    var backScreen=[w/2+(backQ.x-cameraX)/mpp,h/2-(backQ.y-cameraY)/mpp];
-    var frontOffset=b.side==='left'?-12:12;
-    var backOffset=b.side==='left'?-12:12;
-    frontScreen[0]+=frontOffset;
-    backScreen[0]+=backOffset;
-    // Small sand markers stay exactly on the live geolocated bunker edges.
-    // The labels remain offset independently for readability.
-    [[edges.front,frontScreen],[edges.back,backScreen]].forEach(function(item){
-      var point=item[0],q=rotatedLocal(point[0],point[1]);
-      var dot=[w/2+(q.x-cameraX)/mpp,h/2-(q.y-cameraY)/mpp];
-      var distance=Math.round(yd(current,point));
-      // Keep the sand marker slightly offset from the exact geo-edge point,
-      // joined back to it with a short dotted leader so the bunker shape stays visible.
-      var dx=dot[0]-item[1][0],dy=dot[1]-item[1][1],len=Math.hypot(dx,dy)||1;
-      var ux=dx/len,uy=dy/len;
-      // Use vertical leaders. Back edge labels sit above the geo point;
-      // front edge labels sit below it so the two ends read outward from the bunker.
-      var leaderDirection=point===edges.front?1:-1;
-      var markerX=dot[0],markerY=dot[1]+leaderDirection*28;
-      var lineStartX=dot[0],lineStartY=dot[1]+leaderDirection*11;
+    // Bunker geometry stays fixed to the source polygon. Front/back are derived
+    // live from the player's GPS, while the display combines both yardages into
+    // one compact sand-coloured label on the non-fairway side.
+    bunkerData.forEach(function(b){
+      var edges=bunkerEdgesFromPlayer(b);
+      var frontQ=rotatedLocal(edges.front[0],edges.front[1]);
+      var backQ=rotatedLocal(edges.back[0],edges.back[1]);
+      var mpp=metersPerPixel(w,h,pad);
+      var frontScreen=[w/2+(frontQ.x-cameraX)/mpp,h/2-(frontQ.y-cameraY)/mpp];
+      var backScreen=[w/2+(backQ.x-cameraX)/mpp,h/2-(backQ.y-cameraY)/mpp];
+
+      // Small anchor dots remain at the exact geolocated front/back points.
+      [[frontScreen,edges.front],[backScreen,edges.back]].forEach(function(item){
+        var dot=item[0];
+        ctx.beginPath();
+        ctx.arc(dot[0],dot[1],4,0,Math.PI*2);
+        ctx.fillStyle='#d8bd78';
+        ctx.fill();
+        ctx.strokeStyle='#967b43';
+        ctx.lineWidth=1;
+        ctx.stroke();
+      });
+
+      // Put the combined F/B yardage outside the bunker on its non-fairway side.
+      var anchorX=(frontScreen[0]+backScreen[0])/2;
+      var anchorY=(frontScreen[1]+backScreen[1])/2;
+      var side=b.side==='left'?-1:1;
+      var labelX=anchorX+side*34;
+      var labelY=anchorY;
+      var lineStartX=anchorX+side*5;
+      var lineEndX=labelX-side*20;
+
       ctx.beginPath();
       ctx.setLineDash([3,4]);
-      ctx.moveTo(lineStartX,lineStartY);
-      ctx.lineTo(markerX,markerY);
+      ctx.moveTo(lineStartX,anchorY);
+      ctx.lineTo(lineEndX,labelY);
       ctx.strokeStyle='rgba(150,123,67,.9)';
       ctx.lineWidth=1.25;
       ctx.stroke();
       ctx.setLineDash([]);
-      dot=[markerX,markerY];
-      ctx.beginPath();
-      ctx.arc(dot[0],dot[1],10,0,Math.PI*2);
-      ctx.fillStyle='#d8bd78';
-      ctx.fill();
-      ctx.strokeStyle='#967b43';
-      ctx.lineWidth=1;
-      ctx.stroke();
-      ctx.fillStyle='#16231b';
-      ctx.font='600 9px Arial';
-      ctx.textAlign='center';
+
+      ctx.font='600 10px Arial';
+      ctx.textAlign=side<0?'right':'left';
       ctx.textBaseline='middle';
-      ctx.fillText(distance+'',dot[0],dot[1]);
+      ctx.fillStyle='#d8bd78';
+      ctx.fillText(Math.round(yd(current,edges.front))+' / '+Math.round(yd(current,edges.back)),labelX,labelY);
+      ctx.textAlign='left';
+      ctx.textBaseline='alphabetic';
     });
-    // Yardages are now contained entirely inside the sand markers.
-    ctx.textAlign='left';
-    ctx.textBaseline='alphabetic';
-  });
   var pl=project(current[0],current[1],HB,w,h,pad);
   ctx.beginPath();ctx.arc(pl[0],pl[1],9,0,Math.PI*2);ctx.fillStyle='#1c4a31';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();
   ctx.restore();
