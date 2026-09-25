@@ -349,10 +349,17 @@ function drawHoleDetail(){
       var frontScreen=[w/2+(frontQ.x-cameraX)/mpp,h/2-(frontQ.y-cameraY)/mpp];
       var backScreen=[w/2+(backQ.x-cameraX)/mpp,h/2-(backQ.y-cameraY)/mpp];
 
-      // Place the two yardages directly at the midpoint between the live
-      // front/back geo points, so the label stays centred on the bunker.
-      var labelX=(frontScreen[0]+backScreen[0])/2;
-      var labelY=(frontScreen[1]+backScreen[1])/2;
+      // The F/M/B markers are anchored to geographic coordinates. Do the
+      // same here: calculate the bunker label anchor in geographic space,
+      // then project it once. Zoom therefore cannot change its relationship
+      // to the bunker.
+      var labelGeo=[
+        (edges.front[0]+edges.back[0])/2,
+        (edges.front[1]+edges.back[1])/2
+      ];
+      var labelQ=rotatedLocal(labelGeo[0],labelGeo[1]);
+      var labelX=w/2+(labelQ.x-cameraX)/mpp;
+      var labelY=h/2-(labelQ.y-cameraY)/mpp;
 
       ctx.font='600 10px Arial';
       ctx.textAlign='center';
