@@ -264,11 +264,19 @@ function drawHoleDetail(){
   ctx.clearRect(0,0,innerWidth,innerHeight);ctx.fillStyle='#dfe4d8';ctx.fillRect(0,0,innerWidth,innerHeight);
   ctx.save();
   ctx.beginPath();ctx.rect(0,0,w,h);ctx.clip();
-  // Full course remains the underlying spatial context, but uses the same
-  // rotated metric camera as Hole 1 so the course never gets stretched/squashed.
-  C.holes.forEach(function(hole){
-    drawLine(ctx,hole.geometry.coordinates,HB,w,h,pad,'rgba(89,99,84,.16)',1);
+  // Other holes remain visible as quiet spatial context. Only fairways and
+  // bunkers are shown; live yardages/markers remain exclusive to the selected hole.
+  Object.keys(window.UIDO_OVERSTONE_SOURCE_HOLES).forEach(function(key){
+    if(String(key)===String(holeNumber))return;
+    var other=window.UIDO_OVERSTONE_SOURCE_HOLES[key];
+    (other.features||[]).forEach(function(f){
+      if(f.geometry.type!=='Polygon')return;
+      var g=f.golf,c=f.geometry.coordinates[0];
+      if(g==='fairway')drawPoly(ctx,c,HB,w,h,pad,'rgba(199,213,188,.34)','rgba(142,165,138,.34)');
+      else if(g==='bunker')drawPoly(ctx,c,HB,w,h,pad,'rgba(216,189,120,.55)','rgba(150,123,67,.40)');
+    });
   });
+  // Keep the selected hole visually stronger than the surrounding course.
   // Draw fairway/rough first so the green is not hidden by the fairway polygon.
   features.forEach(function(f){
     var g=f.golf,geom=f.geometry,c=geom.coordinates;
