@@ -206,13 +206,7 @@ function selectHole(n){
 function bunkerLabel(b){
   return Math.round(yd(current,b.front_gps))+'/'+Math.round(yd(current,b.back_gps))+' yd';
 }
-function updateYardageUI(){
-  var f=Math.round(yd(current,D.green_fmb.front)),m=Math.round(yd(current,D.green_fmb.middle)),b=Math.round(yd(current,D.green_fmb.back));
-  document.getElementById('greenYardage').textContent='F/M/B '+f+' / '+m+' / '+b+' yd';
-  document.getElementById('bunkerYardage').innerHTML=bunkerData.map(function(x){
-    return '<span class="b">'+bunkerLabel(x)+'</span>';
-  }).join('');
-}
+function updateYardageUI(){}
 
 function fitCamera(){
   var v=viewSize(),pad=28;
@@ -369,8 +363,6 @@ function update(pos){
   window._travelAngle=travelAngleAt(pos[0],pos[1]);
   if(detailMode)keepPlayerVisible();
   updateYardageUI();
-  document.getElementById('main').textContent='Hole '+holeNumber+' · '+Math.round(yd(pos,D.green_fmb.middle))+' yd to middle';
-  document.getElementById('detail').textContent='Live GPS position · Hole '+holeNumber+' · Par '+D.par+' · heading '+Math.round(holeBearingDeg)+'°';
   draw();
 }
 function setMode(detail){
