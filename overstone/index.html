@@ -370,13 +370,15 @@ function drawHoleDetail(){
       // joined back to it with a short dotted leader so the bunker shape stays visible.
       var dx=dot[0]-item[1][0],dy=dot[1]-item[1][1],len=Math.hypot(dx,dy)||1;
       var ux=dx/len,uy=dy/len;
-      var markerX=dot[0]+ux*12,markerY=dot[1]+uy*12;
+      var markerX=dot[0]+ux*24,markerY=dot[1]+uy*24;
+      // Start the leader outside the marker so the full dotted connection is visible.
+      var lineStartX=dot[0]+ux*11,lineStartY=dot[1]+uy*11;
       ctx.beginPath();
-      ctx.setLineDash([2,3]);
-      ctx.moveTo(dot[0],dot[1]);
+      ctx.setLineDash([3,4]);
+      ctx.moveTo(lineStartX,lineStartY);
       ctx.lineTo(markerX,markerY);
-      ctx.strokeStyle='rgba(150,123,67,.85)';
-      ctx.lineWidth=1;
+      ctx.strokeStyle='rgba(150,123,67,.9)';
+      ctx.lineWidth=1.25;
       ctx.stroke();
       ctx.setLineDash([]);
       dot=[markerX,markerY];
