@@ -5,22 +5,22 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>UiDo · Overstone Course</title>
 <style>
-:root{--rail-width:290px}
+:root{--rail-width:188px}
 html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#f3f0e7;color:#16231b;font-family:Arial,sans-serif}
 #map{position:absolute;inset:0;right:var(--rail-width);background:#dfe4d8;transition:right .2s ease}
 canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
 .panel{z-index:4;background:rgba(247,245,238,.96);border:1px solid rgba(22,35,27,.16);border-radius:12px;padding:12px;box-shadow:0 3px 15px rgba(0,0,0,.12);box-sizing:border-box}
-#infoRail{position:fixed;z-index:6;top:12px;right:12px;bottom:12px;width:266px;display:flex;flex-direction:column;gap:10px;pointer-events:none}
-#infoRail .panel{position:relative;inset:auto;left:auto;right:auto;top:auto;bottom:auto;width:100%;pointer-events:auto}
-.title{font-size:13px}.title small{font-size:11px}.status{font-size:12px}.yardage{font-size:11px;line-height:1.5}.yardage strong{font-size:12px}.yardage .b{display:inline-block;margin:0 12px 5px 0}.info{font-size:12px}.info strong{font-size:14px}
+#infoRail{position:fixed;z-index:6;top:12px;right:12px;bottom:12px;width:164px;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+#infoRail .panel{position:relative;inset:auto;left:auto;right:auto;top:auto;bottom:auto;width:100%;pointer-events:auto;padding:10px;border-radius:10px}
+.title{font-size:11px}.title small{font-size:9px}.status{font-size:10px}.yardage{font-size:10px;line-height:1.45}.yardage strong{font-size:11px}.yardage .b{display:inline-block;margin:0 7px 4px 0}.info{font-size:10px}.info strong{font-size:12px}
 .buttons{position:fixed;z-index:7;top:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap;max-width:calc(100vw - var(--rail-width) - 24px)}.buttons button{border:0;border-radius:10px;padding:9px 11px;background:#f7f5ee;color:#16231b;font-weight:600}.buttons .active{background:#1c4a31;color:white}
 #railToggle{margin-top:auto;align-self:flex-end;border:0;border-radius:10px;padding:8px 11px;background:#f7f5ee;color:#16231b;font-weight:600;box-shadow:0 3px 15px rgba(0,0,0,.12);pointer-events:auto}
 body.rail-collapsed #map{right:0}
 body.rail-collapsed #infoRail{display:none}
 .error{color:#9b2c2c}
 @media(max-width:700px){
-  :root{--rail-width:248px}
-  #infoRail{width:224px}
+  :root{--rail-width:174px}
+  #infoRail{width:150px;top:10px;right:10px;bottom:10px;gap:6px}
   .buttons{max-width:calc(100vw - var(--rail-width) - 20px);gap:4px}
   .buttons button{padding:8px 9px}
 }
