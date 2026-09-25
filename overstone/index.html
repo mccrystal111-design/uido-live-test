@@ -370,10 +370,11 @@ function drawHoleDetail(){
       // joined back to it with a short dotted leader so the bunker shape stays visible.
       var dx=dot[0]-item[1][0],dy=dot[1]-item[1][1],len=Math.hypot(dx,dy)||1;
       var ux=dx/len,uy=dy/len;
-      // Use a vertical leader so the marker reads cleanly without obscuring
-      // the bunker edge. Keep the marker above the geo-edge point.
-      var markerX=dot[0],markerY=dot[1]-28;
-      var lineStartX=dot[0],lineStartY=dot[1]-11;
+      // Use vertical leaders. Back edge labels sit above the geo point;
+      // front edge labels sit below it so the two ends read outward from the bunker.
+      var leaderDirection=point===edges.front?1:-1;
+      var markerX=dot[0],markerY=dot[1]+leaderDirection*28;
+      var lineStartX=dot[0],lineStartY=dot[1]+leaderDirection*11;
       ctx.beginPath();
       ctx.setLineDash([3,4]);
       ctx.moveTo(lineStartX,lineStartY);
