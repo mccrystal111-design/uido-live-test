@@ -349,21 +349,11 @@ function drawHoleDetail(){
       var frontScreen=[w/2+(frontQ.x-cameraX)/mpp,h/2-(frontQ.y-cameraY)/mpp];
       var backScreen=[w/2+(backQ.x-cameraX)/mpp,h/2-(backQ.y-cameraY)/mpp];
 
-      // Anchor the combined label to the visible non-fairway edge of the
-      // bunker itself, rather than the midpoint of the front/back points.
-      // This keeps the label a genuinely fixed screen-space distance from
-      // the bunker regardless of zoom.
+      // Place the two yardages midway between the live front/back geo points.
+      // Back is shown on top, front underneath, with no separator.
+      var anchorX=(frontScreen[0]+backScreen[0])/2;
+      var anchorY=(frontScreen[1]+backScreen[1])/2;
       var side=b.side==='left'?-1:1;
-      var ring=bunkerGeometry(b)||[];
-      var edgePoints=[];
-      ring.forEach(function(p){
-        var q=rotatedLocal(p[1],p[0]);
-        edgePoints.push([w/2+(q.x-cameraX)/mpp,h/2-(q.y-cameraY)/mpp]);
-      });
-      var anchor=edgePoints.length?edgePoints.reduce(function(best,p){
-        return side<0?(p[0]<best[0]?p:best):(p[0]>best[0]?p:best);
-      }):[(frontScreen[0]+backScreen[0])/2,(frontScreen[1]+backScreen[1])/2];
-      var anchorX=anchor[0],anchorY=anchor[1];
       var labelX=anchorX+side*14;
       var labelY=anchorY;
       var lineStartX=anchorX+side*2;
@@ -381,8 +371,9 @@ function drawHoleDetail(){
       ctx.font='600 10px Arial';
       ctx.textAlign=side<0?'right':'left';
       ctx.textBaseline='middle';
-      ctx.fillStyle='#d8bd78';
-      ctx.fillText(Math.round(yd(current,edges.front))+' / '+Math.round(yd(current,edges.back)),labelX,labelY);
+      ctx.fillStyle='#16231b';
+      ctx.fillText(Math.round(yd(current,edges.back))+'',labelX,labelY-6);
+      ctx.fillText(Math.round(yd(current,edges.front))+'',labelX,labelY+6);
       ctx.textAlign='left';
       ctx.textBaseline='alphabetic';
     });
