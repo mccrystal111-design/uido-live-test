@@ -350,18 +350,6 @@ function drawHoleDetail(){
       var frontScreen=[w/2+(frontQ.x-cameraX)/mpp,h/2-(frontQ.y-cameraY)/mpp];
       var backScreen=[w/2+(backQ.x-cameraX)/mpp,h/2-(backQ.y-cameraY)/mpp];
 
-      // Small anchor dots remain at the exact geolocated front/back points.
-      [[frontScreen,edges.front],[backScreen,edges.back]].forEach(function(item){
-        var dot=item[0];
-        ctx.beginPath();
-        ctx.arc(dot[0],dot[1],4,0,Math.PI*2);
-        ctx.fillStyle='#d8bd78';
-        ctx.fill();
-        ctx.strokeStyle='#967b43';
-        ctx.lineWidth=1;
-        ctx.stroke();
-      });
-
       // Put the combined F/B yardage outside the bunker on its non-fairway side.
       var anchorX=(frontScreen[0]+backScreen[0])/2;
       var anchorY=(frontScreen[1]+backScreen[1])/2;
