@@ -366,7 +366,20 @@ function drawHoleDetail(){
       var point=item[0],q=rotatedLocal(point[0],point[1]);
       var dot=[w/2+(q.x-cameraX)/mpp,h/2-(q.y-cameraY)/mpp];
       var distance=Math.round(yd(current,point));
-      // Match the F/M/B marker treatment, with a sand fill for bunkers.
+      // Keep the sand marker slightly offset from the exact geo-edge point,
+      // joined back to it with a short dotted leader so the bunker shape stays visible.
+      var dx=dot[0]-item[1][0],dy=dot[1]-item[1][1],len=Math.hypot(dx,dy)||1;
+      var ux=dx/len,uy=dy/len;
+      var markerX=dot[0]+ux*12,markerY=dot[1]+uy*12;
+      ctx.beginPath();
+      ctx.setLineDash([2,3]);
+      ctx.moveTo(dot[0],dot[1]);
+      ctx.lineTo(markerX,markerY);
+      ctx.strokeStyle='rgba(150,123,67,.85)';
+      ctx.lineWidth=1;
+      ctx.stroke();
+      ctx.setLineDash([]);
+      dot=[markerX,markerY];
       ctx.beginPath();
       ctx.arc(dot[0],dot[1],10,0,Math.PI*2);
       ctx.fillStyle='#d8bd78';
