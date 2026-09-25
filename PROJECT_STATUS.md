@@ -1,6 +1,6 @@
 # UiDo — Project Source of Truth
 
-**Last updated:** 2026-09-24  
+**Last updated:** 2026-09-25  
 **Repository:** `mccrystal111-design/uido-live-test`  
 **Canonical project:** UiDo golf decision engine / virtual caddie / SmartShot intelligence.
 
@@ -8,7 +8,7 @@ This is the first file a fresh UiDo session should read. It records authoritativ
 
 ## CURRENT STATE
 
-**Overstone playground navigation:** Hole 1 detail now has camera zoom (buttons/wheel), pan, and a course minimap that can be toggled. The minimap shows the player's position and the current Hole 1 viewport rectangle so it acts as a viewfinder.
+**Overstone playground navigation:** Hole 1 detail has camera zoom (buttons/wheel), pan, and a minimap that can be toggled. When the minimap is off, the minimap and its viewfinder/window are both removed to reclaim screen space. Camera drag now follows natural map movement (right/down drag moves the map right/down).
 
 
 **Overstone course-view playground: full-course context + Hole 1 detail implemented.** The playground now loads an 18-hole course context from the authoritative Overstone OSM hole routes and keeps the existing Hole 1 detailed measurement layer as the active drill-down. The renderer can toggle between full-course overview and Hole 1 detail without changing source geometry.
@@ -17,7 +17,7 @@ This is the first file a fresh UiDo session should read. It records authoritativ
 **GolfCourseAPI discovery/registration: IMPLEMENTED; Northampton registry metadata is complete.**  
 **Northampton physical acquisition: BLOCKED earlier than OSM hole validation by OSM course-identity resolution.**
 
-Current `main` head: `54a88e6081d33a53a2db9d5a4cbaedb089c9c20e` (`Continue evidence acquisition when OSM has gaps`). The previous status file was stale at `27e0df2…`; this reconciliation corrects that discrepancy.
+Current `main` head: `b4ced95e0bf4de0b61dbc9ae3771f0e74ec4a1e8` (`Fix Overstone minimap toggle and camera pan direction`). The previous status file was stale at `27e0df2…`; this reconciliation corrects that discrepancy.
 
 The latest master physical-acquisition run is `35994500134` (2026-09-24). It is a **Northampton** test and failed in `prepare_physical_acquisition.py` before OSM capture. The log records:
 
