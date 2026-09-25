@@ -149,3 +149,9 @@ Whenever meaningful UiDo work changes project state, update this document. If Gi
 - Added a Hide info / Show info control so the information rail can be collapsed and the hole view can expand to the full screen.
 - The existing **Use GPS** control is the live-location handover: it requests the device location, switches off the fixed test player, centres the camera on the live position, and then watches for position updates. Browser/device permission is required.
 - Code commit: `d654bd4afa72ac0b76e729adb837f4a09d6c259d`.
+
+### 2026-09-25 — Overstone GPS camera follow
+- Live GPS mode now follows the player as the GPS position changes instead of leaving the camera behind.
+- Camera follow places the player toward the lower-middle of the view and clamps camera movement against the Hole 1 extents so the hole does not simply disappear off-screen as the player moves.
+- Test mode remains manually movable and unchanged.
+- Code commit: `89daa3af2671e53c721d72e7ca7e240493177a65`.
