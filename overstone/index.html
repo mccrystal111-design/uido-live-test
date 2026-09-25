@@ -218,18 +218,10 @@ function drawLine(c,coords,b,w,h,pad,color,width,dash){
   c.strokeStyle=color;c.lineWidth=width;c.stroke();c.setLineDash([]);
 }
 function drawPoly(c,coords,b,w,h,pad,fill,stroke){
-  if(!coords||coords.length<3)return;
-  var pts=coords.map(function(p){return project(p[1],p[0],b,w,h,pad);});
+  if(!coords||!coords.length)return;
   c.beginPath();
-  var first=pts[0],last=pts[pts.length-1];
-  c.moveTo((last[0]+first[0])/2,(last[1]+first[1])/2);
-  for(var i=0;i<pts.length;i++){
-    var p=pts[i],next=pts[(i+1)%pts.length];
-    var mx=(p[0]+next[0])/2,my=(p[1]+next[1])/2;
-    c.quadraticCurveTo(p[0],p[1],mx,my);
-  }
-  c.closePath();
-  c.fillStyle=fill;c.fill();c.strokeStyle=stroke;c.lineWidth=1;c.stroke();
+  coords.forEach(function(p,i){var q=project(p[1],p[0],b,w,h,pad);if(i)c.lineTo(q[0],q[1]);else c.moveTo(q[0],q[1])});
+  c.closePath();c.fillStyle=fill;c.fill();c.strokeStyle=stroke;c.lineWidth=1;c.stroke();
 }
 function drawFullCourse(c,w,h,small){
   c.clearRect(0,0,w,h);c.fillStyle='#dfe4d8';c.fillRect(0,0,w,h);
