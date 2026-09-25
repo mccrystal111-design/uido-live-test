@@ -9,7 +9,7 @@ html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#f3f0e7;col
 #map{position:absolute;inset:0;background:#dfe4d8}
 canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
 #overview{position:absolute;z-index:3;top:76px;right:12px;width:190px;height:150px;border:1px solid rgba(22,35,27,.2);border-radius:12px;overflow:hidden;background:#dfe4d8;box-shadow:0 3px 15px rgba(0,0,0,.16)}
-#overview canvas{position:relative;width:100%;height:100%}
+#overview canvas{position:relative;width:100%;height:100%}#overview[hidden]{display:none!important}
 .panel{position:absolute;z-index:4;background:rgba(247,245,238,.96);border:1px solid rgba(22,35,27,.16);border-radius:12px;padding:10px;box-shadow:0 3px 15px rgba(0,0,0,.12)}
 .title{top:12px;left:12px}.status{top:76px;left:12px;font-size:12px}.info{left:12px;right:12px;bottom:12px;font-size:12px}.info strong{font-size:14px}
 .buttons{top:12px;right:12px;display:flex;gap:6px}.buttons button{border:0;border-radius:10px;padding:9px 11px;background:#f7f5ee;color:#16231b;font-weight:600}.buttons .active{background:#1c4a31;color:white}
@@ -50,8 +50,9 @@ if(!C)throw new Error('Full course layer did not load');
 if(!D)throw new Error('Hole 1 detail layer did not load');
 
 var canvas=document.getElementById('course'),ctx=canvas.getContext('2d');
+var overviewBox=document.getElementById('overview');
 var overview=document.getElementById('overviewCanvas'),ov=overview.getContext('2d');
-var features=D.features||[],tee=[52.2763578,-0.8194224],current=tee.slice(),gpsWatch=null,testMode=true,detailMode=true,miniVisible=true,zoom=1,cameraLat=null,cameraLon=null,dragging=false,lastX=0,lastY=0;
+var features=D.features||[],tee=[52.2763578,-0.8194224],current=tee.slice(),gpsWatch=null,testMode=true,detailMode=true,miniVisible=true,zoom=1,cameraLat=null,cameraLon=null,dragging=false,moved=false,lastX=0,lastY=0;
 
 function allCourseBounds(){
   var xs=[],ys=[];
@@ -139,7 +140,7 @@ function drawHoleDetail(){
 }
 function draw(){
   if(detailMode)drawHoleDetail();else drawFullCourse(ctx,innerWidth,innerHeight,false);
-  overview.style.display=miniVisible?'block':'none';
+  overview.hidden=!miniVisible;
   if(!miniVisible)return;
   var ow=190,oh=150,dpr=devicePixelRatio||1;
   overview.width=ow*dpr;overview.height=oh*dpr;
@@ -185,6 +186,7 @@ function reset(){
   document.getElementById('status').textContent=detailMode?'Hole 1 test · player fixed at tee':'Full course · test player at Hole 1 tee';
 }
 canvas.addEventListener('click',function(e){
+  if(moved){moved=false;return;}
   if(!testMode||!detailMode)return;
   var r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,pad=36;
   var spanLon=(HB.maxX-HB.minX)/zoom,spanLat=(HB.maxY-HB.minY)/zoom;
@@ -208,14 +210,15 @@ canvas.addEventListener('wheel',function(e){
 },{passive:false});
 canvas.addEventListener('pointerdown',function(e){
   if(!detailMode)return;
-  dragging=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId);
+  dragging=true;moved=false;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId);
 });
 canvas.addEventListener('pointermove',function(e){
   if(!dragging||!detailMode)return;
   var dx=e.clientX-lastX,dy=e.clientY-lastY;
   var spanLon=(HB.maxX-HB.minX)/zoom,spanLat=(HB.maxY-HB.minY)/zoom;
-  cameraLon+=dx/(innerWidth-72)*spanLon;
+  cameraLon-=dx/(innerWidth-72)*spanLon;
   cameraLat+=dy/(innerHeight-72)*spanLat;
+  moved=true;
   lastX=e.clientX;lastY=e.clientY;draw();
 });
 canvas.addEventListener('pointerup',function(){dragging=false});
