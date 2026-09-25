@@ -17,7 +17,7 @@ This is the first file a fresh UiDo session should read. It records authoritativ
 **GolfCourseAPI discovery/registration: IMPLEMENTED; Northampton registry metadata is complete.**  
 **Northampton physical acquisition: BLOCKED earlier than OSM hole validation by OSM course-identity resolution.**
 
-Current `main` head: `d0e539c42ed99cc19a2f87a82ef6ff64f270043c` (`Render source-derived wireframes for Holes 2-18`). The previous status file was stale at `27e0df2…`; this reconciliation corrects that discrepancy.
+Current `main` head: `6fb567d795d0ddd6c1814696e49d66c1dc4d44ae` (`Improve hole picker and smooth wireframe rendering`). The previous status file was stale at `27e0df2…`; this reconciliation corrects that discrepancy.
 
 The latest master physical-acquisition run is `35994500134` (2026-09-24). It is a **Northampton** test and failed in `prepare_physical_acquisition.py` before OSM capture. The log records:
 
@@ -173,3 +173,10 @@ Whenever meaningful UiDo work changes project state, update this document. If Gi
 - Added `overstone/hole-wireframes.js` and wired it into `overstone/index.html`.
 - Commits: `ddce5bc498c3afd33368a0fa6a4c80aa2292c2b9`, `d0e539c42ed99cc19a2f87a82ef6ff64f270043c`.
 - No GitHub Action was automatically rerun; manual Pages/playground testing is the next validation step.
+
+
+### 2026-09-25 — Hole selector and wireframe presentation refinement
+- Replaced the cramped native Hole dropdown with a visible UiDo hole picker that opens an 18-hole grid and clearly shows the active hole.
+- Smoothed the canvas rendering of source-derived polygon wireframes using quadratic curve interpolation at render time; source data itself is unchanged.
+- F/M/B, live GPS and yardage logic are unchanged.
+- Commit: `6fb567d795d0ddd6c1814696e49d66c1dc4d44ae`.
