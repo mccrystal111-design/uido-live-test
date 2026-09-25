@@ -463,7 +463,9 @@ canvas.addEventListener('click',function(e){
   var v=viewSize();
   var rx=cameraX+(x-v.w/2)*mpp;
   var ry=cameraY+(v.h/2-y)*mpp;
-  var cb=Math.cos(holeAngle),sb=Math.sin(holeAngle);
+  // Convert the tap back using the same live travel heading used to draw the map.
+  var tapAngle=window._travelAngle||holeAngle;
+  var cb=Math.cos(tapAngle),sb=Math.sin(tapAngle);
   var e=rx*cb+ry*sb;
   var n=-rx*sb+ry*cb;
   var pos=fromLocal(e,n);
