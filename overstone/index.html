@@ -367,9 +367,23 @@ function drawHoleDetail(){
       var centreQ=rotatedLocal(centre[0],centre[1]);
       var labelX=w/2+(centreQ.x-cameraX)/mpp;
       var labelY=h/2-(centreQ.y-cameraY)/mpp;
-      // Keep bunker yardages just outside the sand: left bunkers shift left,
-      // right bunkers shift right by 20px in screen space.
-      var sideOffset=(b.side==='left'?-20:(b.side==='right'?20:0));
+      // Keep bunker yardages just outside the sand using a physical offset
+      // tied to the bunker size. Because labelX is calculated from the current
+      // metres-per-pixel scale, the spacing naturally follows zoom.
+      var ringWidth=0,ringHeight=0;
+      if(ring.length){
+        var minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+        ring.forEach(function(p){
+          var q=rotatedLocal(p[1],p[0]);
+          minX=Math.min(minX,q.x);maxX=Math.max(maxX,q.x);
+          minY=Math.min(minY,q.y);maxY=Math.max(maxY,q.y);
+        });
+        ringWidth=maxX-minX;
+        ringHeight=maxY-minY;
+      }
+      var physicalOffset=Math.max(2.5,Math.min(6,Math.min(ringWidth,ringHeight)*0.16));
+      var screenOffset=physicalOffset/mpp;
+      var sideOffset=(b.side==='left'?-screenOffset:(b.side==='right'?screenOffset:0));
       labelX+=sideOffset;
 
       ctx.save();
