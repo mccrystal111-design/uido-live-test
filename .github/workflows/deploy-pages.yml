@@ -12,6 +12,7 @@ on:
       - "*.css"
       - "*.html"
       - "assets/**"
+      - "overstone/**"
       - ".github/workflows/deploy-pages.yml"
 permissions:
   contents: read
@@ -52,6 +53,7 @@ jobs:
           if [ -f hole.html ]; then cp hole.html _site/hole.html; fi
           if [ -f scorecard.js ]; then cp scorecard.js _site/scorecard.js; fi
           if [ -d assets ]; then cp -R assets _site/assets; fi
+          if [ -d overstone ]; then cp -R overstone _site/overstone; fi
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
