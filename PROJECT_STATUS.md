@@ -8,7 +8,7 @@ This is the first file a fresh UiDo session should read. It records authoritativ
 
 ## CURRENT STATE
 
-**Overstone playground navigation:** Hole 1 detail has camera zoom (buttons/wheel), pan, and a minimap that can be toggled. When the minimap is off, the minimap and its viewfinder/window are hard-hidden to reclaim screen space. Camera uses a metric, aspect-ratio-preserving projection with Hole 1's direction of play rotated to screen-up. Panning and pinch zoom use the same camera model, so the course no longer stretches/squashes. Dragging no longer triggers a test-position click.
+**Overstone playground navigation:** Hole 1 detail has camera zoom (buttons/wheel), pan, and a minimap that can be toggled. When the minimap is off, the minimap and its viewfinder/window are hard-hidden to reclaim screen space. Camera uses a metric, aspect-ratio-preserving projection with Hole 1's direction of play rotated to screen-up. Fit-to-hole now centers on the rotated hole bounds and adds breathing room so the complete Hole 1 is visible at zoom 1. Panning and pinch zoom use the same camera model, and the minimap viewfinder follows the rotated viewport.
 
 
 **Overstone course-view playground: full-course context + Hole 1 detail implemented.** The playground now loads an 18-hole course context from the authoritative Overstone OSM hole routes and keeps the existing Hole 1 detailed measurement layer as the active drill-down. The renderer can toggle between full-course overview and Hole 1 detail without changing source geometry.
@@ -17,7 +17,7 @@ This is the first file a fresh UiDo session should read. It records authoritativ
 **GolfCourseAPI discovery/registration: IMPLEMENTED; Northampton registry metadata is complete.**  
 **Northampton physical acquisition: BLOCKED earlier than OSM hole validation by OSM course-identity resolution.**
 
-Current `main` head: `3a9a451a050f02119d1a40936c0ce8f3c8d18d89` (`Fix Overstone camera geometry and align Hole 1 view`). The previous status file was stale at `27e0df2…`; this reconciliation corrects that discrepancy.
+Current `main` head: `2a069dfc0e28f1dac9c115d28ffd9364207e950f` (`Update minimap viewfinder for rotated camera`). The previous status file was stale at `27e0df2…`; this reconciliation corrects that discrepancy.
 
 The latest master physical-acquisition run is `35994500134` (2026-09-24). It is a **Northampton** test and failed in `prepare_physical_acquisition.py` before OSM capture. The log records:
 
