@@ -186,12 +186,21 @@ function draw(){
   var q=project(current[0],current[1],CB,ow,oh,10);
   ov.beginPath();ov.arc(q[0],q[1],4,0,Math.PI*2);ov.fillStyle='#1c4a31';ov.fill();
   if(detailMode){
-    var viewLon=(HB.maxX-HB.minX)/zoom, viewLat=(HB.maxY-HB.minY)/zoom;
-    var tl=project(cameraLat+viewLat/2,cameraLon-viewLon/2,CB,ow,oh,10);
-    var br=project(cameraLat-viewLat/2,cameraLon+viewLon/2,CB,ow,oh,10);
-    var rx=Math.max(0,Math.min(ow,tl[0])), ry=Math.max(0,Math.min(oh,tl[1]));
-    var rw=Math.max(0,Math.min(ow-rx,br[0])-rx), rh=Math.max(0,Math.min(oh-ry,br[1])-ry);
-    ov.strokeStyle='#ffd600';ov.lineWidth=2;ov.strokeRect(rx,ry,rw,rh);
+    var mpp=metersPerPixel(innerWidth,innerHeight,36);
+    var corners=[
+      [-innerWidth/2*mpp, innerHeight/2*mpp],
+      [ innerWidth/2*mpp, innerHeight/2*mpp],
+      [ innerWidth/2*mpp,-innerHeight/2*mpp],
+      [-innerWidth/2*mpp,-innerHeight/2*mpp]
+    ];
+    var cb=Math.cos(holeAngle),sb=Math.sin(holeAngle);
+    var pts=corners.map(function(p){
+      var rx=cameraX+p[0],ry=cameraY+p[1];
+      var e=rx*cb+ry*sb,n=-rx*sb+ry*cb,g=fromLocal(e,n);
+      return project(g[0],g[1],CB,ow,oh,10);
+    });
+    ov.beginPath();pts.forEach(function(p,i){if(i)ov.lineTo(p[0],p[1]);else ov.moveTo(p[0],p[1])});ov.closePath();
+    ov.strokeStyle='#ffd600';ov.lineWidth=2;ov.stroke();
   }
 }
 function yd(a,b){
