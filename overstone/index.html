@@ -355,10 +355,10 @@ function drawHoleDetail(){
       var side=b.side==='left'?-1:1;
       // Keep the label a fixed screen-space distance from the geo anchor,
       // regardless of map zoom.
-      var labelX=anchorX+side*34;
+      var labelX=anchorX+side*20;
       var labelY=anchorY;
       var lineStartX=anchorX+side*5;
-      var lineEndX=labelX-side*20;
+      var lineEndX=labelX-side*10;
 
       ctx.beginPath();
       ctx.setLineDash([3,4]);
