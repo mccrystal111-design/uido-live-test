@@ -349,27 +349,13 @@ function drawHoleDetail(){
       var frontScreen=[w/2+(frontQ.x-cameraX)/mpp,h/2-(frontQ.y-cameraY)/mpp];
       var backScreen=[w/2+(backQ.x-cameraX)/mpp,h/2-(backQ.y-cameraY)/mpp];
 
-      // Place the two yardages midway between the live front/back geo points.
-      // Back is shown on top, front underneath, with no separator.
-      var anchorX=(frontScreen[0]+backScreen[0])/2;
-      var anchorY=(frontScreen[1]+backScreen[1])/2;
-      var side=b.side==='left'?-1:1;
-      var labelX=anchorX+side*14;
-      var labelY=anchorY;
-      var lineStartX=anchorX+side*2;
-      var lineEndX=labelX-side*7;
-
-      ctx.beginPath();
-      ctx.setLineDash([3,4]);
-      ctx.moveTo(lineStartX,anchorY);
-      ctx.lineTo(lineEndX,labelY);
-      ctx.strokeStyle='rgba(150,123,67,.9)';
-      ctx.lineWidth=1.25;
-      ctx.stroke();
-      ctx.setLineDash([]);
+      // Place the two yardages directly at the midpoint between the live
+      // front/back geo points, so the label stays centred on the bunker.
+      var labelX=(frontScreen[0]+backScreen[0])/2;
+      var labelY=(frontScreen[1]+backScreen[1])/2;
 
       ctx.font='600 10px Arial';
-      ctx.textAlign=side<0?'right':'left';
+      ctx.textAlign='center';
       ctx.textBaseline='middle';
       ctx.fillStyle='#16231b';
       ctx.fillText(Math.round(yd(current,edges.back))+'',labelX,labelY-6);
