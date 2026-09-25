@@ -5,46 +5,71 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>UiDo · Overstone Course</title>
 <style>
-:root{--rail-width:188px}
+:root{--rail-width:180px}
 html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#f3f0e7;color:#16231b;font-family:Arial,sans-serif}
 #map{position:absolute;inset:0;background:#dfe4d8}
 canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
-.panel{z-index:4;background:rgba(247,245,238,.96);border:1px solid rgba(22,35,27,.16);border-radius:12px;padding:12px;box-shadow:0 3px 15px rgba(0,0,0,.12);box-sizing:border-box}
-#infoRail{position:fixed;z-index:6;top:10px;right:10px;width:164px;display:flex;flex-direction:column;gap:8px;pointer-events:none}
-#infoRail .panel{position:relative;inset:auto;left:auto;right:auto;top:auto;bottom:auto;width:100%;pointer-events:auto;padding:10px;border-radius:10px}
-.hole-picker{position:relative;display:grid;grid-template-columns:1fr;gap:6px}
-.hole-picker-button{width:100%;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;padding:10px 9px;background:#f7f5ee;border:1px solid rgba(22,35,27,.18);border-radius:9px;color:#16231b}
+.panel{z-index:4;background:rgba(247,245,238,.94);border:1px solid rgba(22,35,27,.13);border-radius:12px;padding:10px;box-shadow:0 3px 15px rgba(0,0,0,.10);box-sizing:border-box;backdrop-filter:blur(5px)}
+#infoRail{position:fixed;z-index:6;top:10px;right:10px;width:174px;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+#infoRail .panel{position:relative;inset:auto;width:100%;pointer-events:auto}
+.dev-header{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.brand{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#3f4b3b}
+.hole-picker{position:relative;flex:1;min-width:0}
+.hole-picker-button{width:100%;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;padding:9px 9px;background:#f7f5ee;border:1px solid rgba(22,35,27,.16);border-radius:9px;color:#16231b}
 .hole-picker-button .chevron{font-size:16px;line-height:1}
 .hole-menu{display:none;position:absolute;z-index:20;top:100%;left:0;right:0;margin-top:5px;padding:7px;background:#f7f5ee;border:1px solid rgba(22,35,27,.18);border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.16);grid-template-columns:repeat(3,1fr);gap:5px}
 .hole-menu.open{display:grid}
 .hole-option{padding:8px 4px;border:0;border-radius:7px;background:#e8ece3;color:#16231b;font-size:10px;font-weight:700}
 .hole-option.active{background:#1c4a31;color:#f7f5ee}
-.title{font-size:11px}.title small{font-size:9px}.status{font-size:10px}.yardage{font-size:10px;line-height:1.45}.yardage strong{font-size:11px}.yardage .b{display:inline-block;margin:0 7px 4px 0}.info{font-size:10px}.info strong{font-size:12px}
-.buttons{position:relative;z-index:7;display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}.buttons button,.buttons select{border:0;border-radius:9px;padding:8px 5px;background:#f7f5ee;color:#16231b;font-weight:600;font-size:10px;min-width:0}.buttons .active{background:#1c4a31;color:white}.buttons select{appearance:auto}
-#railToggle{position:fixed;z-index:8;right:12px;bottom:12px;border:0;border-radius:10px;padding:9px 11px;background:rgba(247,245,238,.96);color:#16231b;font-weight:600;box-shadow:0 3px 15px rgba(0,0,0,.12);pointer-events:auto}
+.title{font-size:10px;line-height:1.35}.title small{font-size:8px;color:#596052}.status{font-size:9px;line-height:1.3}.yardage{font-size:10px;line-height:1.45}.yardage strong{font-size:10px}.yardage .b{display:inline-block;margin:0 6px 3px 0}.info{font-size:9px;line-height:1.35}.info strong{font-size:11px}
+.buttons{position:fixed;z-index:7;left:10px;bottom:10px;display:flex;gap:5px;width:auto;pointer-events:auto}
+.buttons button,.buttons select{border:1px solid rgba(22,35,27,.13);border-radius:9px;padding:8px 9px;background:rgba(247,245,238,.94);color:#16231b;font-weight:600;font-size:10px;min-width:0;box-shadow:0 3px 15px rgba(0,0,0,.08);backdrop-filter:blur(5px)}
+.buttons .active{background:#1c4a31;color:white;border-color:#1c4a31}
+#courseBtn{min-width:56px}
+#zoomOut,#zoomIn{width:34px;padding-left:0;padding-right:0;font-size:14px}
+#fit{min-width:38px}
+#gps{min-width:62px}
+#test{min-width:44px}
+#railToggle{position:fixed;z-index:8;right:10px;bottom:10px;border:1px solid rgba(22,35,27,.13);border-radius:9px;padding:8px 10px;background:rgba(247,245,238,.94);color:#16231b;font-weight:600;font-size:10px;box-shadow:0 3px 15px rgba(0,0,0,.08);pointer-events:auto;backdrop-filter:blur(5px)}
 body.info-hidden .info-box{display:none}
-body.info-hidden #railToggle{right:12px}
+body.info-hidden #railToggle{right:10px}
 .error{color:#9b2c2c}
 @media(max-width:700px){
-  :root{--rail-width:174px}
-  #infoRail{width:168px;top:10px;right:10px;gap:6px}
-  .buttons{gap:4px}
-  .buttons button{padding:8px 4px;font-size:9px}
+  :root{--rail-width:180px}
+  #infoRail{width:174px;top:10px;right:10px;gap:6px}
+  .buttons{left:10px;right:10px;bottom:10px;gap:4px}
+  .buttons button{padding:8px 7px;font-size:9px;flex:0 0 auto}
+  #courseBtn{min-width:50px}
+  #zoomOut,#zoomIn{width:32px}
+  #fit{min-width:34px}
+  #gps{min-width:58px}
+  #test{min-width:42px}
+  #railToggle{bottom:52px}
 }
 </style>
 </head>
 <body>
 <div id="map"><canvas id="course"></canvas></div>
 <aside id="infoRail">
-  <div class="panel buttons">
-    <button id="courseBtn">Course</button><div class="hole-picker"><button id="holePickerButton" class="hole-picker-button" type="button"><span>Hole 1</span><span class="chevron">⌄</span></button><div id="holeMenu" class="hole-menu" aria-label="Select hole"><button class="hole-option active" type="button" data-hole="1">Hole 1</button><button class="hole-option" type="button" data-hole="2">Hole 2</button><button class="hole-option" type="button" data-hole="3">Hole 3</button><button class="hole-option" type="button" data-hole="4">Hole 4</button><button class="hole-option" type="button" data-hole="5">Hole 5</button><button class="hole-option" type="button" data-hole="6">Hole 6</button><button class="hole-option" type="button" data-hole="7">Hole 7</button><button class="hole-option" type="button" data-hole="8">Hole 8</button><button class="hole-option" type="button" data-hole="9">Hole 9</button><button class="hole-option" type="button" data-hole="10">Hole 10</button><button class="hole-option" type="button" data-hole="11">Hole 11</button><button class="hole-option" type="button" data-hole="12">Hole 12</button><button class="hole-option" type="button" data-hole="13">Hole 13</button><button class="hole-option" type="button" data-hole="14">Hole 14</button><button class="hole-option" type="button" data-hole="15">Hole 15</button><button class="hole-option" type="button" data-hole="16">Hole 16</button><button class="hole-option" type="button" data-hole="17">Hole 17</button><button class="hole-option" type="button" data-hole="18">Hole 18</button></div></div><select id="holeSelect" aria-hidden="true" style="display:none"><option value="1" selected>Hole 1</option><option value="2">Hole 2</option><option value="3">Hole 3</option><option value="4">Hole 4</option><option value="5">Hole 5</option><option value="6">Hole 6</option><option value="7">Hole 7</option><option value="8">Hole 8</option><option value="9">Hole 9</option><option value="10">Hole 10</option><option value="11">Hole 11</option><option value="12">Hole 12</option><option value="13">Hole 13</option><option value="14">Hole 14</option><option value="15">Hole 15</option><option value="16">Hole 16</option><option value="17">Hole 17</option><option value="18">Hole 18</option></select>
-    <button id="zoomOut">−</button><button id="zoomIn">+</button><button id="fit">Fit</button><button id="gps">Use GPS</button><button id="test" class="active">Test</button>
+  <div class="panel dev-header">
+    <div class="brand">UiDo · Overstone</div>
+    <div class="hole-picker">
+      <button id="holePickerButton" class="hole-picker-button" type="button"><span>Hole 1</span><span class="chevron">⌄</span></button>
+      <div id="holeMenu" class="hole-menu" aria-label="Select hole">
+        <button class="hole-option active" type="button" data-hole="1">1</button><button class="hole-option" type="button" data-hole="2">2</button><button class="hole-option" type="button" data-hole="3">3</button><button class="hole-option" type="button" data-hole="4">4</button><button class="hole-option" type="button" data-hole="5">5</button><button class="hole-option" type="button" data-hole="6">6</button><button class="hole-option" type="button" data-hole="7">7</button><button class="hole-option" type="button" data-hole="8">8</button><button class="hole-option" type="button" data-hole="9">9</button><button class="hole-option" type="button" data-hole="10">10</button><button class="hole-option" type="button" data-hole="11">11</button><button class="hole-option" type="button" data-hole="12">12</button><button class="hole-option" type="button" data-hole="13">13</button><button class="hole-option" type="button" data-hole="14">14</button><button class="hole-option" type="button" data-hole="15">15</button><button class="hole-option" type="button" data-hole="16">16</button><button class="hole-option" type="button" data-hole="17">17</button><button class="hole-option" type="button" data-hole="18">18</button>
+      </div>
+    </div>
   </div>
-  <div class="panel title info-box"><strong>UiDo · Overstone</strong><br><small>Full course context · selected hole</small></div>
   <div id="status" class="panel status info-box">Loading course…</div>
   <div id="yardage" class="panel yardage info-box"><strong>Live yardages</strong><br><span id="greenYardage">F/M/B — / — / — yd</span><br><span id="bunkerYardage">Bunkers —</span></div>
   <div class="panel info info-box"><strong id="main">Hole 1</strong><br><span id="detail">Loading measurement layer…</span></div>
 </aside>
+<button id="railToggle" type="button">Hide info</button>
+<div class="panel buttons">
+  <button id="courseBtn">Course</button>
+  <select id="holeSelect" aria-hidden="true" style="display:none"><option value="1" selected>Hole 1</option><option value="2">Hole 2</option><option value="3">Hole 3</option><option value="4">Hole 4</option><option value="5">Hole 5</option><option value="6">Hole 6</option><option value="7">Hole 7</option><option value="8">Hole 8</option><option value="9">Hole 9</option><option value="10">Hole 10</option><option value="11">Hole 11</option><option value="12">Hole 12</option><option value="13">Hole 13</option><option value="14">Hole 14</option><option value="15">Hole 15</option><option value="16">Hole 16</option><option value="17">Hole 17</option><option value="18">Hole 18</option></select>
+  <button id="zoomOut" aria-label="Zoom out">−</button><button id="zoomIn" aria-label="Zoom in">+</button><button id="fit">Fit</button><button id="gps">Use GPS</button><button id="test" class="active">Test</button>
+</div>>
 <button id="railToggle" type="button">Hide info</button>
 <script>
 window.addEventListener('error',function(e){
