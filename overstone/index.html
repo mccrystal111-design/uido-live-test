@@ -224,8 +224,6 @@ function drawHoleDetail(){
     ctx.fillStyle='#16231b';
     ctx.fillText(Math.round(yd(current,gp.gps)),q[0],q[1]);
   });
-  var gm=project(D.green_fmb.middle[0],D.green_fmb.middle[1],HB,w,h,pad);
-  ctx.beginPath();ctx.arc(gm[0],gm[1],5,0,Math.PI*2);ctx.fillStyle='#ffd600';ctx.fill();ctx.strokeStyle='#1c4a31';ctx.lineWidth=2;ctx.stroke();
   bunkerData.forEach(function(b){
     // Front/back GPS points sit on the fairway-facing edge of the bunker.
     // Push the labels laterally across the bunker to the non-fairway side,
