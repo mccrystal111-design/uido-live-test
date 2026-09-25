@@ -17,7 +17,7 @@ This is the first file a fresh UiDo session should read. It records authoritativ
 **GolfCourseAPI discovery/registration: IMPLEMENTED; Northampton registry metadata is complete.**  
 **Northampton physical acquisition: BLOCKED earlier than OSM hole validation by OSM course-identity resolution.**
 
-Current `main` head: `bb31991440902bff0e65f5a15af82fb1ec3cb8f7` (`Add live GPS yardages for greens and bunkers`). The previous status file was stale at `27e0df2…`; this reconciliation corrects that discrepancy.
+Current `main` head: `d0e539c42ed99cc19a2f87a82ef6ff64f270043c` (`Render source-derived wireframes for Holes 2-18`). The previous status file was stale at `27e0df2…`; this reconciliation corrects that discrepancy.
 
 The latest master physical-acquisition run is `35994500134` (2026-09-24). It is a **Northampton** test and failed in `prepare_physical_acquisition.py` before OSM capture. The log records:
 
@@ -163,3 +163,13 @@ Whenever meaningful UiDo work changes project state, update this document. If Gi
 - Hiding info removes the viewfinder constraint: the map returns to full-screen and normal pan/zoom is free.
 - GPS updates no longer recenter the fixed viewfinder; the player moves within the fixed hole view.
 - Code commits: `b7c7fdddd6c6fadd926be178c68e1fb64cdbc53b`, `f63bb01061b88ce37bdc8d1e3ae498d56fd02e45`.
+
+
+### 2026-09-25 — Overstone Holes 2–18 wireframes
+- Added compact source-derived wireframe data for Holes 2–18 from the authoritative Overstone OSM capture.
+- Hole selection now renders fairway, green, tee and bunker geometry for the selected hole while preserving the working F/M/B and live bunker yardage calculations.
+- Hole 1 remains on its separately verified detailed source layer.
+- The compact renderer uses a 0.5 m quantised local coordinate representation for the playground wireframe; the authoritative OSM source is unchanged.
+- Added `overstone/hole-wireframes.js` and wired it into `overstone/index.html`.
+- Commits: `ddce5bc498c3afd33368a0fa6a4c80aa2292c2b9`, `d0e539c42ed99cc19a2f87a82ef6ff64f270043c`.
+- No GitHub Action was automatically rerun; manual Pages/playground testing is the next validation step.
