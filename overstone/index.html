@@ -328,12 +328,10 @@ document.getElementById('gps').onclick=function(){
   navigator.geolocation.getCurrentPosition(function(p){
     current=[p.coords.latitude,p.coords.longitude];
     fitCamera();
-    keepPlayerVisible();
     update(current);
     document.getElementById('status').textContent='Live GPS · '+Math.round(p.coords.accuracy)+'m accuracy';
     gpsWatch=navigator.geolocation.watchPosition(function(p2){
       current=[p2.coords.latitude,p2.coords.longitude];
-      keepPlayerVisible();
       update(current);
       document.getElementById('status').textContent='Live GPS · '+Math.round(p2.coords.accuracy)+'m accuracy';
     },function(e){document.getElementById('status').textContent='GPS watch error · '+e.message},
