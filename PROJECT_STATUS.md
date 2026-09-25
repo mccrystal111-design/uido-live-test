@@ -17,7 +17,7 @@ This is the first file a fresh UiDo session should read. It records authoritativ
 **GolfCourseAPI discovery/registration: IMPLEMENTED; Northampton registry metadata is complete.**  
 **Northampton physical acquisition: BLOCKED earlier than OSM hole validation by OSM course-identity resolution.**
 
-Current `main` head: `7530ddc6237a5f9e93b50880c536517a3c05fd45` (`Widen mobile hole picker rail`). The previous status file was stale at `27e0df2…`; this reconciliation corrects that discrepancy.
+Current `main` head: `cc7336344825d46bc056043984c9871b69a8f69b` (`Restore source polygon edges for hole wireframes`). The previous status file was stale at `27e0df2…`; this reconciliation corrects that discrepancy.
 
 The latest master physical-acquisition run is `35994500134` (2026-09-24). It is a **Northampton** test and failed in `prepare_physical_acquisition.py` before OSM capture. The log records:
 
@@ -187,3 +187,9 @@ Whenever meaningful UiDo work changes project state, update this document. If Gi
 - Replaced the three Hole 3 bunker render polygons with geometry transformed directly from the authoritative Overstone OSM bunker polygons `way/798091424`, `way/798091425`, and `way/798091426`.
 - The bunker yardage endpoints and live F/M/B logic remain unchanged.
 - Commits: `8e8ec298be7ab2ddc6ba59262238ed8eca1e2421`, `7530ddc6237a5f9e93b50880c536517a3c05fd45`.
+
+
+### 2026-09-25 — Restore source polygon rendering
+- Reverted the quadratic smoothing pass for Holes 2–18 polygons. The renderer now follows the stored source polygon vertices directly, matching the proven Hole 1 rendering approach rather than bending the source geometry at render time.
+- Mobile hole picker width remains at 168px.
+- Commit: `cc7336344825d46bc056043984c9871b69a8f69b`.
