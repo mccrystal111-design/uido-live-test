@@ -381,7 +381,7 @@ function drawHoleDetail(){
         ringWidth=maxX-minX;
         ringHeight=maxY-minY;
       }
-      var physicalOffset=Math.max(2.5,Math.min(6,Math.min(ringWidth,ringHeight)*0.16));
+      var physicalOffset=Math.max(2.5,Math.min(60,Math.min(ringWidth,ringHeight)*0.16));
       var screenOffset=physicalOffset/mpp;
       var sideOffset=(b.side==='left'?-screenOffset:(b.side==='right'?screenOffset:0));
       labelX+=sideOffset;
