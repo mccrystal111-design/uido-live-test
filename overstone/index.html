@@ -12,6 +12,13 @@ canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
 .panel{z-index:4;background:rgba(247,245,238,.96);border:1px solid rgba(22,35,27,.16);border-radius:12px;padding:12px;box-shadow:0 3px 15px rgba(0,0,0,.12);box-sizing:border-box}
 #infoRail{position:fixed;z-index:6;top:10px;right:10px;width:164px;display:flex;flex-direction:column;gap:8px;pointer-events:none}
 #infoRail .panel{position:relative;inset:auto;left:auto;right:auto;top:auto;bottom:auto;width:100%;pointer-events:auto;padding:10px;border-radius:10px}
+.hole-picker{position:relative;display:grid;grid-template-columns:1fr;gap:6px}
+.hole-picker-button{width:100%;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;padding:10px 9px;background:#f7f5ee;border:1px solid rgba(22,35,27,.18);border-radius:9px;color:#16231b}
+.hole-picker-button .chevron{font-size:16px;line-height:1}
+.hole-menu{display:none;position:absolute;z-index:20;top:100%;left:0;right:0;margin-top:5px;padding:7px;background:#f7f5ee;border:1px solid rgba(22,35,27,.18);border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.16);grid-template-columns:repeat(3,1fr);gap:5px}
+.hole-menu.open{display:grid}
+.hole-option{padding:8px 4px;border:0;border-radius:7px;background:#e8ece3;color:#16231b;font-size:10px;font-weight:700}
+.hole-option.active{background:#1c4a31;color:#f7f5ee}
 .title{font-size:11px}.title small{font-size:9px}.status{font-size:10px}.yardage{font-size:10px;line-height:1.45}.yardage strong{font-size:11px}.yardage .b{display:inline-block;margin:0 7px 4px 0}.info{font-size:10px}.info strong{font-size:12px}
 .buttons{position:relative;z-index:7;display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}.buttons button,.buttons select{border:0;border-radius:9px;padding:8px 5px;background:#f7f5ee;color:#16231b;font-weight:600;font-size:10px;min-width:0}.buttons .active{background:#1c4a31;color:white}.buttons select{appearance:auto}
 #railToggle{position:fixed;z-index:8;right:12px;bottom:12px;border:0;border-radius:10px;padding:9px 11px;background:rgba(247,245,238,.96);color:#16231b;font-weight:600;box-shadow:0 3px 15px rgba(0,0,0,.12);pointer-events:auto}
@@ -30,7 +37,7 @@ body.info-hidden #railToggle{right:12px}
 <div id="map"><canvas id="course"></canvas></div>
 <aside id="infoRail">
   <div class="panel buttons">
-    <button id="courseBtn">Course</button><select id="holeSelect" aria-label="Select hole"><option value="1" selected>Hole 1</option><option value="2">Hole 2</option><option value="3">Hole 3</option><option value="4">Hole 4</option><option value="5">Hole 5</option><option value="6">Hole 6</option><option value="7">Hole 7</option><option value="8">Hole 8</option><option value="9">Hole 9</option><option value="10">Hole 10</option><option value="11">Hole 11</option><option value="12">Hole 12</option><option value="13">Hole 13</option><option value="14">Hole 14</option><option value="15">Hole 15</option><option value="16">Hole 16</option><option value="17">Hole 17</option><option value="18">Hole 18</option></select>
+    <button id="courseBtn">Course</button><div class="hole-picker"><button id="holePickerButton" class="hole-picker-button" type="button"><span>Hole 1</span><span class="chevron">⌄</span></button><div id="holeMenu" class="hole-menu" aria-label="Select hole"><button class="hole-option active" type="button" data-hole="1">Hole 1</button><button class="hole-option" type="button" data-hole="2">Hole 2</button><button class="hole-option" type="button" data-hole="3">Hole 3</button><button class="hole-option" type="button" data-hole="4">Hole 4</button><button class="hole-option" type="button" data-hole="5">Hole 5</button><button class="hole-option" type="button" data-hole="6">Hole 6</button><button class="hole-option" type="button" data-hole="7">Hole 7</button><button class="hole-option" type="button" data-hole="8">Hole 8</button><button class="hole-option" type="button" data-hole="9">Hole 9</button><button class="hole-option" type="button" data-hole="10">Hole 10</button><button class="hole-option" type="button" data-hole="11">Hole 11</button><button class="hole-option" type="button" data-hole="12">Hole 12</button><button class="hole-option" type="button" data-hole="13">Hole 13</button><button class="hole-option" type="button" data-hole="14">Hole 14</button><button class="hole-option" type="button" data-hole="15">Hole 15</button><button class="hole-option" type="button" data-hole="16">Hole 16</button><button class="hole-option" type="button" data-hole="17">Hole 17</button><button class="hole-option" type="button" data-hole="18">Hole 18</button></div></div><select id="holeSelect" aria-hidden="true" style="display:none"><option value="1" selected>Hole 1</option><option value="2">Hole 2</option><option value="3">Hole 3</option><option value="4">Hole 4</option><option value="5">Hole 5</option><option value="6">Hole 6</option><option value="7">Hole 7</option><option value="8">Hole 8</option><option value="9">Hole 9</option><option value="10">Hole 10</option><option value="11">Hole 11</option><option value="12">Hole 12</option><option value="13">Hole 13</option><option value="14">Hole 14</option><option value="15">Hole 15</option><option value="16">Hole 16</option><option value="17">Hole 17</option><option value="18">Hole 18</option></select>
     <button id="zoomOut">−</button><button id="zoomIn">+</button><button id="fit">Fit</button><button id="gps">Use GPS</button><button id="test" class="active">Test</button>
   </div>
   <div class="panel title info-box"><strong>UiDo · Overstone</strong><br><small>Full course context · selected hole</small></div>
@@ -136,6 +143,19 @@ function compactHoleData(n){
   });
   return {course:'Overstone Park Golf Club',hole:n,par:HOLE_META.pars[n].par,line_of_play:q.l.map(unq),green_fmb:HOLE_META.greens[n],features:fs,bunkers:bs};
 }
+function setHolePicker(n){
+  var btn=document.getElementById('holePickerButton');
+  if(btn)btn.querySelector('span').textContent='Hole '+n;
+  document.querySelectorAll('.hole-option').forEach(function(x){x.classList.toggle('active',Number(x.dataset.hole)===Number(n));});
+}
+function closeHoleMenu(){var m=document.getElementById('holeMenu');if(m)m.classList.remove('open');}
+document.addEventListener('click',function(e){
+  var b=e.target.closest&&e.target.closest('#holePickerButton');
+  if(b){document.getElementById('holeMenu').classList.toggle('open');e.stopPropagation();return;}
+  var o=e.target.closest&&e.target.closest('.hole-option');
+  if(o){selectHole(Number(o.dataset.hole));closeHoleMenu();e.stopPropagation();return;}
+  if(!e.target.closest||!e.target.closest('.hole-picker'))closeHoleMenu();
+});
 function selectHole(n){
   n=Math.max(1,Math.min(18,Number(n)||1));
   holeNumber=n;
@@ -151,6 +171,7 @@ function selectHole(n){
   rebuildHoleGeometry();
   RHB=rotatedHoleBounds();
   document.getElementById('holeSelect').value=String(n);
+  setHolePicker(n);
   fitCamera();
   update(current);
   document.getElementById('status').textContent=n===1?'Hole 1 detail · full source wireframe':'Hole '+n+' · source wireframe + live F/M/B';
@@ -197,10 +218,18 @@ function drawLine(c,coords,b,w,h,pad,color,width,dash){
   c.strokeStyle=color;c.lineWidth=width;c.stroke();c.setLineDash([]);
 }
 function drawPoly(c,coords,b,w,h,pad,fill,stroke){
-  if(!coords||!coords.length)return;
+  if(!coords||coords.length<3)return;
+  var pts=coords.map(function(p){return project(p[1],p[0],b,w,h,pad);});
   c.beginPath();
-  coords.forEach(function(p,i){var q=project(p[1],p[0],b,w,h,pad);if(i)c.lineTo(q[0],q[1]);else c.moveTo(q[0],q[1])});
-  c.closePath();c.fillStyle=fill;c.fill();c.strokeStyle=stroke;c.lineWidth=1;c.stroke();
+  var first=pts[0],last=pts[pts.length-1];
+  c.moveTo((last[0]+first[0])/2,(last[1]+first[1])/2);
+  for(var i=0;i<pts.length;i++){
+    var p=pts[i],next=pts[(i+1)%pts.length];
+    var mx=(p[0]+next[0])/2,my=(p[1]+next[1])/2;
+    c.quadraticCurveTo(p[0],p[1],mx,my);
+  }
+  c.closePath();
+  c.fillStyle=fill;c.fill();c.strokeStyle=stroke;c.lineWidth=1;c.stroke();
 }
 function drawFullCourse(c,w,h,small){
   c.clearRect(0,0,w,h);c.fillStyle='#dfe4d8';c.fillRect(0,0,w,h);
