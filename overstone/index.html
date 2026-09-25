@@ -152,7 +152,9 @@ function draw(){
     var viewLon=(HB.maxX-HB.minX)/zoom, viewLat=(HB.maxY-HB.minY)/zoom;
     var tl=project(cameraLat+viewLat/2,cameraLon-viewLon/2,CB,ow,oh,10);
     var br=project(cameraLat-viewLat/2,cameraLon+viewLon/2,CB,ow,oh,10);
-    ov.strokeStyle='#ffd600';ov.lineWidth=2;ov.strokeRect(tl[0],tl[1],br[0]-tl[0],br[1]-tl[1]);
+    var rx=Math.max(0,Math.min(ow,tl[0])), ry=Math.max(0,Math.min(oh,tl[1]));
+    var rw=Math.max(0,Math.min(ow-rx,br[0])-rx), rh=Math.max(0,Math.min(oh-ry,br[1])-ry);
+    ov.strokeStyle='#ffd600';ov.lineWidth=2;ov.strokeRect(rx,ry,rw,rh);
   }
 }
 function yd(a,b){
@@ -195,6 +197,7 @@ document.getElementById('zoomOut').onclick=function(){if(!detailMode)return;zoom
 document.getElementById('miniBtn').onclick=function(){
   miniVisible=!miniVisible;
   this.classList.toggle('active',miniVisible);
+  this.textContent=miniVisible?'Mini':'Map';
   draw();
 };
 canvas.addEventListener('wheel',function(e){
@@ -211,7 +214,7 @@ canvas.addEventListener('pointermove',function(e){
   if(!dragging||!detailMode)return;
   var dx=e.clientX-lastX,dy=e.clientY-lastY;
   var spanLon=(HB.maxX-HB.minX)/zoom,spanLat=(HB.maxY-HB.minY)/zoom;
-  cameraLon-=dx/(innerWidth-72)*spanLon;
+  cameraLon+=dx/(innerWidth-72)*spanLon;
   cameraLat+=dy/(innerHeight-72)*spanLat;
   lastX=e.clientX;lastY=e.clientY;draw();
 });
