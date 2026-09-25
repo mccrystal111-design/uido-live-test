@@ -155,3 +155,11 @@ Whenever meaningful UiDo work changes project state, update this document. If Gi
 - Camera follow places the player toward the lower-middle of the view and clamps camera movement against the Hole 1 extents so the hole does not simply disappear off-screen as the player moves.
 - Test mode remains manually movable and unchanged.
 - Code commit: `89daa3af2671e53c721d72e7ca7e240493177a65`.
+
+### 2026-09-25 — Overstone fixed viewfinder / free-roam framing
+- When information is visible, Hole 1 now uses a fixed left-side viewfinder width while the right-side boxes float over the live map.
+- Initial/Fit framing calculates zoom from the available viewfinder dimensions so the hole is fitted to the phone view rather than using the full-screen width.
+- Added a **Fit** control to snap back to that framing.
+- Hiding info removes the viewfinder constraint: the map returns to full-screen and normal pan/zoom is free.
+- GPS updates no longer recenter the fixed viewfinder; the player moves within the fixed hole view.
+- Code commits: `b7c7fdddd6c6fadd926be178c68e1fb64cdbc53b`, `f63bb01061b88ce37bdc8d1e3ae498d56fd02e45`.
