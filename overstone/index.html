@@ -9,7 +9,7 @@ html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#f3f0e7;col
 #map{position:absolute;inset:0;background:#dfe4d8}
 canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
 .panel{position:absolute;z-index:4;background:rgba(247,245,238,.96);border:1px solid rgba(22,35,27,.16);border-radius:12px;padding:10px;box-shadow:0 3px 15px rgba(0,0,0,.12)}
-.title{top:12px;left:12px}.status{top:76px;left:12px;font-size:12px}.info{left:12px;right:12px;bottom:12px;font-size:12px}.info strong{font-size:14px}
+.title{top:12px;left:12px}.status{top:76px;left:12px;font-size:12px}.info{left:12px;right:12px;bottom:12px;font-size:12px}.info strong{font-size:14px}.yardage{left:12px;right:12px;bottom:82px;font-size:11px;line-height:1.45}.yardage strong{font-size:12px}.yardage .b{display:inline-block;margin-right:12px}
 .buttons{top:12px;right:12px;display:flex;gap:6px}.buttons button{border:0;border-radius:10px;padding:9px 11px;background:#f7f5ee;color:#16231b;font-weight:600}.buttons .active{background:#1c4a31;color:white}
 .error{color:#9b2c2c}
 .legend{top:238px;right:12px;font-size:11px;line-height:1.5}
@@ -24,7 +24,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
   <button id="courseBtn">Course</button><button id="holeBtn" class="active">Hole 1</button>
   <button id="zoomOut">−</button><button id="zoomIn">+</button><button id="gps">Use GPS</button><button id="test" class="active">Test</button>
 </div>
-<div class="panel legend">
+<div id="yardage" class="panel yardage"><strong>Live yardages</strong><br><span id="greenYardage">F/M/B — / — / — yd</span><br><span id="bunkerYardage">Bunkers —</span></div>\n<div class="panel legend">
   <span class="dot fairway"></span>course detail<br>
   <span class="dot bunker"></span>bunker<br>
   <span class="dot green"></span>green<br>
@@ -102,6 +102,17 @@ function rotatedHoleBounds(){
 }
 var RHB=rotatedHoleBounds();
 var cameraX=0,cameraY=0;
+var bunkerData=D.bunkers||[];
+function bunkerLabel(b){
+  return (b.side==='left'?'L':'R')+' '+Math.round(yd(current,b.front_gps))+'/'+Math.round(yd(current,b.back_gps))+' yd';
+}
+function updateYardageUI(){
+  var f=Math.round(yd(current,D.green_fmb.front)),m=Math.round(yd(current,D.green_fmb.middle)),b=Math.round(yd(current,D.green_fmb.back));
+  document.getElementById('greenYardage').textContent='F/M/B '+f+' / '+m+' / '+b+' yd';
+  document.getElementById('bunkerYardage').innerHTML=bunkerData.map(function(x){
+    return '<span class="b">'+bunkerLabel(x)+'</span>';
+  }).join('');
+}
 
 function fitCamera(){
   cameraX=(RHB.minX+RHB.maxX)/2;
@@ -173,6 +184,15 @@ function drawHoleDetail(){
     var p=f.geometry.coordinates[0][0],q=project(p[1],p[0],HB,w,h,pad);
     ctx.fillStyle='#16231b';ctx.font='600 11px Arial';ctx.fillText(f.side==='left'?'L':'R',q[0]-4,q[1]-5);
   });
+  bunkerData.forEach(function(b){
+    var q=project(b.anchor_gps[0],b.anchor_gps[1],HB,w,h,pad);
+    var label=Math.round(yd(current,b.front_gps))+'/'+Math.round(yd(current,b.back_gps));
+    ctx.font='600 10px Arial';
+    var tw=ctx.measureText(label).width+12;
+    ctx.fillStyle='rgba(247,245,238,.94)';
+    ctx.beginPath();ctx.roundRect(q[0]-tw/2,q[1]-24,tw,18,8);ctx.fill();
+    ctx.fillStyle='#16231b';ctx.fillText(label,q[0]-tw/2+6,q[1]-11);
+  });
   var pl=project(current[0],current[1],HB,w,h,pad);
   ctx.beginPath();ctx.arc(pl[0],pl[1],9,0,Math.PI*2);ctx.fillStyle='#1c4a31';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();
 }
@@ -187,8 +207,9 @@ function yd(a,b){
 }
 function update(pos){
   current=pos.slice();
+  updateYardageUI();
   document.getElementById('main').textContent='Hole 1 · '+Math.round(yd(pos,D.green_fmb.middle))+' yd to middle';
-  document.getElementById('detail').textContent='F/M/B '+Math.round(yd(pos,D.green_fmb.front))+' / '+Math.round(yd(pos,D.green_fmb.middle))+' / '+Math.round(yd(pos,D.green_fmb.back))+' yd · Hole 1 heading '+Math.round(holeBearingDeg)+'°';
+  document.getElementById('detail').textContent='Live GPS position · Hole 1 heading '+Math.round(holeBearingDeg)+'°';
   draw();
 }
 function setMode(detail){
@@ -266,13 +287,26 @@ document.getElementById('holeBtn').onclick=function(){setMode(true)};
 document.getElementById('courseBtn').onclick=function(){setMode(false)};
 document.getElementById('test').onclick=reset;
 document.getElementById('gps').onclick=function(){
-  if(!navigator.geolocation){document.getElementById('status').textContent='GPS unavailable';return}
+  if(!navigator.geolocation){document.getElementById('status').textContent='GPS unavailable on this device';return}
   testMode=false;this.classList.add('active');document.getElementById('test').classList.remove('active');
-  gpsWatch=navigator.geolocation.watchPosition(function(p){
-    update([p.coords.latitude,p.coords.longitude]);
+  if(gpsWatch)navigator.geolocation.clearWatch(gpsWatch);
+  document.getElementById('status').textContent='Finding live GPS…';
+  var options={enableHighAccuracy:true,maximumAge:0,timeout:15000};
+  navigator.geolocation.getCurrentPosition(function(p){
+    current=[p.coords.latitude,p.coords.longitude];
+    var q=rotatedLocal(current[0],current[1]);
+    cameraX=q.x;cameraY=q.y-80;
+    update(current);
     document.getElementById('status').textContent='Live GPS · '+Math.round(p.coords.accuracy)+'m accuracy';
-  },function(e){document.getElementById('status').textContent='GPS error · '+e.message},
-  {enableHighAccuracy:true,maximumAge:1000,timeout:10000});
+    gpsWatch=navigator.geolocation.watchPosition(function(p2){
+      current=[p2.coords.latitude,p2.coords.longitude];
+      update(current);
+      document.getElementById('status').textContent='Live GPS · '+Math.round(p2.coords.accuracy)+'m accuracy';
+    },function(e){document.getElementById('status').textContent='GPS watch error · '+e.message},
+    {enableHighAccuracy:true,maximumAge:1000,timeout:15000});
+  },function(e){
+    document.getElementById('status').textContent='GPS error · '+e.message;
+  },options);
 };
 addEventListener('resize',function(){resizeCanvas();draw()});
 setMode(true);reset();
