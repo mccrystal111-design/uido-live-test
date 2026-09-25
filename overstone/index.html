@@ -348,9 +348,16 @@ function drawHoleDetail(){
     var lateral=b.side==='left'?-22:22;
     frontQ.x+=lateral;
     backQ.x+=lateral;
+    // Anchor the labels in geographic space, then give them a small fixed
+    // screen-space breathing room. They therefore stay with the bunker point
+    // when zooming instead of drifting by a scale-dependent amount.
     var mpp=metersPerPixel(w,h,pad);
     var frontScreen=[w/2+(frontQ.x-cameraX)/mpp,h/2-(frontQ.y-cameraY)/mpp];
     var backScreen=[w/2+(backQ.x-cameraX)/mpp,h/2-(backQ.y-cameraY)/mpp];
+    var frontOffset=b.side==='left'?-12:12;
+    var backOffset=b.side==='left'?-12:12;
+    frontScreen[0]+=frontOffset;
+    backScreen[0]+=backOffset;
     var align=b.side==='left'?'right':'left';
     ctx.font='600 10px Arial';
     ctx.textAlign=align;
