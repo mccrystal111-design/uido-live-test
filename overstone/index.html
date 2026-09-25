@@ -2,62 +2,39 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>UiDo · Overstone GPS Playground</title>
+<title>UiDo · Overstone Hole 1</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
-@font-face{font-family:'Space Grotesk';src:url('../assets/fonts/SpaceGrotesk-Regular.woff2') format('woff2');font-weight:400}
-@font-face{font-family:'Space Grotesk';src:url('../assets/fonts/SpaceGrotesk-Medium.woff2') format('woff2');font-weight:500}
-@font-face{font-family:'Space Grotesk';src:url('../assets/fonts/SpaceGrotesk-SemiBold.woff2') format('woff2');font-weight:600}
-@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600&display=swap');
-:root{--yellow:#ffd600;--ink:#16231b;--ivory:#f3f0e7}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--ivory);color:var(--ink);font-family:'Space Grotesk',Arial,sans-serif}
-.app{position:relative;width:100vw;height:100dvh;overflow:hidden}.map{position:absolute;inset:0;background:#f3f0e7}
-.top{position:absolute;top:14px;left:14px;z-index:900;pointer-events:none}
-.title{background:rgba(247,245,238,.94);border:1px solid rgba(22,35,27,.16);border-radius:14px;padding:9px 12px;box-shadow:0 4px 18px rgba(0,0,0,.08)}
-.brand{font:600 22px/1 Oxanium,sans-serif}.sub{margin-top:5px;font-size:11px;color:#526057}
-.controls{position:absolute;top:14px;right:14px;z-index:910;display:flex;gap:7px}.control{border:1px solid rgba(22,35,27,.18);background:rgba(247,245,238,.94);color:var(--ink);border-radius:12px;padding:9px 11px;font:600 11px 'Space Grotesk';box-shadow:0 4px 18px rgba(0,0,0,.08)}.control.active{background:#1c4a31;color:#fff;border-color:#1c4a31}
-.bottom{position:absolute;left:14px;right:14px;bottom:14px;z-index:900;display:flex;gap:8px;align-items:end}.info{flex:1;min-height:62px;border:1px solid rgba(22,35,27,.16);border-radius:15px;background:rgba(247,245,238,.94);padding:9px 12px;box-shadow:0 4px 18px rgba(0,0,0,.08)}.info-main{font-size:13px;font-weight:600}.info-sub{font-size:10px;color:#5c675f;margin-top:4px}.back{width:76px;height:62px;border:1px solid rgba(22,35,27,.16);border-radius:15px;background:rgba(247,245,238,.94);font:600 12px 'Space Grotesk';color:var(--ink)}
-.gps-status{position:absolute;left:14px;top:79px;z-index:900;padding:6px 9px;border-radius:10px;background:rgba(247,245,238,.9);font-size:10px;box-shadow:0 3px 12px rgba(0,0,0,.06)}.legend{position:absolute;left:14px;top:112px;z-index:900;font-size:9px;background:rgba(247,245,238,.86);padding:6px 8px;border-radius:9px;color:#526057}
-.bunker-label{background:#16231b;color:#fff;border:1px solid rgba(255,214,0,.8);border-radius:8px;padding:3px 6px;font:600 12px/1 'Space Grotesk';white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.18)}
-.player-dot{width:18px;height:18px;border-radius:50%;background:#1c4a31;border:3px solid #fff;box-shadow:0 0 0 3px rgba(28,74,49,.28)}
-.heading-arrow{width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:18px solid #ffd600;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
-.leaflet-control-zoom{display:none}.leaflet-container{background:#f3f0e7}
-</style>
+html,body,#map{width:100%;height:100%;margin:0;background:#f3f0e7}body{overflow:hidden;font-family:Arial,sans-serif;color:#16231b}.panel{position:absolute;z-index:1000;background:rgba(247,245,238,.96);border:1px solid rgba(22,35,27,.16);border-radius:12px;padding:10px;box-shadow:0 3px 15px rgba(0,0,0,.12)}.title{top:12px;left:12px}.status{top:76px;left:12px;font-size:12px}.info{left:12px;right:12px;bottom:12px;font-size:12px}.info strong{font-size:14px}.buttons{top:12px;right:12px;display:flex;gap:6px}.buttons button{border:0;border-radius:10px;padding:9px 11px;background:#f7f5ee;color:#16231b;font-weight:600}.buttons .active{background:#1c4a31;color:white}.player{width:16px;height:16px;border-radius:50%;background:#1c4a31;border:3px solid white;box-shadow:0 0 0 2px rgba(28,74,49,.3)}.bunker{background:#16231b;color:white;border:1px solid #ffd600;border-radius:7px;padding:3px 5px;font-size:11px;font-weight:600;white-space:nowrap}.error{color:#9b2c2c}</style>
 </head>
 <body>
-<main class="app">
-<div id="map" class="map"></div>
-<div class="top"><div class="title"><div class="brand">UiDo · Overstone Playground</div><div class="sub">Hole 1 · GPS measurement layer · wireframe</div></div></div>
-<div class="controls"><button id="gpsBtn" class="control">Use GPS</button><button id="simBtn" class="control active">Test Hole 1</button></div>
-<div id="gpsStatus" class="gps-status">Hole 1 test · player at tee</div>
-<div class="legend">Tap a bunker for front/back detail · tap the map in test mode to move the ball</div>
-<div class="bottom"><div class="info"><div id="infoMain" class="info-main">Select a feature</div><div id="infoSub" class="info-sub">Live distances are calculated from the player position to GPS-locked feature points.</div></div><button class="back" onclick="location.href='../index.html'">Live<br>Test</button></div>
-</main>
+<div id="map"></div>
+<div class="panel title"><strong>UiDo · Overstone</strong><br><small>Hole 1 · fixed test position</small></div>
+<div id="status" class="panel status">Starting Hole 1…</div>
+<div class="panel buttons"><button id="gps">Use GPS</button><button id="test" class="active">Test Hole 1</button></div>
+<div class="panel info"><strong id="main">Hole 1</strong><br><span id="detail">Loading course geometry…</span></div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="hole1-layer.js"></script>
 <script>
+(function(){
 const D=window.UIDO_OVERSTONE_H1;
-const map=L.map('map',{zoomControl:false,attributionControl:false,minZoom:15,maxZoom:21,zoomSnap:.25});
-function style(f){const g=f.properties.golf;return g==='fairway'?{color:'#8ea58a',weight:1.2,fillColor:'#dfe9d9',fillOpacity:.95}:g==='green'?{color:'#71856e',weight:1.3,fillColor:'#b8cfb1',fillOpacity:.95}:g==='bunker'?{color:'#967b43',weight:1.2,fillColor:'#d8bd78',fillOpacity:.92}:g==='tee'?{color:'#65786a',weight:1,fillColor:'#bfcfba',fillOpacity:.9}:{color:'#b7b9ae',weight:1,fillColor:'#e8e7df',fillOpacity:.35}}
-const geo=L.geoJSON({type:'FeatureCollection',features:D.features.filter(f=>f.golf!=='pin')},{style}).addTo(map);
-L.polyline(D.line_of_play.map(([lon,lat])=>[lat,lon]),{color:'#7b806e',weight:1.5,dashArray:'7 7',opacity:.72}).addTo(map);
-L.circleMarker(D.green_fmb.middle,{radius:4,color:'#1c4a31',weight:2,fillColor:'#ffd600',fillOpacity:1}).addTo(map);
-map.fitBounds(geo.getBounds().pad(.22));
-const bunkerMarkers=new Map();
+if(!window.L||!D)throw new Error(!window.L?'Leaflet did not load':'Hole 1 data did not load');
+const map=L.map('map',{zoomControl:false,attributionControl:false});
+const geo=L.geoJSON({type:'FeatureCollection',features:D.features.filter(f=>f.golf!=='pin')},{
+style:function(f){const g=f.properties.golf;return g==='fairway'?{color:'#8ea58a',weight:1.2,fillColor:'#dfe9d9',fillOpacity:.95}:g==='green'?{color:'#71856e',weight:1.3,fillColor:'#b8cfb1',fillOpacity:.95}:g==='bunker'?{color:'#967b43',weight:1.2,fillColor:'#d8bd78',fillOpacity:.92}:{color:'#65786a',weight:1,fillColor:'#bfcfba',fillOpacity:.9}}
+}).addTo(map);
+L.polyline(D.line_of_play.map(function(p){return[p[1],p[0]]}),{color:'#7b806e',weight:2,dashArray:'7 7'}).addTo(map);
+map.fitBounds(geo.getBounds().pad(.2));
 function yd(a,b){const R=6371000,p=Math.PI/180,d1=(b[0]-a[0])*p,d2=(b[1]-a[1])*p,x=Math.sin(d1/2)**2+Math.cos(a[0]*p)*Math.cos(b[0]*p)*Math.sin(d2/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))*1.0936133}
-D.bunkers.forEach(b=>{const m=L.marker(b.front_gps,{icon:L.divIcon({className:'',html:'<span class="bunker-label">—</span>',iconSize:[34,22],iconAnchor:[17,11]})}).addTo(map);m.on('click',()=>selectBunker(b));bunkerMarkers.set(b.id,m)});
-let player=null,accuracy=null,current=null,watch=null,sim=true,headingMarker=null;
-const TEST_TEE=[52.2763578,-0.8194224];
-function setPlayer(pos,acc=0){current=pos;if(!player){player=L.marker(pos,{icon:L.divIcon({className:'',html:'<span class="player-dot"></span>',iconSize:[18,18],iconAnchor:[9,9]})}).addTo(map);accuracy=L.circle(pos,{radius:acc||0,color:'#1c4a31',weight:1,fillOpacity:.06}).addTo(map)}else{player.setLatLng(pos);accuracy.setLatLng(pos).setRadius(acc||0)}updateLabels();updateFmb();updateHeading();document.getElementById('gpsStatus').textContent='Player GPS · '+(acc?Math.round(acc)+'m accuracy':'test position')}
-function updateHeading(){if(!current)return;const next=[D.line_of_play[1][1],D.line_of_play[1][0]];if(!headingMarker){headingMarker=L.marker(current,{icon:L.divIcon({className:'',html:'<span class="heading-arrow"></span>',iconSize:[14,18],iconAnchor:[7,18]})}).addTo(map)}else headingMarker.setLatLng(current);const angle=Math.atan2((next[1]-current[1])*Math.cos(current[0]*Math.PI/180),next[0]-current[0])*180/Math.PI;const el=headingMarker.getElement();if(el)el.firstElementChild.style.transform='rotate('+angle+'deg)'}
-function updateLabels(){if(!current)return;D.bunkers.forEach(b=>bunkerMarkers.get(b.id).getElement().querySelector('.bunker-label').textContent=Math.round(yd(current,b.front_gps))+' yd')}
-function updateFmb(){if(!current)return;document.getElementById('infoMain').textContent='Player position locked';document.getElementById('infoSub').textContent='FMB · '+Math.round(yd(current,D.green_fmb.front))+' / '+Math.round(yd(current,D.green_fmb.middle))+' / '+Math.round(yd(current,D.green_fmb.back))+' yd'}
-function selectBunker(b){const liveFront=current?Math.round(yd(current,b.front_gps)):'—',liveBack=current?Math.round(yd(current,b.back_gps)):'—';document.getElementById('infoMain').textContent='Bunker · '+b.side+' · live '+liveFront+' yd';document.getElementById('infoSub').textContent='Front '+b.front_yards_from_tee+' yd · back '+b.back_yards_from_tee+' yd from tee · live back '+liveBack+' yd'}
-function setTestPosition(){setPlayer(TEST_TEE,0);map.setView(TEST_TEE,18.5);document.getElementById('gpsStatus').textContent='Hole 1 test · fixed tee position';document.getElementById('simBtn').classList.add('active');sim=true}
-function startGPS(){if(!navigator.geolocation){document.getElementById('gpsStatus').textContent='GPS unavailable';return}if(watch)navigator.geolocation.clearWatch(watch);navigator.geolocation.watchPosition(p=>setPlayer([p.coords.latitude,p.coords.longitude],p.coords.accuracy),e=>document.getElementById('gpsStatus').textContent='GPS error · '+e.message,{enableHighAccuracy:true,maximumAge:1000,timeout:10000});document.getElementById('gpsBtn').classList.add('active');document.getElementById('simBtn').classList.remove('active');sim=false}
-document.getElementById('gpsBtn').onclick=startGPS;
-document.getElementById('simBtn').onclick=()=>{setTestPosition();if(watch){navigator.geolocation.clearWatch(watch);watch=null}document.getElementById('gpsBtn').classList.remove('active')};
-map.on('click',e=>{if(sim)setPlayer([e.latlng.lat,e.latlng.lng],0)});
-setTestPosition();
+const tee=[52.2763578,-0.8194224];
+let player=null,current=tee;
+function setPlayer(pos){current=pos;if(!player)player=L.marker(pos,{icon:L.divIcon({className:'',html:'<span class="player"></span>',iconSize:[22,22],iconAnchor:[11,11]})}).addTo(map);else player.setLatLng(pos);document.getElementById('main').textContent='Hole 1 · '+Math.round(yd(pos,D.green_fmb.middle))+' yd to middle';document.getElementById('detail').textContent='F/M/B '+Math.round(yd(pos,D.green_fmb.front))+' / '+Math.round(yd(pos,D.green_fmb.middle))+' / '+Math.round(yd(pos,D.green_fmb.back))+' yd · direction fixed down Hole 1'}
+D.bunkers.forEach(function(b){const m=L.marker(b.front_gps,{icon:L.divIcon({className:'',html:'<span class="bunker">'+b.side+' — '+b.front_yards_from_tee+' yd</span>',iconSize:[80,24],iconAnchor:[40,12]})}).addTo(map);m.on('click',function(){document.getElementById('detail').textContent='Bunker '+b.side+' · front '+Math.round(yd(current,b.front_gps))+' yd · back '+Math.round(yd(current,b.back_gps))+' yd'})});
+setPlayer(tee);map.setView(tee,18.5);document.getElementById('status').textContent='Hole 1 test · player fixed at tee';
+map.on('click',function(e){if(document.getElementById('test').classList.contains('active'))setPlayer([e.latlng.lat,e.latlng.lng])});
+document.getElementById('test').onclick=function(){this.classList.add('active');document.getElementById('gps').classList.remove('active');setPlayer(tee);map.setView(tee,18.5)};
+document.getElementById('gps').onclick=function(){if(!navigator.geolocation)return;this.classList.add('active');document.getElementById('test').classList.remove('active');navigator.geolocation.watchPosition(function(p){setPlayer([p.coords.latitude,p.coords.longitude]);document.getElementById('status').textContent='Live GPS · '+Math.round(p.coords.accuracy)+'m accuracy'},function(e){document.getElementById('status').textContent='GPS error · '+e.message})};
+})();
 </script>
+<script>window.addEventListener('error',function(e){var s=document.getElementById('status');if(s){s.classList.add('error');s.textContent='Page error · '+e.message}});</script>
 </body></html>
