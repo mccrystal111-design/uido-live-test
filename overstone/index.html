@@ -123,6 +123,7 @@ function holeBounds(){
 }
 var CB=allCourseBounds(),HB,baseLat,baseLon,latM,lonM,holeStart,holeEnd,holeAngle,holeBearingDeg;
 function rebuildHoleGeometry(){
+  window._travelAngle=holeBearingDeg;
   HB=holeBounds();
   baseLat=(HB.minY+HB.maxY)/2; baseLon=(HB.minX+HB.maxX)/2;
   latM=111320; lonM=111320*Math.cos(baseLat*Math.PI/180);
@@ -139,8 +140,22 @@ function toLocal(lat,lon){
 function fromLocal(e,n){
   return [baseLat+n/latM,baseLon+e/lonM];
 }
+function travelAngleAt(lat,lon){
+  var p=toLocal(lat,lon),best=Infinity,angle=holeAngle;
+  for(var i=0;i<D.line_of_play.length-1;i++){
+    var a=toLocal(D.line_of_play[i][1],D.line_of_play[i][0]);
+    var b=toLocal(D.line_of_play[i+1][1],D.line_of_play[i+1][0]);
+    var dx=b.e-a.e,dy=b.n-a.n,len2=dx*dx+dy*dy;
+    if(!len2)continue;
+    var t=((p.e-a.e)*dx+(p.n-a.n)*dy)/len2;
+    t=Math.max(0,Math.min(1,t));
+    var qx=a.e+t*dx,qy=a.n+t*dy,dist=(p.e-qx)*(p.e-qx)+(p.n-qy)*(p.n-qy);
+    if(dist<best){best=dist;angle=Math.atan2(dx,dy);}
+  }
+  return angle;
+}
 function rotatedLocal(lat,lon){
-  var p=toLocal(lat,lon),cb=Math.cos(holeAngle),sb=Math.sin(holeAngle);
+  var p=toLocal(lat,lon),a=window._travelAngle||holeAngle,cb=Math.cos(a),sb=Math.sin(a);
   return {x:p.e*cb-p.n*sb,y:p.e*sb+p.n*cb};
 }
 function rotatedHoleBounds(){
@@ -353,6 +368,7 @@ function keepPlayerVisible(){
 }
 function update(pos){
   current=pos.slice();
+  window._travelAngle=travelAngleAt(pos[0],pos[1]);
   if(detailMode)keepPlayerVisible();
   updateYardageUI();
   document.getElementById('main').textContent='Hole '+holeNumber+' · '+Math.round(yd(pos,D.green_fmb.middle))+' yd to middle';
