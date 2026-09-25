@@ -5,32 +5,40 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>UiDo · Overstone Course</title>
 <style>
+:root{--rail-width:290px}
 html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#f3f0e7;color:#16231b;font-family:Arial,sans-serif}
-#map{position:absolute;inset:0;background:#dfe4d8}
+#map{position:absolute;inset:0;right:var(--rail-width);background:#dfe4d8;transition:right .2s ease}
 canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
-.panel{position:absolute;z-index:4;background:rgba(247,245,238,.96);border:1px solid rgba(22,35,27,.16);border-radius:12px;padding:10px;box-shadow:0 3px 15px rgba(0,0,0,.12)}
-.title{top:12px;left:12px}.status{top:76px;left:12px;font-size:12px}.info{left:12px;right:12px;bottom:12px;font-size:12px}.info strong{font-size:14px}.yardage{left:12px;right:12px;bottom:82px;font-size:11px;line-height:1.45}.yardage strong{font-size:12px}.yardage .b{display:inline-block;margin-right:12px}
-.buttons{top:12px;right:12px;display:flex;gap:6px}.buttons button{border:0;border-radius:10px;padding:9px 11px;background:#f7f5ee;color:#16231b;font-weight:600}.buttons .active{background:#1c4a31;color:white}
+.panel{z-index:4;background:rgba(247,245,238,.96);border:1px solid rgba(22,35,27,.16);border-radius:12px;padding:12px;box-shadow:0 3px 15px rgba(0,0,0,.12);box-sizing:border-box}
+#infoRail{position:fixed;z-index:6;top:12px;right:12px;bottom:12px;width:266px;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+#infoRail .panel{position:relative;inset:auto;left:auto;right:auto;top:auto;bottom:auto;width:100%;pointer-events:auto}
+.title{font-size:13px}.title small{font-size:11px}.status{font-size:12px}.yardage{font-size:11px;line-height:1.5}.yardage strong{font-size:12px}.yardage .b{display:inline-block;margin:0 12px 5px 0}.info{font-size:12px}.info strong{font-size:14px}
+.buttons{position:fixed;z-index:7;top:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap;max-width:calc(100vw - var(--rail-width) - 24px)}.buttons button{border:0;border-radius:10px;padding:9px 11px;background:#f7f5ee;color:#16231b;font-weight:600}.buttons .active{background:#1c4a31;color:white}
+#railToggle{margin-top:auto;align-self:flex-end;border:0;border-radius:10px;padding:8px 11px;background:#f7f5ee;color:#16231b;font-weight:600;box-shadow:0 3px 15px rgba(0,0,0,.12);pointer-events:auto}
+body.rail-collapsed #map{right:0}
+body.rail-collapsed #infoRail{display:none}
 .error{color:#9b2c2c}
-.legend{top:238px;right:12px;font-size:11px;line-height:1.5}
-.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}.green{background:#9fbd9a}.fairway{background:#c7d5bc}.bunker{background:#d8bd78}.player{background:#1c4a31}
+@media(max-width:700px){
+  :root{--rail-width:248px}
+  #infoRail{width:224px}
+  .buttons{max-width:calc(100vw - var(--rail-width) - 20px);gap:4px}
+  .buttons button{padding:8px 9px}
+}
 </style>
 </head>
 <body>
 <div id="map"><canvas id="course"></canvas></div>
-<div class="panel title"><strong>UiDo · Overstone</strong><br><small>Full course context · Hole 1 detail</small></div>
-<div id="status" class="panel status">Loading course…</div>
 <div class="panel buttons">
   <button id="courseBtn">Course</button><button id="holeBtn" class="active">Hole 1</button>
   <button id="zoomOut">−</button><button id="zoomIn">+</button><button id="gps">Use GPS</button><button id="test" class="active">Test</button>
 </div>
-<div id="yardage" class="panel yardage"><strong>Live yardages</strong><br><span id="greenYardage">F/M/B — / — / — yd</span><br><span id="bunkerYardage">Bunkers —</span></div>\n<div class="panel legend">
-  <span class="dot fairway"></span>course detail<br>
-  <span class="dot bunker"></span>bunker<br>
-  <span class="dot green"></span>green<br>
-  <span class="dot player"></span>player
-</div>
-<div class="panel info"><strong id="main">Hole 1</strong><br><span id="detail">Loading measurement layer…</span></div>
+<aside id="infoRail">
+  <div class="panel title"><strong>UiDo · Overstone</strong><br><small>Full course context · Hole 1 detail</small></div>
+  <div id="status" class="panel status">Loading course…</div>
+  <div id="yardage" class="panel yardage"><strong>Live yardages</strong><br><span id="greenYardage">F/M/B — / — / — yd</span><br><span id="bunkerYardage">Bunkers —</span></div>
+  <div class="panel info"><strong id="main">Hole 1</strong><br><span id="detail">Loading measurement layer…</span></div>
+  <button id="railToggle" type="button">Hide info</button>
+</aside>
 <script>
 window.addEventListener('error',function(e){
   var s=document.getElementById('status');
@@ -46,9 +54,12 @@ var C=window.UIDO_OVERSTONE_COURSE,D=window.UIDO_OVERSTONE_H1;
 if(!C)throw new Error('Full course layer did not load');
 if(!D)throw new Error('Hole 1 detail layer did not load');
 
-var canvas=document.getElementById('course'),ctx=canvas.getContext('2d');
+var canvas=document.getElementById('course'),ctx=canvas.getContext('2d'),map=document.getElementById('map');
+function viewSize(){
+  return {w:map.clientWidth,h:map.clientHeight};
+}
 function resizeCanvas(){
-  var dpr=window.devicePixelRatio||1,w=window.innerWidth,h=window.innerHeight;
+  var dpr=window.devicePixelRatio||1,v=viewSize(),w=v.w,h=v.h;
   canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);
   canvas.style.width=w+'px';canvas.style.height=h+'px';
   ctx.setTransform(dpr,0,0,dpr,0,0);
@@ -162,7 +173,7 @@ function drawFullCourse(c,w,h,small){
   }
 }
 function drawHoleDetail(){
-  var w=innerWidth,h=innerHeight,pad=36;
+  var v=viewSize(),w=v.w,h=v.h,pad=36;
   ctx.clearRect(0,0,w,h);ctx.fillStyle='#dfe4d8';ctx.fillRect(0,0,w,h);
   // Full course remains the underlying spatial context, but uses the same
   // rotated metric camera as Hole 1 so the course never gets stretched/squashed.
@@ -180,10 +191,6 @@ function drawHoleDetail(){
   drawLine(ctx,D.line_of_play,HB,w,h,pad,'#596354',2,[7,7]);
   var gm=project(D.green_fmb.middle[0],D.green_fmb.middle[1],HB,w,h,pad);
   ctx.beginPath();ctx.arc(gm[0],gm[1],6,0,Math.PI*2);ctx.fillStyle='#ffd600';ctx.fill();ctx.strokeStyle='#1c4a31';ctx.lineWidth=2;ctx.stroke();
-  features.filter(function(f){return f.golf==='bunker'}).forEach(function(f){
-    var p=f.geometry.coordinates[0][0],q=project(p[1],p[0],HB,w,h,pad);
-    ctx.fillStyle='#16231b';ctx.font='600 11px Arial';ctx.fillText(f.side==='left'?'L':'R',q[0]-4,q[1]-5);
-  });
   bunkerData.forEach(function(b){
     var q=project(b.anchor_gps[0],b.anchor_gps[1],HB,w,h,pad);
     var label=Math.round(yd(current,b.front_gps))+'/'+Math.round(yd(current,b.back_gps));
@@ -197,8 +204,8 @@ function drawHoleDetail(){
   ctx.beginPath();ctx.arc(pl[0],pl[1],9,0,Math.PI*2);ctx.fillStyle='#1c4a31';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();
 }
 function draw(){
-  if(detailMode)drawHoleDetail();else drawFullCourse(ctx,innerWidth,innerHeight,false);
-
+  var v=viewSize();
+  if(detailMode)drawHoleDetail();else drawFullCourse(ctx,v.w,v.h,false);
 }
 function yd(a,b){
   var R=6371000,p=Math.PI/180,d1=(b[0]-a[0])*p,d2=(b[1]-a[1])*p;
@@ -232,9 +239,10 @@ canvas.addEventListener('click',function(e){
   if(moved){moved=false;return;}
   if(!testMode||!detailMode)return;
   var r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,pad=36;
-  var mpp=metersPerPixel(innerWidth,innerHeight,pad);
-  var rx=cameraX+(x-innerWidth/2)*mpp;
-  var ry=cameraY+(innerHeight/2-y)*mpp;
+  var v=viewSize(),mpp=metersPerPixel(v.w,v.h,pad);
+  var v=viewSize();
+  var rx=cameraX+(x-v.w/2)*mpp;
+  var ry=cameraY+(v.h/2-y)*mpp;
   var cb=Math.cos(holeAngle),sb=Math.sin(holeAngle);
   var e=rx*cb+ry*sb;
   var n=-rx*sb+ry*cb;
@@ -271,7 +279,7 @@ canvas.addEventListener('pointermove',function(e){
     moved=true;dragging=false;return;
   }
   if(!dragging)return;
-  var dx=e.clientX-lastX,dy=e.clientY-lastY,mpp=metersPerPixel(innerWidth,innerHeight,36);
+  var dx=e.clientX-lastX,dy=e.clientY-lastY,mpp=metersPerPixel(viewSize().w,viewSize().h,36);
   cameraX-=dx*mpp;
   cameraY+=dy*mpp;
   moved=true;lastX=e.clientX;lastY=e.clientY;draw();
@@ -307,6 +315,11 @@ document.getElementById('gps').onclick=function(){
   },function(e){
     document.getElementById('status').textContent='GPS error · '+e.message;
   },options);
+};
+document.getElementById('railToggle').onclick=function(){
+  var collapsed=document.body.classList.toggle('rail-collapsed');
+  this.textContent=collapsed?'Show info':'Hide info';
+  requestAnimationFrame(function(){resizeCanvas();draw()});
 };
 addEventListener('resize',function(){resizeCanvas();draw()});
 setMode(true);reset();
