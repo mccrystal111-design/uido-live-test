@@ -141,3 +141,11 @@ Later: nearest-course selection from the UiDo Course Registry. Do not mix this i
 ## CHANGE DISCIPLINE
 
 Whenever meaningful UiDo work changes project state, update this document. If GitHub and Library disagree, inspect both authoritative artifacts, record the discrepancy explicitly, and resolve it deliberately. Never guess or silently overwrite source data.
+
+### 2026-09-25 — Overstone playground live GPS / information rail
+- Overstone Hole 1 playground now has a dedicated right-hand information rail so the hole canvas gets a cleaner, larger working area.
+- Moved course/status, live green + bunker yardages, and hole information into stacked right-side boxes.
+- Removed the on-map bunker L/R markers and the legend; bunker yardage labels remain as front/back distances only.
+- Added a Hide info / Show info control so the information rail can be collapsed and the hole view can expand to the full screen.
+- The existing **Use GPS** control is the live-location handover: it requests the device location, switches off the fixed test player, centres the camera on the live position, and then watches for position updates. Browser/device permission is required.
+- Code commit: `d654bd4afa72ac0b76e729adb837f4a09d6c259d`.
