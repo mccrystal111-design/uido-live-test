@@ -378,13 +378,7 @@ function drawHoleDetail(){
       ctx.textBaseline='middle';
       ctx.fillText(distance+'',dot[0],dot[1]);
     });
-    var align=b.side==='left'?'right':'left';
-    ctx.font='600 10px Arial';
-    ctx.textAlign=align;
-    ctx.textBaseline='middle';
-    ctx.fillStyle='#16231b';
-    ctx.fillText(Math.round(yd(current,edges.back))+' yd',backScreen[0],backScreen[1]);
-    ctx.fillText(Math.round(yd(current,edges.front))+' yd',frontScreen[0],frontScreen[1]);
+    // Yardages are now contained entirely inside the sand markers.
     ctx.textAlign='left';
     ctx.textBaseline='alphabetic';
   });
