@@ -349,10 +349,9 @@ function drawHoleDetail(){
       var frontScreen=[w/2+(frontQ.x-cameraX)/mpp,h/2-(frontQ.y-cameraY)/mpp];
       var backScreen=[w/2+(backQ.x-cameraX)/mpp,h/2-(backQ.y-cameraY)/mpp];
 
-      // Anchor the label to the bunker polygon centre, not the midpoint of
-      // the player-relative front/back points. The centre therefore stays
-      // fixed as the player moves. Rotate the two-number stack toward the
-      // player so the label can follow the player's viewpoint without drifting.
+      // Anchor the label to the fixed centre of the bunker. Its orientation is
+      // always perpendicular to the current direction of play (90 degrees),
+      // so player position changes the yardages but never the label position.
       var ring=bunkerGeometry(b)||[];
       var centre=[0,0];
       if(ring.length){
@@ -368,14 +367,10 @@ function drawHoleDetail(){
       var centreQ=rotatedLocal(centre[0],centre[1]);
       var labelX=w/2+(centreQ.x-cameraX)/mpp;
       var labelY=h/2-(centreQ.y-cameraY)/mpp;
-      var playerQ=rotatedLocal(current[0],current[1]);
-      var dx=playerQ.x-centreQ.x;
-      var dy=-(playerQ.y-centreQ.y);
-      var labelAngle=Math.atan2(dx,dy);
 
       ctx.save();
       ctx.translate(labelX,labelY);
-      ctx.rotate(labelAngle);
+      ctx.rotate(Math.PI/2);
       ctx.font='600 10px Arial';
       ctx.textAlign='center';
       ctx.textBaseline='middle';
