@@ -52,7 +52,7 @@ if(!D)throw new Error('Hole 1 detail layer did not load');
 var canvas=document.getElementById('course'),ctx=canvas.getContext('2d');
 var overviewBox=document.getElementById('overview');
 var overview=document.getElementById('overviewCanvas'),ov=overview.getContext('2d');
-var features=D.features||[],tee=[52.2763578,-0.8194224],current=tee.slice(),gpsWatch=null,testMode=true,detailMode=true,miniVisible=true,zoom=1,cameraLat=null,cameraLon=null,dragging=false,moved=false,lastX=0,lastY=0;
+var features=D.features||[],tee=[52.2763578,-0.8194224],current=tee.slice(),gpsWatch=null,testMode=true,detailMode=true,miniVisible=true,zoom=1,cameraE=0,cameraN=0,dragging=false,moved=false,lastX=0,lastY=0,pointers={},pinchStart=null;
 
 function allCourseBounds(){
   var xs=[],ys=[];
@@ -71,13 +71,46 @@ function holeBounds(){
 }
 var CB=allCourseBounds(),HB=holeBounds();
 var baseLat=(HB.minY+HB.maxY)/2,baseLon=(HB.minX+HB.maxX)/2;
-cameraLat=baseLat;cameraLon=baseLon;
+var latM=111320,lonM=111320*Math.cos(baseLat*Math.PI/180);
+var holeStart=D.line_of_play[0],holeEnd=D.line_of_play[D.line_of_play.length-1];
+var holeBearing=Math.atan2((holeEnd[0]-holeStart[0])*latM,(holeEnd[1]-holeStart[1])*lonM);
+var holeBearingDeg=(holeBearing*180/Math.PI+360)%360;
 
+function toLocal(lat,lon){
+  return {e:(lon-baseLon)*lonM,n:(lat-baseLat)*latM};
+}
+function fromLocal(e,n){
+  return [baseLat+n/latM,baseLon+e/lonM];
+}
+function rotatedLocal(lat,lon){
+  var p=toLocal(lat,lon),cb=Math.cos(holeBearing),sb=Math.sin(holeBearing);
+  return {x:p.e*cb-p.n*sb,y:p.e*sb+p.n*cb};
+}
+function rotatedHoleBounds(){
+  var xs=[],ys=[];
+  features.forEach(function(f){
+    if(f.geometry.type!=='Polygon')return;
+    (f.geometry.coordinates[0]||[]).forEach(function(p){
+      var q=rotatedLocal(p[1],p[0]);xs.push(q.x);ys.push(q.y);
+    });
+  });
+  D.line_of_play.forEach(function(p){var q=rotatedLocal(p[1],p[0]);xs.push(q.x);ys.push(q.y)});
+  return {minX:Math.min.apply(null,xs),maxX:Math.max.apply(null,xs),minY:Math.min.apply(null,ys),maxY:Math.max.apply(null,ys)};
+}
+var RHB=rotatedHoleBounds();
+function fitCamera(){
+  cameraE=0;cameraN=0;
+  zoom=1;
+}
+function metersPerPixel(w,h,pad){
+  var spanX=RHB.maxX-RHB.minX,spanY=RHB.maxY-RHB.minY;
+  return Math.max(spanX/(w-pad*2),spanY/(h-pad*2))/zoom;
+}
 function project(lat,lon,b,w,h,pad){
-  if(b===HB && detailMode){
-    var spanLon=(HB.maxX-HB.minX)/zoom, spanLat=(HB.maxY-HB.minY)/zoom;
-    var x=w/2+(lon-cameraLon)/spanLon*(w-pad*2);
-    var y=h/2-(lat-cameraLat)/spanLat*(h-pad*2);
+  if(detailMode && b===HB){
+    var q=rotatedLocal(lat,lon),mpp=metersPerPixel(w,h,pad);
+    var x=w/2+(q.x-(cameraE*Math.cos(holeBearing)-cameraN*Math.sin(holeBearing)))/mpp;
+    var y=h/2-(q.y-(cameraE*Math.sin(holeBearing)+cameraN*Math.cos(holeBearing)))/mpp;
     return [x,y];
   }
   var x=pad+(lon-b.minX)/(b.maxX-b.minX)*(w-pad*2);
@@ -116,9 +149,10 @@ function drawFullCourse(c,w,h,small){
 function drawHoleDetail(){
   var w=innerWidth,h=innerHeight,pad=36;
   ctx.clearRect(0,0,w,h);ctx.fillStyle='#dfe4d8';ctx.fillRect(0,0,w,h);
-  // Full course remains the underlying spatial context; only the camera is focused on Hole 1.
+  // Full course remains the underlying spatial context, but uses the same
+  // rotated metric camera as Hole 1 so the course never gets stretched/squashed.
   C.holes.forEach(function(hole){
-    drawLine(ctx,hole.geometry.coordinates,CB,w,h,pad,'rgba(89,99,84,.16)',1);
+    drawLine(ctx,hole.geometry.coordinates,HB,w,h,pad,'rgba(89,99,84,.16)',1);
   });
   features.forEach(function(f){
     var g=f.golf,c=f.geometry.coordinates;
@@ -166,15 +200,15 @@ function yd(a,b){
 function update(pos){
   current=pos.slice();
   document.getElementById('main').textContent='Hole 1 · '+Math.round(yd(pos,D.green_fmb.middle))+' yd to middle';
-  document.getElementById('detail').textContent='F/M/B '+Math.round(yd(pos,D.green_fmb.front))+' / '+Math.round(yd(pos,D.green_fmb.middle))+' / '+Math.round(yd(pos,D.green_fmb.back))+' yd · direction fixed down Hole 1';
+  document.getElementById('detail').textContent='F/M/B '+Math.round(yd(pos,D.green_fmb.front))+' / '+Math.round(yd(pos,D.green_fmb.middle))+' / '+Math.round(yd(pos,D.green_fmb.back))+' yd · view aligned '+Math.round(holeBearingDeg)+'° to Hole 1';
   draw();
 }
 function setMode(detail){
   detailMode=detail;
-  if(detail){zoom=1;cameraLat=baseLat;cameraLon=baseLon;}
+  if(detail){fitCamera();}
   document.getElementById('holeBtn').classList.toggle('active',detail);
   document.getElementById('courseBtn').classList.toggle('active',!detail);
-  document.getElementById('status').textContent=detail?'Hole 1 detail · full course retained underneath':'Full Overstone course · Hole 1 highlighted';
+  document.getElementById('status').textContent=detail?'Hole 1 detail · view aligned to Hole 1 direction':'Full Overstone course · Hole 1 highlighted';
   draw();
 }
 function reset(){
@@ -189,10 +223,13 @@ canvas.addEventListener('click',function(e){
   if(moved){moved=false;return;}
   if(!testMode||!detailMode)return;
   var r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,pad=36;
-  var spanLon=(HB.maxX-HB.minX)/zoom,spanLat=(HB.maxY-HB.minY)/zoom;
-  var lon=cameraLon+(x-innerWidth/2)/(innerWidth-pad*2)*spanLon;
-  var lat=cameraLat-(y-innerHeight/2)/(innerHeight-pad*2)*spanLat;
-  update([lat,lon]);
+  var mpp=metersPerPixel(innerWidth,innerHeight,pad);
+  var sx=(x-innerWidth/2)*mpp,sy=-(y-innerHeight/2)*mpp;
+  var cb=Math.cos(holeBearing),sb=Math.sin(holeBearing);
+  var e=(sx+cameraE*cb-cameraN*sb)*cb+(sy+cameraE*sb+cameraN*cb)*sb;
+  var n=-(sx+cameraE*cb-cameraN*sb)*sb+(sy+cameraE*sb+cameraN*cb)*cb;
+  var pos=fromLocal(e,n);
+  update(pos);
 });
 document.getElementById('zoomIn').onclick=function(){if(!detailMode)return;zoom=Math.min(8,zoom*1.5);draw()};
 document.getElementById('zoomOut').onclick=function(){if(!detailMode)return;zoom=Math.max(1,zoom/1.5);draw()};
@@ -210,19 +247,41 @@ canvas.addEventListener('wheel',function(e){
 },{passive:false});
 canvas.addEventListener('pointerdown',function(e){
   if(!detailMode)return;
-  dragging=true;moved=false;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId);
+  pointers[e.pointerId]={x:e.clientX,y:e.clientY};
+  canvas.setPointerCapture(e.pointerId);
+  moved=false;
+  if(Object.keys(pointers).length===1){
+    dragging=true;lastX=e.clientX;lastY=e.clientY;
+  }else if(Object.keys(pointers).length===2){
+    var ids=Object.keys(pointers),a=pointers[ids[0]],b=pointers[ids[1]];
+    pinchStart=Math.hypot(a.x-b.x,a.y-b.y);
+  }
 });
 canvas.addEventListener('pointermove',function(e){
-  if(!dragging||!detailMode)return;
-  var dx=e.clientX-lastX,dy=e.clientY-lastY;
-  var spanLon=(HB.maxX-HB.minX)/zoom,spanLat=(HB.maxY-HB.minY)/zoom;
-  cameraLon-=dx/(innerWidth-72)*spanLon;
-  cameraLat+=dy/(innerHeight-72)*spanLat;
-  moved=true;
-  lastX=e.clientX;lastY=e.clientY;draw();
+  if(!detailMode||!pointers[e.pointerId])return;
+  pointers[e.pointerId]={x:e.clientX,y:e.clientY};
+  var ids=Object.keys(pointers);
+  if(ids.length===2){
+    var a=pointers[ids[0]],b=pointers[ids[1]],d=Math.hypot(a.x-b.x,a.y-b.y);
+    if(pinchStart){zoom=Math.max(1,Math.min(8,zoom*(d/pinchStart)));pinchStart=d;draw();}
+    moved=true;dragging=false;return;
+  }
+  if(!dragging)return;
+  var dx=e.clientX-lastX,dy=e.clientY-lastY,mpp=metersPerPixel(innerWidth,innerHeight,36);
+  // Grab-map behaviour: the map follows the finger.
+  var cb=Math.cos(holeBearing),sb=Math.sin(holeBearing);
+  var sx=dx*mpp,sy=-dy*mpp;
+  cameraE-=sx*cb+sy*sb;
+  cameraN-=(-sx*sb+sy*cb);
+  moved=true;lastX=e.clientX;lastY=e.clientY;draw();
 });
-canvas.addEventListener('pointerup',function(){dragging=false});
-canvas.addEventListener('pointercancel',function(){dragging=false});
+function endPointer(e){
+  delete pointers[e.pointerId];
+  dragging=false;
+  if(Object.keys(pointers).length<2)pinchStart=null;
+}
+canvas.addEventListener('pointerup',endPointer);
+canvas.addEventListener('pointercancel',endPointer);
 document.getElementById('holeBtn').onclick=function(){setMode(true)};
 document.getElementById('courseBtn').onclick=function(){setMode(false)};
 document.getElementById('test').onclick=reset;
