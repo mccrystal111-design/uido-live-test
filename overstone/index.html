@@ -47,6 +47,7 @@ window.addEventListener('error',function(e){
 </script>
 <script src="course-layer.js"></script>
 <script src="hole1-layer.js"></script>
+<script src="hole-wireframes.js"></script>
 <script>
 (function(){
 'use strict';
@@ -122,13 +123,26 @@ function rotatedHoleBounds(){
 var RHB=rotatedHoleBounds();
 var cameraX=0,cameraY=0;
 var bunkerData=D.bunkers||[];
+function compactHoleData(n){
+  var q=window.UIDO_OVERSTONE_HOLES_Q&&window.UIDO_OVERSTONE_HOLES_Q[String(n)];
+  if(!q)return null;
+  var origin=C.holes[n-1].geometry.coordinates[0];
+  function unq(p){return [origin[0]+p[0]/(111000*2),origin[1]+p[1]/(111000*2)];}
+  var fs=(q.f||[]).map(function(x){
+    return {id:'derived-hole-'+n+'-'+x[0],golf:{f:'fairway',g:'green',t:'tee',b:'bunker'}[x[0]],geometry:{type:'Polygon',coordinates:[[].concat(x[1].map(unq))]}};
+  });
+  var bs=(q.b||[]).map(function(x,i){
+    return {id:'derived-bunker-'+n+'-'+i,type:'bunker',side:x[0]==='l'?'left':'right',front_gps:(function(p){var u=unq(p);return [u[1],u[0]]})(x[1]),back_gps:(function(p){var u=unq(p);return [u[1],u[0]]})(x[2]),anchor_gps:(function(p){var u=unq(p);return [u[1],u[0]]})(x[3])};
+  });
+  return {course:'Overstone Park Golf Club',hole:n,par:HOLE_META.pars[n].par,line_of_play:q.l.map(unq),green_fmb:HOLE_META.greens[n],features:fs,bunkers:bs};
+}
 function selectHole(n){
   n=Math.max(1,Math.min(18,Number(n)||1));
   holeNumber=n;
   if(n===1){
     D=window.UIDO_OVERSTONE_H1;
   }else{
-    D={hole:n,par:HOLE_META.pars[n].par,line_of_play:C.holes[n-1].geometry.coordinates,green_fmb:HOLE_META.greens[n],features:[],bunkers:[]};
+    D=compactHoleData(n)||{hole:n,par:HOLE_META.pars[n].par,line_of_play:C.holes[n-1].geometry.coordinates,green_fmb:HOLE_META.greens[n],features:[],bunkers:[]};
   }
   features=D.features||[];
   bunkerData=D.bunkers||[];
@@ -139,7 +153,7 @@ function selectHole(n){
   document.getElementById('holeSelect').value=String(n);
   fitCamera();
   update(current);
-  document.getElementById('status').textContent=n===1?'Hole 1 detail · full source wireframe':'Hole '+n+' · verified hole route + green F/M/B · detailed source features next';
+  document.getElementById('status').textContent=n===1?'Hole 1 detail · full source wireframe':'Hole '+n+' · source wireframe + live F/M/B';
   draw();
 }
 function bunkerLabel(b){
