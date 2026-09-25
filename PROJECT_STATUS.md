@@ -17,7 +17,7 @@ This is the first file a fresh UiDo session should read. It records authoritativ
 **GolfCourseAPI discovery/registration: IMPLEMENTED; Northampton registry metadata is complete.**  
 **Northampton physical acquisition: BLOCKED earlier than OSM hole validation by OSM course-identity resolution.**
 
-Current `main` head: `6fb567d795d0ddd6c1814696e49d66c1dc4d44ae` (`Improve hole picker and smooth wireframe rendering`). The previous status file was stale at `27e0df2…`; this reconciliation corrects that discrepancy.
+Current `main` head: `7530ddc6237a5f9e93b50880c536517a3c05fd45` (`Widen mobile hole picker rail`). The previous status file was stale at `27e0df2…`; this reconciliation corrects that discrepancy.
 
 The latest master physical-acquisition run is `35994500134` (2026-09-24). It is a **Northampton** test and failed in `prepare_physical_acquisition.py` before OSM capture. The log records:
 
@@ -180,3 +180,10 @@ Whenever meaningful UiDo work changes project state, update this document. If Gi
 - Smoothed the canvas rendering of source-derived polygon wireframes using quadratic curve interpolation at render time; source data itself is unchanged.
 - F/M/B, live GPS and yardage logic are unchanged.
 - Commit: `6fb567d795d0ddd6c1814696e49d66c1dc4d44ae`.
+
+
+### 2026-09-25 — Hole 3 bunker geometry and picker width
+- Widened the mobile info rail so the Hole picker has more breathing room.
+- Replaced the three Hole 3 bunker render polygons with geometry transformed directly from the authoritative Overstone OSM bunker polygons `way/798091424`, `way/798091425`, and `way/798091426`.
+- The bunker yardage endpoints and live F/M/B logic remain unchanged.
+- Commits: `8e8ec298be7ab2ddc6ba59262238ed8eca1e2421`, `7530ddc6237a5f9e93b50880c536517a3c05fd45`.
