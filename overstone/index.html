@@ -189,17 +189,43 @@ function drawHoleDetail(){
   C.holes.forEach(function(hole){
     drawLine(ctx,hole.geometry.coordinates,HB,w,h,pad,'rgba(89,99,84,.16)',1);
   });
+  // Draw fairway/rough first so the green is not hidden by the fairway polygon.
   features.forEach(function(f){
     var g=f.golf,c=f.geometry.coordinates;
     if(g==='fairway')drawPoly(ctx,c[0],HB,w,h,pad,'#c7d5bc','#8ea58a');
     else if(g==='rough')drawPoly(ctx,c[0],HB,w,h,pad,'#b9c7ae','#9aa993');
-    else if(g==='green')drawPoly(ctx,c[0],HB,w,h,pad,'#9fbd9a','#71856e');
     else if(g==='bunker')drawPoly(ctx,c[0],HB,w,h,pad,'#d8bd78','#967b43');
     else if(g==='tee')drawPoly(ctx,c[0],HB,w,h,pad,'#b5c9ae','#65786a');
   });
+  // Green is a distinct course feature and must sit above the fairway.
+  features.forEach(function(f){
+    if(f.golf==='green')drawPoly(ctx,f.geometry.coordinates[0],HB,w,h,pad,'#9fbd9a','#557052');
+  });
   drawLine(ctx,D.line_of_play,HB,w,h,pad,'#596354',2,[7,7]);
+
+  // Show live F/M/B yardages at their actual points on the green.
+  var greenPoints=[
+    {key:'front',label:'F',gps:D.green_fmb.front},
+    {key:'middle',label:'M',gps:D.green_fmb.middle},
+    {key:'back',label:'B',gps:D.green_fmb.back}
+  ];
+  ctx.font='600 9px Arial';
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  greenPoints.forEach(function(gp){
+    var q=project(gp.gps[0],gp.gps[1],HB,w,h,pad);
+    ctx.beginPath();
+    ctx.arc(q[0],q[1],10,0,Math.PI*2);
+    ctx.fillStyle='rgba(247,245,238,.92)';
+    ctx.fill();
+    ctx.strokeStyle='#557052';
+    ctx.lineWidth=1;
+    ctx.stroke();
+    ctx.fillStyle='#16231b';
+    ctx.fillText(Math.round(yd(current,gp.gps)),q[0],q[1]);
+  });
   var gm=project(D.green_fmb.middle[0],D.green_fmb.middle[1],HB,w,h,pad);
-  ctx.beginPath();ctx.arc(gm[0],gm[1],6,0,Math.PI*2);ctx.fillStyle='#ffd600';ctx.fill();ctx.strokeStyle='#1c4a31';ctx.lineWidth=2;ctx.stroke();
+  ctx.beginPath();ctx.arc(gm[0],gm[1],5,0,Math.PI*2);ctx.fillStyle='#ffd600';ctx.fill();ctx.strokeStyle='#1c4a31';ctx.lineWidth=2;ctx.stroke();
   bunkerData.forEach(function(b){
     // Front/back GPS points sit on the fairway-facing edge of the bunker.
     // Push the labels laterally across the bunker to the non-fairway side,
