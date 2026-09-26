@@ -111,6 +111,15 @@ canvas{
 }
 .metric label{display:block;font-size:8px;font-weight:700;color:var(--ui-muted)}
 .metric strong{display:block;font-size:11px;margin-top:2px}
+.bunker-section-title{
+  margin-top:8px;
+  padding-top:8px;
+  border-top:1px solid rgba(22,35,27,.12);
+  font-size:8px;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase;
+  color:var(--ui-muted);
+}
+.bunker-section-title:first-of-type{margin-top:6px;padding-top:6px}
 .bunker-row{
   display:flex;align-items:center;justify-content:space-between;
   gap:6px;padding:4px 0;
@@ -202,7 +211,6 @@ body.info-hidden #railToggle{right:10px}
     </div>
   </section>
   <section id="greenInfo" class="panel info-box"></section>
-  <section id="bunkerInfo" class="panel info-box"></section>
   <section id="status" class="panel status info-box">Loading course…</section>
 </aside>
 
@@ -218,7 +226,7 @@ body.info-hidden #railToggle{right:10px}
   <button id="zoomIn" type="button" aria-label="Zoom in">+</button>
   <button id="fit" type="button">Fit</button>
   <button id="zoomShot" type="button">Zoom to Shot</button>
-  <button id="gps" type="button">Use GPS</button>
+  <button id="gps" type="button">GPS</button>
 </nav>
 
 <script>
@@ -417,7 +425,6 @@ function hideBunkerPopup(){if(bunkerPopup)bunkerPopup.style.display='none'}
 function updateRail(){
   var holeHeaderMeta=document.getElementById('holeHeaderMeta');
   var greenInfo=document.getElementById('greenInfo');
-  var bunkerInfo=document.getElementById('bunkerInfo');
   var par=(HOLE_META.pars[String(holeNumber)]||{}).par||D.par||'—';
   if(holeHeaderMeta){
     holeHeaderMeta.textContent='Hole '+holeNumber+' · Par '+par;
@@ -428,17 +435,36 @@ function updateRail(){
       {label:'M',gps:D.green_fmb&&D.green_fmb.middle},
       {label:'B',gps:D.green_fmb&&D.green_fmb.back}
     ];
-    greenInfo.innerHTML='<div class="rail-title">Green · F / M / B</div><div class="metric-row">'+pts.map(function(p){
+    var greenHtml='<div class="rail-title">Green · F / M / B</div><div class="metric-row">'+pts.map(function(p){
       return '<div class="metric"><label>'+p.label+'</label><strong>'+((p.gps&&current)?Math.round(yd(current,p.gps)):'—')+'</strong></div>';
     }).join('')+'</div>';
-  }
-  if(bunkerInfo){
-    var rows=(bunkerData||[]).map(function(b){
-      var edges=bunkerEdgesFromPlayer(b);
-      var side=(b.side||'bunker').charAt(0).toUpperCase()+(b.side||'bunker').slice(1);
-      return '<div class="bunker-row"><span class="bunker-side">'+side+'</span><span class="bunker-yardage">F '+Math.round(yd(current,edges.front))+' · B '+Math.round(yd(current,edges.back))+' yd</span></div>';
-    }).join('');
-    bunkerInfo.innerHTML='<div class="rail-title">Bunkers · front / back</div>'+(rows||'<div class="muted">No mapped bunkers</div>');
+
+    // UI grouping only: bunkers within 60 yd of green centre are treated as
+    // green-side; the remaining mapped bunkers are fairway bunkers.
+    var greenSide=[],fairway=[];
+    (bunkerData||[]).forEach(function(b){
+      var ring=bunkerGeometry(b)||[],centre=[0,0];
+      if(ring.length){
+        ring.forEach(function(p){centre[0]+=p[1];centre[1]+=p[0];});
+        centre[0]/=ring.length; centre[1]/=ring.length;
+      }
+      var d=ring.length?yd(D.green_fmb.middle,centre):9999;
+      (d<=60?greenSide:fairway).push(b);
+    });
+    function bunkerRows(list){
+      return list.map(function(b){
+        var edges=bunkerEdgesFromPlayer(b);
+        var side=(b.side||'bunker').charAt(0).toUpperCase()+(b.side||'bunker').slice(1);
+        return '<div class="bunker-row"><span class="bunker-side">'+side+'</span><span class="bunker-yardage">F '+Math.round(yd(current,edges.front))+' · B '+Math.round(yd(current,edges.back))+' yd</span></div>';
+      }).join('');
+    }
+    greenHtml+='<div class="bunker-section-title">Green Side Bunkers</div>';
+    greenHtml+=bunkerRows(greenSide)||'<div class="muted">None mapped</div>';
+    if(fairway.length){
+      greenHtml+='<div class="bunker-section-title">Fairway Bunkers</div>';
+      greenHtml+=bunkerRows(fairway);
+    }
+    greenInfo.innerHTML=greenHtml;
   }
 }
 function updateYardageUI(){updateRail()}
@@ -758,8 +784,23 @@ canvas.addEventListener('pointercancel',endPointer);
 document.getElementById('holeSelect').onchange=function(){setMode(true);selectHole(this.value)};
 document.getElementById('courseBtn').onclick=function(){setMode(false)};
 document.getElementById('gps').onclick=function(){
-  if(!navigator.geolocation){document.getElementById('status').textContent='GPS unavailable on this device';return}
-  testMode=false;this.classList.add('active');
+  var btn=this;
+  if(btn.classList.contains('active')){
+    if(gpsWatch&&navigator.geolocation)navigator.geolocation.clearWatch(gpsWatch);
+    gpsWatch=null;
+    testMode=true;
+    btn.classList.remove('active');
+    document.getElementById('status').textContent='GPS off · player fixed';
+    update(current);
+    return;
+  }
+  if(!navigator.geolocation){
+    document.getElementById('status').textContent='GPS unavailable on this device';
+    return;
+  }
+  testMode=false;
+  btn.classList.add('active');
+  btn.textContent='GPS On';
   if(gpsWatch)navigator.geolocation.clearWatch(gpsWatch);
   document.getElementById('status').textContent='Finding live GPS…';
   var options={enableHighAccuracy:true,maximumAge:0,timeout:15000};
@@ -772,9 +813,13 @@ document.getElementById('gps').onclick=function(){
       current=[p2.coords.latitude,p2.coords.longitude];
       update(current);
       document.getElementById('status').textContent='Live GPS · '+Math.round(p2.coords.accuracy)+'m accuracy';
-    },function(e){document.getElementById('status').textContent='GPS watch error · '+e.message},
-    {enableHighAccuracy:true,maximumAge:1000,timeout:15000});
+    },function(e){
+      document.getElementById('status').textContent='GPS watch error · '+e.message;
+    },{enableHighAccuracy:true,maximumAge:1000,timeout:15000});
   },function(e){
+    btn.classList.remove('active');
+    testMode=true;
+    btn.textContent='GPS';
     document.getElementById('status').textContent='GPS error · '+e.message;
   },options);
 };
