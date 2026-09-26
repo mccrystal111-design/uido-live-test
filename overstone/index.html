@@ -766,7 +766,6 @@ function cameraForPlayer(pos){
   var desiredY=q.y+(v.cy-targetY)*mpp;
   // Keep the camera from drifting so far that the hole leaves the viewport.
   var halfW=v.w*mpp/2,halfH=v.h*mpp/2;
-  var holeCenterX=(RHB.minX+RHB.maxX)/2,holeCenterY=(RHB.minY+RHB.maxY)/2;
   var minCamX=RHB.maxX-halfW,maxCamX=RHB.minX+halfW;
   var minCamY=RHB.maxY-halfH,maxCamY=RHB.minY+halfH;
   // When the viewport is larger than the selected hole, do not force the
@@ -800,26 +799,23 @@ function requestGpsAnimation(){
     cameraAnimFrame=null;
     var target=gpsPredictedPosition(now);
     var p=renderCurrent;
-    // Smoothly chase the live/predicted GPS target rather than snapping to
-    // each browser position fix. This keeps the player moving between fixes.
     renderCurrent=[
-      p[0]+(target[0]-p[0])*0.10,
-      p[1]+(target[1]-p[1])*0.10
+      p[0]+(target[0]-p[0])*0.07,
+      p[1]+(target[1]-p[1])*0.07
     ];
     var desired=cameraForPlayer(renderCurrent);
-    cameraX+=(desired.x-cameraX)*0.08;
-    cameraY+=(desired.y-cameraY)*0.08;
+    cameraX+=(desired.x-cameraX)*0.055;
+    cameraY+=(desired.y-cameraY)*0.055;
     draw();
-    var positionMoving=Math.abs(target[0]-renderCurrent[0])>0.00000002||Math.abs(target[1]-renderCurrent[1])>0.00000002;
-    var cameraMoving=Math.abs(desired.x-cameraX)>0.02||Math.abs(desired.y-cameraY)>0.02;
-    // Keep rendering while GPS follow is active so the predicted position
-    // advances continuously; the prediction horizon is deliberately capped.
-    if(gpsFollow&&(positionMoving||cameraMoving||gpsSpeed>0.45))requestGpsAnimation();
+    // GPS follow owns the frame while enabled. This is intentionally a
+    // continuous camera loop; browser GPS fixes remain the authoritative
+    // position updates and only gently steer the rendered position.
+    if(gpsFollow)requestGpsAnimation();
   });
 }
 function update(pos){
   current=pos.slice();
-  window._travelAngle=travelAngleAt(pos[0],pos[1]);
+  window._travelAngle=holeAngle;
   if(detailMode){
     if(gpsFollow)requestGpsAnimation();
     else{
@@ -845,6 +841,7 @@ function reset(){
   gpsSpeed=null;
   gpsFix=null;
   gpsPreviousFix=null;
+  window._travelAngle=holeAngle;
   if(gpsWatch&&navigator.geolocation)navigator.geolocation.clearWatch(gpsWatch);
   gpsWatch=null;
   if(cameraAnimFrame){cancelAnimationFrame(cameraAnimFrame);cameraAnimFrame=null;}
@@ -938,6 +935,7 @@ function applyGpsFix(p){
   if(heading!=null&&isFinite(heading))gpsHeading=heading;
   if(speed!=null)gpsSpeed=speed;
   gpsFix={pos:pos.slice(),timestamp:now,speed:speed,heading:(heading!=null&&isFinite(heading))?heading:gpsHeading};
+  window._travelAngle=holeAngle;
   gpsPreviousFix={pos:pos.slice(),timestamp:now};
   current=pos.slice();
   window._travelAngle=travelAngleAt(pos[0],pos[1]);
@@ -979,6 +977,7 @@ document.getElementById('gps').onclick=function(){
   var options={enableHighAccuracy:true,maximumAge:0,timeout:15000};
   navigator.geolocation.getCurrentPosition(function(p){
     gpsFollow=true;
+    window._travelAngle=holeAngle;
     applyGpsFix(p);
     renderCurrent=current.slice();
     var firstCamera=cameraForPlayer(renderCurrent);
