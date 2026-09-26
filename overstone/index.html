@@ -627,31 +627,54 @@ function drawHoleDetail(){
         ];
       }
       var centreQ=rotatedLocal(centre[0],centre[1]);
-      // Derive the displayed side from the actual source geometry rather than
-      // relying on side metadata that can be inconsistent on individual holes.
-      // The label is tied to the bunker edge itself: use the true leftmost or
-      // rightmost edge in shot-space, then add a small fixed screen-space gap.
-      // This means the label scales with the bunker as the camera zooms, while
-      // remaining just outside the boundary instead of drifting through it.
+      // Use the geometric middle of the bunker as the median line. From
+      // that centreline, find where the polygon's actual boundary crosses it.
+      // The label then sits just outside that boundary. This keeps the two
+      // yardages aligned to the bunker centre rather than averaging arbitrary
+      // edge vertices, and it remains attached as the bunker scales with zoom.
       var visualSide=centreQ.x<0?'left':'right';
-      var extremeX=visualSide==='left'?Infinity:-Infinity;
-      ring.forEach(function(p){
-        var q=rotatedLocal(p[1],p[0]);
-        if(visualSide==='left')extremeX=Math.min(extremeX,q.x);
-        else extremeX=Math.max(extremeX,q.x);
+      var centreX=centreQ.x,centreY=centreQ.y;
+      // Area-weighted polygon centroid in shot-space. For ordinary bunker
+      // polygons this is the true geometric middle, not simply the mean of
+      // the vertices.
+      if(ring.length>=3){
+        var area2=0,cx6=0,cy6=0;
+        ring.forEach(function(p,i){
+          var q1=rotatedLocal(p[1],p[0]);
+          var p2=ring[(i+1)%ring.length];
+          var q2=rotatedLocal(p2[1],p2[0]);
+          var cross=q1.x*q2.y-q2.x*q1.y;
+          area2+=cross;
+          cx6+=(q1.x+q2.x)*cross;
+          cy6+=(q1.y+q2.y)*cross;
+        });
+        if(Math.abs(area2)>1e-6){
+          centreX=cx6/(3*area2);
+          centreY=cy6/(3*area2);
+        }
+      }
+      var intersections=[];
+      var eps=0.001;
+      ring.forEach(function(p,i){
+        var a=rotatedLocal(p[1],p[0]);
+        var b=rotatedLocal(ring[(i+1)%ring.length][1],ring[(i+1)%ring.length][0]);
+        var dy=b.y-a.y;
+        if(Math.abs(dy)<eps)return;
+        var t=(centreY-a.y)/dy;
+        if(t>=0&&t<=1){
+          intersections.push(a.x+(b.x-a.x)*t);
+        }
       });
-      if(!isFinite(extremeX))extremeX=centreQ.x;
-      var edgePoints=[];
-      var edgeTolerance=Math.max(1.5,(Math.abs(extremeX-centreQ.x))*0.15);
-      ring.forEach(function(p){
-        var q=rotatedLocal(p[1],p[0]);
-        if(Math.abs(q.x-extremeX)<=edgeTolerance)edgePoints.push(q);
-      });
-      if(!edgePoints.length)edgePoints=[centreQ];
-      var edgeY=edgePoints.reduce(function(sum,q){return sum+q.y;},0)/edgePoints.length;
+      var edgeX=centreX;
+      if(intersections.length){
+        edgeX=visualSide==='left'?Math.min.apply(null,intersections):Math.max.apply(null,intersections);
+      }
+      // Fallback for a geometry whose centreline happens not to cross an edge
+      // cleanly (e.g. a degenerate source polygon).
+      if(!isFinite(edgeX))edgeX=centreX;
       var sideGap=10;
-      var labelX=w/2+(extremeX-cameraX)/mpp+(visualSide==='left'?-sideGap:sideGap);
-      var labelY=v.cy-(edgeY-cameraY)/mpp;
+      var labelX=w/2+(edgeX-cameraX)/mpp+(visualSide==='left'?-sideGap:sideGap);
+      var labelY=v.cy-(centreY-cameraY)/mpp;
 
       ctx.save();
       ctx.translate(labelX,labelY);
