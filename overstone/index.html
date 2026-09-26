@@ -262,7 +262,7 @@ function resizeCanvas(){
   ctx.setTransform(dpr,0,0,dpr,0,0);
 }
 resizeCanvas();
-var features=D.features||[],tee=[D.line_of_play[0][1],D.line_of_play[0][0]],current=tee.slice(),renderCurrent=tee.slice(),gpsWatch=null,gpsFollow=false,gpsHeading=null,gpsSpeed=null,cameraAnimFrame=null,testMode=true,detailMode=true,zoom=1,dragging=false,moved=false,lastX=0,lastY=0,pointers={},pinchStart=null;
+var features=D.features||[],tee=[D.line_of_play[0][1],D.line_of_play[0][0]],current=tee.slice(),renderCurrent=tee.slice(),gpsWatch=null,gpsFollow=false,gpsHeading=null,gpsSpeed=null,gpsFix=null,gpsPreviousFix=null,gpsPredictionHorizon=2.5,cameraAnimFrame=null,testMode=true,detailMode=true,zoom=1,dragging=false,moved=false,lastX=0,lastY=0,pointers={},pinchStart=null;
 
 function allCourseBounds(){
   var xs=[],ys=[];
@@ -359,6 +359,8 @@ function selectHole(n){
   tee=[D.line_of_play[0][1],D.line_of_play[0][0]];
   current=tee.slice();
   renderCurrent=tee.slice();
+  gpsFix=null;
+  gpsPreviousFix=null;
   rebuildHoleGeometry();
   RHB=rotatedHoleBounds();
   document.getElementById('holeSelect').value=String(n);
@@ -779,21 +781,40 @@ function keepPlayerVisible(pos){
   cameraX=desired.x;
   cameraY=desired.y;
 }
+function gpsPredictedPosition(now){
+  if(!gpsFix)return current.slice();
+  var p=gpsFix.pos;
+  var elapsed=Math.max(0,Math.min(gpsPredictionHorizon,(now-gpsFix.timestamp)/1000));
+  var speed=Number(gpsFix.speed);
+  var heading=gpsFix.heading;
+  if(!isFinite(speed)||speed<0.45||heading==null)return p.slice();
+  var distance=speed*elapsed;
+  var h=heading*Math.PI/180;
+  var north=Math.cos(h)*distance;
+  var east=Math.sin(h)*distance;
+  return [p[0]+north/111320,p[1]+east/(111320*Math.cos(p[0]*Math.PI/180))];
+}
 function requestGpsAnimation(){
   if(!gpsFollow||!detailMode||cameraAnimFrame)return;
-  cameraAnimFrame=requestAnimationFrame(function animateGps(){
+  cameraAnimFrame=requestAnimationFrame(function animateGps(now){
     cameraAnimFrame=null;
-    var p=renderCurrent,t=current;
-    var latStep=(t[0]-p[0])*0.12;
-    var lonStep=(t[1]-p[1])*0.12;
-    renderCurrent=[p[0]+latStep,p[1]+lonStep];
+    var target=gpsPredictedPosition(now);
+    var p=renderCurrent;
+    // Smoothly chase the live/predicted GPS target rather than snapping to
+    // each browser position fix. This keeps the player moving between fixes.
+    renderCurrent=[
+      p[0]+(target[0]-p[0])*0.10,
+      p[1]+(target[1]-p[1])*0.10
+    ];
     var desired=cameraForPlayer(renderCurrent);
-    cameraX+=(desired.x-cameraX)*0.10;
-    cameraY+=(desired.y-cameraY)*0.10;
+    cameraX+=(desired.x-cameraX)*0.08;
+    cameraY+=(desired.y-cameraY)*0.08;
     draw();
-    var moving=Math.abs(t[0]-renderCurrent[0])>0.00000001||Math.abs(t[1]-renderCurrent[1])>0.00000001;
-    var cameraMoving=Math.abs(desired.x-cameraX)>0.01||Math.abs(desired.y-cameraY)>0.01;
-    if(moving||cameraMoving)requestGpsAnimation();
+    var positionMoving=Math.abs(target[0]-renderCurrent[0])>0.00000002||Math.abs(target[1]-renderCurrent[1])>0.00000002;
+    var cameraMoving=Math.abs(desired.x-cameraX)>0.02||Math.abs(desired.y-cameraY)>0.02;
+    // Keep rendering while GPS follow is active so the predicted position
+    // advances continuously; the prediction horizon is deliberately capped.
+    if(gpsFollow&&(positionMoving||cameraMoving||gpsSpeed>0.45))requestGpsAnimation();
   });
 }
 function update(pos){
@@ -819,9 +840,17 @@ function setMode(detail){
 }
 function reset(){
   testMode=true;
-  
+  gpsFollow=false;
+  gpsHeading=null;
+  gpsSpeed=null;
+  gpsFix=null;
+  gpsPreviousFix=null;
   if(gpsWatch&&navigator.geolocation)navigator.geolocation.clearWatch(gpsWatch);
-  gpsWatch=null;update(tee);
+  gpsWatch=null;
+  if(cameraAnimFrame){cancelAnimationFrame(cameraAnimFrame);cameraAnimFrame=null;}
+  renderCurrent=tee.slice();
+  current=tee.slice();
+  update(tee);
   document.getElementById('status').textContent=detailMode?'Hole '+holeNumber+' · player fixed at tee':'Full course · player fixed at Hole '+holeNumber+' tee';
 }
 canvas.addEventListener('click',function(e){
@@ -884,6 +913,37 @@ canvas.addEventListener('pointerup',endPointer);
 canvas.addEventListener('pointercancel',endPointer);
 document.getElementById('holeSelect').onchange=function(){setMode(true);selectHole(this.value)};
 document.getElementById('courseBtn').onclick=function(){setMode(false)};
+function applyGpsFix(p){
+  var pos=[p.coords.latitude,p.coords.longitude];
+  var now=Number(p.timestamp)||Date.now();
+  var speed=Number(p.coords.speed);
+  var heading=(p.coords.heading!=null)?Number(p.coords.heading):null;
+  // Some browsers/devices do not provide heading reliably. Derive it from
+  // consecutive fixes when there is enough movement.
+  if((heading==null||!isFinite(heading))&&gpsPreviousFix){
+    var movedYd=yd(gpsPreviousFix.pos,pos);
+    if(movedYd>1){
+      var a=toLocal(gpsPreviousFix.pos[0],gpsPreviousFix.pos[1]);
+      var b=toLocal(pos[0],pos[1]);
+      heading=(Math.atan2(b.e-a.e,b.n-a.n)*180/Math.PI+360)%360;
+    }
+  }
+  if(!isFinite(speed)||speed<0)speed=null;
+  if(speed==null&&gpsPreviousFix){
+    var dt=(now-gpsPreviousFix.timestamp)/1000;
+    if(dt>0.2&&dt<30){
+      speed=yd(gpsPreviousFix.pos,pos)*0.9144/dt;
+    }
+  }
+  if(heading!=null&&isFinite(heading))gpsHeading=heading;
+  if(speed!=null)gpsSpeed=speed;
+  gpsFix={pos:pos.slice(),timestamp:now,speed:speed,heading:(heading!=null&&isFinite(heading))?heading:gpsHeading};
+  gpsPreviousFix={pos:pos.slice(),timestamp:now};
+  current=pos.slice();
+  window._travelAngle=travelAngleAt(pos[0],pos[1]);
+  update(pos);
+  document.getElementById('status').textContent='Live GPS · '+Math.round(p.coords.accuracy)+'m accuracy';
+}
 document.getElementById('gps').onclick=function(){
   var btn=this;
   if(btn.classList.contains('active')){
@@ -892,6 +952,8 @@ document.getElementById('gps').onclick=function(){
     gpsFollow=false;
     gpsHeading=null;
     gpsSpeed=null;
+    gpsFix=null;
+    gpsPreviousFix=null;
     if(cameraAnimFrame){cancelAnimationFrame(cameraAnimFrame);cameraAnimFrame=null;}
     renderCurrent=current.slice();
     testMode=true;
@@ -910,30 +972,29 @@ document.getElementById('gps').onclick=function(){
   btn.classList.add('active');
   btn.textContent='GPS On';
   if(gpsWatch)navigator.geolocation.clearWatch(gpsWatch);
+  gpsWatch=null;
+  gpsFix=null;
+  gpsPreviousFix=null;
   document.getElementById('status').textContent='Finding live GPS…';
   var options={enableHighAccuracy:true,maximumAge:0,timeout:15000};
   navigator.geolocation.getCurrentPosition(function(p){
     gpsFollow=true;
-    current=[p.coords.latitude,p.coords.longitude];
+    applyGpsFix(p);
     renderCurrent=current.slice();
-    gpsHeading=(p.coords.heading!=null&&p.coords.speed!=null&&p.coords.speed>0.5)?p.coords.heading:null;
-    gpsSpeed=p.coords.speed;
     var firstCamera=cameraForPlayer(renderCurrent);
     cameraX=firstCamera.x;
     cameraY=firstCamera.y;
-    update(current);
-    document.getElementById('status').textContent='Live GPS · '+Math.round(p.coords.accuracy)+'m accuracy';
+    requestGpsAnimation();
     gpsWatch=navigator.geolocation.watchPosition(function(p2){
-      current=[p2.coords.latitude,p2.coords.longitude];
-      gpsHeading=(p2.coords.heading!=null&&p2.coords.speed!=null&&p2.coords.speed>0.5)?p2.coords.heading:gpsHeading;
-      gpsSpeed=p2.coords.speed;
-      update(current);
-      document.getElementById('status').textContent='Live GPS · '+Math.round(p2.coords.accuracy)+'m accuracy';
+      applyGpsFix(p2);
     },function(e){
       document.getElementById('status').textContent='GPS watch error · '+e.message;
     },{enableHighAccuracy:true,maximumAge:1000,timeout:15000});
   },function(e){
     btn.classList.remove('active');
+    gpsFollow=false;
+    gpsFix=null;
+    gpsPreviousFix=null;
     testMode=true;
     btn.textContent='GPS';
     document.getElementById('status').textContent='GPS error · '+e.message;
