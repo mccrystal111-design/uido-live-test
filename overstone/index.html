@@ -29,8 +29,6 @@ canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
 #zoomOut,#zoomIn{width:34px;padding-left:0;padding-right:0;font-size:14px}
 #fit{min-width:38px}
 #gps{min-width:62px}
-#test{min-width:44px}
-@media(max-width:700px){#test{margin-left:auto}}
 
 #zoomShot{min-width:78px}
 #bunkerPopup{position:fixed;z-index:9;display:none;min-width:132px;padding:9px 10px;background:rgba(247,245,238,.97);border:1px solid rgba(22,35,27,.16);border-radius:10px;box-shadow:0 5px 18px rgba(0,0,0,.16);pointer-events:none}.popup-title{font-size:9px;font-weight:700;color:#596052;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}.popup-yardage{font-size:12px;font-weight:700;line-height:1.5}#railToggle{position:fixed;z-index:8;right:10px;bottom:74px;border:1px solid rgba(22,35,27,.13);border-radius:9px;padding:8px 10px;background:rgba(247,245,238,.94);color:#16231b;font-weight:600;font-size:10px;box-shadow:0 3px 15px rgba(0,0,0,.08);pointer-events:auto;backdrop-filter:blur(5px)}
@@ -56,7 +54,10 @@ body.info-hidden #railToggle{right:10px}
 <div id="map"><canvas id="course"></canvas></div>
 <aside id="infoRail">
   <div class="panel dev-header">
-    <div class="brand">UiDo · Overstone</div>
+    <div style="flex:1;min-width:0">
+      <div class="brand">UiDo · Overstone</div>
+      <div id="holeHeaderMeta" style="font-size:11px;font-weight:700;margin-top:6px">Hole 1 · Par 4</div>
+    </div>
     <div class="hole-picker">
       <button id="holePickerButton" class="hole-picker-button" type="button"><span>Hole 1</span><span class="chevron">⌄</span></button>
       <div id="holeMenu" class="hole-menu" aria-label="Select hole">
@@ -64,7 +65,6 @@ body.info-hidden #railToggle{right:10px}
       </div>
     </div>
   </div>
-  <div id="holeInfo" class="panel info-box"></div>
   <div id="greenInfo" class="panel info-box"></div>
   <div id="bunkerInfo" class="panel info-box"></div>
   <div id="status" class="panel status info-box">Loading course…</div>
@@ -263,12 +263,12 @@ function showBunkerPopup(b,x,y){
 }
 function hideBunkerPopup(){if(bunkerPopup)bunkerPopup.style.display='none'}
 function updateRail(){
-  var holeInfo=document.getElementById('holeInfo');
+  var holeHeaderMeta=document.getElementById('holeHeaderMeta');
   var greenInfo=document.getElementById('greenInfo');
   var bunkerInfo=document.getElementById('bunkerInfo');
   var par=(HOLE_META.pars[String(holeNumber)]||{}).par||D.par||'—';
-  if(holeInfo){
-    holeInfo.innerHTML='<div class="rail-title">Hole '+holeNumber+'</div><div class="info"><strong>Par '+par+'</strong><br><span class="muted">Live shot view · '+(testMode?'Test position':'GPS position')+'</span></div>';
+  if(holeHeaderMeta){
+    holeHeaderMeta.textContent='Hole '+holeNumber+' · Par '+par;
   }
   if(greenInfo){
     var pts=[
@@ -540,8 +540,7 @@ function setMode(detail){
 }
 function reset(){
   testMode=true;
-  document.getElementById('test').classList.add('active');
-  document.getElementById('gps').classList.remove('active');
+  
   if(gpsWatch&&navigator.geolocation)navigator.geolocation.clearWatch(gpsWatch);
   gpsWatch=null;update(tee);
   document.getElementById('status').textContent=detailMode?'Hole '+holeNumber+' test · player fixed at tee':'Full course · test player at Hole '+holeNumber+' tee';
@@ -606,10 +605,9 @@ canvas.addEventListener('pointerup',endPointer);
 canvas.addEventListener('pointercancel',endPointer);
 document.getElementById('holeSelect').onchange=function(){setMode(true);selectHole(this.value)};
 document.getElementById('courseBtn').onclick=function(){setMode(false)};
-document.getElementById('test').onclick=reset;
 document.getElementById('gps').onclick=function(){
   if(!navigator.geolocation){document.getElementById('status').textContent='GPS unavailable on this device';return}
-  testMode=false;this.classList.add('active');document.getElementById('test').classList.remove('active');
+  testMode=false;this.classList.add('active');
   if(gpsWatch)navigator.geolocation.clearWatch(gpsWatch);
   document.getElementById('status').textContent='Finding live GPS…';
   var options={enableHighAccuracy:true,maximumAge:0,timeout:15000};
