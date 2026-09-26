@@ -10,7 +10,7 @@ html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#f3f0e7;col
 #map{position:absolute;inset:0;background:#dfe4d8}
 canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
 .panel{z-index:4;background:rgba(247,245,238,.94);border:1px solid rgba(22,35,27,.13);border-radius:12px;padding:10px;box-shadow:0 3px 15px rgba(0,0,0,.10);box-sizing:border-box;backdrop-filter:blur(5px)}
-#infoRail{position:fixed;z-index:6;top:10px;right:10px;width:174px;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+#infoRail{position:fixed;z-index:6;top:10px;right:10px;width:174px;max-height:calc(100vh - 20px);display:flex;flex-direction:column;gap:6px;pointer-events:none;overflow-y:auto}
 #infoRail .panel{position:relative;inset:auto;width:100%;pointer-events:auto}
 .dev-header{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .brand{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#3f4b3b}
@@ -21,7 +21,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
 .hole-menu.open{display:grid}
 .hole-option{padding:8px 4px;border:0;border-radius:7px;background:#e8ece3;color:#16231b;font-size:10px;font-weight:700}
 .hole-option.active{background:#1c4a31;color:#f7f5ee}
-.title{font-size:10px;line-height:1.35}.title small{font-size:8px;color:#596052}.status{font-size:9px;line-height:1.3}.yardage{font-size:10px;line-height:1.45}.yardage strong{font-size:10px}.yardage .b{display:inline-block;margin:0 6px 3px 0}.info{font-size:9px;line-height:1.35}.info strong{font-size:11px}
+.title{font-size:10px;line-height:1.35}.title small{font-size:8px;color:#596052}.status{font-size:9px;line-height:1.3}.yardage{font-size:10px;line-height:1.45}.yardage strong{font-size:10px}.yardage .b{display:inline-block;margin:0 6px 3px 0}.info{font-size:9px;line-height:1.35}.info strong{font-size:11px}.rail-title{font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#596052;margin-bottom:6px}.metric-row{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}.metric{padding:5px 3px;border-radius:7px;background:#e8ece3;text-align:center}.metric label{display:block;font-size:8px;font-weight:700;color:#596052}.metric strong{display:block;font-size:11px;margin-top:2px}.bunker-row{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:5px 0;border-top:1px solid rgba(22,35,27,.08)}.bunker-row:first-child{border-top:0;padding-top:0}.bunker-side{font-size:9px;font-weight:700}.bunker-yardage{font-size:9px;color:#3f4b3b;white-space:nowrap}.muted{font-size:8px;color:#596052}
 .buttons{position:fixed;z-index:7;left:10px;bottom:10px;display:flex;gap:5px;width:auto;pointer-events:auto}
 .buttons button,.buttons select{border:1px solid rgba(22,35,27,.13);border-radius:9px;padding:8px 9px;background:rgba(247,245,238,.94);color:#16231b;font-weight:600;font-size:10px;min-width:0;box-shadow:0 3px 15px rgba(0,0,0,.08);backdrop-filter:blur(5px)}
 .buttons .active{background:#1c4a31;color:white;border-color:#1c4a31}
@@ -62,6 +62,9 @@ body.info-hidden #railToggle{right:10px}
       </div>
     </div>
   </div>
+  <div id="holeInfo" class="panel info-box"></div>
+  <div id="greenInfo" class="panel info-box"></div>
+  <div id="bunkerInfo" class="panel info-box"></div>
   <div id="status" class="panel status info-box">Loading course…</div>
 </aside>
 <button id="railToggle" type="button">Hide info</button>
@@ -227,7 +230,34 @@ function bunkerLabel(b){
   var edges=bunkerEdgesFromPlayer(b);
   return Math.round(yd(current,edges.front))+'/'+Math.round(yd(current,edges.back))+' yd';
 }
-function updateYardageUI(){}
+function updateRail(){
+  var holeInfo=document.getElementById('holeInfo');
+  var greenInfo=document.getElementById('greenInfo');
+  var bunkerInfo=document.getElementById('bunkerInfo');
+  var par=(HOLE_META.pars[String(holeNumber)]||{}).par||D.par||'—';
+  if(holeInfo){
+    holeInfo.innerHTML='<div class="rail-title">Hole '+holeNumber+'</div><div class="info"><strong>Par '+par+'</strong><br><span class="muted">Live shot view · '+(testMode?'Test position':'GPS position')+'</span></div>';
+  }
+  if(greenInfo){
+    var pts=[
+      {label:'F',gps:D.green_fmb&&D.green_fmb.front},
+      {label:'M',gps:D.green_fmb&&D.green_fmb.middle},
+      {label:'B',gps:D.green_fmb&&D.green_fmb.back}
+    ];
+    greenInfo.innerHTML='<div class="rail-title">Green · F / M / B</div><div class="metric-row">'+pts.map(function(p){
+      return '<div class="metric"><label>'+p.label+'</label><strong>'+((p.gps&&current)?Math.round(yd(current,p.gps)):'—')+'</strong></div>';
+    }).join('')+'</div>';
+  }
+  if(bunkerInfo){
+    var rows=(bunkerData||[]).map(function(b){
+      var edges=bunkerEdgesFromPlayer(b);
+      var side=(b.side||'bunker').charAt(0).toUpperCase()+(b.side||'bunker').slice(1);
+      return '<div class="bunker-row"><span class="bunker-side">'+side+'</span><span class="bunker-yardage">F '+Math.round(yd(current,edges.front))+' · B '+Math.round(yd(current,edges.back))+' yd</span></div>';
+    }).join('');
+    bunkerInfo.innerHTML='<div class="rail-title">Bunkers · front / back</div>'+(rows||'<div class="muted">No mapped bunkers</div>');
+  }
+}
+function updateYardageUI(){updateRail()}
 
 function fitCamera(){
   var v=viewSize(),pad=28;
@@ -241,6 +271,12 @@ function fitCamera(){
 function metersPerPixel(w,h,pad){
   var spanX=RHB.maxX-RHB.minX,spanY=RHB.maxY-RHB.minY;
   return Math.max(spanX/(w-pad*2),spanY/(h-pad*2))*1.08/zoom;
+}
+function showShotAnnotations(){
+  var v=viewSize(),pad=28;
+  var mpp=metersPerPixel(v.w,v.h,pad);
+  var visibleYards=(v.h-pad*2)*mpp*1.0936133;
+  return visibleYards<=350;
 }
 function project(lat,lon,b,w,h,pad){
   if(detailMode && b===HB){
@@ -317,6 +353,10 @@ function drawHoleDetail(){
   });
   drawLine(ctx,D.line_of_play,HB,w,h,pad,'#596354',2,[7,7]);
 
+  // Map annotations appear only once the viewport is at shot scale.
+  // The side rail remains populated at every zoom level.
+  var showAnnotations=showShotAnnotations();
+  if(showAnnotations){
   // Show live F/M/B yardages at their actual points on the green.
   var greenPoints=[
     {key:'front',label:'F',gps:D.green_fmb.front},
@@ -338,6 +378,7 @@ function drawHoleDetail(){
     ctx.fillStyle='#16231b';
     ctx.fillText(Math.round(yd(current,gp.gps)),q[0],q[1]);
   });
+  }
   // Bunker geometry stays fixed to the source polygon. Front/back are derived
   // live from the player's GPS, while the display combines both yardages into
   // one compact sand-coloured label on the non-fairway side.
@@ -427,8 +468,8 @@ function zoomToShot(){
     if(g.y>start.y)target=(start.y+Math.min(g.y,start.y+shotSpan))*0.5;
   }
   var desiredMpp=shotSpan/(v.h-pad*2);
-  var fitMpp=metersPerPixel(v.w,v.h,pad);
-  zoom=Math.max(0.35,Math.min(8,fitMpp/desiredMpp*zoom));
+  var baseMpp=Math.max((RHB.maxX-RHB.minX)/(v.w-pad*2),(RHB.maxY-RHB.minY)/(v.h-pad*2))*1.08;
+  zoom=Math.max(0.35,Math.min(8,baseMpp/desiredMpp));
   var q=rotatedLocal(current[0],current[1]);
   cameraX=q.x;
   cameraY=target;
