@@ -12,7 +12,7 @@
   --ui-paper:rgba(247,245,238,.96);
   --ui-line:rgba(22,35,27,.13);
   --ui-shadow:0 4px 16px rgba(0,0,0,.10);
-  --rail-width:184px;
+  --rail-width:138px;
   --ui-gap:6px;
 }
 *{box-sizing:border-box}
@@ -54,7 +54,7 @@ canvas{
 }
 .dev-header{
   display:grid;
-  grid-template-columns:minmax(0,1fr) 78px;
+  grid-template-columns:minmax(0,1fr) 68px;
   gap:8px;
   align-items:start;
 }
@@ -165,8 +165,8 @@ canvas{
 body.info-hidden #infoRail{display:none}
 body.info-hidden #railToggle{right:10px}
 @media(max-width:700px){
-  :root{--rail-width:184px}
-  #infoRail{top:8px;right:8px;width:184px;gap:5px}
+  :root{--rail-width:138px}
+  #infoRail{top:8px;right:8px;width:138px;gap:5px}
   .panel{padding:8px;border-radius:10px}
   .buttons{left:8px;right:8px;bottom:8px;gap:4px}
   .buttons button{padding:8px 7px;font-size:9px}
@@ -235,12 +235,9 @@ if(!D)throw new Error('Hole 1 source model did not load');
 
 var canvas=document.getElementById('course'),ctx=canvas.getContext('2d'),map=document.getElementById('map'),bunkerPopup=document.getElementById('bunkerPopup');
 function viewSize(){
-  var hidden=document.body.classList.contains('info-hidden');
-  var rail=document.getElementById('infoRail');
   var controls=document.querySelector('.buttons');
-  var railWidth=hidden?0:(rail?rail.getBoundingClientRect().width+18:0);
   var bottomHeight=controls?controls.getBoundingClientRect().height+18:18;
-  var w=Math.max(220,window.innerWidth-railWidth);
+  var w=window.innerWidth;
   var h=Math.max(220,window.innerHeight-bottomHeight);
   return {w:w,h:h,cx:w/2,cy:h/2};
 }
@@ -503,7 +500,7 @@ function drawHoleDetail(){
   var v=viewSize(),w=v.w,h=v.h,pad=28;
   ctx.clearRect(0,0,innerWidth,innerHeight);ctx.fillStyle='#dfe4d8';ctx.fillRect(0,0,innerWidth,innerHeight);
   ctx.save();
-  ctx.beginPath();ctx.rect(0,0,w,h);ctx.clip();
+  ctx.beginPath();ctx.rect(0,0,innerWidth,innerHeight);ctx.clip();
   // Other holes remain visible as quiet spatial context. Only fairways and
   // bunkers are shown; live yardages/markers remain exclusive to the selected hole.
   Object.keys(window.UIDO_OVERSTONE_SOURCE_HOLES).forEach(function(key){
