@@ -92,10 +92,10 @@ if(!D)throw new Error('Hole 1 source model did not load');
 
 var canvas=document.getElementById('course'),ctx=canvas.getContext('2d'),map=document.getElementById('map'),bunkerPopup=document.getElementById('bunkerPopup');
 function viewSize(){
-  var hidden=document.body.classList.contains('info-hidden');
-  var rail=document.getElementById('infoRail');
-  var railWidth=hidden?0:(rail?rail.offsetWidth+20:0);
-  return {w:Math.max(220,window.innerWidth-railWidth),h:window.innerHeight};
+  // The information rail floats over the map; it does not reserve a
+  // separate canvas column. This keeps the course visually continuous
+  // right up to the edge of the floating panels.
+  return {w:Math.max(220,window.innerWidth),h:window.innerHeight};
 }
 function resizeCanvas(){
   var dpr=window.devicePixelRatio||1,v=viewSize(),w=v.w,h=v.h;
