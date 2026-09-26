@@ -262,7 +262,7 @@ function resizeCanvas(){
   ctx.setTransform(dpr,0,0,dpr,0,0);
 }
 resizeCanvas();
-var features=D.features||[],tee=[D.line_of_play[0][1],D.line_of_play[0][0]],current=tee.slice(),gpsWatch=null,testMode=true,detailMode=true,zoom=1,dragging=false,moved=false,lastX=0,lastY=0,pointers={},pinchStart=null;
+var features=D.features||[],tee=[D.line_of_play[0][1],D.line_of_play[0][0]],current=tee.slice(),renderCurrent=tee.slice(),gpsWatch=null,gpsFollow=false,gpsHeading=null,gpsSpeed=null,cameraAnimFrame=null,testMode=true,detailMode=true,zoom=1,dragging=false,moved=false,lastX=0,lastY=0,pointers={},pinchStart=null;
 
 function allCourseBounds(){
   var xs=[],ys=[];
@@ -358,6 +358,7 @@ function selectHole(n){
   bunkerData=D.bunkers||[];
   tee=[D.line_of_play[0][1],D.line_of_play[0][0]];
   current=tee.slice();
+  renderCurrent=tee.slice();
   rebuildHoleGeometry();
   RHB=rotatedHoleBounds();
   document.getElementById('holeSelect').value=String(n);
@@ -696,8 +697,32 @@ function drawHoleDetail(){
       ctx.textBaseline='alphabetic';
     });
   }
-  var pl=project(current[0],current[1],HB,w,h,pad);
-  ctx.beginPath();ctx.arc(pl[0],pl[1],9,0,Math.PI*2);ctx.fillStyle='#1c4a31';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();
+  var playerPosition=gpsFollow?renderCurrent:current;
+  var pl=project(playerPosition[0],playerPosition[1],HB,w,h,pad);
+  var playerAngle;
+  if(gpsFollow&&gpsHeading!=null){
+    var hr=gpsHeading*Math.PI/180, north=Math.cos(hr), east=Math.sin(hr);
+    var rq=rotatedLocal(baseLat+north/latM,baseLon+east/lonM);
+    playerAngle=Math.atan2(rq.x,rq.y);
+  }else{
+    var travelQ=rotatedLocal(playerPosition[0],playerPosition[1]);
+    playerAngle=Math.atan2(travelQ.x,travelQ.y);
+  }
+  ctx.save();
+  ctx.translate(pl[0],pl[1]);
+  ctx.rotate(playerAngle);
+  ctx.beginPath();
+  ctx.moveTo(0,-11);
+  ctx.lineTo(7,8);
+  ctx.lineTo(0,4);
+  ctx.lineTo(-7,8);
+  ctx.closePath();
+  ctx.fillStyle='#1c4a31';
+  ctx.fill();
+  ctx.strokeStyle='#fff';
+  ctx.lineWidth=2.5;
+  ctx.stroke();
+  ctx.restore();
   ctx.restore();
 }
 function draw(){
@@ -731,24 +756,53 @@ function zoomToShot(){
   cameraY=target;
   draw();
 }
-function keepPlayerVisible(){
-  if(!detailMode)return;
-  var v=viewSize(),pad=36,mpp=metersPerPixel(v.w,v.h,pad),q=rotatedLocal(current[0],current[1]);
+function cameraForPlayer(pos){
+  if(!detailMode)return {x:cameraX,y:cameraY};
+  var v=viewSize(),pad=36,mpp=metersPerPixel(v.w,v.h,pad),q=rotatedLocal(pos[0],pos[1]);
   var targetX=v.cx,targetY=v.h*0.68;
-  cameraX=q.x+(targetX-v.cx)*mpp;
-  cameraY=q.y+(v.cy-targetY)*mpp;
+  var desiredX=q.x+(targetX-v.cx)*mpp;
+  var desiredY=q.y+(v.cy-targetY)*mpp;
   // Keep the camera from drifting so far that the hole leaves the viewport.
   var halfW=v.w*mpp/2,halfH=v.h*mpp/2;
   var holeCenterX=(RHB.minX+RHB.maxX)/2,holeCenterY=(RHB.minY+RHB.maxY)/2;
   var minCamX=RHB.maxX-halfW,maxCamX=RHB.minX+halfW;
   var minCamY=RHB.maxY-halfH,maxCamY=RHB.minY+halfH;
-  if(minCamX<=maxCamX)cameraX=Math.max(minCamX,Math.min(maxCamX,cameraX));else cameraX=holeCenterX;
-  if(minCamY<=maxCamY)cameraY=Math.max(minCamY,Math.min(maxCamY,cameraY));else cameraY=holeCenterY;
+  if(minCamX<=maxCamX)desiredX=Math.max(minCamX,Math.min(maxCamX,desiredX));else desiredX=holeCenterX;
+  if(minCamY<=maxCamY)desiredY=Math.max(minCamY,Math.min(maxCamY,desiredY));else desiredY=holeCenterY;
+  return {x:desiredX,y:desiredY};
+}
+function keepPlayerVisible(pos){
+  var desired=cameraForPlayer(pos||current);
+  cameraX=desired.x;
+  cameraY=desired.y;
+}
+function requestGpsAnimation(){
+  if(!gpsFollow||!detailMode||cameraAnimFrame)return;
+  cameraAnimFrame=requestAnimationFrame(function animateGps(){
+    cameraAnimFrame=null;
+    var p=renderCurrent,t=current;
+    var latStep=(t[0]-p[0])*0.12;
+    var lonStep=(t[1]-p[1])*0.12;
+    renderCurrent=[p[0]+latStep,p[1]+lonStep];
+    var desired=cameraForPlayer(renderCurrent);
+    cameraX+=(desired.x-cameraX)*0.10;
+    cameraY+=(desired.y-cameraY)*0.10;
+    draw();
+    var moving=Math.abs(t[0]-renderCurrent[0])>0.00000001||Math.abs(t[1]-renderCurrent[1])>0.00000001;
+    var cameraMoving=Math.abs(desired.x-cameraX)>0.01||Math.abs(desired.y-cameraY)>0.01;
+    if(moving||cameraMoving)requestGpsAnimation();
+  });
 }
 function update(pos){
   current=pos.slice();
   window._travelAngle=travelAngleAt(pos[0],pos[1]);
-  if(detailMode)keepPlayerVisible();
+  if(detailMode){
+    if(gpsFollow)requestGpsAnimation();
+    else{
+      renderCurrent=current.slice();
+      keepPlayerVisible(current);
+    }
+  }
   updateYardageUI();
   draw();
 }
@@ -832,6 +886,11 @@ document.getElementById('gps').onclick=function(){
   if(btn.classList.contains('active')){
     if(gpsWatch&&navigator.geolocation)navigator.geolocation.clearWatch(gpsWatch);
     gpsWatch=null;
+    gpsFollow=false;
+    gpsHeading=null;
+    gpsSpeed=null;
+    if(cameraAnimFrame){cancelAnimationFrame(cameraAnimFrame);cameraAnimFrame=null;}
+    renderCurrent=current.slice();
     testMode=true;
     btn.classList.remove('active');
     btn.textContent='GPS';
@@ -851,12 +910,20 @@ document.getElementById('gps').onclick=function(){
   document.getElementById('status').textContent='Finding live GPS…';
   var options={enableHighAccuracy:true,maximumAge:0,timeout:15000};
   navigator.geolocation.getCurrentPosition(function(p){
+    gpsFollow=true;
     current=[p.coords.latitude,p.coords.longitude];
-    fitCamera();
+    renderCurrent=current.slice();
+    gpsHeading=(p.coords.heading!=null&&p.coords.speed!=null&&p.coords.speed>0.5)?p.coords.heading:null;
+    gpsSpeed=p.coords.speed;
+    var firstCamera=cameraForPlayer(renderCurrent);
+    cameraX=firstCamera.x;
+    cameraY=firstCamera.y;
     update(current);
     document.getElementById('status').textContent='Live GPS · '+Math.round(p.coords.accuracy)+'m accuracy';
     gpsWatch=navigator.geolocation.watchPosition(function(p2){
       current=[p2.coords.latitude,p2.coords.longitude];
+      gpsHeading=(p2.coords.heading!=null&&p2.coords.speed!=null&&p2.coords.speed>0.5)?p2.coords.heading:gpsHeading;
+      gpsSpeed=p2.coords.speed;
       update(current);
       document.getElementById('status').textContent='Live GPS · '+Math.round(p2.coords.accuracy)+'m accuracy';
     },function(e){
