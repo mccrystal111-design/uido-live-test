@@ -175,6 +175,30 @@ canvas{
   text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;
 }
 .popup-yardage{font-size:12px;font-weight:700;line-height:1.5}
+#debugGrid{
+  position:fixed;inset:0;z-index:40;pointer-events:none;
+  background-image:
+    linear-gradient(to right,rgba(28,74,49,.22) 1px,transparent 1px),
+    linear-gradient(to bottom,rgba(28,74,49,.22) 1px,transparent 1px);
+  background-size:10% 10%;
+}
+#debugGrid::before{
+  content:'X 10%   20%   30%   40%   50%   60%   70%   80%   90%';
+  position:absolute;left:5px;top:5px;
+  font:600 9px Arial,sans-serif;letter-spacing:.02em;
+  color:rgba(22,35,27,.75);white-space:pre;
+}
+#debugGrid::after{
+  content:'Y 10%\A\A20%\A\A30%\A\A40%\A\A50%\A\A60%\A\A70%\A\A80%\A\A90%';
+  position:absolute;left:5px;top:10%;
+  font:600 9px/2 Arial,sans-serif;
+  color:rgba(22,35,27,.75);white-space:pre;
+}
+#debugGrid span{
+  position:absolute;left:50%;top:50%;width:20px;height:20px;
+  transform:translate(-50%,-50%);
+  border:1px solid rgba(155,44,44,.75);border-radius:50%;
+}
 body.info-hidden #infoRail{display:none}
 body.info-hidden #railToggle{right:10px}
 @media(max-width:700px){
@@ -215,6 +239,7 @@ body.info-hidden #railToggle{right:10px}
 </aside>
 
 <div id="bunkerPopup" aria-live="polite"></div>
+<div id="debugGrid" aria-hidden="true"></div>
 <button id="railToggle" type="button">Hide info</button>
 
 <nav class="buttons" aria-label="Map controls">
@@ -695,6 +720,13 @@ function drawHoleDetail(){
   ctx.restore();
   ctx.restore();
 }
+(function(){
+  var g=document.getElementById('debugGrid');
+  if(g){
+    var cross=document.createElement('span');
+    g.appendChild(cross);
+  }
+})();
 function draw(){
   var v=viewSize();
   if(detailMode)drawHoleDetail();else drawFullCourse(ctx,v.w,v.h,false);
