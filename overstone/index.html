@@ -6,7 +6,7 @@
 <title>UiDo · Overstone Course</title>
 <style>
 :root{--rail-width:180px}
-html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#f3f0e7;color:#16231b;font-family:Arial,sans-serif}
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#dfe4d8;color:#16231b;font-family:Arial,sans-serif}
 #map{position:absolute;inset:0;background:#dfe4d8}
 canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
 .panel{z-index:4;background:rgba(247,245,238,.94);border:1px solid rgba(22,35,27,.13);border-radius:12px;padding:10px;box-shadow:0 3px 15px rgba(0,0,0,.10);box-sizing:border-box;backdrop-filter:blur(5px)}
@@ -92,10 +92,12 @@ if(!D)throw new Error('Hole 1 source model did not load');
 
 var canvas=document.getElementById('course'),ctx=canvas.getContext('2d'),map=document.getElementById('map'),bunkerPopup=document.getElementById('bunkerPopup');
 function viewSize(){
-  // The information rail floats over the map; it does not reserve a
-  // separate canvas column. This keeps the course visually continuous
-  // right up to the edge of the floating panels.
-  return {w:Math.max(220,window.innerWidth),h:window.innerHeight};
+  // The canvas remains full-screen, but camera fitting uses the unobscured
+  // map area so the course is not hidden behind the floating information rail.
+  var hidden=document.body.classList.contains('info-hidden');
+  var rail=document.getElementById('infoRail');
+  var railWidth=hidden?0:(rail?rail.offsetWidth+20:0);
+  return {w:Math.max(220,window.innerWidth-railWidth),h:window.innerHeight};
 }
 function resizeCanvas(){
   var dpr=window.devicePixelRatio||1,v=viewSize(),w=v.w,h=v.h;
