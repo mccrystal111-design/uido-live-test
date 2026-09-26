@@ -630,60 +630,28 @@ function drawHoleDetail(){
         ];
       }
       var centreQ=rotatedLocal(centre[0],centre[1]);
-      // Use the geometric middle of the bunker as the median line. From
-      // that centreline, find where the polygon's actual boundary crosses it.
-      // The label then sits just outside that boundary. This keeps the two
-      // yardages aligned to the bunker centre rather than averaging arbitrary
-      // edge vertices, and it remains attached as the bunker scales with zoom.
-      // The source model's left/right designation is the semantic side of
-      // the bunker relative to the hole. Use that for label placement, while
-      // the actual polygon supplies the edge position.
+      // Place the label from the actual outermost polygon edge, not from a
+      // centreline intersection. This guarantees that the complete label is
+      // outside the bunker and prevents it drifting over the green/FMB labels
+      // when a bunker sits close to the putting surface.
       var visualSide=(b.side==='left'||b.side==='right')?b.side:(centreQ.x<0?'left':'right');
-      var centreX=centreQ.x,centreY=centreQ.y;
-      // Area-weighted polygon centroid in shot-space. For ordinary bunker
-      // polygons this is the true geometric middle, not simply the mean of
-      // the vertices.
-      if(ring.length>=3){
-        var area2=0,cx6=0,cy6=0;
-        ring.forEach(function(p,i){
-          var q1=rotatedLocal(p[1],p[0]);
-          var p2=ring[(i+1)%ring.length];
-          var q2=rotatedLocal(p2[1],p2[0]);
-          var cross=q1.x*q2.y-q2.x*q1.y;
-          area2+=cross;
-          cx6+=(q1.x+q2.x)*cross;
-          cy6+=(q1.y+q2.y)*cross;
-        });
-        if(Math.abs(area2)>1e-6){
-          centreX=cx6/(3*area2);
-          centreY=cy6/(3*area2);
-        }
-      }
-      var intersections=[];
-      var eps=0.001;
-      ring.forEach(function(p,i){
-        var a=rotatedLocal(p[1],p[0]);
-        var b=rotatedLocal(ring[(i+1)%ring.length][1],ring[(i+1)%ring.length][0]);
-        var dy=b.y-a.y;
-        if(Math.abs(dy)<eps)return;
-        var t=(centreY-a.y)/dy;
-        if(t>=0&&t<=1){
-          intersections.push(a.x+(b.x-a.x)*t);
-        }
+      var minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+      ring.forEach(function(p){
+        var q=rotatedLocal(p[1],p[0]);
+        minX=Math.min(minX,q.x);
+        maxX=Math.max(maxX,q.x);
+        minY=Math.min(minY,q.y);
+        maxY=Math.max(maxY,q.y);
       });
-      var edgeX=centreX;
-      if(intersections.length){
-        edgeX=visualSide==='left'?Math.min.apply(null,intersections):Math.max.apply(null,intersections);
+      if(!isFinite(minX)){
+        minX=maxX=centreQ.x;
+        minY=maxY=centreQ.y;
       }
-      // Fallback for a geometry whose centreline happens not to cross an edge
-      // cleanly (e.g. a degenerate source polygon).
-      if(!isFinite(edgeX))edgeX=centreX;
-      // Keep the whole label outside the bunker. Text is aligned away from
-      // the bunker edge, rather than centred on the anchor point, so the
-      // breathing room remains visible at every zoom level.
-      var sideGap=Math.max(8,Math.min(16,8+(zoom-1)*8));
+      var edgeX=visualSide==='left'?minX:maxX;
+      var labelY=(minY+maxY)/2;
+      var sideGap=Math.max(10,Math.min(20,10+(zoom-1)*10));
       var labelX=w/2+(edgeX-cameraX)/mpp+(visualSide==='left'?-sideGap:sideGap);
-      var labelY=v.cy-(centreY-cameraY)/mpp;
+      labelY=v.h/2-(labelY-cameraY)/mpp;
 
       ctx.save();
       ctx.translate(labelX,labelY);
