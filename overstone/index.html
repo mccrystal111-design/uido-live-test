@@ -535,7 +535,7 @@ function setMode(detail){
   detailMode=detail;
   if(detail){fitCamera();}
   document.getElementById('courseBtn').classList.toggle('active',!detail);
-  document.getElementById('status').textContent=detail?'Hole '+holeNumber+' · direction of play aligned up':'Full Overstone course · Hole '+holeNumber+' highlighted';
+  document.getElementById('status').textContent=detail?'Hole '+holeNumber+' · shot view':'Full Overstone course · Hole '+holeNumber+' highlighted';
   draw();
 }
 function reset(){
