@@ -72,13 +72,13 @@ canvas{
 .hole-picker{position:relative;min-width:0}
 .hole-picker-button{
   width:100%;display:flex;align-items:center;
-  justify-content:space-between;gap:4px;
+  justify-content:center;gap:7px;
   padding:7px 5px;
   background:#f7f5ee;color:var(--ui-ink);
   border:1px solid var(--ui-line);border-radius:8px;
   font-size:10px;font-weight:700;
 }
-.hole-picker-button .chevron{font-size:14px;line-height:1}
+.hole-picker-button .chevron{font-size:13px;line-height:1}
 .hole-menu{
   display:none;position:absolute;z-index:30;
   top:100%;right:0;left:auto;margin-top:5px;
@@ -385,6 +385,16 @@ function bunkerEdgesFromPlayer(b){
   });
   return {front:bestFront||b.front_gps,back:bestBack||b.back_gps};
 }
+function bunkerVisualSide(b){
+  var ring=bunkerGeometry(b)||[];
+  if(!ring.length)return b.side||'right';
+  var sum=0;
+  ring.forEach(function(p){
+    var q=rotatedLocal(p[1],p[0]);
+    sum+=q.x;
+  });
+  return (sum/ring.length)<0?'left':'right';
+}
 function bunkerLabel(b){
   var edges=bunkerEdgesFromPlayer(b);
   return Math.round(yd(current,edges.front))+'/'+Math.round(yd(current,edges.back))+' yd';
@@ -415,7 +425,7 @@ function bunkerAtScreen(x,y){
 }
 function showBunkerPopup(b,x,y){
   var edges=bunkerEdgesFromPlayer(b),front=Math.round(yd(current,edges.front)),back=Math.round(yd(current,edges.back));
-  var side=(b.side||'bunker').charAt(0).toUpperCase()+(b.side||'bunker').slice(1);
+  var side=bunkerVisualSide(b).charAt(0).toUpperCase()+bunkerVisualSide(b).slice(1);
   bunkerPopup.innerHTML='<div class="popup-title">'+side+' bunker</div><div class="popup-yardage">Back '+back+' yd<br>Front '+front+' yd</div>';
   bunkerPopup.style.left=Math.max(8,Math.min(window.innerWidth-150,x+12))+'px';
   bunkerPopup.style.top=Math.max(8,Math.min(window.innerHeight-95,y-70))+'px';
@@ -617,26 +627,25 @@ function drawHoleDetail(){
         ];
       }
       var centreQ=rotatedLocal(centre[0],centre[1]);
-      var labelX=v.cx+(centreQ.x-cameraX)/mpp;
-      var labelY=v.cy-(centreQ.y-cameraY)/mpp;
-      // Place bunker yardages clearly outside the sand, on the
-      // player's left/right side of the bunker. Use the actual source polygon
-      // edge rather than its centroid so the label never sits over the bunker.
-      var minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+      // Derive the displayed side from the actual source geometry rather than
+      // relying on side metadata that can be inconsistent on individual holes.
+      var visualSide=centreQ.x<0?'left':'right';
+      var edgePoints=[];
       if(ring.length){
         ring.forEach(function(p){
           var q=rotatedLocal(p[1],p[0]);
-          minX=Math.min(minX,q.x);maxX=Math.max(maxX,q.x);
-          minY=Math.min(minY,q.y);maxY=Math.max(maxY,q.y);
+          if((visualSide==='left'&&q.x<=centreQ.x)||(visualSide==='right'&&q.x>=centreQ.x)){
+            edgePoints.push(q);
+          }
         });
-      }else{
-        var centreLocal=rotatedLocal(centre[0],centre[1]);
-        minX=maxX=centreLocal.x;
-        minY=maxY=centreLocal.y;
       }
-      var edgeX=b.side==='left'?minX:maxX;
+      if(!edgePoints.length)edgePoints=[centreQ];
+      var edgeQ=edgePoints.reduce(function(a,q){
+        return {x:a.x+q.x/edgePoints.length,y:a.y+q.y/edgePoints.length};
+      },{x:0,y:0});
       var sideGap=18;
-      labelX=w/2+(edgeX-cameraX)/mpp+(b.side==='left'?-sideGap:sideGap);
+      var labelX=w/2+(edgeQ.x-cameraX)/mpp+(visualSide==='left'?-sideGap:sideGap);
+      var labelY=v.cy-(edgeQ.y-cameraY)/mpp;
 
       ctx.save();
       ctx.translate(labelX,labelY);
