@@ -464,7 +464,7 @@ function showShotAnnotations(){
 function project(lat,lon,b,w,h,pad){
   if(detailMode && b===HB){
     var q=rotatedLocal(lat,lon),mpp=metersPerPixel(w,h,pad);
-    return [v.cx+(q.x-cameraX)/mpp,v.cy-(q.y-cameraY)/mpp];
+    var v=viewSize(); return [v.cx+(q.x-cameraX)/mpp,v.cy-(q.y-cameraY)/mpp];
   }
   var x=pad+(lon-b.minX)/(b.maxX-b.minX)*(w-pad*2);
   var y=h-pad-(lat-b.minY)/(b.maxY-b.minY)*(h-pad*2);
@@ -705,7 +705,7 @@ canvas.addEventListener('click',function(e){
   hideBunkerPopup();
   if(!testMode)return;
   var pad=36,v=viewSize(),mpp=metersPerPixel(v.w,v.h,pad);
-  var rx=cameraX+(x-v.w/2)*mpp,ry=cameraY+(v.h/2-y)*mpp;
+  var rx=cameraX+(x-v.cx)*mpp,ry=cameraY+(v.cy-y)*mpp;
   var tapAngle=window._travelAngle||holeAngle,cb=Math.cos(tapAngle),sb=Math.sin(tapAngle);
   var east=rx*cb+ry*sb,north=-rx*sb+ry*cb;
   update(fromLocal(east,north));
