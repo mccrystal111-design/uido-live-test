@@ -629,23 +629,29 @@ function drawHoleDetail(){
       var centreQ=rotatedLocal(centre[0],centre[1]);
       // Derive the displayed side from the actual source geometry rather than
       // relying on side metadata that can be inconsistent on individual holes.
+      // The label is tied to the bunker edge itself: use the true leftmost or
+      // rightmost edge in shot-space, then add a small fixed screen-space gap.
+      // This means the label scales with the bunker as the camera zooms, while
+      // remaining just outside the boundary instead of drifting through it.
       var visualSide=centreQ.x<0?'left':'right';
+      var extremeX=visualSide==='left'?Infinity:-Infinity;
+      ring.forEach(function(p){
+        var q=rotatedLocal(p[1],p[0]);
+        if(visualSide==='left')extremeX=Math.min(extremeX,q.x);
+        else extremeX=Math.max(extremeX,q.x);
+      });
+      if(!isFinite(extremeX))extremeX=centreQ.x;
       var edgePoints=[];
-      if(ring.length){
-        ring.forEach(function(p){
-          var q=rotatedLocal(p[1],p[0]);
-          if((visualSide==='left'&&q.x<=centreQ.x)||(visualSide==='right'&&q.x>=centreQ.x)){
-            edgePoints.push(q);
-          }
-        });
-      }
+      var edgeTolerance=Math.max(1.5,(Math.abs(extremeX-centreQ.x))*0.15);
+      ring.forEach(function(p){
+        var q=rotatedLocal(p[1],p[0]);
+        if(Math.abs(q.x-extremeX)<=edgeTolerance)edgePoints.push(q);
+      });
       if(!edgePoints.length)edgePoints=[centreQ];
-      var edgeQ=edgePoints.reduce(function(a,q){
-        return {x:a.x+q.x/edgePoints.length,y:a.y+q.y/edgePoints.length};
-      },{x:0,y:0});
-      var sideGap=18;
-      var labelX=w/2+(edgeQ.x-cameraX)/mpp+(visualSide==='left'?-sideGap:sideGap);
-      var labelY=v.cy-(edgeQ.y-cameraY)/mpp;
+      var edgeY=edgePoints.reduce(function(sum,q){return sum+q.y;},0)/edgePoints.length;
+      var sideGap=10;
+      var labelX=w/2+(extremeX-cameraX)/mpp+(visualSide==='left'?-sideGap:sideGap);
+      var labelY=v.cy-(edgeY-cameraY)/mpp;
 
       ctx.save();
       ctx.translate(labelX,labelY);
