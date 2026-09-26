@@ -5,75 +5,218 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>UiDo · Overstone Course</title>
 <style>
-:root{--rail-width:180px}
-html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#dfe4d8;color:#16231b;font-family:Arial,sans-serif}
-#map{position:absolute;inset:0;background:#dfe4d8}
-canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
-.panel{z-index:4;background:rgba(247,245,238,.94);border:1px solid rgba(22,35,27,.13);border-radius:12px;padding:10px;box-shadow:0 3px 15px rgba(0,0,0,.10);box-sizing:border-box;backdrop-filter:blur(5px)}
-#infoRail{position:fixed;z-index:6;top:10px;right:10px;width:174px;max-height:calc(100vh - 90px);display:flex;flex-direction:column;gap:6px;pointer-events:none;overflow-y:auto}
-#infoRail .panel{position:relative;inset:auto;width:100%;pointer-events:auto}
-.dev-header{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.brand{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#3f4b3b}
-.hole-picker{position:relative;flex:1;min-width:0}
-.hole-picker-button{width:100%;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;padding:9px 9px;background:#f7f5ee;border:1px solid rgba(22,35,27,.16);border-radius:9px;color:#16231b}
-.hole-picker-button .chevron{font-size:16px;line-height:1}
-.hole-menu{display:none;position:absolute;z-index:20;top:100%;left:0;right:0;margin-top:5px;padding:7px;background:#f7f5ee;border:1px solid rgba(22,35,27,.18);border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.16);grid-template-columns:repeat(3,1fr);gap:5px}
+:root{
+  --ui-ink:#16231b;
+  --ui-green:#1c4a31;
+  --ui-muted:#596052;
+  --ui-paper:rgba(247,245,238,.96);
+  --ui-line:rgba(22,35,27,.13);
+  --ui-shadow:0 4px 16px rgba(0,0,0,.10);
+  --rail-width:184px;
+  --ui-gap:6px;
+}
+*{box-sizing:border-box}
+html,body{
+  width:100%;height:100%;margin:0;overflow:hidden;
+  background:#dfe4d8;color:var(--ui-ink);
+  font-family:Arial,sans-serif;
+}
+body{overscroll-behavior:none}
+#map{
+  position:fixed;inset:0;
+  background:#dfe4d8;
+}
+canvas{
+  position:absolute;inset:0;width:100%;height:100%;
+  touch-action:none;
+}
+#infoRail{
+  position:fixed;z-index:6;
+  top:10px;right:10px;
+  width:var(--rail-width);
+  max-height:calc(100vh - 92px);
+  display:flex;flex-direction:column;
+  gap:var(--ui-gap);
+  pointer-events:none;
+  overflow:visible;
+}
+#infoRail .panel{
+  width:100%;
+  pointer-events:auto;
+}
+.panel{
+  background:var(--ui-paper);
+  border:1px solid var(--ui-line);
+  border-radius:11px;
+  padding:9px;
+  box-shadow:var(--ui-shadow);
+  backdrop-filter:blur(5px);
+}
+.dev-header{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 78px;
+  gap:8px;
+  align-items:start;
+}
+.brand{
+  font-size:10px;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase;
+  color:#3f4b3b;
+}
+#holeHeaderMeta{
+  font-size:11px;font-weight:700;
+  margin-top:5px;white-space:nowrap;
+}
+.hole-picker{position:relative;min-width:0}
+.hole-picker-button{
+  width:100%;display:flex;align-items:center;
+  justify-content:space-between;gap:4px;
+  padding:8px 8px;
+  background:#f7f5ee;color:var(--ui-ink);
+  border:1px solid var(--ui-line);border-radius:8px;
+  font-size:10px;font-weight:700;
+}
+.hole-picker-button .chevron{font-size:14px;line-height:1}
+.hole-menu{
+  display:none;position:absolute;z-index:20;
+  top:100%;left:0;right:0;margin-top:5px;
+  padding:6px;grid-template-columns:repeat(3,1fr);gap:4px;
+  background:#f7f5ee;border:1px solid var(--ui-line);
+  border-radius:9px;box-shadow:0 6px 20px rgba(0,0,0,.16);
+}
 .hole-menu.open{display:grid}
-.hole-option{padding:8px 4px;border:0;border-radius:7px;background:#e8ece3;color:#16231b;font-size:10px;font-weight:700}
-.hole-option.active{background:#1c4a31;color:#f7f5ee}
-.title{font-size:10px;line-height:1.35}.title small{font-size:8px;color:#596052}.status{font-size:9px;line-height:1.3}.yardage{font-size:10px;line-height:1.45}.yardage strong{font-size:10px}.yardage .b{display:inline-block;margin:0 6px 3px 0}.info{font-size:9px;line-height:1.35}.info strong{font-size:11px}.rail-title{font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#596052;margin-bottom:6px}.metric-row{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}.metric{padding:5px 3px;border-radius:7px;background:rgba(247,245,238,.98);border:1px solid rgba(22,35,27,.08);text-align:center}.metric label{display:block;font-size:8px;font-weight:700;color:#596052}.metric strong{display:block;font-size:11px;margin-top:2px}.bunker-row{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:5px 0;border-top:1px solid rgba(22,35,27,.08)}.bunker-row:first-child{border-top:0;padding-top:0}.bunker-side{font-size:9px;font-weight:700}.bunker-yardage{font-size:9px;color:#3f4b3b;white-space:nowrap}.muted{font-size:8px;color:#596052}
-.buttons{position:fixed;z-index:7;left:10px;right:10px;bottom:10px;display:flex;gap:5px;width:auto;pointer-events:auto;box-sizing:border-box}
-.buttons button,.buttons select{flex:0 0 auto;border:1px solid rgba(22,35,27,.13);border-radius:9px;padding:8px 9px;background:rgba(247,245,238,.94);color:#16231b;font-weight:600;font-size:10px;min-width:0;box-shadow:0 3px 15px rgba(0,0,0,.08);backdrop-filter:blur(5px)}
-.buttons .active{background:#1c4a31;color:white;border-color:#1c4a31}
+.hole-option{
+  padding:7px 3px;border:0;border-radius:6px;
+  background:#e8ece3;color:var(--ui-ink);
+  font-size:10px;font-weight:700;
+}
+.hole-option.active{background:var(--ui-green);color:#f7f5ee}
+.info-box{min-height:0}
+.rail-title{
+  margin-bottom:5px;
+  font-size:8px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ui-muted);
+}
+.metric-row{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.metric{
+  padding:5px 3px;border-radius:7px;
+  background:rgba(247,245,238,.82);
+  border:1px solid rgba(22,35,27,.08);
+  text-align:center;
+}
+.metric label{display:block;font-size:8px;font-weight:700;color:var(--ui-muted)}
+.metric strong{display:block;font-size:11px;margin-top:2px}
+.bunker-row{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:6px;padding:4px 0;
+  border-top:1px solid rgba(22,35,27,.08);
+}
+.bunker-row:first-child{border-top:0;padding-top:0}
+.bunker-side{font-size:9px;font-weight:700}
+.bunker-yardage{font-size:9px;color:#3f4b3b;white-space:nowrap}
+.status{font-size:9px;line-height:1.3}
+.muted{font-size:8px;color:var(--ui-muted)}
+.error{color:#9b2c2c}
+.buttons{
+  position:fixed;z-index:7;
+  left:10px;right:10px;bottom:10px;
+  display:flex;align-items:center;justify-content:flex-start;
+  gap:5px;width:auto;pointer-events:auto;
+}
+.buttons button,.buttons select{
+  flex:0 0 auto;
+  border:1px solid var(--ui-line);border-radius:9px;
+  padding:8px 9px;
+  background:var(--ui-paper);color:var(--ui-ink);
+  font-weight:600;font-size:10px;
+  box-shadow:var(--ui-shadow);
+  backdrop-filter:blur(5px);
+}
+.buttons .active{background:var(--ui-green);color:#fff;border-color:var(--ui-green)}
 #courseBtn{min-width:56px}
 #zoomOut,#zoomIn{width:34px;padding-left:0;padding-right:0;font-size:14px}
 #fit{min-width:38px}
-#gps{min-width:62px}
-
 #zoomShot{min-width:78px}
-#bunkerPopup{position:fixed;z-index:9;display:none;min-width:132px;padding:9px 10px;background:rgba(247,245,238,.97);border:1px solid rgba(22,35,27,.16);border-radius:10px;box-shadow:0 5px 18px rgba(0,0,0,.16);pointer-events:none}.popup-title{font-size:9px;font-weight:700;color:#596052;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}.popup-yardage{font-size:12px;font-weight:700;line-height:1.5}#railToggle{position:fixed;z-index:8;right:10px;bottom:74px;border:1px solid rgba(22,35,27,.13);border-radius:9px;padding:8px 10px;background:rgba(247,245,238,.94);color:#16231b;font-weight:600;font-size:10px;box-shadow:0 3px 15px rgba(0,0,0,.08);pointer-events:auto;backdrop-filter:blur(5px)}
-body.info-hidden .info-box{display:none}
+#gps{min-width:62px}
+#railToggle{
+  position:fixed;z-index:8;
+  right:10px;bottom:74px;
+  border:1px solid var(--ui-line);border-radius:9px;
+  padding:8px 10px;
+  background:var(--ui-paper);color:var(--ui-ink);
+  font-weight:600;font-size:10px;
+  box-shadow:var(--ui-shadow);
+  pointer-events:auto;backdrop-filter:blur(5px);
+}
+#bunkerPopup{
+  position:fixed;z-index:9;display:none;
+  min-width:132px;padding:9px 10px;
+  background:rgba(247,245,238,.97);
+  border:1px solid var(--ui-line);border-radius:10px;
+  box-shadow:0 5px 18px rgba(0,0,0,.16);
+  pointer-events:none;
+}
+.popup-title{
+  font-size:9px;font-weight:700;color:var(--ui-muted);
+  text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;
+}
+.popup-yardage{font-size:12px;font-weight:700;line-height:1.5}
+body.info-hidden #infoRail{display:none}
 body.info-hidden #railToggle{right:10px}
-.error{color:#9b2c2c}
 @media(max-width:700px){
-  :root{--rail-width:180px}
-  #infoRail{width:174px;top:10px;right:10px;gap:6px}
-  .buttons{left:10px;right:10px;bottom:10px;gap:4px}
-  .buttons button{padding:8px 7px;font-size:9px;flex:0 0 auto}
+  :root{--rail-width:184px}
+  #infoRail{top:8px;right:8px;width:184px;gap:5px}
+  .panel{padding:8px;border-radius:10px}
+  .buttons{left:8px;right:8px;bottom:8px;gap:4px}
+  .buttons button{padding:8px 7px;font-size:9px}
   #courseBtn{min-width:50px}
   #zoomOut,#zoomIn{width:32px}
   #fit{min-width:34px}
+  #zoomShot{min-width:72px}
   #gps{min-width:58px}
-    #zoomShot{min-width:72px}
-  #railToggle{bottom:74px}
+  #railToggle{right:8px;bottom:70px}
 }
 </style>
 </head>
 <body>
 <div id="map"><canvas id="course"></canvas></div>
-<aside id="infoRail">
-  <div class="panel dev-header">
-    <div style="flex:1;min-width:0">
+
+<aside id="infoRail" aria-label="Hole information">
+  <section class="panel dev-header">
+    <div>
       <div class="brand">UiDo · Overstone</div>
-      <div id="holeHeaderMeta" style="font-size:11px;font-weight:700;margin-top:6px">Hole 1 · Par 4</div>
+      <div id="holeHeaderMeta">Hole 1 · Par 4</div>
     </div>
     <div class="hole-picker">
-      <button id="holePickerButton" class="hole-picker-button" type="button"><span>Hole 1</span><span class="chevron">⌄</span></button>
+      <button id="holePickerButton" class="hole-picker-button" type="button">
+        <span>Hole 1</span><span class="chevron">⌄</span>
+      </button>
       <div id="holeMenu" class="hole-menu" aria-label="Select hole">
         <button class="hole-option active" type="button" data-hole="1">1</button><button class="hole-option" type="button" data-hole="2">2</button><button class="hole-option" type="button" data-hole="3">3</button><button class="hole-option" type="button" data-hole="4">4</button><button class="hole-option" type="button" data-hole="5">5</button><button class="hole-option" type="button" data-hole="6">6</button><button class="hole-option" type="button" data-hole="7">7</button><button class="hole-option" type="button" data-hole="8">8</button><button class="hole-option" type="button" data-hole="9">9</button><button class="hole-option" type="button" data-hole="10">10</button><button class="hole-option" type="button" data-hole="11">11</button><button class="hole-option" type="button" data-hole="12">12</button><button class="hole-option" type="button" data-hole="13">13</button><button class="hole-option" type="button" data-hole="14">14</button><button class="hole-option" type="button" data-hole="15">15</button><button class="hole-option" type="button" data-hole="16">16</button><button class="hole-option" type="button" data-hole="17">17</button><button class="hole-option" type="button" data-hole="18">18</button>
       </div>
     </div>
-  </div>
-  <div id="greenInfo" class="panel info-box"></div>
-  <div id="bunkerInfo" class="panel info-box"></div>
-  <div id="status" class="panel status info-box">Loading course…</div>
+  </section>
+  <section id="greenInfo" class="panel info-box"></section>
+  <section id="bunkerInfo" class="panel info-box"></section>
+  <section id="status" class="panel status info-box">Loading course…</section>
 </aside>
-<div id="bunkerPopup" aria-live="polite"></div><button id="railToggle" type="button">Hide info</button>
-<div class="panel buttons">
-  <button id="courseBtn">Course</button>
-  <select id="holeSelect" aria-hidden="true" style="display:none"><option value="1" selected>Hole 1</option><option value="2">Hole 2</option><option value="3">Hole 3</option><option value="4">Hole 4</option><option value="5">Hole 5</option><option value="6">Hole 6</option><option value="7">Hole 7</option><option value="8">Hole 8</option><option value="9">Hole 9</option><option value="10">Hole 10</option><option value="11">Hole 11</option><option value="12">Hole 12</option><option value="13">Hole 13</option><option value="14">Hole 14</option><option value="15">Hole 15</option><option value="16">Hole 16</option><option value="17">Hole 17</option><option value="18">Hole 18</option></select>
-  <button id="zoomOut" aria-label="Zoom out">−</button><button id="zoomIn" aria-label="Zoom in">+</button><button id="fit">Fit</button><button id="zoomShot">Zoom to Shot</button><button id="gps">Use GPS</button>
-</div>
+
+<div id="bunkerPopup" aria-live="polite"></div>
+<button id="railToggle" type="button">Hide info</button>
+
+<nav class="buttons" aria-label="Map controls">
+  <button id="courseBtn" type="button">Course</button>
+  <select id="holeSelect" aria-hidden="true" tabindex="-1" style="display:none">
+    <option value="1" selected>Hole 1</option><option value="2">Hole 2</option><option value="3">Hole 3</option><option value="4">Hole 4</option><option value="5">Hole 5</option><option value="6">Hole 6</option><option value="7">Hole 7</option><option value="8">Hole 8</option><option value="9">Hole 9</option><option value="10">Hole 10</option><option value="11">Hole 11</option><option value="12">Hole 12</option><option value="13">Hole 13</option><option value="14">Hole 14</option><option value="15">Hole 15</option><option value="16">Hole 16</option><option value="17">Hole 17</option><option value="18">Hole 18</option>
+  </select>
+  <button id="zoomOut" type="button" aria-label="Zoom out">−</button>
+  <button id="zoomIn" type="button" aria-label="Zoom in">+</button>
+  <button id="fit" type="button">Fit</button>
+  <button id="zoomShot" type="button">Zoom to Shot</button>
+  <button id="gps" type="button">Use GPS</button>
+</nav>
+
 <script>
 window.addEventListener('error',function(e){
   var s=document.getElementById('status');
@@ -92,17 +235,21 @@ if(!D)throw new Error('Hole 1 source model did not load');
 
 var canvas=document.getElementById('course'),ctx=canvas.getContext('2d'),map=document.getElementById('map'),bunkerPopup=document.getElementById('bunkerPopup');
 function viewSize(){
-  // The canvas remains full-screen, but camera fitting uses the unobscured
-  // map area so the course is not hidden behind the floating information rail.
   var hidden=document.body.classList.contains('info-hidden');
   var rail=document.getElementById('infoRail');
-  var railWidth=hidden?0:(rail?rail.offsetWidth+20:0);
-  return {w:Math.max(220,window.innerWidth-railWidth),h:window.innerHeight};
+  var controls=document.querySelector('.buttons');
+  var railWidth=hidden?0:(rail?rail.getBoundingClientRect().width+18:0);
+  var bottomHeight=controls?controls.getBoundingClientRect().height+18:18;
+  var w=Math.max(220,window.innerWidth-railWidth);
+  var h=Math.max(220,window.innerHeight-bottomHeight);
+  return {w:w,h:h,cx:w/2,cy:h/2};
 }
 function resizeCanvas(){
-  var dpr=window.devicePixelRatio||1,v=viewSize(),w=v.w,h=v.h;
-  canvas.width=Math.round(window.innerWidth*dpr);canvas.height=Math.round(window.innerHeight*dpr);
-  canvas.style.width='100%';canvas.style.height='100%';
+  var dpr=window.devicePixelRatio||1;
+  canvas.width=Math.round(window.innerWidth*dpr);
+  canvas.height=Math.round(window.innerHeight*dpr);
+  canvas.style.width='100%';
+  canvas.style.height='100%';
   ctx.setTransform(dpr,0,0,dpr,0,0);
 }
 resizeCanvas();
@@ -235,7 +382,10 @@ function bunkerLabel(b){
 }
 function bunkerScreenRing(b,w,h,pad){
   var ring=bunkerGeometry(b)||[],mpp=metersPerPixel(w,h,pad),out=[];
-  ring.forEach(function(p){var q=rotatedLocal(p[1],p[0]);out.push([w/2+(q.x-cameraX)/mpp,h/2-(q.y-cameraY)/mpp])});
+  ring.forEach(function(p){
+    var q=rotatedLocal(p[1],p[0]);
+    out.push([w/2+(q.x-cameraX)/mpp,h/2-(q.y-cameraY)/mpp]);
+  });
   return out;
 }
 function pointInPolygon(x,y,poly){
@@ -314,7 +464,7 @@ function showShotAnnotations(){
 function project(lat,lon,b,w,h,pad){
   if(detailMode && b===HB){
     var q=rotatedLocal(lat,lon),mpp=metersPerPixel(w,h,pad);
-    return [w/2+(q.x-cameraX)/mpp,h/2-(q.y-cameraY)/mpp];
+    return [v.cx+(q.x-cameraX)/mpp,v.cy-(q.y-cameraY)/mpp];
   }
   var x=pad+(lon-b.minX)/(b.maxX-b.minX)*(w-pad*2);
   var y=h-pad-(lat-b.minY)/(b.maxY-b.minY)*(h-pad*2);
@@ -440,8 +590,8 @@ function drawHoleDetail(){
         ];
       }
       var centreQ=rotatedLocal(centre[0],centre[1]);
-      var labelX=w/2+(centreQ.x-cameraX)/mpp;
-      var labelY=h/2-(centreQ.y-cameraY)/mpp;
+      var labelX=v.cx+(centreQ.x-cameraX)/mpp;
+      var labelY=v.cy-(centreQ.y-cameraY)/mpp;
       // Place bunker yardages clearly outside the sand, on the
       // player's left/right side of the bunker. Use the actual source polygon
       // edge rather than its centroid so the label never sits over the bunker.
@@ -513,9 +663,9 @@ function zoomToShot(){
 function keepPlayerVisible(){
   if(!detailMode)return;
   var v=viewSize(),pad=36,mpp=metersPerPixel(v.w,v.h,pad),q=rotatedLocal(current[0],current[1]);
-  var targetX=v.w*0.5,targetY=v.h*0.68;
-  cameraX=q.x+(targetX-v.w/2)*mpp;
-  cameraY=q.y+(v.h/2-targetY)*mpp;
+  var targetX=v.cx,targetY=v.h*0.68;
+  cameraX=q.x+(targetX-v.cx)*mpp;
+  cameraY=q.y+(v.cy-targetY)*mpp;
   // Keep the camera from drifting so far that the hole leaves the viewport.
   var halfW=v.w*mpp/2,halfH=v.h*mpp/2;
   var holeCenterX=(RHB.minX+RHB.maxX)/2,holeCenterY=(RHB.minY+RHB.maxY)/2;
