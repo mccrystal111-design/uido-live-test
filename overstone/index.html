@@ -31,7 +31,7 @@ canvas{
   touch-action:none;
 }
 #infoRail{
-  position:fixed;z-index:6;
+  position:fixed;z-index:10;
   top:10px;right:10px;
   width:var(--rail-width);
   max-height:calc(100vh - 92px);
@@ -78,17 +78,19 @@ canvas{
 }
 .hole-picker-button .chevron{font-size:14px;line-height:1}
 .hole-menu{
-  display:none;position:absolute;z-index:20;
-  top:100%;left:0;right:0;margin-top:5px;
-  padding:6px;grid-template-columns:repeat(3,1fr);gap:4px;
+  display:none;position:absolute;z-index:30;
+  top:100%;right:0;left:auto;margin-top:5px;
+  width:210px;
+  padding:8px;grid-template-columns:repeat(3,1fr);gap:6px;
   background:#f7f5ee;border:1px solid var(--ui-line);
-  border-radius:9px;box-shadow:0 6px 20px rgba(0,0,0,.16);
+  border-radius:11px;box-shadow:0 8px 24px rgba(0,0,0,.18);
 }
 .hole-menu.open{display:grid}
 .hole-option{
-  padding:7px 3px;border:0;border-radius:6px;
+  min-height:36px;
+  padding:8px 4px;border:0;border-radius:7px;
   background:#e8ece3;color:var(--ui-ink);
-  font-size:10px;font-weight:700;
+  font-size:11px;font-weight:700;
 }
 .hole-option.active{background:var(--ui-green);color:#f7f5ee}
 .info-box{min-height:0}
