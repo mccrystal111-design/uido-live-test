@@ -767,8 +767,11 @@ function cameraForPlayer(pos){
   var holeCenterX=(RHB.minX+RHB.maxX)/2,holeCenterY=(RHB.minY+RHB.maxY)/2;
   var minCamX=RHB.maxX-halfW,maxCamX=RHB.minX+halfW;
   var minCamY=RHB.maxY-halfH,maxCamY=RHB.minY+halfH;
-  if(minCamX<=maxCamX)desiredX=Math.max(minCamX,Math.min(maxCamX,desiredX));else desiredX=holeCenterX;
-  if(minCamY<=maxCamY)desiredY=Math.max(minCamY,Math.min(maxCamY,desiredY));else desiredY=holeCenterY;
+  // When the viewport is larger than the selected hole, do not force the
+  // camera back to the hole centre. GPS follow should still keep the player
+  // low in the screen, with surrounding course context filling the view.
+  if(minCamX<=maxCamX)desiredX=Math.max(minCamX,Math.min(maxCamX,desiredX));
+  if(minCamY<=maxCamY)desiredY=Math.max(minCamY,Math.min(maxCamY,desiredY));
   return {x:desiredX,y:desiredY};
 }
 function keepPlayerVisible(pos){
