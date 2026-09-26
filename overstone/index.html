@@ -678,7 +678,7 @@ function drawHoleDetail(){
       // Keep the whole label outside the bunker. Text is aligned away from
       // the bunker edge, rather than centred on the anchor point, so the
       // breathing room remains visible at every zoom level.
-      var sideGap=16;
+      var sideGap=Math.max(8,Math.min(16,8+(zoom-1)*8));
       var labelX=w/2+(edgeX-cameraX)/mpp+(visualSide==='left'?-sideGap:sideGap);
       var labelY=v.cy-(centreY-cameraY)/mpp;
 
