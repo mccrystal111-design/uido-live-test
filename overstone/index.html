@@ -729,7 +729,7 @@ function zoomToShot(){
 function cameraForPlayer(pos){
   if(!detailMode)return {x:cameraX,y:cameraY};
   var v=viewSize(),pad=36,mpp=metersPerPixel(v.w,v.h,pad),q=rotatedLocal(pos[0],pos[1]);
-  var targetX=v.cx,targetY=v.h*0.74;
+  var targetX=v.cx,targetY=v.h*0.78;
   var desiredX=q.x+(targetX-v.cx)*mpp;
   // Screen Y increases downward, so moving the camera target down requires
   // increasing cameraY, not decreasing it. This keeps the GPS player at the
@@ -764,6 +764,16 @@ function gpsPredictedPosition(now){
   var east=Math.sin(h)*distance;
   return [p[0]+north/111320,p[1]+east/(111320*Math.cos(p[0]*Math.PI/180))];
 }
+function gpsAutoZoom(){
+  if(!D.green_fmb||!D.green_fmb.middle)return zoom;
+  var distance=yd(renderCurrent,D.green_fmb.middle);
+  // Start at normal shot scale and progressively tighten the view as the
+  // player approaches the green. The transition is continuous rather than
+  // stepping between preset zoom levels.
+  var t=Math.max(0,Math.min(1,(350-distance)/320));
+  var eased=t*t*(3-2*t);
+  return 1+(1.35*eased);
+}
 function requestGpsAnimation(){
   if(!gpsFollow||!detailMode||cameraAnimFrame)return;
   cameraAnimFrame=requestAnimationFrame(function animateGps(now){
@@ -777,6 +787,10 @@ function requestGpsAnimation(){
     var desired=cameraForPlayer(renderCurrent);
     cameraX+=(desired.x-cameraX)*0.055;
     cameraY+=(desired.y-cameraY)*0.055;
+    // GPS mode owns zoom too: smoothly tighten the shot as the player gets
+    // closer to the green middle, without abrupt scale changes.
+    var targetZoom=gpsAutoZoom();
+    zoom+=(targetZoom-zoom)*0.025;
     draw();
     // GPS follow owns the frame while enabled. This is intentionally a
     // continuous camera loop; browser GPS fixes remain the authoritative
