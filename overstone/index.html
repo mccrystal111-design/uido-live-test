@@ -31,7 +31,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
 #gps{min-width:62px}
 #test{min-width:44px}
 #zoomShot{min-width:78px}
-#railToggle{position:fixed;z-index:8;right:10px;bottom:10px;border:1px solid rgba(22,35,27,.13);border-radius:9px;padding:8px 10px;background:rgba(247,245,238,.94);color:#16231b;font-weight:600;font-size:10px;box-shadow:0 3px 15px rgba(0,0,0,.08);pointer-events:auto;backdrop-filter:blur(5px)}
+#bunkerPopup{position:fixed;z-index:9;display:none;min-width:132px;padding:9px 10px;background:rgba(247,245,238,.97);border:1px solid rgba(22,35,27,.16);border-radius:10px;box-shadow:0 5px 18px rgba(0,0,0,.16);pointer-events:none}.popup-title{font-size:9px;font-weight:700;color:#596052;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}.popup-yardage{font-size:12px;font-weight:700;line-height:1.5}#railToggle{position:fixed;z-index:8;right:10px;bottom:10px;border:1px solid rgba(22,35,27,.13);border-radius:9px;padding:8px 10px;background:rgba(247,245,238,.94);color:#16231b;font-weight:600;font-size:10px;box-shadow:0 3px 15px rgba(0,0,0,.08);pointer-events:auto;backdrop-filter:blur(5px)}
 body.info-hidden .info-box{display:none}
 body.info-hidden #railToggle{right:10px}
 .error{color:#9b2c2c}
@@ -67,7 +67,7 @@ body.info-hidden #railToggle{right:10px}
   <div id="bunkerInfo" class="panel info-box"></div>
   <div id="status" class="panel status info-box">Loading course…</div>
 </aside>
-<button id="railToggle" type="button">Hide info</button>
+<div id="bunkerPopup" aria-live="polite"></div><button id="railToggle" type="button">Hide info</button>
 <div class="panel buttons">
   <button id="courseBtn">Course</button>
   <select id="holeSelect" aria-hidden="true" style="display:none"><option value="1" selected>Hole 1</option><option value="2">Hole 2</option><option value="3">Hole 3</option><option value="4">Hole 4</option><option value="5">Hole 5</option><option value="6">Hole 6</option><option value="7">Hole 7</option><option value="8">Hole 8</option><option value="9">Hole 9</option><option value="10">Hole 10</option><option value="11">Hole 11</option><option value="12">Hole 12</option><option value="13">Hole 13</option><option value="14">Hole 14</option><option value="15">Hole 15</option><option value="16">Hole 16</option><option value="17">Hole 17</option><option value="18">Hole 18</option></select>
@@ -90,7 +90,7 @@ var HOLE_META={"pars":{"1":{"par":4},"2":{"par":3},"3":{"par":5},"4":{"par":3},"
 if(!C)throw new Error('Full course layer did not load');
 if(!D)throw new Error('Hole 1 source model did not load');
 
-var canvas=document.getElementById('course'),ctx=canvas.getContext('2d'),map=document.getElementById('map');
+var canvas=document.getElementById('course'),ctx=canvas.getContext('2d'),map=document.getElementById('map'),bunkerPopup=document.getElementById('bunkerPopup');
 function viewSize(){
   var hidden=document.body.classList.contains('info-hidden');
   var rail=document.getElementById('infoRail');
@@ -191,6 +191,7 @@ document.addEventListener('click',function(e){
   if(!e.target.closest||!e.target.closest('.hole-picker'))closeHoleMenu();
 });
 function selectHole(n){
+  hideBunkerPopup();
   n=Math.max(1,Math.min(18,Number(n)||1));
   holeNumber=n;
   D=window.UIDO_OVERSTONE_SOURCE_HOLES[String(n)];
@@ -230,6 +231,36 @@ function bunkerLabel(b){
   var edges=bunkerEdgesFromPlayer(b);
   return Math.round(yd(current,edges.front))+'/'+Math.round(yd(current,edges.back))+' yd';
 }
+function bunkerScreenRing(b,w,h,pad){
+  var ring=bunkerGeometry(b)||[],mpp=metersPerPixel(w,h,pad),out=[];
+  ring.forEach(function(p){var q=rotatedLocal(p[1],p[0]);out.push([w/2+(q.x-cameraX)/mpp,h/2-(q.y-cameraY)/mpp])});
+  return out;
+}
+function pointInPolygon(x,y,poly){
+  var inside=false;
+  for(var i=0,j=poly.length-1;i<poly.length;j=i++){
+    var a=poly[i],b=poly[j];
+    if(((a[1]>y)!==(b[1]>y))&&(x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0]))inside=!inside;
+  }
+  return inside;
+}
+function bunkerAtScreen(x,y){
+  var v=viewSize(),pad=28;
+  for(var i=bunkerData.length-1;i>=0;i--){
+    var ring=bunkerScreenRing(bunkerData[i],v.w,v.h,pad);
+    if(ring.length>=3&&pointInPolygon(x,y,ring))return bunkerData[i];
+  }
+  return null;
+}
+function showBunkerPopup(b,x,y){
+  var edges=bunkerEdgesFromPlayer(b),front=Math.round(yd(current,edges.front)),back=Math.round(yd(current,edges.back));
+  var side=(b.side||'bunker').charAt(0).toUpperCase()+(b.side||'bunker').slice(1);
+  bunkerPopup.innerHTML='<div class="popup-title">'+side+' bunker</div><div class="popup-yardage">Front '+front+' yd<br>Back '+back+' yd</div>';
+  bunkerPopup.style.left=Math.max(8,Math.min(window.innerWidth-150,x+12))+'px';
+  bunkerPopup.style.top=Math.max(8,Math.min(window.innerHeight-95,y-70))+'px';
+  bunkerPopup.style.display='block';
+}
+function hideBunkerPopup(){if(bunkerPopup)bunkerPopup.style.display='none'}
 function updateRail(){
   var holeInfo=document.getElementById('holeInfo');
   var greenInfo=document.getElementById('greenInfo');
@@ -497,6 +528,7 @@ function update(pos){
   draw();
 }
 function setMode(detail){
+  hideBunkerPopup();
   detailMode=detail;
   if(detail){fitCamera();}
   document.getElementById('courseBtn').classList.toggle('active',!detail);
@@ -513,19 +545,17 @@ function reset(){
 }
 canvas.addEventListener('click',function(e){
   if(moved){moved=false;return;}
-  if(!testMode||!detailMode)return;
-  var r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,pad=36;
-  var v=viewSize(),mpp=metersPerPixel(v.w,v.h,pad);
-  var v=viewSize();
-  var rx=cameraX+(x-v.w/2)*mpp;
-  var ry=cameraY+(v.h/2-y)*mpp;
-  // Convert the tap back using the same live travel heading used to draw the map.
-  var tapAngle=window._travelAngle||holeAngle;
-  var cb=Math.cos(tapAngle),sb=Math.sin(tapAngle);
-  var e=rx*cb+ry*sb;
-  var n=-rx*sb+ry*cb;
-  var pos=fromLocal(e,n);
-  update(pos);
+  if(!detailMode)return;
+  var r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+  var hit=bunkerAtScreen(x,y);
+  if(hit){showBunkerPopup(hit,e.clientX,e.clientY);return;}
+  hideBunkerPopup();
+  if(!testMode)return;
+  var pad=36,v=viewSize(),mpp=metersPerPixel(v.w,v.h,pad);
+  var rx=cameraX+(x-v.w/2)*mpp,ry=cameraY+(v.h/2-y)*mpp;
+  var tapAngle=window._travelAngle||holeAngle,cb=Math.cos(tapAngle),sb=Math.sin(tapAngle);
+  var east=rx*cb+ry*sb,north=-rx*sb+ry*cb;
+  update(fromLocal(east,north));
 });
 document.getElementById('zoomIn').onclick=function(){if(!detailMode)return;zoom=Math.min(8,zoom*1.5);draw()};
 document.getElementById('zoomShot').onclick=function(){zoomToShot()};
