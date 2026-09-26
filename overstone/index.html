@@ -790,8 +790,10 @@ document.getElementById('gps').onclick=function(){
     gpsWatch=null;
     testMode=true;
     btn.classList.remove('active');
-    document.getElementById('status').textContent='GPS off · player fixed';
+    btn.textContent='GPS';
+    current=tee.slice();
     update(current);
+    document.getElementById('status').textContent='GPS off · tap map to set position';
     return;
   }
   if(!navigator.geolocation){
