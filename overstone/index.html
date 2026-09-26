@@ -632,7 +632,10 @@ function drawHoleDetail(){
       // The label then sits just outside that boundary. This keeps the two
       // yardages aligned to the bunker centre rather than averaging arbitrary
       // edge vertices, and it remains attached as the bunker scales with zoom.
-      var visualSide=centreQ.x<0?'left':'right';
+      // The source model's left/right designation is the semantic side of
+      // the bunker relative to the hole. Use that for label placement, while
+      // the actual polygon supplies the edge position.
+      var visualSide=(b.side==='left'||b.side==='right')?b.side:(centreQ.x<0?'left':'right');
       var centreX=centreQ.x,centreY=centreQ.y;
       // Area-weighted polygon centroid in shot-space. For ordinary bunker
       // polygons this is the true geometric middle, not simply the mean of
@@ -672,7 +675,10 @@ function drawHoleDetail(){
       // Fallback for a geometry whose centreline happens not to cross an edge
       // cleanly (e.g. a degenerate source polygon).
       if(!isFinite(edgeX))edgeX=centreX;
-      var sideGap=10;
+      // Keep the whole label outside the bunker. Text is aligned away from
+      // the bunker edge, rather than centred on the anchor point, so the
+      // breathing room remains visible at every zoom level.
+      var sideGap=16;
       var labelX=w/2+(edgeX-cameraX)/mpp+(visualSide==='left'?-sideGap:sideGap);
       var labelY=v.cy-(centreY-cameraY)/mpp;
 
@@ -680,7 +686,7 @@ function drawHoleDetail(){
       ctx.translate(labelX,labelY);
       ctx.rotate(0);
       ctx.font='600 10px Arial';
-      ctx.textAlign='center';
+      ctx.textAlign=visualSide==='left'?'right':'left';
       ctx.textBaseline='middle';
       ctx.fillStyle='#d8bd78';
       ctx.fillText(Math.round(yd(current,edges.back))+'',0,-6);
