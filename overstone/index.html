@@ -53,9 +53,11 @@ canvas{
   backdrop-filter:blur(5px);
 }
 .dev-header{
+  position:relative;
+  z-index:20;
   display:grid;
-  grid-template-columns:minmax(0,1fr) 68px;
-  gap:8px;
+  grid-template-columns:minmax(0,1fr) 54px;
+  gap:6px;
   align-items:start;
 }
 .brand{
@@ -71,7 +73,7 @@ canvas{
 .hole-picker-button{
   width:100%;display:flex;align-items:center;
   justify-content:space-between;gap:4px;
-  padding:8px 8px;
+  padding:7px 7px;
   background:#f7f5ee;color:var(--ui-ink);
   border:1px solid var(--ui-line);border-radius:8px;
   font-size:10px;font-weight:700;
@@ -80,7 +82,7 @@ canvas{
 .hole-menu{
   display:none;position:absolute;z-index:30;
   top:100%;right:0;left:auto;margin-top:5px;
-  width:210px;
+  width:190px;
   padding:8px;grid-template-columns:repeat(3,1fr);gap:6px;
   background:#f7f5ee;border:1px solid var(--ui-line);
   border-radius:11px;box-shadow:0 8px 24px rgba(0,0,0,.18);
@@ -327,7 +329,7 @@ var cameraX=0,cameraY=0;
 var bunkerData=D.bunkers||[];
 function setHolePicker(n){
   var btn=document.getElementById('holePickerButton');
-  if(btn)btn.querySelector('span').textContent='Hole '+n;
+  if(btn)btn.querySelector('span').textContent=String(n);
   document.querySelectorAll('.hole-option').forEach(function(x){x.classList.toggle('active',Number(x.dataset.hole)===Number(n));});
 }
 function closeHoleMenu(){var m=document.getElementById('holeMenu');if(m)m.classList.remove('open');}
