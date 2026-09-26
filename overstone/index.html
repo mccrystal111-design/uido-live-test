@@ -759,7 +759,7 @@ function zoomToShot(){
 function cameraForPlayer(pos){
   if(!detailMode)return {x:cameraX,y:cameraY};
   var v=viewSize(),pad=36,mpp=metersPerPixel(v.w,v.h,pad),q=rotatedLocal(pos[0],pos[1]);
-  var targetX=v.cx,targetY=v.h*0.68;
+  var targetX=v.cx,targetY=v.h*0.74;
   var desiredX=q.x+(targetX-v.cx)*mpp;
   var desiredY=q.y+(v.cy-targetY)*mpp;
   // Keep the camera from drifting so far that the hole leaves the viewport.
