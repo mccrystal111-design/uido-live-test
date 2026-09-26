@@ -729,7 +729,7 @@ function zoomToShot(){
 function cameraForPlayer(pos){
   if(!detailMode)return {x:cameraX,y:cameraY};
   var v=viewSize(),pad=36,mpp=metersPerPixel(v.w,v.h,pad),q=rotatedLocal(pos[0],pos[1]);
-  var targetX=v.w*0.18,targetY=v.h*0.88;
+  var targetX=v.w*0.82,targetY=v.h*0.88;
   var desiredX=q.x+(targetX-v.cx)*mpp;
   // Screen Y increases downward, so moving the camera target down requires
   // increasing cameraY, not decreasing it. This keeps the GPS player at the
