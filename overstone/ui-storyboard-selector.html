@@ -4,7 +4,7 @@
 #stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px}#screen{position:relative;width:min(100vw - 40px,calc((100vh - 40px)*9/16));height:min(100vh - 40px,calc((100vw - 40px)*16/9));background:#e9eadf;border:2px solid #3f4b3b;overflow:hidden;touch-action:none}
 .grid{position:absolute;inset:0;background-image:linear-gradient(to right,#16231b28 1px,transparent 1px),linear-gradient(to bottom,#16231b28 1px,transparent 1px);background-size:10% 10%}
 .mid{position:absolute;background:#16231b66;z-index:1}.v{left:50%;top:0;bottom:0;width:1px}.h{top:50%;left:0;right:0;height:1px}
-.axis{position:absolute;z-index:3;font-size:9px;font-weight:700;background:#f7f5eee8;padding:2px 4px;border-radius:4px;pointer-events:none}.axis.x{left:50%;top:3px;transform:translateX(-50%)}.axis.y{left:3px;top:50%;transform:translateY(-50%)}
+.axis{position:absolute;z-index:3;font-size:9px;font-weight:700;background:#f7f5eee8;padding:2px 4px;border-radius:4px;pointer-events:none}.axis.x{left:50%;top:3px;transform:translateX(-50%)}.axis.y{left:3px;top:50%;transform:translateY(-50%)}.marker{position:absolute;left:25%;top:15%;width:32px;height:32px;border:2px solid #16231b;border-radius:50%;transform:translate(-50%,-50%);z-index:5}
 .area{position:absolute;border:2px dashed #3f4b3b55;z-index:2;pointer-events:none}.safe{left:8%;right:8%;top:8%;bottom:16%;background:#ffffff18}.controls{left:8%;right:8%;bottom:3%;height:10%;background:#3f4b3b10;border-color:#3f4b3b88}
 .area-label{position:absolute;font-size:10px;font-weight:700;background:#f7f5eedd;padding:3px 6px;border-radius:5px;white-space:nowrap}
 .safe .area-label{left:6px;top:6px}.controls .area-label{left:50%;top:50%;transform:translate(-50%,-50%)}
@@ -13,6 +13,6 @@ pre{white-space:pre-wrap;font-size:10px;line-height:1.3;max-height:28vh;overflow
 </style></head><body>
 <div id="stage"><div id="screen">
 <div class="grid"></div><div class="mid v"></div><div class="mid h"></div>
-<div class="axis x">X: 50%</div><div class="axis y">Y: 50%</div>
+<div class="axis x">X: 50%</div><div class="axis y">Y: 50%</div><div class="marker"></div>
 </div></div>
 <script></script></body></html>
