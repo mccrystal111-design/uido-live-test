@@ -12,11 +12,11 @@
 #tools p{margin:7px 0}.key{line-height:1.6}button{font:inherit;padding:6px 8px;border:1px solid #16231b2b;border-radius:7px;background:#fff;margin:3px 2px}
 pre{white-space:pre-wrap;font-size:10px;line-height:1.3;max-height:28vh;overflow:auto;margin:6px 0 0}
 </style></head><body>
-<div id="tools"><b>UiDo · Viewport & Safe Area</b>
+<div id="tools"><button id="helpToggle">Hide help</button><div id="helpContent"><b>UiDo · Viewport & Safe Area</b>
 <p><b>Viewport:</b> the complete UiDo app view. Browser tabs, address bars and browser controls are outside this coordinate system.</p>
 <div class="key"><b>X:</b> 0% left → 100% right<br><b>Y:</b> 0% top → 100% bottom</div>
 <p><b>Illustrative safe presentation area:</b> 8% left/right, 8% top, 16% bottom. This is a working reference only; it is not yet a locked rule.</p>
-<button id="copy">Copy coordinates</button><pre id="out"></pre></div>
+</div><button id="copy">Copy coordinates</button><pre id="out"></pre></div>
 <div id="stage"><div id="screen">
 <div class="grid"></div><div class="mid v"></div><div class="mid h"></div>
 <div class="axis x">X: 50%</div><div class="axis y">Y: 50%</div>
@@ -28,4 +28,5 @@ const s=document.querySelector('#screen'),out=document.querySelector('#out');
 const spec={viewport:{x:[0,100],y:[0,100],note:'UiDo viewport only; browser chrome excluded'},safe_presentation_area:{left:8,right:92,top:8,bottom:84,status:'illustrative / not locked'},ui_control_area:{left:8,right:92,top:87,bottom:97,status:'illustrative / not locked'}};
 out.textContent=JSON.stringify(spec,null,2);
 document.querySelector('#copy').onclick=async()=>{await navigator.clipboard.writeText(out.textContent);alert('Coordinates copied')};
+document.querySelector("#helpToggle").onclick=()=>{const h=document.querySelector("#helpContent");const on=h.style.display!=="none";h.style.display=on?"none":"";document.querySelector("#helpToggle").textContent=on?"Show help":"Hide help"};
 </script></body></html>
