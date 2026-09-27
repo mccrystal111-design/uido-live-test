@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>UiDo · Screen Coordinate Storyboard</title>
+<style>
+:root{--ink:#16231b;--green:#3f4b3b;--paper:#f7f5ee;--line:rgba(22,35,27,.18);--bg:#dfe4d8}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:Arial,sans-serif}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:28px}
+#screen{position:relative;width:min(100vw - 56px,calc((100vh - 56px)*9/16));height:min(100vh - 56px,calc((100vw - 56px)*16/9));background:#e9eadf;border:2px solid var(--green);box-shadow:0 10px 30px rgba(0,0,0,.15);overflow:hidden;touch-action:none}
+.grid{position:absolute;inset:0;background-image:linear-gradient(to right,rgba(22,35,27,.16) 1px,transparent 1px),linear-gradient(to bottom,rgba(22,35,27,.16) 1px,transparent 1px);background-size:10% 10%}
+.mid-v,.mid-h{position:absolute;background:rgba(22,35,27,.38);z-index:2}.mid-v{top:0;bottom:0;left:50%;width:1px}.mid-h{left:0;right:0;top:50%;height:1px}
+label.edge{position:absolute;font-size:10px;font-weight:700;background:rgba(247,245,238,.88);padding:2px 4px;border-radius:4px;z-index:5}
+.x0{left:0;top:2px}.x10{left:10%;top:2px}.x20{left:20%;top:2px}.x30{left:30%;top:2px}.x40{left:40%;top:2px}.x50{left:50%;top:2px;transform:translateX(-50%)}.x60{left:60%;top:2px}.x70{left:70%;top:2px}.x80{left:80%;top:2px}.x90{left:90%;top:2px}.x100{right:0;top:2px}
+.y0{left:2px;top:0}.y10{left:2px;top:10%}.y20{left:2px;top:20%}.y30{left:2px;top:30%}.y40{left:2px;top:40%}.y50{left:2px;top:50%;transform:translateY(-50%)}.y60{left:2px;top:60%}.y70{left:2px;top:70%}.y80{left:2px;top:80%}.y90{left:2px;top:90%}.y100{left:2px;bottom:0}
+.item{position:absolute;transform:translate(-50%,-50%);z-index:8;cursor:grab;user-select:none;text-align:center}
+.dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--ink);background:var(--paper);font-size:16px}
+.player .dot{background:#fff;border-color:var(--green)}
+.green .dot{background:#9aa98f;border-color:var(--green)}
+.tee .dot{background:#e8d6a2;border-color:#8c762e}
+.north{position:absolute;right:10px;top:10px;z-index:8;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-weight:700;font-size:11px}
+.play-arrow{position:absolute;left:50%;top:8%;height:34%;border-left:2px dashed var(--green);z-index:6}
+.play-arrow:after{content:"";position:absolute;bottom:-1px;left:-7px;border-left:6px solid transparent;border-right:6px solid transparent;border-top:12px solid var(--green)}
+.panel{position:fixed;z-index:20;left:10px;top:10px;width:220px;background:rgba(247,245,238,.95);border:1px solid var(--line);border-radius:10px;padding:10px;box-shadow:0 4px 18px rgba(0,0,0,.12);font-size:11px}
+h1{font-size:13px;margin:0 0 7px}.hint{color:#596052;line-height:1.35;margin-bottom:8px}
+.row{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-top:1px solid rgba(22,35,27,.08)}
+button{font:inherit;border:1px solid var(--line);background:#fff;border-radius:7px;padding:6px 8px;margin-top:7px}
+#readout{font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<div class="panel">
+<h1>UiDo · Screen Storyboard</h1>
+<div class="hint">Drag the reference points. Coordinates are screen coordinates only: X is left→right, Y is top→bottom. This board is not course geometry.</div>
+<div id="readout"></div>
+<button id="reset">Reset example</button>
+</div>
+<div id="stage"><div id="screen">
+<div class="grid"></div><div class="mid-v"></div><div class="mid-h"></div>
+<label class="edge x0">0%</label><label class="edge x10">10</label><label class="edge x20">20</label><label class="edge x30">30</label><label class="edge x40">40</label><label class="edge x50">50</label><label class="edge x60">60</label><label class="edge x70">70</label><label class="edge x80">80</label><label class="edge x90">90</label><label class="edge x100">100%</label>
+<label class="edge y0">0%</label><label class="edge y10">10</label><label class="edge y20">20</label><label class="edge y30">30</label><label class="edge y40">40</label><label class="edge y50">50</label><label class="edge y60">60</label><label class="edge y70">70</label><label class="edge y80">80</label><label class="edge y90">90</label><label class="edge y100">100%</label>
+<div class="north">N ↑</div><div class="play-arrow"></div>
+<div class="item tee" data-name="Tee" style="left:82%;top:88%"><div class="dot">T</div><small>Tee</small></div>
+<div class="item player" data-name="Player / GPS" style="left:82%;top:88%"><div class="dot">●</div><small>Player / GPS</small></div>
+<div class="item green" data-name="Green middle" style="left:54%;top:18%"><div class="dot">G</div><small>Green middle</small></div>
+</div></div>
+<script>
+const screen=document.getElementById('screen'), readout=document.getElementById('readout');
+const items=[...document.querySelectorAll('.item')];
+function pct(n){return Math.max(0,Math.min(100,n))}
+function update(){
+ readout.innerHTML=items.map(el=>{const r=el.getBoundingClientRect(),s=screen.getBoundingClientRect();const x=pct((r.left+r.width/2-s.left)/s.width*100),y=pct((r.top+r.height/2-s.top)/s.height*100);return '<div class="row"><b>'+el.dataset.name+'</b><span>X '+x.toFixed(0)+'% · Y '+y.toFixed(0)+'%</span></div>'}).join('');
+}
+items.forEach(el=>{
+ let drag=false;
+ const move=e=>{if(!drag)return;const r=screen.getBoundingClientRect();const p=e.touches?e.touches[0]:e;el.style.left=pct((p.clientX-r.left)/r.width*100)+'%';el.style.top=pct((p.clientY-r.top)/r.height*100)+'%';update()};
+ el.addEventListener('pointerdown',e=>{drag=true;el.setPointerCapture(e.pointerId)});
+ el.addEventListener('pointermove',move);el.addEventListener('pointerup',()=>drag=false);el.addEventListener('pointercancel',()=>drag=false);
+});
+document.getElementById('reset').onclick=()=>{items[0].style.left='82%';items[0].style.top='88%';items[1].style.left='82%';items[1].style.top='88%';items[2].style.left='54%';items[2].style.top='18%';update()};
+update();
+</script>
+</body>
+</html>
