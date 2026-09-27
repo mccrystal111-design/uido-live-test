@@ -16,31 +16,38 @@ label.edge{position:absolute;font-size:10px;font-weight:700;background:rgba(247,
 .y0{left:2px;top:0}.y10{left:2px;top:10%}.y20{left:2px;top:20%}.y30{left:2px;top:30%}.y40{left:2px;top:40%}.y50{left:2px;top:50%;transform:translateY(-50%)}.y60{left:2px;top:60%}.y70{left:2px;top:70%}.y80{left:2px;top:80%}.y90{left:2px;top:90%}.y100{left:2px;bottom:0}
 .item{position:absolute;transform:translate(-50%,-50%);z-index:8;cursor:grab;user-select:none;text-align:center}
 .dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--ink);background:var(--paper);font-size:16px}
-.player .dot{background:#fff;border-color:var(--green)}
-.green .dot{background:#9aa98f;border-color:var(--green)}
-.tee .dot{background:#e8d6a2;border-color:#8c762e}
-.north{position:absolute;right:10px;top:10px;z-index:8;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-weight:700;font-size:11px}
+.player .dot{background:#fff;border-color:var(--green)}.green .dot{background:#9aa98f;border-color:var(--green)}.tee .dot{background:#e8d6a2;border-color:#8c762e}
 .play-arrow{position:absolute;left:50%;top:8%;height:34%;border-left:2px dashed var(--green);z-index:6}
 .play-arrow:after{content:"";position:absolute;bottom:-1px;left:-7px;border-left:6px solid transparent;border-right:6px solid transparent;border-top:12px solid var(--green)}
-.panel{position:fixed;z-index:20;left:10px;top:10px;width:220px;background:rgba(247,245,238,.95);border:1px solid var(--line);border-radius:10px;padding:10px;box-shadow:0 4px 18px rgba(0,0,0,.12);font-size:11px}
-h1{font-size:13px;margin:0 0 7px}.hint{color:#596052;line-height:1.35;margin-bottom:8px}
+/* Reference-only version of the normal UiDo right information rail. */
+#infoRail{position:absolute;z-index:12;top:10px;right:10px;width:138px;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.infoBox{height:58px;background:rgba(247,245,238,.94);border:1px solid var(--line);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.10)}
+.infoBox.tall{height:82px}
+.infoBox.small{height:42px}
+.story-controls{position:fixed;z-index:20;left:10px;top:10px;display:flex;gap:6px}
+.control{font:inherit;border:1px solid var(--line);background:rgba(247,245,238,.95);color:var(--ink);border-radius:7px;padding:6px 9px;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+#help{position:fixed;z-index:21;left:10px;top:48px;width:240px;background:rgba(247,245,238,.97);border:1px solid var(--line);border-radius:10px;padding:10px;box-shadow:0 4px 18px rgba(0,0,0,.12);font-size:11px;line-height:1.35;display:none}
+#help h1{font-size:13px;margin:0 0 7px}.hint{color:#596052}
+#readout{font-variant-numeric:tabular-nums;margin-top:8px}
 .row{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-top:1px solid rgba(22,35,27,.08)}
-button{font:inherit;border:1px solid var(--line);background:#fff;border-radius:7px;padding:6px 8px;margin-top:7px}
-#readout{font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
-<div class="panel">
+<div class="story-controls">
+<button class="control" id="helpToggle">Help</button>
+<button class="control" id="reset">Reset</button>
+</div>
+<div id="help">
 <h1>UiDo · Screen Storyboard</h1>
-<div class="hint">Drag the reference points. Coordinates are screen coordinates only: X is left→right, Y is top→bottom. This board is not course geometry.</div>
+<div class="hint">Drag the reference points. Coordinates are screen coordinates only: X is left→right, Y is top→bottom. This board is not course geometry. The pale boxes on the right are spacing references for the normal UiDo information rail.</div>
 <div id="readout"></div>
-<button id="reset">Reset example</button>
 </div>
 <div id="stage"><div id="screen">
 <div class="grid"></div><div class="mid-v"></div><div class="mid-h"></div>
 <label class="edge x0">0%</label><label class="edge x10">10</label><label class="edge x20">20</label><label class="edge x30">30</label><label class="edge x40">40</label><label class="edge x50">50</label><label class="edge x60">60</label><label class="edge x70">70</label><label class="edge x80">80</label><label class="edge x90">90</label><label class="edge x100">100%</label>
 <label class="edge y0">0%</label><label class="edge y10">10</label><label class="edge y20">20</label><label class="edge y30">30</label><label class="edge y40">40</label><label class="edge y50">50</label><label class="edge y60">60</label><label class="edge y70">70</label><label class="edge y80">80</label><label class="edge y90">90</label><label class="edge y100">100%</label>
-<div class="north">N ↑</div><div class="play-arrow"></div>
+<div class="play-arrow"></div>
+<div id="infoRail" aria-hidden="true"><div class="infoBox tall"></div><div class="infoBox"></div><div class="infoBox"></div><div class="infoBox small"></div></div>
 <div class="item tee" data-name="Tee" style="left:82%;top:88%"><div class="dot">T</div><small>Tee</small></div>
 <div class="item player" data-name="Player / GPS" style="left:82%;top:88%"><div class="dot">●</div><small>Player / GPS</small></div>
 <div class="item green" data-name="Green middle" style="left:54%;top:18%"><div class="dot">G</div><small>Green middle</small></div>
@@ -54,11 +61,12 @@ function update(){
 }
 items.forEach(el=>{
  let drag=false;
- const move=e=>{if(!drag)return;const r=screen.getBoundingClientRect();const p=e.touches?e.touches[0]:e;el.style.left=pct((p.clientX-r.left)/r.width*100)+'%';el.style.top=pct((p.clientY-r.top)/r.height*100)+'%';update()};
  el.addEventListener('pointerdown',e=>{drag=true;el.setPointerCapture(e.pointerId)});
- el.addEventListener('pointermove',move);el.addEventListener('pointerup',()=>drag=false);el.addEventListener('pointercancel',()=>drag=false);
+ el.addEventListener('pointermove',e=>{if(!drag)return;const r=screen.getBoundingClientRect();el.style.left=pct((e.clientX-r.left)/r.width*100)+'%';el.style.top=pct((e.clientY-r.top)/r.height*100)+'%';update()});
+ el.addEventListener('pointerup',()=>drag=false);el.addEventListener('pointercancel',()=>drag=false);
 });
 document.getElementById('reset').onclick=()=>{items[0].style.left='82%';items[0].style.top='88%';items[1].style.left='82%';items[1].style.top='88%';items[2].style.left='54%';items[2].style.top='18%';update()};
+document.getElementById('helpToggle').onclick=()=>{const h=document.getElementById('help');h.style.display=h.style.display==='block'?'none':'block'};
 update();
 </script>
 </body>
