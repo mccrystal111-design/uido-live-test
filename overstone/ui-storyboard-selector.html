@@ -1,0 +1,30 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>UiDo Storyboard Selector</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;font-family:Arial;background:#dfe4d8;color:#16231b}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px}#screen{position:relative;width:min(100vw - 40px,calc((100vh - 40px)*9/16));height:min(100vh - 40px,calc((100vw - 40px)*16/9));background:#e9eadf;border:2px solid #3f4b3b;overflow:hidden;touch-action:none}
+.grid{position:absolute;inset:0;background-image:linear-gradient(to right,#16231b28 1px,transparent 1px),linear-gradient(to bottom,#16231b28 1px,transparent 1px);background-size:10% 10%}.mid{position:absolute;background:#16231b66;z-index:1}.v{left:50%;top:0;bottom:0;width:1px}.h{top:50%;left:0;right:0;height:1px}
+.item{position:absolute;transform:translate(-50%,-50%);z-index:8;cursor:grab;text-align:center;user-select:none}.dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;border:2px solid #16231b;background:#f7f5ee;font-weight:700}
+.player .dot{border-color:#3f4b3b}.green .dot{background:#9aa98f}.tee .dot{background:#e8d6a2}.bunker .dot{background:#c9b78c}
+.label{position:absolute;transform:translate(-50%,-50%);z-index:7;padding:4px 7px;border:1px dashed #3f4b3b;border-radius:6px;background:#f7f5eecc;font-size:10px;white-space:nowrap;cursor:grab}
+#tools{position:fixed;left:10px;top:10px;width:250px;z-index:20;background:#f7f5eef5;border:1px solid #16231b2b;border-radius:10px;padding:10px;box-shadow:0 4px 18px #0002;font-size:11px}
+button,select{font:inherit;padding:6px 8px;border:1px solid #16231b2b;border-radius:7px;background:#fff;margin:3px 2px}
+pre{white-space:pre-wrap;font-size:10px;line-height:1.3;max-height:38vh;overflow:auto;margin:6px 0 0}
+</style></head><body>
+<div id="tools"><b>UiDo · Storyboard Selector</b><p>Drag the objects to the positions you want. The output is the numeric specification to send back with your screenshot.</p>
+<select id="add"><option value="">Add reference…</option><option value="bunker-left">Bunker · LEFT of line of play</option><option value="bunker-right">Bunker · RIGHT of line of play</option><option value="bunker-label-left">Bunker label · LEFT</option><option value="bunker-label-right">Bunker label · RIGHT</option></select><button id="addBtn">Add</button><button id="reset">Reset</button><button id="copy">Copy spec</button><pre id="out"></pre></div>
+<div id="stage"><div id="screen"><div class="grid"></div><div class="mid v"></div><div class="mid h"></div>
+<div class="item tee" data-type="tee" data-name="Tee" style="left:82%;top:88%"><div class="dot">T</div><small>Tee</small></div>
+<div class="item player" data-type="player" data-name="Player / GPS" style="left:82%;top:88%"><div class="dot">●</div><small>Player</small></div>
+<div class="item green" data-type="green-middle" data-name="Green middle" style="left:54%;top:18%"><div class="dot">G</div><small>Green</small></div>
+</div></div>
+<script>
+const s=document.querySelector('#screen'),out=document.querySelector('#out');let n=0;
+function pct(v){return Math.max(0,Math.min(100,v))}
+function pos(el){const a=el.getBoundingClientRect(),b=s.getBoundingClientRect();return{x:+pct((a.left+a.width/2-b.left)/b.width*100).toFixed(1),y:+pct((a.top+a.height/2-b.top)/b.height*100).toFixed(1)}}
+function spec(){const arr=[...s.querySelectorAll('[data-type]')].map(e=>({name:e.dataset.name,type:e.dataset.type,...pos(e)}));out.textContent=JSON.stringify({screen:"X 0=left,100=right; Y 0=top,100=bottom",objects:arr},null,2)}
+function drag(el){let down=false;el.addEventListener('pointerdown',e=>{down=true;el.setPointerCapture(e.pointerId)});el.addEventListener('pointermove',e=>{if(!down)return;let r=s.getBoundingClientRect();el.style.left=pct((e.clientX-r.left)/r.width*100)+'%';el.style.top=pct((e.clientY-r.top)/r.height*100)+'%';spec()});el.addEventListener('pointerup',()=>down=false);el.addEventListener('pointercancel',()=>down=false)}
+document.querySelectorAll('.item').forEach(drag);
+document.querySelector('#addBtn').onclick=()=>{let v=document.querySelector('#add').value;if(!v)return;n++;let parts=v.split('-');let type=parts[0],side=parts[1]||'';let e=document.createElement('div');e.className=type==='bunker'?'item bunker':'label';e.dataset.type=type+(side?'-'+side:'');e.dataset.name=type==='bunker'?'Bunker '+n:(type==='bunker'?'Bunker':'Bunker label')+' '+n+' '+side.toUpperCase();e.style.left='50%';e.style.top='50%';e.innerHTML=type==='bunker'?'<div class="dot">B</div><small>'+side.toUpperCase()+'</small>':'BUNKER LABEL · '+side.toUpperCase();s.appendChild(e);drag(e);spec();document.querySelector('#add').value=''};
+document.querySelector('#reset').onclick=()=>location.reload();
+document.querySelector('#copy').onclick=async()=>{await navigator.clipboard.writeText(out.textContent);alert('Specification copied')};spec();
+</script></body></html>
