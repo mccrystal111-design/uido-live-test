@@ -9,10 +9,10 @@
 .area-label{position:absolute;font-size:10px;font-weight:700;background:#f7f5eedd;padding:3px 6px;border-radius:5px;white-space:nowrap}
 .safe .area-label{left:6px;top:6px}.controls .area-label{left:50%;top:50%;transform:translate(-50%,-50%)}
 #tools{position:fixed;left:10px;top:10px;width:265px;z-index:20;background:#f7f5eef5;border:1px solid #16231b2b;border-radius:10px;padding:10px;box-shadow:0 4px 18px #0002;font-size:11px}
-#tools p{margin:7px 0}.key{line-height:1.6}button{font:inherit;padding:6px 8px;border:1px solid #16231b2b;border-radius:7px;background:#fff;margin:3px 2px}
+#tools p{margin:7px 0}.toggle{display:flex;align-items:center;gap:6px;margin-bottom:7px;cursor:pointer;font-weight:700}.toggle input{display:none}.switch{width:30px;height:17px;border-radius:20px;background:#9aa98f;position:relative}.switch:after{content:"";position:absolute;width:13px;height:13px;left:2px;top:2px;border-radius:50%;background:#fff;transition:.15s}.toggle input:not(:checked)+.switch{background:#aaa}.toggle input:not(:checked)+.switch:after{left:15px}.key{line-height:1.6}button{font:inherit;padding:6px 8px;border:1px solid #16231b2b;border-radius:7px;background:#fff;margin:3px 2px}
 pre{white-space:pre-wrap;font-size:10px;line-height:1.3;max-height:28vh;overflow:auto;margin:6px 0 0}
 </style></head><body>
-<div id="tools"><button id="helpToggle">Hide help</button><div id="helpContent"><b>UiDo · Viewport & Safe Area</b>
+<div id="tools"><label class="toggle"><input id="helpToggle" type="checkbox" checked><span class="switch"></span><span>Help</span></label><div id="helpContent"><b>UiDo · Viewport & Safe Area</b>
 <p><b>Viewport:</b> the complete UiDo app view. Browser tabs, address bars and browser controls are outside this coordinate system.</p>
 <div class="key"><b>X:</b> 0% left → 100% right<br><b>Y:</b> 0% top → 100% bottom</div>
 <p><b>Illustrative safe presentation area:</b> 8% left/right, 8% top, 16% bottom. This is a working reference only; it is not yet a locked rule.</p>
@@ -28,5 +28,5 @@ const s=document.querySelector('#screen'),out=document.querySelector('#out');
 const spec={viewport:{x:[0,100],y:[0,100],note:'UiDo viewport only; browser chrome excluded'},safe_presentation_area:{left:8,right:92,top:8,bottom:84,status:'illustrative / not locked'},ui_control_area:{left:8,right:92,top:87,bottom:97,status:'illustrative / not locked'}};
 out.textContent=JSON.stringify(spec,null,2);
 document.querySelector('#copy').onclick=async()=>{await navigator.clipboard.writeText(out.textContent);alert('Coordinates copied')};
-document.querySelector("#helpToggle").onclick=()=>{const h=document.querySelector("#helpContent");const on=h.style.display!=="none";h.style.display=on?"none":"";document.querySelector("#helpToggle").textContent=on?"Show help":"Hide help"};
+document.querySelector("#helpToggle").onchange=e=>{document.querySelector("#helpContent").style.display=e.target.checked?"":"none"};
 </script></body></html>
