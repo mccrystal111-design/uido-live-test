@@ -17,6 +17,7 @@ svg{width:100%;height:100%;display:block}
 .green{fill:#b9caa0;stroke:#4d6543;stroke-width:.45}
 .bunker{fill:#d8c9a0;stroke:#8c7950;stroke-width:.4}
 .teeBox{fill:#c8c6a8;stroke:#7d8069;stroke-width:.35}
+.water{fill:#d9dce0;stroke:#4d5258;stroke-width:.35}
 .playline{fill:none;stroke:#3f4b3b;stroke-width:.45;stroke-dasharray:1.2 1}
 .teeMarker{fill:#82956f;stroke:#526348;stroke-width:.4}
 .greenMarker{fill:none;stroke:#3f4b3b;stroke-width:.45}
@@ -50,7 +51,7 @@ svg{width:100%;height:100%;display:block}
     <rect x="0" y="0" width="60" height="177.7777777778" fill="url(#roughFadeYGradient)"></rect>
   </mask>
 </svg></div>
-<div class="status">Hole 17 · X10-X60 usable hole-view · visual balance ≈ X35 · relevant geometry tee/fairway/green/bunkers · heavy rough non-constraining</div>
+<div class="status">Hole 17 · X10-X60 usable hole-view · visual balance ≈ X35 · relevant geometry tee/fairway/green/bunkers · water structural · heavy rough non-constraining</div>
 </div></div>
 <script src="course-source-model.js"></script>
 <script>
@@ -97,7 +98,8 @@ function makeCamera(teeX,greenX){
 }
 
 // Source geometry is immutable. Visual balance and camera constraints use
-// tee + fairway + green + bunker. Heavy rough remains rendered source
+// tee + fairway + green + bunker. Water is structural but does not constrain
+// camera placement. Heavy rough remains rendered source
 // geometry but is non-constraining and never participates in the bounds.
 const cameraConstraintFeatures=(source.features||[]).filter(f=>
   f.geometry && f.geometry.type==="Polygon" &&
@@ -199,6 +201,7 @@ function addFeature(f){
 (source.features||[]).filter(f=>f.golf==="green").forEach(addFeature);
 (source.features||[]).filter(f=>f.golf==="bunker").forEach(addFeature);
 (source.features||[]).filter(f=>f.golf==="tee").forEach(addFeature);
+(source.features||[]).filter(f=>f.golf==="water_hazard").forEach(addFeature);
 addPath("playline",source.line_of_play.map(p=>projectLL(p)),false);
 
 if(!meetsSafeViewport(bounds)) throw new Error("No tee/green X combination satisfies the X10-X60 usable hole-view area");
