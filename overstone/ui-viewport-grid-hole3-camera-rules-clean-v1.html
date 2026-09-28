@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UiDo — Overstone Hole 3 — Camera Rules Clean v1</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dfe4d8}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px}
+#screen{position:relative;width:min(calc(100vw - 40px),calc((100vh - 40px)*9/16));height:min(calc(100vh - 40px),calc((100vw - 40px)*16/9));background:#f4f1e6;border:2px solid #3f4b3b;overflow:hidden}
+.grid{position:absolute;inset:0;background-image:linear-gradient(to right,#16231b22 1px,transparent 1px),linear-gradient(to bottom,#16231b22 1px,transparent 1px);background-size:10% 10%;z-index:1}
+.course{position:absolute;inset:0;z-index:2;pointer-events:none}
+svg{width:100%;height:100%;display:block}
+.fairway{fill:#9cad83;stroke:#5f7254;stroke-width:.35}
+.green{fill:#b9caa0;stroke:#4d6543;stroke-width:.45}
+.bunker{fill:#d8c9a0;stroke:#8c7950;stroke-width:.4}
+.playline{fill:none;stroke:#3f4b3b;stroke-width:.45;stroke-dasharray:1.2 1}
+.teeMarker{fill:#82956f;stroke:#526348;stroke-width:.4}
+.greenMarker{fill:none;stroke:#3f4b3b;stroke-width:.45}
+</style>
+</head>
+<body>
+<div id="stage"><div id="screen">
+<div class="grid"></div>
+<div class="course">
+<svg id="courseSvg" viewBox="0 0 100 177.7777777778" preserveAspectRatio="none">
+<path id="fairway" class="fairway"></path>
+<path id="green" class="green"></path>
+<g id="bunkers"></g>
+<path id="playline" class="playline"></path>
+<circle id="teeMarker" class="teeMarker" r="1.5"></circle>
+<circle id="greenMarker" class="greenMarker" r="1.4"></circle>
+</svg>
+</div>
+</div></div>
+
+<script>
+/*
+ OVERSTONE HOLE 3 — AUTHORITATIVE SOURCE GEOMETRY
+
+ Source: overstone/hole-wireframes.js
+ Hole 3 was updated in the repository on 2026-09-25 to use the
+ authoritative OSM-derived bunker geometry for the three bunkers.
+
+ Geometry is kept in its source coordinate system.
+ Nothing below changes the source geometry itself.
+*/
+
+const hole={
+  tee:[0,0],
+
+  // The green-middle marker is the geometric centroid of the
+  // authoritative Hole 3 green polygon below.
+  greenMiddle:[1399.9245283018868,463.85714285714283],
+
+  line:[
+    [0,0],
+    [780,408],
+    [1025,460],
+    [1408,465]
+  ],
+
+  fairway:[
+    [361,211],
+    [760,364],
+    [1434,446],
+    [1447,479],
+    [804,440],
+    [361,211]
+  ],
+
+  green:[
+    [1352,468],
+    [1366,457],
+    [1436,454],
+    [1443,469],
+    [1387,474],
+    [1352,468]
+  ],
+
+  teeShape:[
+    [12,4],
+    [3,8],
+    [-10,-1],
+    [-9,-3],
+    [12,-3],
+    [12,4]
+  ],
+
+  bunkers:[
+    [
+      [462,316],
+      [460,299],
+      [461,268],
+      [474,280],
+      [483,311],
+      [462,316]
+    ],
+    [
+      [565,357],
+      [571,342],
+      [617,362],
+      [619,367],
+      [583,361],
+      [565,357]
+    ],
+    [
+      [1314.7,460.1],
+      [1313.8,456.5],
+      [1315.9,453.2],
+      [1318.6,451.4],
+      [1320.5,449.1],
+      [1320.5,444.6],
+      [1324.6,441.2],
+      [1328.8,439.7],
+      [1334.7,438.9],
+      [1337.8,437.1],
+      [1341.3,434.1],
+      [1346.8,431.5],
+      [1353.7,429.5],
+      [1359.4,429.4],
+      [1365.1,429.7],
+      [1370.6,430.7],
+      [1374.4,431.4],
+      [1377.3,433.1],
+      [1379.6,435.5],
+      [1379.6,438.4],
+      [1376.1,441.3],
+      [1371.2,441.5],
+      [1366.5,441],
+      [1361.4,439.5],
+      [1356.2,439.2],
+      [1352.3,440.7],
+      [1345.8,444.4],
+      [1341.6,445.7],
+      [1337.6,447.4],
+      [1335.2,448.4],
+      [1333.9,450.9],
+      [1333.5,452.6],
+      [1335.2,454.6],
+      [1336,456.2],
+      [1338.3,458.4],
+      [1339.4,460.1],
+      [1338.2,461.7],
+      [1336.3,462.8],
+      [1333.9,463.9],
+      [1330.9,465.2],
+      [1327.6,465.9],
+      [1323.8,465.8],
+      [1319.9,464.6],
+      [1316.2,462.3],
+      [1314.7,460.1]
+    ]
+  ]
+};
+
+/*
+ CAMERA RULES — SAME AS THE ACCEPTED HOLE 1 v3 BUILD
+
+ 1. Source geometry is fixed.
+ 2. Tee/player is the fixed opening anchor and rotation point.
+ 3. The physical viewport is portrait 9:16.
+ 4. X/Y percentages refer to the actual viewport dimensions.
+ 5. Rotate the complete hole around the tee so tee→green is the
+    vertical viewing axis.
+ 6. Apply ONE uniform scale.
+ 7. No independent X/Y scaling, widening or squeezing.
+ 8. Opening test anchors:
+      tee   = X25%, Y90%
+      green = X25%, Y10%
+*/
+
+const VIEW_WIDTH=100;
+const VIEW_HEIGHT=100*16/9;
+
+const teeAnchor=[
+  VIEW_WIDTH*0.25,
+  VIEW_HEIGHT*0.90
+];
+
+const greenAnchor=[
+  VIEW_WIDTH*0.25,
+  VIEW_HEIGHT*0.10
+];
+
+const targetVector=[
+  0,
+  teeAnchor[1]-greenAnchor[1]
+];
+
+const courseVector=[
+  hole.greenMiddle[0]-hole.tee[0],
+  hole.greenMiddle[1]-hole.tee[1]
+];
+
+const rotation=
+  Math.atan2(targetVector[1],targetVector[0])-
+  Math.atan2(courseVector[1],courseVector[0]);
+
+const scale=
+  Math.hypot(targetVector[0],targetVector[1])/
+  Math.hypot(courseVector[0],courseVector[1]);
+
+function project(point){
+  const x=point[0]-hole.tee[0];
+  const y=point[1]-hole.tee[1];
+
+  const c=Math.cos(rotation);
+  const s=Math.sin(rotation);
+
+  // Physical camera space: +X right, +Y up.
+  const cameraX=x*c-y*s;
+  const cameraY=x*s+y*c;
+
+  // SVG screen space: +Y down.
+  return [
+    teeAnchor[0]+cameraX*scale,
+    teeAnchor[1]-cameraY*scale
+  ];
+}
+
+// Hard assertions before rendering.
+const pTee=project(hole.tee);
+const pGreen=project(hole.greenMiddle);
+const EPS=1e-7;
+
+if(Math.abs(pTee[0]-teeAnchor[0])>EPS ||
+   Math.abs(pTee[1]-teeAnchor[1])>EPS){
+  throw new Error("Hole 3 tee anchor transform failed");
+}
+
+if(Math.abs(pGreen[0]-greenAnchor[0])>EPS ||
+   Math.abs(pGreen[1]-greenAnchor[1])>EPS){
+  throw new Error("Hole 3 green anchor transform failed");
+}
+
+function closedPath(points){
+  return points.map((point,index)=>{
+    const [x,y]=project(point);
+    return (index?"L":"M")+x.toFixed(3)+" "+y.toFixed(3);
+  }).join(" ")+" Z";
+}
+
+function openPath(points){
+  return points.map((point,index)=>{
+    const [x,y]=project(point);
+    return (index?"L":"M")+x.toFixed(3)+" "+y.toFixed(3);
+  }).join(" ");
+}
+
+document.getElementById("fairway")
+  .setAttribute("d",closedPath(hole.fairway));
+
+document.getElementById("green")
+  .setAttribute("d",closedPath(hole.green));
+
+document.getElementById("playline")
+  .setAttribute("d",openPath(hole.line));
+
+const bunkerLayer=document.getElementById("bunkers");
+
+hole.bunkers.forEach(bunker=>{
+  const element=document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "path"
+  );
+  element.setAttribute("class","bunker");
+  element.setAttribute("d",closedPath(bunker));
+  bunkerLayer.appendChild(element);
+});
+
+document.getElementById("teeMarker")
+  .setAttribute("cx",teeAnchor[0]);
+
+document.getElementById("teeMarker")
+  .setAttribute("cy",teeAnchor[1]);
+
+document.getElementById("greenMarker")
+  .setAttribute("cx",greenAnchor[0]);
+
+document.getElementById("greenMarker")
+  .setAttribute("cy",greenAnchor[1]);
+</script>
+</body>
+</html>
