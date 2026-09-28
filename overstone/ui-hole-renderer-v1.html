@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UiDo — Generic Hole Renderer v1</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dfe4d8}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px}
+#screen{position:relative;width:min(calc(100vw - 40px),calc((100vh - 40px)*9/16));height:min(calc(100vh - 40px),calc((100vw - 40px)*16/9));background:#f4f1e6;overflow:hidden}
+svg{width:100%;height:100%;display:block}
+.rough{fill:#b9c7ae;stroke:#8d9e85;stroke-width:.22}
+.fairway{fill:#9cad83;stroke:#5f7254;stroke-width:.35}
+.green{fill:#b9caa0;stroke:#4d6543;stroke-width:.45}
+.bunker{fill:#d8c9a0;stroke:#8c7950;stroke-width:.4}
+.playline{fill:none;stroke:#3f4b3b;stroke-width:.45;stroke-dasharray:1.2 1}
+.teeMarker{fill:#82956f;stroke:#526348;stroke-width:.4}
+.greenMarker{fill:none;stroke:#3f4b3b;stroke-width:.45}
+</style>
+</head>
+<body>
+<div id="stage"><div id="screen"><svg id="courseSvg" viewBox="0 0 100 177.7777777778" preserveAspectRatio="none"></svg></div></div>
+<script src="course-source-model.js"></script>
+<script>
+/*
+  UiDo Generic Hole Renderer v1
+  -----------------------------
+  Camera:
+  - tee is the fixed rotation point
+  - source geometry is never moved, stretched or smoothed
+  - one uniform scale only
+  - green target is normally X25 / Y10
+  - green X may slide along the Y10 line
+  - fairway + bunker geometry must retain 10% side breathing room
+  - no arch locus yet; straight Y10 search is the first constraint
+*/
+
+const CONFIG={
+  hole:11,
+  teeAnchor:{x:25,y:90},
+  greenTarget:{x:25,y:10},
+  greenYFlexible:true,
+  minSideClearance:10,
+  greenSearchStep:.25
+};
+
+const params=new URLSearchParams(location.search);
+const holeNumber=Number(params.get("hole")||CONFIG.hole);
+const source=window.UIDO_OVERSTONE_SOURCE_HOLES[String(holeNumber)];
+if(!source) throw new Error("Authoritative source model not found for Hole "+holeNumber);
+
+const VIEW_W=100, VIEW_H=100*16/9;
+const teeAnchor=[VIEW_W*CONFIG.teeAnchor.x/100,VIEW_H*CONFIG.teeAnchor.y/100];
+const greenY=VIEW_H*CONFIG.greenTarget.y/100;
+
+const teeLL=[source.line_of_play[0][0],source.line_of_play[0][1]];
+const greenMiddleLL=[source.green_fmb.middle[1],source.green_fmb.middle[0]];
+
+const refLat=teeLL[1]*Math.PI/180;
+const M_LAT=111320;
+const M_LON=111320*Math.cos(refLat);
+
+function local(ll){
+  return [(ll[0]-teeLL[0])*M_LON,(ll[1]-teeLL[1])*M_LAT];
+}
+
+const greenLocal=local(greenMiddleLL);
+const targetDistance=teeAnchor[1]-greenY;
+
+function makeCamera(greenX){
+  const rotation=Math.atan2(greenY-teeAnchor[1],greenX-teeAnchor[0])
+    -Math.atan2(greenLocal[1],greenLocal[0]);
+
+  const scale=targetDistance/Math.hypot(greenLocal[0],greenLocal[1]);
+
+  function projectLL(ll){
+    const p=local(ll);
+    const c=Math.cos(rotation),s=Math.sin(rotation);
+    const x=p[0]*c-p[1]*s;
+    const y=p[0]*s+p[1]*c;
+    return [teeAnchor[0]+x*scale,teeAnchor[1]-y*scale];
+  }
+
+  return {rotation,scale,projectLL};
+}
+
+const constraintFeatures=(source.features||[]).filter(
+  f=>(f.golf==="fairway"||f.golf==="bunker") &&
+  f.geometry && f.geometry.type==="Polygon"
+);
+
+const constraintPoints=constraintFeatures.flatMap(
+  f=>f.geometry.coordinates[0]
+);
+
+function evaluateCamera(camera){
+  const xs=constraintPoints.map(p=>camera.projectLL(p)[0]);
+  const minX=Math.min(...xs);
+  const maxX=Math.max(...xs);
+  return {
+    minX,
+    maxX,
+    safe:minX>=CONFIG.minSideClearance && maxX<=VIEW_W-CONFIG.minSideClearance
+  };
+}
+
+function solveCamera(){
+  const preferredX=VIEW_W*CONFIG.greenTarget.x/100;
+  const preferred=makeCamera(preferredX);
+  if(evaluateCamera(preferred).safe){
+    return {greenX:preferredX,camera:preferred,constraint:evaluateCamera(preferred)};
+  }
+
+  // Straight-line green locus: search outward from the preferred X.
+  const candidates=[];
+  for(let x=CONFIG.minSideClearance;x<=VIEW_W-CONFIG.minSideClearance;x+=CONFIG.greenSearchStep){
+    const camera=makeCamera(x);
+    const constraint=evaluateCamera(camera);
+    if(constraint.safe){
+      candidates.push({greenX:x,camera,constraint,distance:Math.abs(x-preferredX)});
+    }
+  }
+
+  candidates.sort((a,b)=>a.distance-b.distance);
+  if(!candidates.length){
+    throw new Error("No Y10 green position satisfies the 10% side-clearance constraint");
+  }
+
+  return candidates[0];
+}
+
+const solved=solveCamera();
+const projectLL=solved.camera.projectLL;
+const svg=document.getElementById("courseSvg");
+const ns="http://www.w3.org/2000/svg";
+
+function path(points,close=true){
+  return points.map((p,i)=>(i?"L":"M")+p[0].toFixed(3)+" "+p[1].toFixed(3)).join(" ")+(close?" Z":"");
+}
+
+function addPath(cls,pts,close=true){
+  const e=document.createElementNS(ns,"path");
+  e.setAttribute("class",cls);
+  e.setAttribute("d",path(pts,close));
+  svg.appendChild(e);
+}
+
+function addFeature(f){
+  if(!f.geometry||f.geometry.type!=="Polygon")return;
+  const pts=f.geometry.coordinates[0].map(projectLL);
+  if(f.golf==="rough")addPath("rough",pts);
+  else if(f.golf==="fairway")addPath("fairway",pts);
+  else if(f.golf==="green")addPath("green",pts);
+  else if(f.golf==="bunker")addPath("bunker",pts);
+}
+
+// Draw contextual areas first, then playing surfaces.
+(source.features||[]).filter(f=>f.golf==="rough").forEach(addFeature);
+(source.features||[]).filter(f=>f.golf==="fairway").forEach(addFeature);
+(source.features||[]).filter(f=>f.golf==="green").forEach(addFeature);
+(source.features||[]).filter(f=>f.golf==="bunker").forEach(addFeature);
+
+addPath("playline",source.line_of_play.map(projectLL),false);
+
+const tee=document.createElementNS(ns,"circle");
+tee.setAttribute("class","teeMarker");
+tee.setAttribute("cx",teeAnchor[0]);
+tee.setAttribute("cy",teeAnchor[1]);
+tee.setAttribute("r","1.5");
+svg.appendChild(tee);
+
+const gm=document.createElementNS(ns,"circle");
+gm.setAttribute("class","greenMarker");
+gm.setAttribute("cx",solved.greenX);
+gm.setAttribute("cy",greenY);
+gm.setAttribute("r","1.4");
+svg.appendChild(gm);
+
+// Hard assertions: the camera is allowed to move the green target,
+// but the tee must remain the fixed rotation point.
+const EPS=1e-8;
+const pT=projectLL(teeLL);
+const pG=projectLL(greenMiddleLL);
+if(Math.hypot(pT[0]-teeAnchor[0],pT[1]-teeAnchor[1])>EPS){
+  throw new Error("Tee anchor transform failed");
+}
+if(Math.hypot(pG[0]-solved.greenX,pG[1]-greenY)>EPS){
+  throw new Error("Green target transform failed");
+}
+if(!solved.constraint.safe){
+  throw new Error("Side-clearance constraint failed");
+}
+</script>
+</body>
+</html>
