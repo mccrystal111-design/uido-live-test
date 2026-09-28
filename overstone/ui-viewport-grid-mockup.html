@@ -118,17 +118,15 @@ document.getElementById('green').setAttribute('d',path(hole.green));
 document.getElementById('lineplay').setAttribute('d',hole.line.map((p,i)=>{const [x,y]=P(p);return (i?'L':'M')+x.toFixed(2)+' '+y.toFixed(2)}).join(' '));
 hole.bunkers.forEach(b=>{const e=document.createElementNS('http://www.w3.org/2000/svg','path');e.setAttribute('class','bunker');e.setAttribute('d',path(b));document.getElementById('bunkers').appendChild(e)});
 const t=P(hole.tee),g=P(hole.greenMiddle),pin=P([-0.8150842,52.2777189]);
-// Align the real course geometry to the fixed UI anchors:
-// tee sits on the player/tee circle; green-middle sits on the green-mid circle.
-const dxT=25-t[0], dyT=85-t[1], dxG=25-g[0], dyG=15-g[1];
-function shiftPath(id,dx,dy){
-  const el=document.getElementById(id);
-  const d=el.getAttribute('d');
-  el.setAttribute('transform',`translate(${dxT} ${dyT})`);
-}
+// One transform only: the tee is the fixed player position.
+// Everything else keeps its true relationship to the tee.
+const dxT=25-t[0], dyT=85-t[1];
 document.getElementById('course').setAttribute('transform',`translate(${dxT} ${dyT})`);
-document.getElementById('green').setAttribute('transform',`translate(${dxG-dxT} ${dyG-dyT})`);
 
+// Put the green-middle UI marker on the transformed real green centre.
+const greenAnchor=document.querySelector('.greenAnchor');
+greenAnchor.style.left=(g[0]+dxT)+'%';
+greenAnchor.style.top=(g[1]+dyT)+'%';
 document.getElementById('pin').setAttribute('cx',pin[0]);document.getElementById('pin').setAttribute('cy',pin[1]);
 document.getElementById('tees').innerHTML='<circle class="teeShape" cx="'+t[0]+'" cy="'+t[1]+'" r="1.5"/>';
 document.getElementById('toggleInfo').onclick=()=>{document.getElementById('info').classList.toggle('off');document.getElementById('toggleInfo').textContent=document.getElementById('info').classList.contains('off')?'Show information viewport':'Hide information viewport'};
