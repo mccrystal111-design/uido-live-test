@@ -192,6 +192,17 @@ function addFeature(f){
     outer.appendChild(inner);
     svg.appendChild(outer);
   }else if(f.golf==="fairway")addPath("fairway",pts);
+  else if(f.golf==="water_hazard"){
+    // Keep the complete source lake immutable; clip only its presentation
+    // to the hole viewport because the lake extends beyond this hole view.
+    const g=document.createElementNS(ns,"g");
+    g.setAttribute("clip-path","url(#holeViewClip)");
+    const e=document.createElementNS(ns,"path");
+    e.setAttribute("class","water");
+    e.setAttribute("d",path(pts,true));
+    g.appendChild(e);
+    svg.appendChild(g);
+  }
   else if(f.golf==="green")addPath("green",pts);
   else if(f.golf==="bunker")addPath("bunker",pts);
   else if(f.golf==="tee")addPath("teeBox",pts);
