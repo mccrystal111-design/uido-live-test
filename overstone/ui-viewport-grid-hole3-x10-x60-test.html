@@ -40,7 +40,7 @@ svg{width:100%;height:100%;display:block}
     <rect x="0" y="0" width="60" height="177.7777777778" fill="url(#roughFadeGradient)"></rect>
   </mask>
 </svg></div>
-<div class="status">Hole 3 · X10-X60 usable hole-view · immutable geometry / tee pivot / flexible tee X + green X / heavy rough non-constraining</div>
+<div class="status">Hole 3 · X10-X60 usable hole-view · visual balance ≈ X35 · relevant geometry tee/fairway/green/bunkers · heavy rough non-constraining</div>
 </div></div>
 <script src="course-source-model.js"></script>
 <script>
@@ -55,6 +55,7 @@ const GREEN_X_PREFERRED=VIEW_W*.25;
 const SAFE_X_MIN=VIEW_W*.10;
 const SAFE_X_MAX=VIEW_W*.60;
 const X_STEP=.25;
+const VISUAL_BALANCE_X=VIEW_W*.35;
 
 // Source coordinates are [longitude, latitude].
 const teeLL=[source.line_of_play[0][0],source.line_of_play[0][1]];
@@ -85,9 +86,9 @@ function makeCamera(teeX,greenX){
   return {rotation,scale,project};
 }
 
-// Source geometry is immutable. Camera constraints use only the
-// presentation-priority playing geometry: fairway, green and bunker.
-// Heavy rough remains rendered source geometry but is non-constraining.
+// Source geometry is immutable. Visual balance and camera constraints use
+// tee + fairway + green + bunker. Heavy rough remains rendered source
+// geometry but is non-constraining and never participates in the bounds.
 const cameraConstraintFeatures=(source.features||[]).filter(f=>
   f.geometry && f.geometry.type==="Polygon" &&
   Array.isArray(f.geometry.coordinates) &&
@@ -95,8 +96,8 @@ const cameraConstraintFeatures=(source.features||[]).filter(f=>
   ["fairway","green","bunker"].includes(f.golf)
 );
 
-function projectedBounds(camera){
-  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+function projectedBounds(camera,teeX){
+  let minX=teeX,maxX=teeX,minY=TEE_Y,maxY=TEE_Y;
   cameraConstraintFeatures.forEach(f=>{
     f.geometry.coordinates[0].forEach(ll=>{
       const p=camera.project(ll);
@@ -106,7 +107,7 @@ function projectedBounds(camera){
       maxY=Math.max(maxY,p[1]);
     });
   });
-  return {minX,maxX,minY,maxY};
+  return {minX,maxX,minY,maxY,centerX:(minX+maxX)/2,width:maxX-minX};
 }
 
 function meetsSafeViewport(bounds){
@@ -123,10 +124,11 @@ const candidates=[];
 for(let teeX=SAFE_X_MIN;teeX<=SAFE_X_MAX+1e-8;teeX+=X_STEP){
   for(let greenX=SAFE_X_MIN;greenX<=SAFE_X_MAX+1e-8;greenX+=X_STEP){
     const camera=makeCamera(teeX,greenX);
-    const bounds=projectedBounds(camera);
+    const bounds=projectedBounds(camera,teeX);
     if(meetsSafeViewport(bounds)){
       candidates.push({
         teeX,greenX,camera,bounds,
+        balanceError:Math.abs(bounds.centerX-VISUAL_BALANCE_X),
         movement:Math.abs(teeX-TEE_X_PREFERRED)+Math.abs(greenX-GREEN_X_PREFERRED)
       });
     }
@@ -134,7 +136,10 @@ for(let teeX=SAFE_X_MIN;teeX<=SAFE_X_MAX+1e-8;teeX+=X_STEP){
 }
 if(!candidates.length) throw new Error("No tee/green X combination satisfies the safe viewport");
 
-candidates.sort((a,b)=>a.movement-b.movement);
+candidates.sort((a,b)=>
+  a.balanceError-b.balanceError ||
+  a.movement-b.movement
+);
 const chosen=candidates[0];
 const teeAnchor=[chosen.teeX,TEE_Y];
 const greenAnchor=[chosen.greenX,GREEN_Y];
