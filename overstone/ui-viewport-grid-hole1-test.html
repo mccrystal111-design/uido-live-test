@@ -58,30 +58,35 @@ function metric(p){
 }
 
 const teeAnchor=[25,85];
-const sourcePoints=[
- ...hole.fairway,
- ...hole.green,
- ...hole.bunkers.flat(),
- ...hole.line,
- hole.tee,
- hole.greenMiddle
-].map(metric);
 
-const xs=sourcePoints.map(p=>p[0]), ys=sourcePoints.map(p=>p[1]);
-const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
+// Opening camera rule:
+// 1. The tee is the fixed rotation point.
+// 2. Rotate the course around the tee so the tee-to-green axis is vertical.
+// 3. Zoom uniformly so green middle lands at the preferred Y=15%.
+// X/Y are never scaled independently.
+const greenVector=metric(hole.greenMiddle);
+const greenBearing=Math.atan2(greenVector[1],greenVector[0]);
+const rotation=Math.PI/2-greenBearing;
 
-// One uniform scale. The course is fitted to the viewport; X/Y are never scaled independently.
-const margin=5;
-const width=maxX-minX;
-const height=maxY-minY;
-const scale=Math.min((100-margin*2)/width,(100-margin*2)/height);
-
-// Keep the player's tee fixed. Translate the complete, unrotated course from that point.
-function P(p){
+function rotateFromTee(p){
  const q=metric(p);
+ const cos=Math.cos(rotation);
+ const sin=Math.sin(rotation);
  return [
-   teeAnchor[0]+(q[0]-metric(hole.tee)[0])*scale,
-   teeAnchor[1]-(q[1]-metric(hole.tee)[1])*scale
+   q[0]*cos-q[1]*sin,
+   q[0]*sin+q[1]*cos
+ ];
+}
+
+const rotatedGreen=rotateFromTee(hole.greenMiddle);
+const targetGreenY=15;
+const scale=(teeAnchor[1]-targetGreenY)/rotatedGreen[1];
+
+function P(p){
+ const q=rotateFromTee(p);
+ return [
+   teeAnchor[0]+q[0]*scale,
+   teeAnchor[1]-q[1]*scale
  ];
 }
 
