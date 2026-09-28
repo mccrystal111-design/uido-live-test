@@ -69,7 +69,8 @@ const greenLocal=local(greenMiddleLL);
 const targetDistance=teeAnchor[1]-greenY;
 
 function makeCamera(greenX){
-  const rotation=Math.atan2(greenY-teeAnchor[1],greenX-teeAnchor[0])
+  // SVG Y increases downward, so the camera target vector uses math-space +Y upward.
+  const rotation=Math.atan2(teeAnchor[1]-greenY,greenX-teeAnchor[0])
     -Math.atan2(greenLocal[1],greenLocal[0]);
 
   const scale=targetDistance/Math.hypot(greenLocal[0],greenLocal[1]);
