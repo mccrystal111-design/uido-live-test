@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UiDo — Overstone Hole 3 — Camera Rules Clean v2</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dfe4d8}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px}
+#screen{position:relative;width:min(calc(100vw - 40px),calc((100vh - 40px)*9/16));height:min(calc(100vh - 40px),calc((100vw - 40px)*16/9));background:#f4f1e6;border:2px solid #3f4b3b;overflow:hidden}
+.grid{position:absolute;inset:0;background-image:linear-gradient(to right,#16231b22 1px,transparent 1px),linear-gradient(to bottom,#16231b22 1px,transparent 1px);background-size:10% 10%;z-index:1}
+.course{position:absolute;inset:0;z-index:2;pointer-events:none}
+svg{width:100%;height:100%;display:block}
+.rough{fill:#b9c7ae;stroke:#8d9e85;stroke-width:.22}
+.fairway{fill:#9cad83;stroke:#5f7254;stroke-width:.35}
+.green{fill:#b9caa0;stroke:#4d6543;stroke-width:.45}
+.bunker{fill:#d8c9a0;stroke:#8c7950;stroke-width:.4}
+.playline{fill:none;stroke:#3f4b3b;stroke-width:.45;stroke-dasharray:1.2 1}
+.teeMarker{fill:#82956f;stroke:#526348;stroke-width:.4}
+.greenMarker{fill:none;stroke:#3f4b3b;stroke-width:.45}
+.status{position:absolute;left:8px;bottom:6px;font:8px/1.2 Arial,sans-serif;color:#526057;z-index:5;opacity:.75}
+</style>
+</head>
+<body>
+<div id="stage"><div id="screen">
+<div class="grid"></div>
+<div class="course"><svg id="courseSvg" viewBox="0 0 100 177.7777777778" preserveAspectRatio="none"></svg></div>
+<div class="status">Hole 3 · authoritative GPS/source geometry · fixed geometry / tee rotation / uniform scale</div>
+</div></div>
+<script src="course-source-model.js"></script>
+<script>
+const source=window.UIDO_OVERSTONE_SOURCE_HOLES["3"];
+if(!source) throw new Error("Authoritative Hole 3 source model not found");
+
+const VIEW_W=100, VIEW_H=100*16/9;
+const teeAnchor=[VIEW_W*.25,VIEW_H*.90];
+const greenAnchor=[VIEW_W*.25,VIEW_H*.10];
+const targetDistance=teeAnchor[1]-greenAnchor[1];
+
+// Source coordinates are [longitude, latitude].
+const teeLL=[source.line_of_play[0][0],source.line_of_play[0][1]];
+const greenMiddleLL=[source.green_fmb.middle[1],source.green_fmb.middle[0]];
+const refLat=teeLL[1]*Math.PI/180;
+const M_LAT=111320, M_LON=111320*Math.cos(refLat);
+
+function local(ll){
+  return [(ll[0]-teeLL[0])*M_LON,(ll[1]-teeLL[1])*M_LAT];
+}
+
+const greenLocal=local(greenMiddleLL);
+const rotation=Math.PI/2-Math.atan2(greenLocal[1],greenLocal[0]);
+const scale=targetDistance/Math.hypot(greenLocal[0],greenLocal[1]);
+
+function projectLL(ll){
+  const p=local(ll),c=Math.cos(rotation),s=Math.sin(rotation);
+  const x=p[0]*c-p[1]*s, y=p[0]*s+p[1]*c;
+  return [teeAnchor[0]+x*scale,teeAnchor[1]-y*scale];
+}
+function path(points,close=true){
+  return points.map((p,i)=>(i?"L":"M")+p[0].toFixed(3)+" "+p[1].toFixed(3)).join(" ")+(close?" Z":"");
+}
+const svg=document.getElementById("courseSvg"),ns="http://www.w3.org/2000/svg";
+function addPath(cls,pts,close=true){
+  const e=document.createElementNS(ns,"path");
+  e.setAttribute("class",cls);e.setAttribute("d",path(pts,close));svg.appendChild(e);
+}
+function addFeature(f){
+  if(!f.geometry||f.geometry.type!=="Polygon")return;
+  const pts=f.geometry.coordinates[0].map(p=>projectLL(p));
+  if(f.golf==="rough")addPath("rough",pts);
+  else if(f.golf==="fairway")addPath("fairway",pts);
+  else if(f.golf==="green")addPath("green",pts);
+  else if(f.golf==="bunker")addPath("bunker",pts);
+}
+(source.features||[]).filter(f=>f.golf==="rough").forEach(addFeature);
+(source.features||[]).filter(f=>f.golf==="fairway").forEach(addFeature);
+(source.features||[]).filter(f=>f.golf==="green").forEach(addFeature);
+(source.features||[]).filter(f=>f.golf==="bunker").forEach(addFeature);
+addPath("playline",source.line_of_play.map(p=>projectLL(p)),false);
+
+const tee=document.createElementNS(ns,"circle");
+tee.setAttribute("class","teeMarker");tee.setAttribute("cx",teeAnchor[0]);tee.setAttribute("cy",teeAnchor[1]);tee.setAttribute("r","1.5");svg.appendChild(tee);
+const gm=document.createElementNS(ns,"circle");
+gm.setAttribute("class","greenMarker");gm.setAttribute("cx",greenAnchor[0]);gm.setAttribute("cy",greenAnchor[1]);gm.setAttribute("r","1.4");svg.appendChild(gm);
+
+const EPS=1e-8,pT=projectLL(teeLL),pG=projectLL(greenMiddleLL);
+if(Math.hypot(pT[0]-teeAnchor[0],pT[1]-teeAnchor[1])>EPS)throw new Error("Tee anchor transform failed");
+if(Math.hypot(pG[0]-greenAnchor[0],pG[1]-greenAnchor[1])>EPS)throw new Error("Green anchor transform failed");
+</script>
+</body>
+</html>
