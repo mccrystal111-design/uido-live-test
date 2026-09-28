@@ -21,7 +21,7 @@ svg{width:100%;height:100%;display:block}
 </head>
 <body>
 <div id="stage"><div id="screen"><svg id="courseSvg" viewBox="0 0 100 177.7777777778" preserveAspectRatio="none"></svg></div></div>
-<script src="course-source-model.js"></script>
+<script src="course-source-model.js?v=20260928-2"></script>
 <script>
 /*
   UiDo Generic Hole Renderer v1
@@ -147,8 +147,10 @@ function addPath(cls,pts,close=true){
 }
 
 function addFeature(f){
-  if(!f.geometry||f.geometry.type!=="Polygon")return;
-  const pts=f.geometry.coordinates[0].map(projectLL);
+  if(!f || !f.geometry || f.geometry.type!=="Polygon")return;
+  const ring=f.geometry.coordinates && f.geometry.coordinates[0];
+  if(!Array.isArray(ring) || ring.length<3)return;
+  const pts=ring.map(ll=>projectLL(ll));
   if(f.golf==="rough")addPath("rough",pts);
   else if(f.golf==="fairway")addPath("fairway",pts);
   else if(f.golf==="green")addPath("green",pts);
