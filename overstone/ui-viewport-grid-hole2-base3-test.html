@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UiDo — Overstone Hole 2 — X10-X60 Renderer Test</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dfe4d8}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px}
+#screen{position:relative;width:min(calc(100vw - 40px),calc((100vh - 40px)*9/16));height:min(calc(100vh - 40px),calc((100vw - 40px)*16/9));background:#f4f1e6;border:2px solid #3f4b3b;overflow:hidden}
+.grid{position:absolute;inset:0;background-image:linear-gradient(to right,#16231b22 1px,transparent 1px),linear-gradient(to bottom,#16231b22 1px,transparent 1px);background-size:10% 10%;z-index:1}
+.course{position:absolute;inset:0;z-index:2;pointer-events:none}
+svg{width:100%;height:100%;display:block}
+.rough{fill:#b9c7ae;stroke:#8d9e85;stroke-width:.22}
+.fairway{fill:#9cad83;stroke:#5f7254;stroke-width:.35}
+.green{fill:#b9caa0;stroke:#4d6543;stroke-width:.45}
+.bunker{fill:#d8c9a0;stroke:#8c7950;stroke-width:.4}
+.playline{fill:none;stroke:#3f4b3b;stroke-width:.45;stroke-dasharray:1.2 1}
+.teeMarker{fill:#82956f;stroke:#526348;stroke-width:.4}
+.greenMarker{fill:none;stroke:#3f4b3b;stroke-width:.45}
+.status{position:absolute;left:8px;bottom:6px;font:8px/1.2 Arial,sans-serif;color:#526057;z-index:5;opacity:.75}
+</style>
+</head>
+<body>
+<div id="stage"><div id="screen">
+<div class="grid"></div>
+<div class="course"><svg id="courseSvg" viewBox="0 0 100 177.7777777778" preserveAspectRatio="none">
+<defs>
+  <clipPath id="holeViewClip" clipPathUnits="userSpaceOnUse">
+    <rect x="0" y="0" width="60" height="177.7777777778"></rect>
+  </clipPath>
+  <linearGradient id="roughFadeGradient" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="60" y2="0">
+    <stop offset="0%" stop-color="black"></stop>
+    <stop offset="16.6667%" stop-color="white"></stop>
+    <stop offset="83.3333%" stop-color="white"></stop>
+    <stop offset="100%" stop-color="black"></stop>
+  </linearGradient>
+  <mask id="roughEdgeFade" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="177.7777777778">
+    <rect x="0" y="0" width="60" height="177.7777777778" fill="url(#roughFadeGradient)"></rect>
+  </mask>
+</svg></div>
+<div class="status">Hole 2 · X10-X60 usable hole-view · visual balance ≈ X35 · relevant geometry tee/fairway/green/bunkers · heavy rough non-constraining</div>
+</div></div>
+<script src="course-source-model.js"></script>
+<script>
+const source=window.UIDO_OVERSTONE_SOURCE_HOLES["2"];
+if(!source) throw new Error("Authoritative Hole 2 source model not found");
+
+const VIEW_W=100, VIEW_H=100*16/9;
+const TEE_Y=VIEW_H*.90;
+const GREEN_Y=VIEW_H*.10;
+const TEE_X_PREFERRED=VIEW_W*.25;
+const GREEN_X_PREFERRED=VIEW_W*.25;
+const SAFE_X_MIN=VIEW_W*.10;
+const SAFE_X_MAX=VIEW_W*.60;
+const X_STEP=.25;
+const VISUAL_BALANCE_X=VIEW_W*.35;
+
+// Source coordinates are [longitude, latitude].
+const teeLL=[source.line_of_play[0][0],source.line_of_play[0][1]];
+const greenMiddleLL=[source.green_fmb.middle[1],source.green_fmb.middle[0]];
+const refLat=teeLL[1]*Math.PI/180;
+const M_LAT=111320, M_LON=111320*Math.cos(refLat);
+
+function local(ll){
+  return [(ll[0]-teeLL[0])*M_LON,(ll[1]-teeLL[1])*M_LAT];
+}
+
+const greenLocal=local(greenMiddleLL);
+
+function makeCamera(teeX,greenX){
+  // Tee remains the rotation pivot. Both presentation anchors are flexible
+  // in X, so the target vector is derived from their chosen screen positions.
+  const targetVector=[greenX-teeX,TEE_Y-GREEN_Y];
+  const targetDistance=Math.hypot(targetVector[0],targetVector[1]);
+  const rotation=Math.atan2(targetVector[1],targetVector[0])
+    -Math.atan2(greenLocal[1],greenLocal[0]);
+  const scale=targetDistance/Math.hypot(greenLocal[0],greenLocal[1]);
+  const c=Math.cos(rotation),s=Math.sin(rotation);
+  function project(ll){
+    const p=local(ll);
+    const x=p[0]*c-p[1]*s, y=p[0]*s+p[1]*c;
+    return [teeX+x*scale,TEE_Y-y*scale];
+  }
+  return {rotation,scale,project};
+}
+
+// Source geometry is immutable. Visual balance and camera constraints use
+// tee + fairway + green + bunker. Heavy rough remains rendered source
+// geometry but is non-constraining and never participates in the bounds.
+const cameraConstraintFeatures=(source.features||[]).filter(f=>
+  f.geometry && f.geometry.type==="Polygon" &&
+  Array.isArray(f.geometry.coordinates) &&
+  Array.isArray(f.geometry.coordinates[0]) &&
+  ["fairway","green","bunker"].includes(f.golf)
+);
+
+function projectedBounds(camera,teeX){
+  let minX=teeX,maxX=teeX,minY=TEE_Y,maxY=TEE_Y;
+  cameraConstraintFeatures.forEach(f=>{
+    f.geometry.coordinates[0].forEach(ll=>{
+      const p=camera.project(ll);
+      minX=Math.min(minX,p[0]);
+      maxX=Math.max(maxX,p[0]);
+      minY=Math.min(minY,p[1]);
+      maxY=Math.max(maxY,p[1]);
+    });
+  });
+  return {minX,maxX,minY,maxY,centerX:(minX+maxX)/2,width:maxX-minX};
+}
+
+function meetsSafeViewport(bounds){
+  // The protected UI region is the right-hand sidebar beginning at X60%.
+  // The course-view safety margin is X10% on the left.
+  // There is deliberately no invented top/bottom information-bar constraint.
+  return bounds.minX>=SAFE_X_MIN-1e-8 &&
+    bounds.maxX<=SAFE_X_MAX+1e-8;
+}
+
+// Search the two flexible X anchors together. Prefer the established 25% /
+// 25% composition, then the smallest total movement from those preferences.
+const candidates=[];
+for(let teeX=SAFE_X_MIN;teeX<=SAFE_X_MAX+1e-8;teeX+=X_STEP){
+  for(let greenX=SAFE_X_MIN;greenX<=SAFE_X_MAX+1e-8;greenX+=X_STEP){
+    const camera=makeCamera(teeX,greenX);
+    const bounds=projectedBounds(camera,teeX);
+    if(meetsSafeViewport(bounds)){
+      candidates.push({
+        teeX,greenX,camera,bounds,
+        balanceError:Math.abs(bounds.centerX-VISUAL_BALANCE_X),
+        movement:Math.abs(teeX-TEE_X_PREFERRED)+Math.abs(greenX-GREEN_X_PREFERRED)
+      });
+    }
+  }
+}
+if(!candidates.length) throw new Error("No tee/green X combination satisfies the safe viewport");
+
+candidates.sort((a,b)=>
+  a.balanceError-b.balanceError ||
+  a.movement-b.movement
+);
+const chosen=candidates[0];
+const teeAnchor=[chosen.teeX,TEE_Y];
+const greenAnchor=[chosen.greenX,GREEN_Y];
+const camera=chosen.camera;
+const bounds=chosen.bounds;
+const rotation=camera.rotation;
+const scale=camera.scale;
+function projectLL(ll){ return camera.project(ll); }
+
+function path(points,close=true){
+  return points.map((p,i)=>(i?"L":"M")+p[0].toFixed(3)+" "+p[1].toFixed(3)).join(" ")+(close?" Z":"");
+}
+const svg=document.getElementById("courseSvg"),ns="http://www.w3.org/2000/svg";
+function addPath(cls,pts,close=true,attrs={}){
+  const e=document.createElementNS(ns,"path");
+  e.setAttribute("class",cls);
+  e.setAttribute("d",path(pts,close));
+  Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));
+  svg.appendChild(e);
+}
+function addFeature(f){
+  if(!f.geometry||f.geometry.type!=="Polygon")return;
+  const pts=f.geometry.coordinates[0].map(p=>projectLL(p));
+  if(f.golf==="rough"){
+    // Heavy rough remains source geometry but is presentation-only:
+    // it never constrains camera placement. It fades through the two
+    // presentation margins: X0-X10 and X50-X60.
+    addPath("rough",pts,true,{
+      "clip-path":"url(#holeViewClip)",
+      "mask":"url(#roughEdgeFade)"
+    });
+  }else if(f.golf==="fairway")addPath("fairway",pts);
+  else if(f.golf==="green")addPath("green",pts);
+  else if(f.golf==="bunker")addPath("bunker",pts);
+}
+(source.features||[]).filter(f=>f.golf==="rough").forEach(addFeature);
+(source.features||[]).filter(f=>f.golf==="fairway").forEach(addFeature);
+(source.features||[]).filter(f=>f.golf==="green").forEach(addFeature);
+(source.features||[]).filter(f=>f.golf==="bunker").forEach(addFeature);
+addPath("playline",source.line_of_play.map(p=>projectLL(p)),false);
+
+if(!meetsSafeViewport(bounds)) throw new Error("No tee/green X combination satisfies the X10-X60 usable hole-view area");
+const tee=document.createElementNS(ns,"circle");
+tee.setAttribute("class","teeMarker");tee.setAttribute("cx",teeAnchor[0]);tee.setAttribute("cy",teeAnchor[1]);tee.setAttribute("r","1.5");svg.appendChild(tee);
+const gm=document.createElementNS(ns,"circle");
+gm.setAttribute("class","greenMarker");gm.setAttribute("cx",greenAnchor[0]);gm.setAttribute("cy",greenAnchor[1]);gm.setAttribute("r","1.4");svg.appendChild(gm);
+
+const EPS=1e-8,pT=projectLL(teeLL),pG=projectLL(greenMiddleLL);
+if(Math.hypot(pT[0]-teeAnchor[0],pT[1]-teeAnchor[1])>EPS)throw new Error("Tee anchor transform failed");
+if(Math.hypot(pG[0]-greenAnchor[0],pG[1]-greenAnchor[1])>EPS)throw new Error("Green anchor transform failed");
+</script>
+</body>
+</html>
