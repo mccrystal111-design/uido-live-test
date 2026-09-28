@@ -18,15 +18,30 @@ bunkers:[
 [[-0.8152489,52.2776165],[-0.8152589,52.277592],[-0.8152381,52.2775637],[-0.815205,52.277551],[-0.8151834,52.2775326],[-0.8151765,52.2775156],[-0.8151272,52.2775081],[-0.8151025,52.2775166],[-0.815094,52.2775284],[-0.8150971,52.2775694],[-0.8150963,52.2775896],[-0.8151156,52.2776047],[-0.815151,52.2775991],[-0.815188,52.2776217],[-0.8152096,52.2776264]],
 [[-0.8152797,52.2777871],[-0.8153059,52.2777748],[-0.8153112,52.2777546],[-0.8152897,52.2777362],[-0.8152542,52.2777348],[-0.8152358,52.2777452],[-0.8152234,52.2777565],[-0.8152204,52.2777701],[-0.8152304,52.277781]]
 ]};
-const minLon=-0.8191,maxLon=-0.81475,minLat=52.27625,maxLat=52.27798;
+const refLat=hole.tee[1]*Math.PI/180;
+const earthRadius=6371000;
+function metric(p){
+ const lat=p[1]*Math.PI/180;
+ const x=(p[0]-hole.tee[0])*Math.cos(refLat)*earthRadius*Math.PI/180;
+ const y=(p[1]-hole.tee[1])*earthRadius*Math.PI/180;
+ return [x,y];
+}
+const st=metric(hole.tee),sg=metric(hole.greenMiddle);
 const teeAnchor=[25,85],greenAnchor=[25,15];
-function sourcePoint(p){const x=(p[0]-minLon)/(maxLon-minLon)*58+4;const y=92-(p[1]-minLat)/(maxLat-minLat)*78;return[x,y]}
-const st=sourcePoint(hole.tee),sg=sourcePoint(hole.greenMiddle),sv=[sg[0]-st[0],sg[1]-st[1]],tv=[greenAnchor[0]-teeAnchor[0],greenAnchor[1]-teeAnchor[1]];
-const scale=Math.hypot(tv[0],tv[1])/Math.hypot(sv[0],sv[1]),angle=Math.atan2(tv[1],tv[0])-Math.atan2(sv[1],sv[0]),c=Math.cos(angle),s=Math.sin(angle);
-function P(p){const q=sourcePoint(p),x=q[0]-st[0],y=q[1]-st[1];return[teeAnchor[0]+scale*(x*c-y*s),teeAnchor[1]+scale*(x*s+y*c)]}
+const sv=[sg[0]-st[0],sg[1]-st[1]],tv=[greenAnchor[0]-teeAnchor[0],greenAnchor[1]-teeAnchor[1]];
+const scale=Math.hypot(tv[0],tv[1])/Math.hypot(sv[0],sv[1]);
+const angle=Math.atan2(tv[1],tv[0])-Math.atan2(sv[1],sv[0]);
+const c=Math.cos(angle),s=Math.sin(angle);
+function P(p){
+ const q=metric(p),x=q[0]-st[0],y=q[1]-st[1];
+ return [teeAnchor[0]+scale*(x*c-y*s),teeAnchor[1]+scale*(x*s+y*c)];
+}
 function closed(ps){return ps.map((p,i)=>{const q=P(p);return(i?'L':'M')+q[0].toFixed(2)+' '+q[1].toFixed(2)}).join(' ')+' Z'}
 function open(ps){return ps.map((p,i)=>{const q=P(p);return(i?'L':'M')+q[0].toFixed(2)+' '+q[1].toFixed(2)}).join(' ')}
-document.getElementById('fairway').setAttribute('d',closed(hole.fairway));document.getElementById('green').setAttribute('d',closed(hole.green));document.getElementById('playline').setAttribute('d',open(hole.line));
+document.getElementById('fairway').setAttribute('d',closed(hole.fairway));
+document.getElementById('green').setAttribute('d',closed(hole.green));
+document.getElementById('playline').setAttribute('d',open(hole.line));
 hole.bunkers.forEach(b=>{const e=document.createElementNS('http://www.w3.org/2000/svg','path');e.setAttribute('class','bunker');e.setAttribute('d',closed(b));document.getElementById('bunkers').appendChild(e)});
-document.getElementById('teeMarker').setAttribute('cx',teeAnchor[0]);document.getElementById('teeMarker').setAttribute('cy',teeAnchor[1]);document.getElementById('greenMarker').setAttribute('cx',greenAnchor[0]);document.getElementById('greenMarker').setAttribute('cy',greenAnchor[1]);
+document.getElementById('teeMarker').setAttribute('cx',teeAnchor[0]);document.getElementById('teeMarker').setAttribute('cy',teeAnchor[1]);
+document.getElementById('greenMarker').setAttribute('cx',greenAnchor[0]);document.getElementById('greenMarker').setAttribute('cy',greenAnchor[1]);
 </script></body></html>
