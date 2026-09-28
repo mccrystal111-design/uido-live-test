@@ -31,9 +31,6 @@ svg{width:100%;height:100%;display:block}
   <clipPath id="holeViewClip" clipPathUnits="userSpaceOnUse">
     <rect x="0" y="0" width="60" height="177.7777777778"></rect>
   </clipPath>
-  <clipPath id="relevantGeometryClip" clipPathUnits="userSpaceOnUse">
-    <rect x="0" y="17.7777777778" width="60" height="142.2222222222"></rect>
-  </clipPath>
   <linearGradient id="roughFadeXGradient" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="60" y2="0">
     <stop offset="0%" stop-color="black"></stop>
     <stop offset="16.6667%" stop-color="white"></stop>
@@ -124,11 +121,12 @@ function projectedBounds(camera,teeX){
 }
 
 function meetsSafeViewport(bounds){
-  // The protected UI region is the right-hand sidebar beginning at X60%.
-  // The course-view safety margin is X10% on the left.
-  // There is deliberately no invented top/bottom information-bar constraint.
+  // X10-X60 is the usable hole-view width. Vertically, relevant geometry
+  // defines the camera boundary across the complete application viewport.
   return bounds.minX>=SAFE_X_MIN-1e-8 &&
-    bounds.maxX<=SAFE_X_MAX+1e-8;
+    bounds.maxX<=SAFE_X_MAX+1e-8 &&
+    bounds.minY>=-1e-8 &&
+    bounds.maxY<=VIEW_H+1e-8;
 }
 
 // Search the two flexible X anchors together. Prefer the established 25% /
@@ -191,10 +189,10 @@ function addFeature(f){
     inner.appendChild(e);
     outer.appendChild(inner);
     svg.appendChild(outer);
-  }else if(f.golf==="fairway")addPath("fairway",pts,true,{"clip-path":"url(#relevantGeometryClip)"});
-  else if(f.golf==="green")addPath("green",pts,true,{"clip-path":"url(#relevantGeometryClip)"});
-  else if(f.golf==="bunker")addPath("bunker",pts,true,{"clip-path":"url(#relevantGeometryClip)"});
-  else if(f.golf==="tee")addPath("teeBox",pts,true,{"clip-path":"url(#relevantGeometryClip)"});
+  }else if(f.golf==="fairway")addPath("fairway",pts);
+  else if(f.golf==="green")addPath("green",pts);
+  else if(f.golf==="bunker")addPath("bunker",pts);
+  else if(f.golf==="tee")addPath("teeBox",pts);
 }
 (source.features||[]).filter(f=>f.golf==="rough").forEach(addFeature);
 (source.features||[]).filter(f=>f.golf==="fairway").forEach(addFeature);
