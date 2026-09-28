@@ -157,6 +157,7 @@ candidates.sort((a,b)=>
   a.balanceY-b.balanceY ||
   a.movement-b.movement
 );
+const chosen=candidates[0];
 const teeAnchor=[chosen.teeX,TEE_Y];
 const greenAnchor=[chosen.greenX,chosen.greenY];
 const camera=chosen.camera;
