@@ -105,10 +105,32 @@ bunkers:[
 [[-0.8152797,52.2777871],[-0.8153059,52.2777748],[-0.8153112,52.2777546],[-0.8152897,52.2777362],[-0.8152542,52.2777348],[-0.8152358,52.2777452],[-0.8152234,52.2777565],[-0.8152204,52.2777701],[-0.8152304,52.277781]]
 ]};
 const minLon=-0.8191,maxLon=-0.81475,minLat=52.27625,maxLat=52.27798;
-function P(p){
+function P0(p){
   const x=(p[0]-minLon)/(maxLon-minLon)*58+4;
   const y=92-(p[1]-minLat)/(maxLat-minLat)*78;
   return [x,y];
+}
+// Fixed UI anchors: tee = X25/Y85, green middle = X25/Y15.
+// Build one similarity transform from the real Overstone tee/green pair.
+// This preserves the hole's shape while making both positions exact.
+const realTee=P0(hole.tee);
+const realGreen=P0(hole.greenMiddle);
+const targetTee=[25,85];
+const targetGreen=[25,15];
+const rv=[realGreen[0]-realTee[0],realGreen[1]-realTee[1]];
+const tv=[targetGreen[0]-targetTee[0],targetGreen[1]-targetTee[1]];
+const rLen=Math.hypot(rv[0],rv[1]);
+const tLen=Math.hypot(tv[0],tv[1]);
+const scale=tLen/rLen;
+const angle=Math.atan2(tv[1],tv[0])-Math.atan2(rv[1],rv[0]);
+const ca=Math.cos(angle), sa=Math.sin(angle);
+function P(p){
+  const q=P0(p);
+  const x=q[0]-realTee[0], y=q[1]-realTee[1];
+  return [
+    targetTee[0]+scale*(x*ca-y*sa),
+    targetTee[1]+scale*(x*sa+y*ca)
+  ];
 }
 function path(points){
   return points.map((p,i)=>{const [x,y]=P(p);return (i?'L':'M')+x.toFixed(2)+' '+y.toFixed(2)}).join(' ')+' Z';
@@ -118,15 +140,6 @@ document.getElementById('green').setAttribute('d',path(hole.green));
 document.getElementById('lineplay').setAttribute('d',hole.line.map((p,i)=>{const [x,y]=P(p);return (i?'L':'M')+x.toFixed(2)+' '+y.toFixed(2)}).join(' '));
 hole.bunkers.forEach(b=>{const e=document.createElementNS('http://www.w3.org/2000/svg','path');e.setAttribute('class','bunker');e.setAttribute('d',path(b));document.getElementById('bunkers').appendChild(e)});
 const t=P(hole.tee),g=P(hole.greenMiddle),pin=P([-0.8150842,52.2777189]);
-// One transform only: the tee is the fixed player position.
-// Everything else keeps its true relationship to the tee.
-const dxT=25-t[0], dyT=85-t[1];
-document.getElementById('course').setAttribute('transform',`translate(${dxT} ${dyT})`);
-
-// Put the green-middle UI marker on the transformed real green centre.
-const greenAnchor=document.querySelector('.greenAnchor');
-greenAnchor.style.left=(g[0]+dxT)+'%';
-greenAnchor.style.top=(g[1]+dyT)+'%';
 document.getElementById('pin').setAttribute('cx',pin[0]);document.getElementById('pin').setAttribute('cy',pin[1]);
 document.getElementById('tees').innerHTML='<circle class="teeShape" cx="'+t[0]+'" cy="'+t[1]+'" r="1.5"/>';
 document.getElementById('toggleInfo').onclick=()=>{document.getElementById('info').classList.toggle('off');document.getElementById('toggleInfo').textContent=document.getElementById('info').classList.contains('off')?'Show information viewport':'Hide information viewport'};
