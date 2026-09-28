@@ -196,12 +196,13 @@ function addFeature(f){
   else if(f.golf==="bunker")addPath("bunker",pts);
   else if(f.golf==="tee")addPath("teeBox",pts);
 }
+// Structural layer order: water sits beneath the playing surfaces.
+(source.features||[]).filter(f=>f.golf==="water_hazard").forEach(addFeature);
 (source.features||[]).filter(f=>f.golf==="rough").forEach(addFeature);
 (source.features||[]).filter(f=>f.golf==="fairway").forEach(addFeature);
 (source.features||[]).filter(f=>f.golf==="green").forEach(addFeature);
 (source.features||[]).filter(f=>f.golf==="bunker").forEach(addFeature);
 (source.features||[]).filter(f=>f.golf==="tee").forEach(addFeature);
-(source.features||[]).filter(f=>f.golf==="water_hazard").forEach(addFeature);
 addPath("playline",source.line_of_play.map(p=>projectLL(p)),false);
 
 if(!meetsSafeViewport(bounds)) throw new Error("No tee/green X combination satisfies the X10-X60 usable hole-view area");
