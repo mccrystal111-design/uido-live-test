@@ -8,7 +8,7 @@
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;overflow:hidden;font-family:Arial,sans-serif;background:#dfe4d8;color:#16231b}
 #stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px}
-#screen{position:relative;width:min(100vw - 40px,calc((100vh - 40px)*9/16));height:min(100vh - 40px,calc((100vw - 40px)*16/9));background:#f4f1e6;border:2px solid #3f4b3b;overflow:hidden}
+#screen{position:relative;width:min(calc(100vw - 40px),calc((100vh - 40px)*9/16));height:min(calc(100vh - 40px),calc((100vw - 40px)*16/9));background:#f4f1e6;border:2px solid #3f4b3b;overflow:hidden}
 .grid{position:absolute;inset:0;background-image:linear-gradient(to right,#16231b22 1px,transparent 1px),linear-gradient(to bottom,#16231b22 1px,transparent 1px);background-size:10% 10%}
 .line{position:absolute;z-index:20;pointer-events:none}
 .x60{left:60%;top:0;bottom:0;border-left:2px dashed #9b6b3d}
@@ -105,33 +105,34 @@ bunkers:[
 [[-0.8152797,52.2777871],[-0.8153059,52.2777748],[-0.8153112,52.2777546],[-0.8152897,52.2777362],[-0.8152542,52.2777348],[-0.8152358,52.2777452],[-0.8152234,52.2777565],[-0.8152204,52.2777701],[-0.8152304,52.277781]]
 ]};
 const minLon=-0.8191,maxLon=-0.81475,minLat=52.27625,maxLat=52.27798;
-function P0(p){
+
+// The viewport is fixed. The grid, boundaries and anchors are never transformed.
+// Only course coordinates are mapped into the fixed screen coordinate system.
+function sourcePoint(p){
   const x=(p[0]-minLon)/(maxLon-minLon)*58+4;
   const y=92-(p[1]-minLat)/(maxLat-minLat)*78;
   return [x,y];
 }
-// Fixed UI anchors: tee = X25/Y85, green middle = X25/Y15.
-// Build one similarity transform from the real Overstone tee/green pair.
-// This preserves the hole's shape while making both positions exact.
-const realTee=P0(hole.tee);
-const realGreen=P0(hole.greenMiddle);
+
+// Fixed UiDo anchors.
 const targetTee=[25,85];
 const targetGreen=[25,15];
-const rv=[realGreen[0]-realTee[0],realGreen[1]-realTee[1]];
+const sourceTee=sourcePoint(hole.tee);
+const sourceGreen=sourcePoint(hole.greenMiddle);
+
+// Rotate + uniformly scale the COURSE ONLY so both fixed anchors are exact.
+const sv=[sourceGreen[0]-sourceTee[0],sourceGreen[1]-sourceTee[1]];
 const tv=[targetGreen[0]-targetTee[0],targetGreen[1]-targetTee[1]];
-const rLen=Math.hypot(rv[0],rv[1]);
-const tLen=Math.hypot(tv[0],tv[1]);
-const scale=tLen/rLen;
-const angle=Math.atan2(tv[1],tv[0])-Math.atan2(rv[1],rv[0]);
-const ca=Math.cos(angle), sa=Math.sin(angle);
+const scale=Math.hypot(tv[0],tv[1])/Math.hypot(sv[0],sv[1]);
+const angle=Math.atan2(tv[1],tv[0])-Math.atan2(sv[1],sv[0]);
+const c=Math.cos(angle), ss=Math.sin(angle);
+
 function P(p){
-  const q=P0(p);
-  const x=q[0]-realTee[0], y=q[1]-realTee[1];
-  return [
-    targetTee[0]+scale*(x*ca-y*sa),
-    targetTee[1]+scale*(x*sa+y*ca)
-  ];
+  const q=sourcePoint(p);
+  const x=q[0]-sourceTee[0], y=q[1]-sourceTee[1];
+  return [targetTee[0]+scale*(x*c-y*ss),targetTee[1]+scale*(x*ss+y*c)];
 }
+
 function path(points){
   return points.map((p,i)=>{const [x,y]=P(p);return (i?'L':'M')+x.toFixed(2)+' '+y.toFixed(2)}).join(' ')+' Z';
 }
