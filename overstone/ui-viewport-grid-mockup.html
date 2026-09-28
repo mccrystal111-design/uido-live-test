@@ -36,10 +36,10 @@ svg{width:100%;height:100%;display:block}
 .info{position:absolute;left:61%;right:2%;top:4%;bottom:32%;z-index:60;border:1px solid #3f4b3b55;background:#f7f5eee8;padding:10px;border-radius:10px;box-shadow:0 4px 16px #16231b12;font-size:10px;overflow:hidden}
 .info h3{margin:0 0 5px;font-size:12px}.info .logo{font-weight:900;letter-spacing:.12em;font-size:13px}.holebox{border:1px solid #3f4b3b66;padding:5px;border-radius:5px;margin:5px 0 8px}.info section{margin-top:7px}.info b{font-size:9px}.row{display:flex;justify-content:space-between;gap:8px;margin:2px 0}
 .radial{position:absolute;left:2%;right:2%;bottom:2%;height:26%;z-index:70;border:1px dashed #3f4b3b88;background:#3f4b3b10;border-radius:18px 18px 0 0;display:flex;align-items:center;justify-content:center;gap:14px}
-.tile{width:54px;height:54px;border:1px solid #3f4b3b88;background:#f7f5ee;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
-.controls{position:absolute;z-index:100;left:8px;top:8px;display:flex;gap:5px}
-button{font:inherit;font-size:10px;padding:6px 8px;border:1px solid #16231b44;border-radius:7px;background:#f7f5ee;cursor:pointer}
-.legend{position:absolute;left:8px;bottom:8px;z-index:100;font-size:9px;background:#f7f5eedd;padding:6px;border-radius:6px}
+.tile{width:54px;height:54px;border:1px solid #3f4b3b88;background:#f7f5ee;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;cursor:pointer;pointer-events:auto}
+.tile:focus{outline:2px solid #3f4b3b}
+.info-controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-top:9px;padding-top:8px;border-top:1px solid #3f4b3b33}
+.info-controls button{font-size:9px;padding:5px 4px}
 .off{display:none}
 </style>
 </head>
@@ -76,18 +76,19 @@ button{font:inherit;font-size:10px;padding:6px 8px;border:1px solid #16231b44;bo
     <div>Back <strong>352</strong></div><div>Middle <strong>367</strong></div><div>Front <strong>352</strong></div>
     <section><b>GREEN SIDE BUNKERS</b><div class="row"><span>Right · Front</span><strong>344</strong></div><div class="row"><span>Right · Carry</span><strong>355</strong></div><div class="row"><span>Left · Front</span><strong>350</strong></div><div class="row"><span>Left · Carry</span><strong>357</strong></div></section>
     <section><b>FAIRWAY BUNKERS</b><div class="row"><span>Right · Front</span><strong>209</strong></div><div class="row"><span>Right · Carry</span><strong>231</strong></div><div class="row"><span>Left · Front</span><strong>198</strong></div><div class="row"><span>Left · Carry</span><strong>215</strong></div></section>
+  
+    <div class="info-controls">
+      <button id="toggleInfo">Hide information</button>
+      <button id="toggleHeat">Heat map</button>
+      <button id="holeView">Hole View</button>
+    </div>
   </aside>
 
   <div class="radial">
-    <div class="tile">AIM</div><div class="tile">WIND</div><div class="tile">LIE</div><div class="tile">CLUB</div><div class="tile">HOLE<br>VIEW</div>
+    <button class="tile" data-tile="AIM">AIM</button><button class="tile" data-tile="WIND">WIND</button><button class="tile" data-tile="LIE">LIE</button><button class="tile" data-tile="CLUB">CLUB</button><button class="tile" data-tile="HOLE VIEW">HOLE<br>VIEW</button>
   </div>
 
-  <div class="controls">
-    <button id="toggleInfo">Hide information viewport</button>
-    <button id="toggleHeat">Heat map</button>
-    <button id="holeView">Hole View</button>
-  </div>
-  <div class="legend">Mockup only · Hole 1 geometry from current Overstone layer · coordinates are viewport percentages</div>
+
 </div></div>
 
 <script>
@@ -117,11 +118,23 @@ document.getElementById('green').setAttribute('d',path(hole.green));
 document.getElementById('lineplay').setAttribute('d',hole.line.map((p,i)=>{const [x,y]=P(p);return (i?'L':'M')+x.toFixed(2)+' '+y.toFixed(2)}).join(' '));
 hole.bunkers.forEach(b=>{const e=document.createElementNS('http://www.w3.org/2000/svg','path');e.setAttribute('class','bunker');e.setAttribute('d',path(b));document.getElementById('bunkers').appendChild(e)});
 const t=P(hole.tee),g=P(hole.greenMiddle),pin=P([-0.8150842,52.2777189]);
+// Align the real course geometry to the fixed UI anchors:
+// tee sits on the player/tee circle; green-middle sits on the green-mid circle.
+const dxT=25-t[0], dyT=85-t[1], dxG=25-g[0], dyG=15-g[1];
+function shiftPath(id,dx,dy){
+  const el=document.getElementById(id);
+  const d=el.getAttribute('d');
+  el.setAttribute('transform',`translate(${dxT} ${dyT})`);
+}
+document.getElementById('course').setAttribute('transform',`translate(${dxT} ${dyT})`);
+document.getElementById('green').setAttribute('transform',`translate(${dxG-dxT} ${dyG-dyT})`);
+
 document.getElementById('pin').setAttribute('cx',pin[0]);document.getElementById('pin').setAttribute('cy',pin[1]);
 document.getElementById('tees').innerHTML='<circle class="teeShape" cx="'+t[0]+'" cy="'+t[1]+'" r="1.5"/>';
 document.getElementById('toggleInfo').onclick=()=>{document.getElementById('info').classList.toggle('off');document.getElementById('toggleInfo').textContent=document.getElementById('info').classList.contains('off')?'Show information viewport':'Hide information viewport'};
 document.getElementById('toggleHeat').onclick=()=>document.getElementById('green').classList.toggle('heat');
 document.getElementById('holeView').onclick=()=>alert('Mockup: return to direction-of-travel view');
+document.querySelectorAll('.tile').forEach(tile=>tile.addEventListener('click',()=>alert('Mockup tile: '+tile.dataset.tile)));
 </script>
 </body>
 </html>
