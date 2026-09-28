@@ -16,6 +16,7 @@ svg{width:100%;height:100%;display:block}
 .fairway{fill:#9cad83;stroke:#5f7254;stroke-width:.35}
 .green{fill:#b9caa0;stroke:#4d6543;stroke-width:.45}
 .bunker{fill:#d8c9a0;stroke:#8c7950;stroke-width:.4}
+.teeBox{fill:#c8c6a8;stroke:#7d8069;stroke-width:.35}
 .playline{fill:none;stroke:#3f4b3b;stroke-width:.45;stroke-dasharray:1.2 1}
 .teeMarker{fill:#82956f;stroke:#526348;stroke-width:.4}
 .greenMarker{fill:none;stroke:#3f4b3b;stroke-width:.45}
@@ -174,11 +175,13 @@ function addFeature(f){
   }else if(f.golf==="fairway")addPath("fairway",pts);
   else if(f.golf==="green")addPath("green",pts);
   else if(f.golf==="bunker")addPath("bunker",pts);
+  else if(f.golf==="tee")addPath("teeBox",pts);
 }
 (source.features||[]).filter(f=>f.golf==="rough").forEach(addFeature);
 (source.features||[]).filter(f=>f.golf==="fairway").forEach(addFeature);
 (source.features||[]).filter(f=>f.golf==="green").forEach(addFeature);
 (source.features||[]).filter(f=>f.golf==="bunker").forEach(addFeature);
+(source.features||[]).filter(f=>f.golf==="tee").forEach(addFeature);
 addPath("playline",source.line_of_play.map(p=>projectLL(p)),false);
 
 if(!meetsSafeViewport(bounds)) throw new Error("No tee/green X combination satisfies the X10-X60 usable hole-view area");
