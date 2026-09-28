@@ -31,14 +31,26 @@ svg{width:100%;height:100%;display:block}
   <clipPath id="holeViewClip" clipPathUnits="userSpaceOnUse">
     <rect x="0" y="0" width="60" height="177.7777777778"></rect>
   </clipPath>
-  <linearGradient id="roughFadeGradient" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="60" y2="0">
+  <clipPath id="relevantGeometryClip" clipPathUnits="userSpaceOnUse">
+    <rect x="0" y="17.7777777778" width="60" height="142.2222222222"></rect>
+  </clipPath>
+  <linearGradient id="roughFadeXGradient" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="60" y2="0">
     <stop offset="0%" stop-color="black"></stop>
     <stop offset="16.6667%" stop-color="white"></stop>
     <stop offset="83.3333%" stop-color="white"></stop>
     <stop offset="100%" stop-color="black"></stop>
   </linearGradient>
-  <mask id="roughEdgeFade" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="177.7777777778">
-    <rect x="0" y="0" width="60" height="177.7777777778" fill="url(#roughFadeGradient)"></rect>
+  <linearGradient id="roughFadeYGradient" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="177.7777777778">
+    <stop offset="0%" stop-color="black"></stop>
+    <stop offset="10%" stop-color="white"></stop>
+    <stop offset="90%" stop-color="white"></stop>
+    <stop offset="100%" stop-color="black"></stop>
+  </linearGradient>
+  <mask id="roughEdgeFadeX" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="177.7777777778">
+    <rect x="0" y="0" width="60" height="177.7777777778" fill="url(#roughFadeXGradient)"></rect>
+  </mask>
+  <mask id="roughEdgeFadeY" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="177.7777777778">
+    <rect x="0" y="0" width="60" height="177.7777777778" fill="url(#roughFadeYGradient)"></rect>
   </mask>
 </svg></div>
 <div class="status">Hole 2 · X10-X60 usable hole-view · visual balance ≈ X35 · relevant geometry tee/fairway/green/bunkers · heavy rough non-constraining</div>
@@ -170,12 +182,18 @@ function addFeature(f){
     // presentation margins: X0-X10 and X50-X60.
     addPath("rough",pts,true,{
       "clip-path":"url(#holeViewClip)",
-      "mask":"url(#roughEdgeFade)"
+      "mask":"url(#roughEdgeFadeX)"
     });
-  }else if(f.golf==="fairway")addPath("fairway",pts);
-  else if(f.golf==="green")addPath("green",pts);
-  else if(f.golf==="bunker")addPath("bunker",pts);
-  else if(f.golf==="tee")addPath("teeBox",pts);
+    // Apply the vertical fade as a second presentation layer so the
+    // existing X fade and the new Y fade remain independent.
+    const last=svg.lastElementChild;
+    last.setAttribute("mask","url(#roughEdgeFadeX)");
+    last.setAttribute("clip-path","url(#holeViewClip)");
+    last.style.mask="url(#roughEdgeFadeY)";
+  }else if(f.golf==="fairway")addPath("fairway",pts,true,{"clip-path":"url(#relevantGeometryClip)"});
+  else if(f.golf==="green")addPath("green",pts,true,{"clip-path":"url(#relevantGeometryClip)"});
+  else if(f.golf==="bunker")addPath("bunker",pts,true,{"clip-path":"url(#relevantGeometryClip)"});
+  else if(f.golf==="tee")addPath("teeBox",pts,true,{"clip-path":"url(#relevantGeometryClip)"});
 }
 (source.features||[]).filter(f=>f.golf==="rough").forEach(addFeature);
 (source.features||[]).filter(f=>f.golf==="fairway").forEach(addFeature);
