@@ -178,18 +178,19 @@ function addFeature(f){
   const pts=f.geometry.coordinates[0].map(p=>projectLL(p));
   if(f.golf==="rough"){
     // Heavy rough remains source geometry but is presentation-only:
-    // it never constrains camera placement. It fades through the two
-    // presentation margins: X0-X10 and X50-X60.
-    addPath("rough",pts,true,{
-      "clip-path":"url(#holeViewClip)",
-      "mask":"url(#roughEdgeFadeX)"
-    });
-    // Apply the vertical fade as a second presentation layer so the
-    // existing X fade and the new Y fade remain independent.
-    const last=svg.lastElementChild;
-    last.setAttribute("mask","url(#roughEdgeFadeX)");
-    last.setAttribute("clip-path","url(#holeViewClip)");
-    last.style.mask="url(#roughEdgeFadeY)";
+    // it never constrains camera placement. It fades through the four
+    // presentation margins: X0-X10, X50-X60, Y0-Y10 and Y90-Y100.
+    const outer=document.createElementNS(ns,"g");
+    outer.setAttribute("clip-path","url(#holeViewClip)");
+    outer.setAttribute("mask","url(#roughEdgeFadeX)");
+    const inner=document.createElementNS(ns,"g");
+    inner.setAttribute("mask","url(#roughEdgeFadeY)");
+    const e=document.createElementNS(ns,"path");
+    e.setAttribute("class","rough");
+    e.setAttribute("d",path(pts,true));
+    inner.appendChild(e);
+    outer.appendChild(inner);
+    svg.appendChild(outer);
   }else if(f.golf==="fairway")addPath("fairway",pts,true,{"clip-path":"url(#relevantGeometryClip)"});
   else if(f.golf==="green")addPath("green",pts,true,{"clip-path":"url(#relevantGeometryClip)"});
   else if(f.golf==="bunker")addPath("bunker",pts,true,{"clip-path":"url(#relevantGeometryClip)"});
