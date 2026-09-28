@@ -196,9 +196,10 @@ function addFeature(f){
   else if(f.golf==="bunker")addPath("bunker",pts);
   else if(f.golf==="tee")addPath("teeBox",pts);
 }
-// Structural layer order: water sits beneath the playing surfaces.
-(source.features||[]).filter(f=>f.golf==="water_hazard").forEach(addFeature);
+// Structural layer order: rough is the base surface, then water
+// sits above it and remains visible where it is in play.
 (source.features||[]).filter(f=>f.golf==="rough").forEach(addFeature);
+(source.features||[]).filter(f=>f.golf==="water_hazard").forEach(addFeature);
 (source.features||[]).filter(f=>f.golf==="fairway").forEach(addFeature);
 (source.features||[]).filter(f=>f.golf==="green").forEach(addFeature);
 (source.features||[]).filter(f=>f.golf==="bunker").forEach(addFeature);
