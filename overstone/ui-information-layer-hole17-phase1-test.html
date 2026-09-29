@@ -328,7 +328,7 @@ if(Math.hypot(pG[0]-greenAnchor[0],pG[1]-greenAnchor[1])>EPS)throw new Error("Gr
   });
   document.getElementById("bunkerInfo").innerHTML=bunkerItems.length
     ? bunkerItems.map(b=>'<div class="bunkerCard"><div class="infoRow"><span>Bunker '+b.index+'</span><span class="infoValue">'+b.front+' / '+b.carry+'</span></div></div>').join("")
-    : '<div class="infoMuted">No bunkers</div>';
+    : '';
 
   const greenPts=(source.features||[]).filter(f=>f.golf==="green"&&f.geometry?.type==="Polygon").flatMap(f=>f.geometry.coordinates[0].map(localMeters));
   const fmb=source.green_fmb;
@@ -372,8 +372,8 @@ if(Math.hypot(pG[0]-greenAnchor[0],pG[1]-greenAnchor[1])>EPS)throw new Error("Gr
   const fw=document.getElementById("fairwayInfo");
   const rows=[];
   if(w220!=null)rows.push('<div class="fwCard"><div class="infoRow"><span>220</span><span class="infoValue">'+Math.round(w220)+'</span></div></div>');
-  if(w260!=null && !(w220!=null && Math.abs(w260-w220)<5))rows.push('<div class="fwCard"><div class="infoRow"><span>260</span><span class="infoValue">'+Math.round(w260)+'</span></div></div>');
-  fw.innerHTML=rows.join("")||'<div class="infoMuted">—</div>';
+  if(w260!=null)rows.push('<div class="fwCard"><div class="infoRow"><span>260</span><span class="infoValue">'+Math.round(w260)+'</span></div></div>');
+  fw.innerHTML=rows.join("")||'';
 
   function drawRadial(){
     const NS=ns, s=document.createElementNS(NS,"svg");
