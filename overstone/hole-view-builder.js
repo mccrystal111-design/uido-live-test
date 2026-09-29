@@ -122,6 +122,100 @@
     });
   }
 
+
+  function pointInRect(p,rect){
+    return p.forward >= rect.minForward && p.forward <= rect.maxForward &&
+      p.lateral >= rect.minLateral && p.lateral <= rect.maxLateral;
+  }
+
+  function orient(a,b,c){
+    const v=(b.lateral-a.lateral)*(c.forward-a.forward)-
+      (b.forward-a.forward)*(c.lateral-a.lateral);
+    return Math.abs(v)<1e-9 ? 0 : (v>0 ? 1 : -1);
+  }
+
+  function onSegment(a,b,p){
+    return Math.min(a.forward,b.forward)-1e-9 <= p.forward &&
+      p.forward <= Math.max(a.forward,b.forward)+1e-9 &&
+      Math.min(a.lateral,b.lateral)-1e-9 <= p.lateral &&
+      p.lateral <= Math.max(a.lateral,b.lateral)+1e-9;
+  }
+
+  function segmentsIntersect(a,b,c,d){
+    const o1=orient(a,b,c),o2=orient(a,b,d),o3=orient(c,d,a),o4=orient(c,d,b);
+    if(o1!==o2 && o3!==o4) return true;
+    if(o1===0 && onSegment(a,b,c)) return true;
+    if(o2===0 && onSegment(a,b,d)) return true;
+    if(o3===0 && onSegment(c,d,a)) return true;
+    if(o4===0 && onSegment(c,d,b)) return true;
+    return false;
+  }
+
+  function rectangleEdges(rect){
+    const a={forward:rect.minForward,lateral:rect.minLateral};
+    const b={forward:rect.maxForward,lateral:rect.minLateral};
+    const c={forward:rect.maxForward,lateral:rect.maxLateral};
+    const d={forward:rect.minForward,lateral:rect.maxLateral};
+    return [[a,b],[b,c],[c,d],[d,a]];
+  }
+
+  function pointInPolygon(point,ring){
+    let inside=false;
+    for(let i=0,j=ring.length-1;i<ring.length;j=i++){
+      const a=ring[i], b=ring[j];
+      const intersects=((a.lateral>point.lateral)!==(b.lateral>point.lateral)) &&
+        point.forward < (b.forward-a.forward)*(point.lateral-a.lateral)/(b.lateral-a.lateral)+a.forward;
+      if(intersects) inside=!inside;
+    }
+    return inside;
+  }
+
+  function geometryIntersectsWindow(geometry,origin,direction,rect){
+    if(!geometry) return false;
+
+    const toHolePoint=p=>projectToHoleSpace(p,origin,direction);
+    const rectEdges=rectangleEdges(rect);
+
+    if(geometry.type==="Point"){
+      return pointInRect(toHolePoint(geometry.coordinates),rect);
+    }
+
+    if(geometry.type==="LineString"){
+      const pts=geometry.coordinates.map(toHolePoint);
+      if(pts.some(p=>pointInRect(p,rect))) return true;
+      for(let i=1;i<pts.length;i++){
+        if(rectEdges.some(([a,b])=>segmentsIntersect(pts[i-1],pts[i],a,b))) return true;
+      }
+      return false;
+    }
+
+    if(geometry.type==="Polygon"){
+      const rings=geometry.coordinates.map(r=>r.map(toHolePoint));
+      for(const ring of rings){
+        if(ring.some(p=>pointInRect(p,rect))) return true;
+        for(let i=1;i<ring.length;i++){
+          if(rectEdges.some(([a,b])=>segmentsIntersect(ring[i-1],ring[i],a,b))) return true;
+        }
+      }
+      const corners=rectEdges.map(([a])=>a);
+      return corners.some(corner=>pointInPolygon(corner,rings[0]));
+    }
+
+    if(geometry.type==="MultiLineString"){
+      return geometry.coordinates.some(line=>geometryIntersectsWindow({type:"LineString",coordinates:line},origin,direction,rect));
+    }
+
+    if(geometry.type==="MultiPolygon"){
+      return geometry.coordinates.some(poly=>geometryIntersectsWindow({type:"Polygon",coordinates:poly},origin,direction,rect));
+    }
+
+    if(geometry.type==="GeometryCollection"){
+      return geometry.geometries.some(g=>geometryIntersectsWindow(g,origin,direction,rect));
+    }
+
+    return false;
+  }
+
   function windowBoundsInHoleSpace(features,origin,direction){
     const points=[];
     features.forEach(feature=>{
@@ -155,13 +249,16 @@
     const direction=directionFromRoute(hole.routing);
     const polygon=buildWindowPolygon(direction.origin,direction,options);
 
-    const windowPoints=polygon.map(p=>toLocal(p,direction.origin));
-    const windowBBox=bbox(windowPoints);
+    const rect={
+      minForward:-options.back_m,
+      maxForward:options.forward_m,
+      minLateral:-options.width_m/2,
+      maxLateral:options.width_m/2
+    };
 
-    const features=course.geometry.features.filter(feature=>{
-      const points=geometryPoints(feature.geometry).map(p=>toLocal(p,direction.origin));
-      return bboxIntersects(bbox(points),windowBBox);
-    });
+    const features=course.geometry.features.filter(feature=>
+      geometryIntersectsWindow(feature.geometry,direction.origin,direction,rect)
+    );
 
     return {
       schema:"uido.hole-view.v2",
