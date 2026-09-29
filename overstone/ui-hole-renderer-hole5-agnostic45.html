@@ -174,7 +174,7 @@ function project(point){
 const FADE_PCT=0.025;
 const fadeMask=document.getElementById("courseFadeMask");
 const fadeCanvas=document.createElement("canvas");
-const fadeW=600,fadeH=1778;
+const fadeW=60,fadeH=178;
 fadeCanvas.width=fadeW;
 fadeCanvas.height=fadeH;
 const fadeCtx=fadeCanvas.getContext("2d");
@@ -183,7 +183,7 @@ const fadeX=fadeW*FADE_PCT, fadeY=fadeH*FADE_PCT;
 for(let y=0;y<fadeH;y++){
   for(let x=0;x<fadeW;x++){
     const d=Math.min(x,fadeW-1-x,y,fadeH-1-y);
-    const edge=Math.min(1,d/Math.min(fadeX,fadeY));
+    const edge=Math.min(1,x/fadeX,(fadeW-1-x)/fadeX,y/fadeY,(fadeH-1-y)/fadeY);
     const a=Math.max(0,Math.min(255,Math.round(edge*255)));
     const i=(y*fadeW+x)*4;
     fadeImage.data[i]=255;
