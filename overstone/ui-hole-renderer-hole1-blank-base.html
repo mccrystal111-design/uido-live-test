@@ -183,8 +183,6 @@ hole.teeBoxes.forEach(box=>{
   teeLayer.appendChild(element);
 });
 document.getElementById("green").setAttribute("d",closedPath(hole.green));
-document.getElementById("playline").setAttribute("d",openPath(hole.line));
-
 const bunkerLayer=document.getElementById("bunkers");
 hole.bunkers.forEach(bunker=>{
   const element=document.createElementNS("http://www.w3.org/2000/svg","path");
@@ -193,12 +191,8 @@ hole.bunkers.forEach(bunker=>{
   bunkerLayer.appendChild(element);
 });
 
-document.getElementById("teeMarker").setAttribute("cx",teeAnchor[0]);
-document.getElementById("teeMarker").setAttribute("cy",teeAnchor[1]);
 document.getElementById("pin").setAttribute("cx",project([-0.8150842,52.2777189])[0]);
 document.getElementById("pin").setAttribute("cy",project([-0.8150842,52.2777189])[1]);
-document.getElementById("greenMarker").setAttribute("cx",greenAnchor[0]);
-document.getElementById("greenMarker").setAttribute("cy",greenAnchor[1]);
 </script>
 </body>
 </html>
