@@ -1,0 +1,51 @@
+name: Validate Canonical Course v2
+
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: "Provider-neutral course model JSON"
+        required: true
+        type: string
+        default: course-models/overstone-park-v0.1.json
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build canonical v2
+        env:
+          MODEL: ${{ inputs.model }}
+        run: |
+          set -euo pipefail
+          mkdir -p build/canonical
+          python3 tools/course-model/build_canonical_course.py \
+            --model "$MODEL" \
+            --out build/canonical/course.json
+          python3 - <<'PY'
+          import json, pathlib
+          p = pathlib.Path("build/canonical/course.json")
+          c = json.loads(p.read_text())
+          assert c["schema"] == "uido.course.canonical.v2"
+          assert c["geometry"]["scope"] == "course"
+          assert len(c["holes"]) == 18
+          ids = [str(f["id"]) for f in c["geometry"]["features"]]
+          assert len(ids) == len(set(ids)), "Duplicate physical geometry identity detected"
+          for hole in c["holes"]:
+              assert set(hole) >= {"hole_number", "routing", "truth"}
+              assert "features" not in hole, "Hole still owns physical geometry"
+          for feature in c["geometry"]["features"]:
+              assert "geometry" in feature
+              assert "id" in feature
+          print("CANONICAL V2 CONTRACT: PASS")
+          print(json.dumps(c["validation"], indent=2))
+          PY
+
+      - name: Upload canonical v2 packet
+        uses: actions/upload-artifact@v4
+        with:
+          name: uido-canonical-v2-${{ github.run_id }}
+          path: build/canonical/course.json
+          retention-days: 14
