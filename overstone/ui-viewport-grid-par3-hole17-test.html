@@ -83,11 +83,13 @@ function local(ll){
 
 const greenLocal=local(greenMiddleLL);
 
+const BASE3_ROTATION=Math.PI/2-Math.atan2(greenLocal[1],greenLocal[0]);
+
 function makeCamera(teeX,greenX,greenY){
-  const targetVector=[greenX-teeX,TEE_Y-greenY];
-  const targetDistance=Math.hypot(targetVector[0],targetVector[1]);
-  const rotation=Math.atan2(targetVector[1],targetVector[0])
-    -Math.atan2(greenLocal[1],greenLocal[0]);
+  // Par 3 keeps the proven Base 4 hole heading. Green Y changes composition
+  // and zoom, but never changes the established player-to-green orientation.
+  const targetDistance=Math.hypot(greenX-teeX,TEE_Y-greenY);
+  const rotation=BASE3_ROTATION;
   const scale=targetDistance/Math.hypot(greenLocal[0],greenLocal[1]);
   const c=Math.cos(rotation),s=Math.sin(rotation);
   function project(ll){
