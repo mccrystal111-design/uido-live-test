@@ -194,7 +194,7 @@ for(let y=0;y<fadeH;y++){
 }
 fadeCtx.putImageData(fadeImage,0,0);
 const fadeHref=fadeCanvas.toDataURL();
-const fadeImageEl=document.createElementNS(ns,"image");
+const fadeImageEl=document.createElementNS("http://www.w3.org/2000/svg","image");
 fadeImageEl.setAttribute("x",0);
 fadeImageEl.setAttribute("y",0);
 fadeImageEl.setAttribute("width",60);
