@@ -51,7 +51,7 @@ svg{width:100%;height:100%;display:block}
     <rect x="0" y="0" width="60" height="177.7777777778" fill="url(#roughFadeYGradient)"></rect>
   </mask>
 </svg></div>
-<div class="status">Hole 17 · Par 3 renderer · X10-X50 usable hole-view · green Y flexible · breathing zones reserved · water structural</div>
+<div class="status">Hole 17 · Par 3 renderer · X10-X50 usable hole-view · same Base 3 projection · Par 3 composition only</div>
 </div></div>
 <script src="course-source-model.js?v=7188dc0cfe620e6be59111508e0c0ebc6a2d6fb3"></script>
 <script>
@@ -61,8 +61,8 @@ if(!source) throw new Error("Authoritative Hole 17 source model not found");
 const VIEW_W=100, VIEW_H=100*16/9;
 const TEE_Y=VIEW_H*.90;
 const GREEN_Y_MIN=VIEW_H*.10;
-const GREEN_Y_MAX=VIEW_H*.90;
-const GREEN_Y_PREFERRED=VIEW_H*.25;
+const GREEN_Y_MAX=VIEW_H*.24;
+const GREEN_Y_PREFERRED=VIEW_H*.24;
 const TEE_X_PREFERRED=VIEW_W*.25;
 const GREEN_X_PREFERRED=VIEW_W*.25;
 const SAFE_X_MIN=VIEW_W*.10;
@@ -84,7 +84,6 @@ function local(ll){
 
 const greenLocal=local(greenMiddleLL);
 
-const BASE3_ROTATION=Math.PI/2-Math.atan2(greenLocal[1],greenLocal[0]);
 
 function makeCamera(teeX,greenX,greenY){
   const targetVector=[greenX-teeX,TEE_Y-greenY];
@@ -235,7 +234,7 @@ function addFeature(f){
 (source.features||[]).filter(f=>f.golf==="tee").forEach(addFeature);
 addPath("playline",source.line_of_play.map(p=>projectLL(p)),false);
 
-if(!meetsSafeViewport(bounds)) throw new Error("No tee/green X combination satisfies the X10-X60 usable hole-view area");
+if(!meetsSafeViewport(bounds)) throw new Error("No Par 3 composition satisfies the X10-X50 usable hole-view area");
 const tee=document.createElementNS(ns,"circle");
 tee.setAttribute("class","teeMarker");tee.setAttribute("cx",teeAnchor[0]);tee.setAttribute("cy",teeAnchor[1]);tee.setAttribute("r","1.5");svg.appendChild(tee);
 const gm=document.createElementNS(ns,"circle");
