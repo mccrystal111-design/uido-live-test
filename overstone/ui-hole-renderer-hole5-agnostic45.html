@@ -44,77 +44,87 @@ svg{width:100%;height:100%;display:block}
 </svg>
 </div>
 </div></div>
+<script src="course-source-model.js"></script>
+<script src="hole-view-builder.js"></script>
 <script>
-const hole={"tee":[-0.8086448,52.2757696],"greenMiddle":[-0.8077740714,52.277808219],"line":[[-0.8086448,52.2757696],[-0.8080594,52.2768932],[-0.8078253,52.277783]],"fairway":[[-0.8079538,52.2776606],[-0.8079927,52.2775762],[-0.8080281,52.2775047],[-0.8080564,52.2774116],[-0.8080918,52.2773098],[-0.8081201,52.2772059],[-0.8081307,52.2770955],[-0.808152,52.2769179],[-0.8082051,52.2768226],[-0.8082865,52.2766927],[-0.8083396,52.2765692],[-0.8083891,52.2764588],[-0.808421,52.2763527],[-0.8083679,52.2763289],[-0.8082546,52.2763332],[-0.8081131,52.2763938],[-0.8080564,52.2765454],[-0.8079927,52.2766754],[-0.8079219,52.2768334],[-0.8078795,52.2769677],[-0.8078865,52.2771583],[-0.8078618,52.2772882],[-0.8078228,52.2774246],[-0.8077804,52.2775589],[-0.8077379,52.2776281],[-0.8076678,52.2777032],[-0.807619,52.2778142],[-0.807619,52.2778969],[-0.8076866,52.2779558],[-0.8077404,52.2779788],[-0.8078192,52.2779543],[-0.8078805,52.2779198],[-0.8079256,52.2778877],[-0.8079494,52.2778456],[-0.8079494,52.2778042],[-0.8079331,52.2777797],[-0.8079331,52.2777506],[-0.8079344,52.2777154],[-0.8079538,52.2776606]],"green":[[-0.8078979,52.2778605],[-0.8079095,52.2778322],[-0.8079194,52.2778039],[-0.8079012,52.2777584],[-0.8078863,52.2777039],[-0.8078583,52.2776665],[-0.8078104,52.2776584],[-0.8077526,52.2776584],[-0.8077278,52.2776796],[-0.8076866,52.277721],[-0.8076667,52.2777544],[-0.8076469,52.2777918],[-0.8076387,52.2778211],[-0.8076486,52.2778675],[-0.8076568,52.2778958],[-0.80768,52.277916],[-0.8077064,52.2779423],[-0.8077361,52.2779524],[-0.8077856,52.2779302],[-0.8078418,52.2778978],[-0.8078979,52.2778605]],"teeBoxes":[[[-0.808601,52.2759575],[-0.8086701,52.2759065],[-0.8087006,52.2758655],[-0.8087331,52.2758207],[-0.8087656,52.275776],[-0.8087575,52.2757212],[-0.8087331,52.2756789],[-0.8086619,52.2756516],[-0.8085827,52.2756628],[-0.8085237,52.2757399],[-0.8084993,52.2758033],[-0.8084729,52.2758829],[-0.8084709,52.2759414],[-0.8085318,52.2759687],[-0.808601,52.2759575]]],"paths":[[[-0.8084536,52.2766818],[-0.8084574,52.2765966],[-0.8084737,52.2765551],[-0.8084807,52.2765251],[-0.8084971,52.2764837],[-0.8084994,52.2764366],[-0.8085064,52.2763766],[-0.8085321,52.2763094],[-0.8085718,52.2762708],[-0.8085881,52.2762308],[-0.8085881,52.2761723],[-0.8085718,52.2761251],[-0.8085741,52.2760837],[-0.8085858,52.2760465],[-0.8086091,52.2760065],[-0.8086348,52.2759608],[-0.8086839,52.2759151],[-0.8087212,52.2758708],[-0.8087516,52.2758294],[-0.8087819,52.2757822],[-0.8087913,52.2757508]]],"rough":[[[-0.8078164,52.276232],[-0.8080061,52.2762654],[-0.80817,52.2762426],[-0.8082993,52.2761599],[-0.8084143,52.2760121],[-0.8084373,52.2759383],[-0.8084488,52.2758767],[-0.8084948,52.2757325],[-0.8085379,52.2756516],[-0.8086213,52.2756269],[-0.8087478,52.2756287],[-0.808834,52.275692],[-0.8089835,52.2755847],[-0.8089347,52.275546],[-0.808124,52.2755812],[-0.8079141,52.2757641],[-0.8078164,52.276232]]],"bunkers":[],"water":[]};
+const sources=window.UIDO_OVERSTONE_SOURCE_HOLES;
+const selectedSource=sources["5"];
+if(!selectedSource) throw new Error("Authoritative Hole 5 source model not found");
 
-const EARTH_RADIUS=6371000;
-const referenceLatitude=hole.tee[1]*Math.PI/180;
-
-function toLocalMetres(point){
-  return [
-    (point[0]-hole.tee[0])*Math.cos(referenceLatitude)*Math.PI/180*EARTH_RADIUS,
-    (point[1]-hole.tee[1])*Math.PI/180*EARTH_RADIUS
-  ];
+function buildRuntimeCanonical(){
+  const featuresById=new Map();
+  const holes=[];
+  Object.keys(sources).sort((a,b)=>Number(a)-Number(b)).forEach(key=>{
+    const s=sources[key];
+    holes.push({
+      hole_number:Number(s.hole),
+      par:s.par,
+      routing:{
+        role:"hole_route",
+        hole_number:Number(s.hole),
+        geometry:{type:"LineString",coordinates:s.line_of_play},
+        destination:{
+          lon:s.green_fmb.middle[1],
+          lat:s.green_fmb.middle[0]
+        }
+      },
+      truth:"CONFIRMED"
+    });
+    (s.features||[]).forEach(feature=>{
+      if(!feature.geometry || feature.id==null) return;
+      if(!featuresById.has(String(feature.id))){
+        featuresById.set(String(feature.id),{
+          id:String(feature.id),
+          type:String(feature.golf||"UNKNOWN").toUpperCase(),
+          geometry:feature.geometry,
+          provenance:feature.source||"source",
+          source_refs:[String(feature.id)]
+        });
+      }
+    });
+  });
+  return {
+    schema:"uido.course.canonical.v2.runtime-adapter",
+    course:{id:"overstone-park",name:"Overstone Park Golf Club"},
+    geometry:{scope:"course",features:Array.from(featuresById.values())},
+    holes
+  };
 }
 
-/*
- CAMERA / VIEWPORT RULES — CLEAN v3
-
- The physical viewport is portrait 9:16.
-
- IMPORTANT:
- The SVG coordinate system is NOT treated as a 100x100 square.
- It is 100 units wide by 177.777... units high, so one SVG unit
- represents the same physical amount in X and Y.
-
- Percentage positions are converted independently:
-   X% -> X percentage of 100-unit width.
-   Y% -> Y percentage of 177.777...-unit height.
-
- Opening test:
-   tee   = X25%, Y90%
-   green = X25%, Y10%
-
- Course geometry remains fixed.
- Tee is the rotation point.
- Rotate the complete geometry around the tee.
- Apply one uniform scale only.
- No X/Y stretching.
-*/
+const canonical=buildRuntimeCanonical();
+const holeView=window.UiDoHoleViewBuilder.buildHoleView(canonical,5,{
+  back_m:25,
+  forward_m:425,
+  width_m:180
+});
 
 const VIEW_WIDTH=100;
 const VIEW_HEIGHT=100*16/9;
+const teeAnchor=[VIEW_WIDTH*.25,VIEW_HEIGHT*.90];
+const greenAnchor=[VIEW_WIDTH*.25,VIEW_HEIGHT*.10];
 
-const teeAnchor=[
-  VIEW_WIDTH*0.25,
-  VIEW_HEIGHT*0.90
+const teeLL=selectedSource.line_of_play[0];
+const greenMiddleLL=[
+  selectedSource.green_fmb.middle[1],
+  selectedSource.green_fmb.middle[0]
 ];
+const referenceLatitude=teeLL[1]*Math.PI/180;
+const EARTH_RADIUS=6371000;
 
-const greenAnchor=[
-  VIEW_WIDTH*0.25,
-  VIEW_HEIGHT*0.10
-];
+function toLocalMetres(point){
+  return [
+    (point[0]-teeLL[0])*Math.cos(referenceLatitude)*Math.PI/180*EARTH_RADIUS,
+    (point[1]-teeLL[1])*Math.PI/180*EARTH_RADIUS
+  ];
+}
 
-// Mathematical camera space: +X right, +Y up.
-// The physical distance between the anchors is therefore the actual
-// 80% of the viewport height, not an arbitrary 80 units.
-const targetVector=[
-  0,
-  teeAnchor[1]-greenAnchor[1]
-];
-
-const teeLocal=toLocalMetres(hole.tee);
-const greenLocal=toLocalMetres(hole.greenMiddle);
-
-const courseVector=[
-  greenLocal[0]-teeLocal[0],
-  greenLocal[1]-teeLocal[1]
-];
-
+const teeLocal=toLocalMetres(teeLL);
+const greenLocal=toLocalMetres(greenMiddleLL);
+const targetVector=[0,teeAnchor[1]-greenAnchor[1]];
+const courseVector=[greenLocal[0]-teeLocal[0],greenLocal[1]-teeLocal[1]];
 const rotation=
   Math.atan2(targetVector[1],targetVector[0])-
   Math.atan2(courseVector[1],courseVector[0]);
-
 const scale=
   Math.hypot(targetVector[0],targetVector[1])/
   Math.hypot(courseVector[0],courseVector[1]);
@@ -123,71 +133,75 @@ function project(point){
   const local=toLocalMetres(point);
   const x=local[0]-teeLocal[0];
   const y=local[1]-teeLocal[1];
-
-  const c=Math.cos(rotation);
-  const s=Math.sin(rotation);
-
-  // Rotate in physical, aspect-correct camera space.
+  const c=Math.cos(rotation),s=Math.sin(rotation);
   const cameraX=x*c-y*s;
   const cameraY=x*s+y*c;
-
-  // Convert mathematical +Y-up to SVG +Y-down once.
   return [
     teeAnchor[0]+cameraX*scale,
     teeAnchor[1]-cameraY*scale
   ];
 }
 
-// Hard assertions: percentage anchors must resolve exactly.
-const pTee=project(hole.tee);
-const pGreen=project(hole.greenMiddle);
-const EPS=1e-7;
+const svg=document.getElementById("courseSvg");
+const ns="http://www.w3.org/2000/svg";
 
-if(Math.abs(pTee[0]-teeAnchor[0])>EPS || Math.abs(pTee[1]-teeAnchor[1])>EPS){
+function pathFromGeometry(geometry){
+  if(!geometry) return null;
+  if(geometry.type==="Polygon"){
+    return geometry.coordinates[0].map((p,i)=>{
+      const q=project(p);
+      return (i?"L":"M")+q[0].toFixed(3)+" "+q[1].toFixed(3);
+    }).join(" ")+" Z";
+  }
+  if(geometry.type==="LineString"){
+    return geometry.coordinates.map((p,i)=>{
+      const q=project(p);
+      return (i?"L":"M")+q[0].toFixed(3)+" "+q[1].toFixed(3);
+    }).join(" ");
+  }
+  return null;
+}
+
+function addFeature(feature){
+  const d=pathFromGeometry(feature.geometry);
+  if(!d) return;
+  const type=String(feature.type||"").toUpperCase();
+
+  let cls=null;
+  if(type==="ROUGH") cls="rough";
+  else if(type==="FAIRWAY") cls="fairway";
+  else if(type==="GREEN") cls="green";
+  else if(type==="BUNKER") cls="bunker";
+  else if(type==="TEE") cls="teeBox";
+  else if(type==="WATER") cls="water";
+  else if(type==="PATH") cls="path";
+  if(!cls) return;
+
+  const element=document.createElementNS(ns,"path");
+  element.setAttribute("class",cls);
+  element.setAttribute("d",d);
+  if(type==="PATH") element.setAttribute("fill","none");
+  svg.insertBefore(element,svg.querySelector("#fairway"));
+}
+
+holeView.features.forEach(addFeature);
+
+const routeElement=document.createElementNS(ns,"path");
+routeElement.setAttribute("class","playline");
+routeElement.setAttribute("d",pathFromGeometry(canonical.holes.find(h=>h.hole_number===5).routing.geometry));
+svg.insertBefore(routeElement,svg.querySelector("#fairway"));
+
+const pTee=project(teeLL);
+const pGreen=project(greenMiddleLL);
+const EPS=1e-7;
+if(Math.hypot(pTee[0]-teeAnchor[0],pTee[1]-teeAnchor[1])>EPS) {
   throw new Error("Tee percentage anchor transform failed");
 }
-if(Math.abs(pGreen[0]-greenAnchor[0])>EPS || Math.abs(pGreen[1]-greenAnchor[1])>EPS){
+if(Math.hypot(pGreen[0]-greenAnchor[0],pGreen[1]-greenAnchor[1])>EPS) {
   throw new Error("Green percentage anchor transform failed");
 }
 
-function closedPath(points){
-  return points.map((point,index)=>{
-    const [x,y]=project(point);
-    return (index?"L":"M")+x.toFixed(3)+" "+y.toFixed(3);
-  }).join(" ")+" Z";
-}
-
-function openPath(points){
-  return points.map((point,index)=>{
-    const [x,y]=project(point);
-    return (index?"L":"M")+x.toFixed(3)+" "+y.toFixed(3);
-  }).join(" ");
-}
-
-const svg=document.getElementById("courseSvg"),ns="http://www.w3.org/2000/svg";
-function addPath(cls,points,clip=false,mask=null){const e=document.createElementNS(ns,"path");e.setAttribute("class",cls);e.setAttribute("d",closedPath(points));if(clip)e.setAttribute("clip-path","url(#holeViewClip)");if(mask)e.setAttribute("mask","url(#"+mask+")");svg.insertBefore(e,svg.querySelector("#fairway"));}
-function addOpenPath(cls,points,clip=false){const e=document.createElementNS(ns,"path");e.setAttribute("class",cls);e.setAttribute("d",openPath(points));if(clip)e.setAttribute("clip-path","url(#holeViewClip)");svg.insertBefore(e,svg.querySelector("#fairway"));}
-if(hole.paths&&hole.paths.length)hole.paths.forEach(path=>addOpenPath("path",path,true));
-// Structural course layers sourced directly from the Hole 5 course model.
-if(hole.rough&&hole.rough.length)addPath("rough",hole.rough,true,"roughEdgeFadeX");
-if(hole.water&&hole.water.length)addPath("water",hole.water,true,null);
-document.getElementById("fairway").setAttribute("d",closedPath(hole.fairway));
-const teeLayer=document.getElementById("tees");
-hole.teeBoxes.forEach(box=>{
-  const element=document.createElementNS("http://www.w3.org/2000/svg","path");
-  element.setAttribute("class","teeBox");
-  element.setAttribute("d",closedPath(box));
-  teeLayer.appendChild(element);
-});
-document.getElementById("green").setAttribute("d",closedPath(hole.green));
-const bunkerLayer=document.getElementById("bunkers");
-hole.bunkers.forEach(bunker=>{
-  const element=document.createElementNS("http://www.w3.org/2000/svg","path");
-  element.setAttribute("class","bunker");
-  element.setAttribute("d",closedPath(bunker));
-  bunkerLayer.appendChild(element);
-});
-
+document.title="UiDo — Hole 5 — AGNOSTIC45 Canonical Hole View";
 </script>
 </body>
 </html>
