@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       model:
-        description: "Provider-neutral course model JSON"
-        required: true
+        description: "Optional provider-neutral course model JSON. Leave blank to build Overstone from the current public OSM capture."
+        required: false
         type: string
-        default: course-models/overstone-park-v0.1.json
+        default: ""
 
 jobs:
   validate:
@@ -15,15 +15,52 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Acquire Overstone OSM source
+        if: ${{ inputs.model == '' }}
+        run: |
+          set -euo pipefail
+          mkdir -p build/osm
+          QUERY='[out:json][timeout:120];(nwr["golf"~"^(hole|pin|tee|green|bunker|rough|fairway|water_hazard|cartpath|path|wood|woodland|driving_range)$"](52.2755460,-0.8266019,52.2862605,-0.8076190););convert item ::=::,::geom=geom(),_osm_type=type();out geom;'
+          curl -fsSL --retry 3 --data-urlencode "data=$QUERY" https://overpass-api.de/api/interpreter -o build/osm/overstone-golf.geojson
+          python3 - <<'PY'
+          import json
+          p = "build/osm/overstone-golf.geojson"
+          d = json.load(open(p))
+          assert d.get("elements"), "Overpass returned no OSM golf elements"
+          print(f"OSM source elements: {len(d['elements'])}")
+          PY
+
+      - name: Build provider-neutral source model
+        if: ${{ inputs.model == '' }}
+        run: |
+          set -euo pipefail
+          python3 tools/course-model/build_overstone_model.py --osm build/osm/overstone-golf.geojson --greens course_green_data.json --out build/overstone-course-model.json
+          test -s build/overstone-course-model.json
+          python3 - <<'PY'
+          import json
+          c = json.load(open("build/overstone-course-model.json"))
+          assert c["schema_version"] == "uido.course.v0.2"
+          assert len(c["holes"]) == 18
+          assert all(h.get("routing") for h in c["holes"])
+          assert all(h.get("tees") for h in c["holes"])
+          assert all(h.get("fairways") for h in c["holes"])
+          print("PROVIDER-NEUTRAL SOURCE MODEL: PASS")
+          PY
+
+      - name: Select canonical input
+        run: |
+          set -euo pipefail
+          if [ -n "${{ inputs.model }}" ]; then
+            test -f "${{ inputs.model }}"
+            cp "${{ inputs.model }}" build/overstone-course-model.json
+          fi
+          test -s build/overstone-course-model.json
+
       - name: Build canonical v2
-        env:
-          MODEL: ${{ inputs.model }}
         run: |
           set -euo pipefail
           mkdir -p build/canonical
-          python3 tools/course-model/build_canonical_course.py \
-            --model "$MODEL" \
-            --out build/canonical/course.json
+          python3 tools/course-model/build_canonical_course.py --model build/overstone-course-model.json --out build/canonical/course.json
           python3 - <<'PY'
           import json, pathlib
           p = pathlib.Path("build/canonical/course.json")
@@ -32,6 +69,7 @@ jobs:
           assert c["geometry"]["scope"] == "course"
           assert len(c["holes"]) == 18
           ids = [str(f["id"]) for f in c["geometry"]["features"]]
+          assert ids, "Canonical course contains no physical geometry"
           assert len(ids) == len(set(ids)), "Duplicate physical geometry identity detected"
           for hole in c["holes"]:
               assert set(hole) >= {"hole_number", "routing", "truth"}
