@@ -36,15 +36,22 @@ svg{width:100%;height:100%;display:block}
 <linearGradient id="roughFadeYGradient" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="177.7777777778"><stop offset="0%" stop-color="black"></stop><stop offset="10%" stop-color="white"></stop><stop offset="90%" stop-color="white"></stop><stop offset="100%" stop-color="black"></stop></linearGradient>
 <mask id="roughEdgeFadeX" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="177.7777777778"><rect x="0" y="0" width="60" height="177.7777777778" fill="url(#roughFadeXGradient)"></rect></mask>
 <mask id="roughEdgeFadeY" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="177.7777777778"><rect x="0" y="0" width="60" height="177.7777777778" fill="url(#roughFadeYGradient)"></rect></mask>
+<linearGradient id="perimeterFade" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="60" y2="0">
+  <stop offset="0%" stop-color="black"></stop>
+  <stop offset="2.5%" stop-color="white"></stop>
+  <stop offset="97.5%" stop-color="white"></stop>
+  <stop offset="100%" stop-color="black"></stop>
+</linearGradient>
 <mask id="courseEdgeFade" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="177.7777777778">
-  <rect id="courseFadeMask" x="0" y="0" width="60" height="177.7777777778" fill="black"></rect>
+  <rect x="0" y="0" width="60" height="177.7777777778" fill="white"></rect>
+  <rect x="0" y="0" width="60" height="177.7777777778" fill="url(#perimeterFade)"></rect>
 </mask>
 </defs>
 <path id="fairway" class="fairway"></path>
 <path id="green" class="green"></path>
 <g id="bunkers"></g>
 <g id="tees"></g>
-<g id="renderedGeometry" clip-path="url(#holeViewClip)"></g>
+<g id="renderedGeometry" clip-path="url(#holeViewClip)" mask="url(#courseEdgeFade)"></g>
 </svg>
 </div>
 </div></div>
@@ -170,38 +177,6 @@ function project(point){
     teeAnchor[1]-cameraY*scale
   ];
 }
-
-const FADE_PCT=0.025;
-const fadeMask=document.getElementById("courseFadeMask");
-const fadeCanvas=document.createElement("canvas");
-const fadeW=60,fadeH=178;
-fadeCanvas.width=fadeW;
-fadeCanvas.height=fadeH;
-const fadeCtx=fadeCanvas.getContext("2d");
-const fadeImage=fadeCtx.createImageData(fadeW,fadeH);
-const fadeX=fadeW*FADE_PCT, fadeY=fadeH*FADE_PCT;
-for(let y=0;y<fadeH;y++){
-  for(let x=0;x<fadeW;x++){
-    const d=Math.min(x,fadeW-1-x,y,fadeH-1-y);
-    const edge=Math.min(1,x/fadeX,(fadeW-1-x)/fadeX,y/fadeY,(fadeH-1-y)/fadeY);
-    const a=Math.max(0,Math.min(255,Math.round(edge*255)));
-    const i=(y*fadeW+x)*4;
-    fadeImage.data[i]=255;
-    fadeImage.data[i+1]=255;
-    fadeImage.data[i+2]=255;
-    fadeImage.data[i+3]=a;
-  }
-}
-fadeCtx.putImageData(fadeImage,0,0);
-const fadeHref=fadeCanvas.toDataURL();
-const fadeImageEl=document.createElementNS("http://www.w3.org/2000/svg","image");
-fadeImageEl.setAttribute("x",0);
-fadeImageEl.setAttribute("y",0);
-fadeImageEl.setAttribute("width",60);
-fadeImageEl.setAttribute("height",VIEW_HEIGHT);
-fadeImageEl.setAttribute("preserveAspectRatio","none");
-fadeImageEl.setAttribute("href",fadeHref);
-fadeMask.appendChild(fadeImageEl);
 
 const svg=document.getElementById("courseSvg");
 const ns="http://www.w3.org/2000/svg";
