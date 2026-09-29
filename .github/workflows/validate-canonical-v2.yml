@@ -14,11 +14,38 @@ jobs:
           set -euo pipefail
           mkdir -p build/osm
           QUERY='[out:json][timeout:120];(nwr["golf"~"^(hole|pin|tee|green|bunker|rough|fairway|water_hazard|cartpath|path|wood|woodland|driving_range)$"](52.2755460,-0.8266019,52.2862605,-0.8076190););convert item ::=::,::geom=geom(),_osm_type=type();out geom;'
-          curl -fsSL --retry 3 --data-urlencode "data=$QUERY" https://overpass-api.de/api/interpreter -o build/osm/overstone-golf.geojson
+
+          # Overpass can reject requests at a busy endpoint with HTTP 406.
+          # Try two public interpreters, with an explicit User-Agent, before failing.
+          for ENDPOINT in \
+            "https://overpass-api.de/api/interpreter" \
+            "https://overpass.kumi.systems/api/interpreter"
+          do
+            echo "Trying Overpass endpoint: $ENDPOINT"
+            if curl -fsSL --retry 2 --retry-all-errors \
+              -A "UiDo-canonical-validator/1.0 (github.com/mccrystal111-design/uido-live-test)" \
+              --data-urlencode "data=$QUERY" \
+              "$ENDPOINT" \
+              -o build/osm/overstone-golf.geojson
+            then
+              if python3 - <<'PY'
+import json
+d = json.load(open("build/osm/overstone-golf.geojson"))
+assert d.get("elements"), "Overpass returned no OSM golf elements"
+print(f"OSM source elements: {len(d['elements'])}")
+PY
+              then
+                break
+              fi
+            fi
+            echo "Endpoint failed; trying next endpoint"
+          done
+
+          test -s build/osm/overstone-golf.geojson
           python3 - <<'PY'
           import json
           d = json.load(open("build/osm/overstone-golf.geojson"))
-          assert d.get("elements"), "Overpass returned no OSM golf elements"
+          assert d.get("elements"), "All Overpass endpoints returned no OSM golf elements"
           print(f"OSM source elements: {len(d['elements'])}")
           PY
 
