@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UiDo — Hole 1 — Fairway Bunker Labels</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dfe4d8}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px}
+#screen{position:relative;width:min(calc(100vw - 40px),calc((100vh - 40px)*9/16));height:min(calc(100vh - 40px),calc((100vw - 40px)*16/9));background:#f4f1e6;border:2px solid #3f4b3b;overflow:hidden}
+.grid{position:absolute;inset:0;background-image:linear-gradient(to right,#16231b22 1px,transparent 1px),linear-gradient(to bottom,#16231b22 1px,transparent 1px);background-size:10% 10%;z-index:1}
+.course{position:absolute;inset:0;z-index:2;pointer-events:none}
+svg{width:100%;height:100%;display:block}
+.fairway{fill:#9cad83;stroke:#5f7254;stroke-width:.35}
+.green{fill:#b9caa0;stroke:#4d6543;stroke-width:.45}
+.bunker{fill:#d8c9a0;stroke:#8c7950;stroke-width:.4}
+.playline{fill:none;stroke:#3f4b3b;stroke-width:.45;stroke-dasharray:1.2 1}
+.teeMarker{fill:#82956f;stroke:#526348;stroke-width:.4}
+.greenMarker{fill:none;stroke:#3f4b3b;stroke-width:.45}
+.teeBox{fill:#c8c6a8;stroke:#7d8069;stroke-width:.35}
+.pin{fill:#3f4b3b;stroke:#f4f1e6;stroke-width:.25}
+.bunkerLabel{fill:#8c7950;font:600 2.25px Arial,sans-serif;text-anchor:middle;dominant-baseline:middle}
+</style>
+</head>
+<body>
+<div id="stage"><div id="screen">
+<div class="grid"></div>
+<div class="course">
+<svg id="courseSvg" viewBox="0 0 100 177.7777777778" preserveAspectRatio="none">
+<path id="fairway" class="fairway"></path>
+<path id="green" class="green"></path>
+<g id="bunkers"></g>
+<g id="tees"></g>
+<circle id="pin" class="pin" r="0.65"></circle>
+<g id="bunkerLabels"></g>
+<path id="playline" class="playline"></path>
+<circle id="teeMarker" class="teeMarker" r="1.5"></circle>
+<circle id="greenMarker" class="greenMarker" r="1.4"></circle>
+</svg>
+</div>
+</div></div>
+<script>
+const hole={
+tee:[-0.8194224,52.2763578],
+greenMiddle:[-0.8150508742,52.2777593548],
+line:[[-0.8194224,52.2763578],[-0.8174382,52.276667],[-0.8163783,52.2770214],[-0.8150842,52.2777189]],
+fairway:[[-0.8181366,52.2765546],[-0.818056,52.2764824],[-0.8179675,52.2764597],[-0.8178578,52.2764619],[-0.817449,52.2765323],[-0.8173393,52.2765712],[-0.8170597,52.2766405],[-0.8168686,52.2766416],[-0.8167624,52.2766687],[-0.8166545,52.2767445],[-0.8165607,52.2767856],[-0.8164863,52.2768874],[-0.8163005,52.2769015],[-0.8161749,52.2769762],[-0.8158599,52.2771667],[-0.815483,52.2773367],[-0.8153591,52.2774233],[-0.8152919,52.2775392],[-0.8152537,52.2776185],[-0.8151976,52.2776369],[-0.8151167,52.2776226],[-0.8150219,52.2776419],[-0.8149691,52.2776836],[-0.8149631,52.2776986],[-0.8149451,52.2777439],[-0.8149557,52.2777667],[-0.8149378,52.2777934],[-0.8149138,52.2778031],[-0.814889,52.2778392],[-0.8148901,52.2778616],[-0.8149119,52.2778785],[-0.8149438,52.2778897],[-0.814989,52.2778889],[-0.8150336,52.2778815],[-0.8150737,52.2778636],[-0.8150979,52.2778217],[-0.8151235,52.2777906],[-0.8152047,52.2777549],[-0.815236,52.2777264],[-0.8152559,52.2776935],[-0.8153391,52.2776706],[-0.815492,52.2776361],[-0.8157092,52.2775459],[-0.8159292,52.2774113],[-0.8161652,52.277298],[-0.8164602,52.2771307],[-0.8166587,52.2769977],[-0.816766,52.2769534],[-0.8168921,52.2769239],[-0.817053,52.2769124],[-0.81723,52.2769124],[-0.8173802,52.2768927],[-0.8175251,52.2768467],[-0.8176538,52.2767844],[-0.8177558,52.2767269],[-0.8178979,52.2766892],[-0.8179972,52.2766794],[-0.8180937,52.2766498],[-0.8181366,52.2766121]],
+green:[[-0.8152132,52.2776921],[-0.8151979,52.2776675],[-0.8151674,52.2776495],[-0.8151217,52.2776348],[-0.8150759,52.2776335],[-0.8150324,52.2776488],[-0.8149997,52.2776728],[-0.8149801,52.2776981],[-0.8149757,52.2777221],[-0.8149615,52.2777421],[-0.8149681,52.2777681],[-0.8149474,52.2778028],[-0.8149202,52.2778148],[-0.8149049,52.2778394],[-0.8149234,52.2778714],[-0.8149463,52.2778801],[-0.8149866,52.2778787],[-0.8150204,52.2778721],[-0.8150487,52.2778561],[-0.815077,52.2778074],[-0.8150988,52.2777801],[-0.8151914,52.2777381],[-0.8152088,52.2777221]],
+teeBoxes:[
+[[-0.8188332,52.2763843],[-0.8188411,52.2763989],[-0.8188564,52.276411],[-0.8188776,52.2764192],[-0.818902,52.2764227],[-0.8189269,52.276421],[-0.818948,52.2764149],[-0.8189649,52.2764051],[-0.818976,52.2763925],[-0.8189801,52.2763785],[-0.8189769,52.2763644],[-0.8189667,52.2763516],[-0.8189505,52.2763414],[-0.8189299,52.2763347],[-0.8189051,52.2763324],[-0.8188805,52.2763352],[-0.8188588,52.2763429],[-0.8188426,52.2763546],[-0.8188337,52.276369],[-0.8188332,52.2763843]],
+[[-0.818904,52.276688],[-0.8188869,52.2766794],[-0.8188661,52.2766749],[-0.8188439,52.276675],[-0.8188231,52.2766797],[-0.8188062,52.2766884],[-0.8187951,52.2767001],[-0.8187911,52.2767134],[-0.8187942,52.2767257],[-0.8188034,52.2767367],[-0.8188177,52.2767455],[-0.8188357,52.2767511],[-0.8188757,52.2767509],[-0.8188936,52.2767452],[-0.8189078,52.2767363],[-0.8189167,52.2767252],[-0.8189196,52.276713],[-0.8189154,52.2766997],[-0.818904,52.276688]],
+[[-0.8196246,52.2763378],[-0.8195619,52.2762867],[-0.8192696,52.2763322],[-0.8192308,52.2763676],[-0.8192671,52.2764403],[-0.8193951,52.2764711],[-0.8195206,52.2764504],[-0.8196205,52.2763948],[-0.8196246,52.2763378]]
+],
+bunkers:[
+[[-0.8164635,52.2768491],[-0.8165136,52.2768213],[-0.8165159,52.2767746],[-0.8165513,52.2767539],[-0.8165605,52.2767425],[-0.8165652,52.2767275],[-0.8166561,52.2767157],[-0.816673,52.2766954],[-0.816653,52.276662],[-0.8165852,52.2766544],[-0.8165752,52.2766756],[-0.816512,52.2766808],[-0.8164804,52.2766874],[-0.8164581,52.2767223],[-0.8164103,52.2767619],[-0.8163972,52.2767737],[-0.8164073,52.2767911],[-0.816435,52.2767958]],
+[[-0.8169604,52.2769965],[-0.8169434,52.2769536],[-0.8168795,52.2769805],[-0.8167686,52.2769654],[-0.8167439,52.2769828],[-0.8167393,52.2769988],[-0.8167386,52.2770215],[-0.816784,52.2770384],[-0.8168579,52.2770356],[-0.8168918,52.277013],[-0.8169319,52.2770177]],
+[[-0.8152489,52.2776165],[-0.8152589,52.277592],[-0.8152381,52.2775637],[-0.815205,52.277551],[-0.8151834,52.2775326],[-0.8151765,52.2775156],[-0.8151272,52.2775081],[-0.8151025,52.2775166],[-0.815094,52.2775284],[-0.8150971,52.2775694],[-0.8150963,52.2775896],[-0.8151156,52.2776047],[-0.815151,52.2775991],[-0.815188,52.2776217],[-0.8152096,52.2776264]],
+[[-0.8152797,52.2777871],[-0.8153059,52.2777748],[-0.8153112,52.2777546],[-0.8152897,52.2777362],[-0.8152542,52.2777348],[-0.8152358,52.2777452],[-0.8152234,52.2777565],[-0.8152204,52.2777701],[-0.8152304,52.277781]]
+]};
+
+const EARTH_RADIUS=6371000;
+const referenceLatitude=hole.tee[1]*Math.PI/180;
+
+function toLocalMetres(point){
+  return [
+    (point[0]-hole.tee[0])*Math.cos(referenceLatitude)*Math.PI/180*EARTH_RADIUS,
+    (point[1]-hole.tee[1])*Math.PI/180*EARTH_RADIUS
+  ];
+}
+
+/*
+ CAMERA / VIEWPORT RULES — CLEAN v3
+
+ The physical viewport is portrait 9:16.
+
+ IMPORTANT:
+ The SVG coordinate system is NOT treated as a 100x100 square.
+ It is 100 units wide by 177.777... units high, so one SVG unit
+ represents the same physical amount in X and Y.
+
+ Percentage positions are converted independently:
+   X% -> X percentage of 100-unit width.
+   Y% -> Y percentage of 177.777...-unit height.
+
+ Opening test:
+   tee   = X25%, Y90%
+   green = X25%, Y10%
+
+ Course geometry remains fixed.
+ Tee is the rotation point.
+ Rotate the complete geometry around the tee.
+ Apply one uniform scale only.
+ No X/Y stretching.
+*/
+
+const VIEW_WIDTH=100;
+const VIEW_HEIGHT=100*16/9;
+
+const teeAnchor=[
+  VIEW_WIDTH*0.25,
+  VIEW_HEIGHT*0.90
+];
+
+const greenAnchor=[
+  VIEW_WIDTH*0.25,
+  VIEW_HEIGHT*0.10
+];
+
+// Mathematical camera space: +X right, +Y up.
+// The physical distance between the anchors is therefore the actual
+// 80% of the viewport height, not an arbitrary 80 units.
+const targetVector=[
+  0,
+  teeAnchor[1]-greenAnchor[1]
+];
+
+const teeLocal=toLocalMetres(hole.tee);
+const greenLocal=toLocalMetres(hole.greenMiddle);
+
+const courseVector=[
+  greenLocal[0]-teeLocal[0],
+  greenLocal[1]-teeLocal[1]
+];
+
+const rotation=
+  Math.atan2(targetVector[1],targetVector[0])-
+  Math.atan2(courseVector[1],courseVector[0]);
+
+const scale=
+  Math.hypot(targetVector[0],targetVector[1])/
+  Math.hypot(courseVector[0],courseVector[1]);
+
+function project(point){
+  const local=toLocalMetres(point);
+  const x=local[0]-teeLocal[0];
+  const y=local[1]-teeLocal[1];
+
+  const c=Math.cos(rotation);
+  const s=Math.sin(rotation);
+
+  // Rotate in physical, aspect-correct camera space.
+  const cameraX=x*c-y*s;
+  const cameraY=x*s+y*c;
+
+  // Convert mathematical +Y-up to SVG +Y-down once.
+  return [
+    teeAnchor[0]+cameraX*scale,
+    teeAnchor[1]-cameraY*scale
+  ];
+}
+
+// Hard assertions: percentage anchors must resolve exactly.
+const pTee=project(hole.tee);
+const pGreen=project(hole.greenMiddle);
+const EPS=1e-7;
+
+if(Math.abs(pTee[0]-teeAnchor[0])>EPS || Math.abs(pTee[1]-teeAnchor[1])>EPS){
+  throw new Error("Tee percentage anchor transform failed");
+}
+if(Math.abs(pGreen[0]-greenAnchor[0])>EPS || Math.abs(pGreen[1]-greenAnchor[1])>EPS){
+  throw new Error("Green percentage anchor transform failed");
+}
+
+function closedPath(points){
+  return points.map((point,index)=>{
+    const [x,y]=project(point);
+    return (index?"L":"M")+x.toFixed(3)+" "+y.toFixed(3);
+  }).join(" ")+" Z";
+}
+
+function openPath(points){
+  return points.map((point,index)=>{
+    const [x,y]=project(point);
+    return (index?"L":"M")+x.toFixed(3)+" "+y.toFixed(3);
+  }).join(" ");
+}
+
+document.getElementById("fairway").setAttribute("d",closedPath(hole.fairway));
+const teeLayer=document.getElementById("tees");
+hole.teeBoxes.forEach(box=>{
+  const element=document.createElementNS("http://www.w3.org/2000/svg","path");
+  element.setAttribute("class","teeBox");
+  element.setAttribute("d",closedPath(box));
+  teeLayer.appendChild(element);
+});
+document.getElementById("green").setAttribute("d",closedPath(hole.green));
+document.getElementById("playline").setAttribute("d",openPath(hole.line));
+
+const bunkerLayer=document.getElementById("bunkers");
+hole.bunkers.forEach(bunker=>{
+  const element=document.createElementNS("http://www.w3.org/2000/svg","path");
+  element.setAttribute("class","bunker");
+  element.setAttribute("d",closedPath(bunker));
+  bunkerLayer.appendChild(element);
+});
+
+document.getElementById("teeMarker").setAttribute("cx",teeAnchor[0]);
+document.getElementById("teeMarker").setAttribute("cy",teeAnchor[1]);
+document.getElementById("pin").setAttribute("cx",project([-0.8150842,52.2777189])[0]);
+document.getElementById("pin").setAttribute("cy",project([-0.8150842,52.2777189])[1]);
+document.getElementById("greenMarker").setAttribute("cx",greenAnchor[0]);
+
+// FAIRWAY BUNKER LABELS — Hole View.
+// Position is the existing polygon-centre position from the label test.
+// Numbers are the existing front/carry values. No halo, box or background.
+const bunkerLabelLayer=document.getElementById("bunkerLabels");
+const fairwayBunkerLabels=[
+  {poly:hole.bunkers[0],text:"204 / 229"},
+  {poly:hole.bunkers[1],text:"201 / 219"}
+];
+fairwayBunkerLabels.forEach(({poly,text})=>{
+  const center=poly.reduce((sum,p)=>{
+    const q=project(p);
+    return [sum[0]+q[0],sum[1]+q[1]];
+  },[0,0]).map(v=>v/poly.length);
+  const label=document.createElementNS("http://www.w3.org/2000/svg","text");
+  label.setAttribute("class","bunkerLabel");
+  label.setAttribute("x",center[0]);
+  label.setAttribute("y",center[1]);
+  label.textContent=text;
+  bunkerLabelLayer.appendChild(label);
+});
+document.getElementById("greenMarker").setAttribute("cy",greenAnchor[1]);
+</script>
+</body>
+</html>
