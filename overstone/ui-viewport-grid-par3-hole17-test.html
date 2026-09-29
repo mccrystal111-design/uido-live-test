@@ -51,7 +51,7 @@ svg{width:100%;height:100%;display:block}
     <rect x="0" y="0" width="60" height="177.7777777778" fill="url(#roughFadeYGradient)"></rect>
   </mask>
 </svg></div>
-<div class="status">Hole 17 · Par 3 renderer · X10-X60 usable hole-view · green Y flexible · visual balance ≈ X35 · water structural</div>
+<div class="status">Hole 17 · Par 3 renderer · X10-X50 usable hole-view · green Y flexible · breathing zones reserved · water structural</div>
 </div></div>
 <script src="course-source-model.js?v=7188dc0cfe620e6be59111508e0c0ebc6a2d6fb3"></script>
 <script>
@@ -61,11 +61,12 @@ if(!source) throw new Error("Authoritative Hole 17 source model not found");
 const VIEW_W=100, VIEW_H=100*16/9;
 const TEE_Y=VIEW_H*.90;
 const GREEN_Y_MIN=VIEW_H*.10;
-const GREEN_Y_MAX=VIEW_H*.24;
+const GREEN_Y_MAX=VIEW_H*.90;
+const GREEN_Y_PREFERRED=VIEW_H*.25;
 const TEE_X_PREFERRED=VIEW_W*.25;
 const GREEN_X_PREFERRED=VIEW_W*.25;
 const SAFE_X_MIN=VIEW_W*.10;
-const SAFE_X_MAX=VIEW_W*.60;
+const SAFE_X_MAX=VIEW_W*.50;
 const X_STEP=.25;
 const Y_STEP=.5;
 const VISUAL_BALANCE_X=VIEW_W*.35;
@@ -86,16 +87,26 @@ const greenLocal=local(greenMiddleLL);
 const BASE3_ROTATION=Math.PI/2-Math.atan2(greenLocal[1],greenLocal[0]);
 
 function makeCamera(teeX,greenX,greenY){
-  // Par 3 keeps the proven Base 4 hole heading. Green Y changes composition
-  // and zoom, but never changes the established player-to-green orientation.
-  const targetDistance=Math.hypot(greenX-teeX,TEE_Y-greenY);
-  const rotation=BASE3_ROTATION;
+  const targetVector=[greenX-teeX,TEE_Y-greenY];
+  const targetDistance=Math.hypot(targetVector[0],targetVector[1]);
+  const rotation=Math.atan2(targetVector[1],targetVector[0])
+    -Math.atan2(greenLocal[1],greenLocal[0]);
   const scale=targetDistance/Math.hypot(greenLocal[0],greenLocal[1]);
   const c=Math.cos(rotation),s=Math.sin(rotation);
+  const ux=(greenX-teeX)/targetDistance;
+  const uy=(TEE_Y-greenY)/targetDistance;
   function project(ll){
     const p=local(ll);
-    const x=p[0]*c-p[1]*s, y=p[0]*s+p[1]*c;
-    return [teeX+x*scale,TEE_Y-y*scale];
+    const rx=p[0]*c-p[1]*s;
+    const ry=p[0]*s+p[1]*c;
+    // Preserve the tee-to-green axis and anchor positions, but reverse
+    // only the lateral component. This fixes the observed handedness
+    // without rotating or relocating the hole.
+    const longitudinal=rx*ux+ry*uy;
+    const lateral=rx*uy-ry*ux;
+    const mx=longitudinal*ux-lateral*uy;
+    const my=longitudinal*uy+lateral*ux;
+    return [teeX+mx*scale,TEE_Y-my*scale];
   }
   return {rotation,scale,project};
 }
@@ -129,23 +140,26 @@ function meetsSafeViewport(bounds){
 }
 
 // Par 3 composition variant:
-// X behaviour remains Base 4. Green Y is now flexible so the renderer can
-// compose tee + green together without pressing the green boundary against Y0.
-// Rank for horizontal balance first, then vertical balance, then movement from
-// the established Base 4 X preferences.
+// Keep tee and green inside the main X10-X50 / Y10-Y90 viewing field.
+// The breathing zones remain empty presentation space. Green Y is flexible,
+// with a lower preferred position inside the usable field.
+// Rank visual balance first, then the preferred lower green position.
 const candidates=[];
 for(let teeX=SAFE_X_MIN;teeX<=SAFE_X_MAX+1e-8;teeX+=X_STEP){
-  const greenX=teeX;
-  for(let greenY=GREEN_Y_MIN;greenY<=GREEN_Y_MAX+1e-8;greenY+=Y_STEP){
-    const camera=makeCamera(teeX,greenX,greenY);
-    const bounds=projectedBounds(camera,teeX);
-    if(meetsSafeViewport(bounds)){
-      candidates.push({
-        teeX,greenX,greenY,camera,bounds,
-        balanceX:Math.abs(bounds.centerX-VISUAL_BALANCE_X),
-        balanceY:Math.abs(bounds.centerY-VISUAL_BALANCE_Y),
-        movement:Math.abs(teeX-TEE_X_PREFERRED)+Math.abs(greenY-GREEN_Y_MIN)
-      });
+  for(let greenX=SAFE_X_MIN;greenX<=SAFE_X_MAX+1e-8;greenX+=X_STEP){
+    for(let greenY=GREEN_Y_MIN;greenY<=GREEN_Y_MAX+1e-8;greenY+=Y_STEP){
+      const camera=makeCamera(teeX,greenX,greenY);
+      const bounds=projectedBounds(camera,teeX);
+      if(meetsSafeViewport(bounds)){
+        candidates.push({
+          teeX,greenX,greenY,camera,bounds,
+          balanceX:Math.abs(bounds.centerX-VISUAL_BALANCE_X),
+          balanceY:Math.abs(bounds.centerY-VISUAL_BALANCE_Y),
+          movement:Math.abs(teeX-TEE_X_PREFERRED)+
+            Math.abs(greenX-GREEN_X_PREFERRED)+
+            Math.abs(greenY-GREEN_Y_PREFERRED)
+        });
+      }
     }
   }
 }
