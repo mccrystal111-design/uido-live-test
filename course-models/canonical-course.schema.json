@@ -1,56 +1,37 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://uido.golf/schemas/canonical-course.v1.json",
-  "title": "UiDo Canonical Course Source of Truth",
+  "$id": "https://uido.golf/schemas/canonical-course.v2.json",
+  "title": "UiDo Canonical Course Source of Truth v2",
   "type": "object",
-  "required": [
-    "schema",
-    "course",
-    "provenance",
-    "holes",
-    "validation"
-  ],
+  "required": ["schema", "course", "provenance", "geometry", "holes", "validation"],
   "properties": {
-    "schema": {
-      "const": "uido.course.canonical.v1"
-    },
-    "course": {
-      "type": "object",
-      "required": [
-        "id",
-        "name"
-      ],
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "location": {
-          "type": "object"
-        }
-      }
-    },
+    "schema": {"const": "uido.course.canonical.v2"},
+    "course": {"type": "object", "required": ["id", "name"]},
     "provenance": {
       "type": "object",
-      "required": [
-        "policy",
-        "sources"
-      ],
+      "required": ["policy", "sources"],
       "properties": {
-        "policy": {
-          "type": "string"
-        },
-        "sources": {
+        "policy": {"type": "string"},
+        "sources": {"type": "array", "items": {"type": "object"}}
+      }
+    },
+    "geometry": {
+      "type": "object",
+      "required": ["scope", "features"],
+      "properties": {
+        "scope": {"const": "course"},
+        "features": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": [
-              "id",
-              "kind",
-              "status"
-            ]
+            "required": ["id", "type", "geometry"],
+            "properties": {
+              "id": {"type": "string"},
+              "type": {"type": "string"},
+              "geometry": {"type": "object"},
+              "source_ids": {"type": "array", "items": {"type": "string"}},
+              "association_evidence": {}
+            }
           }
         }
       }
@@ -61,77 +42,13 @@
       "maxItems": 18,
       "items": {
         "type": "object",
-        "required": [
-          "hole_number",
-          "truth",
-          "features"
-        ],
+        "required": ["hole_number", "routing", "truth"],
         "properties": {
-          "hole_number": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 18
-          },
-          "par": {
-            "type": [
-              "integer",
-              "null"
-            ]
-          },
-          "routing": {
-            "type": [
-              "object",
-              "null"
-            ]
-          },
-          "truth": {
-            "type": "string",
-            "enum": [
-              "CONFIRMED",
-              "INCOMPLETE",
-              "CONFLICT"
-            ]
-          },
-          "features": {
-            "type": "object",
-            "required": [
-              "tee",
-              "fairway",
-              "rough",
-              "green",
-              "bunkers",
-              "water",
-              "paths",
-              "context"
-            ],
-            "additionalProperties": false,
-            "properties": {
-              "tee": {
-                "$ref": "#/$defs/featureSet"
-              },
-              "fairway": {
-                "$ref": "#/$defs/featureSet"
-              },
-              "rough": {
-                "$ref": "#/$defs/featureSet"
-              },
-              "green": {
-                "$ref": "#/$defs/featureSet"
-              },
-              "bunkers": {
-                "$ref": "#/$defs/featureSet"
-              },
-              "water": {
-                "$ref": "#/$defs/featureSet"
-              },
-              "paths": {
-                "$ref": "#/$defs/featureSet"
-              },
-              "context": {
-                "$ref": "#/$defs/featureSet"
-              }
-            }
-          }
+          "hole_number": {"type": "integer", "minimum": 1, "maximum": 18},
+          "par": {"type": ["integer", "null"]},
+          "truth": {"type": "string", "enum": ["CONFIRMED", "INCOMPLETE", "CONFLICT"]},
+          "routing": {"type": "object"},
+          "conflicts": {"type": "array"}
         }
       }
     },
@@ -140,62 +57,11 @@
       "required": [
         "course_complete",
         "holes_complete",
+        "physical_geometry_count",
+        "unique_physical_geometry_ids",
         "unresolved_features",
         "conflicts"
-      ],
-      "properties": {
-        "course_complete": {
-          "type": "boolean"
-        },
-        "holes_complete": {
-          "type": "integer"
-        },
-        "unresolved_features": {
-          "type": "array"
-        },
-        "conflicts": {
-          "type": "array"
-        }
-      }
-    }
-  },
-  "$defs": {
-    "featureSet": {
-      "type": "object",
-      "required": [
-        "status",
-        "scope",
-        "features"
-      ],
-      "properties": {
-        "status": {
-          "type": "string",
-          "enum": [
-            "CONFIRMED",
-            "CONFIRMED_NONE",
-            "UNKNOWN",
-            "CONFLICT"
-          ]
-        },
-        "scope": {
-          "type": "string"
-        },
-        "features": {
-          "type": "array"
-        },
-        "source_ids": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "notes": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
+      ]
     }
   }
 }

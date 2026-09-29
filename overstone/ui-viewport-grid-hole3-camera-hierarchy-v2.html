@@ -28,9 +28,9 @@ svg{width:100%;height:100%;display:block}
 <div class="course"><svg id="courseSvg" viewBox="0 0 100 177.7777777778" preserveAspectRatio="none"></svg></div>
 <div class="status">Hole 3 · authoritative GPS/source geometry · fixed geometry / tee pivot / flexible tee X + green X / usable X10-X60</div>
 </div></div>
-<script src="course-source-model.js"></script>
+<script src="course-source-model.js"></script>\n<script src="hole-view-builder.js"></script>
 <script>
-const source=window.UIDO_OVERSTONE_SOURCE_HOLES["3"];
+const holeView=window.UIDO_HOLE_VIEW_BUILDER.build(window.UIDO_OVERSTONE_SOURCE_HOLES, 3);\nconst source=holeView.route;
 if(!source) throw new Error("Authoritative Hole 3 source model not found");
 
 const VIEW_W=100, VIEW_H=100*16/9;
@@ -73,7 +73,7 @@ function makeCamera(teeX,greenX){
 
 // The camera evaluates the whole relevant source geometry. Nothing is
 // translated, stretched, bent or independently repositioned.
-const relevantFeatures=(source.features||[]).filter(f=>
+const relevantFeatures=(holeView.features||[]).filter(f=>
   f.geometry && f.geometry.type==="Polygon" &&
   Array.isArray(f.geometry.coordinates) &&
   Array.isArray(f.geometry.coordinates[0]) &&
@@ -145,10 +145,10 @@ function addFeature(f){
   else if(f.golf==="green")addPath("green",pts);
   else if(f.golf==="bunker")addPath("bunker",pts);
 }
-(source.features||[]).filter(f=>f.golf==="rough").forEach(addFeature);
-(source.features||[]).filter(f=>f.golf==="fairway").forEach(addFeature);
-(source.features||[]).filter(f=>f.golf==="green").forEach(addFeature);
-(source.features||[]).filter(f=>f.golf==="bunker").forEach(addFeature);
+(holeView.features||[]).filter(f=>f.golf==="rough").forEach(addFeature);
+(holeView.features||[]).filter(f=>f.golf==="fairway").forEach(addFeature);
+(holeView.features||[]).filter(f=>f.golf==="green").forEach(addFeature);
+(holeView.features||[]).filter(f=>f.golf==="bunker").forEach(addFeature);
 addPath("playline",source.line_of_play.map(p=>projectLL(p)),false);
 
 if(!meetsSafeViewport(bounds)) throw new Error("No tee/green X combination satisfies the X10-X60 usable hole-view area");

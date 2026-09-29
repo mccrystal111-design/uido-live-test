@@ -55,7 +55,7 @@ svg{width:100%;height:100%;display:block}
 </div></div>
 <script src="course-source-model.js?v=7188dc0cfe620e6be59111508e0c0ebc6a2d6fb3"></script>
 <script>
-const source=window.UIDO_OVERSTONE_SOURCE_HOLES["17"];
+const holeView=window.UIDO_HOLE_VIEW_BUILDER.build(window.UIDO_OVERSTONE_SOURCE_HOLES, 17);\nconst source=holeView.route;
 if(!source) throw new Error("Authoritative Hole 17 source model not found");
 
 const VIEW_W=100, VIEW_H=100*16/9;
@@ -101,7 +101,7 @@ function makeCamera(teeX,greenX){
 // tee + fairway + green + bunker. Water is structural but does not constrain
 // camera placement. Heavy rough remains rendered source
 // geometry but is non-constraining and never participates in the bounds.
-const cameraConstraintFeatures=(source.features||[]).filter(f=>
+const cameraConstraintFeatures=(holeView.features||[]).filter(f=>
   f.geometry && f.geometry.type==="Polygon" &&
   Array.isArray(f.geometry.coordinates) &&
   Array.isArray(f.geometry.coordinates[0]) &&
@@ -210,12 +210,12 @@ function addFeature(f){
 // Structural layer order: rough is the base surface, fairway sits
 // above it, then water is drawn above playing surfaces so an in-play lake
 // cannot disappear underneath fairway geometry.
-(source.features||[]).filter(f=>f.golf==="rough").forEach(addFeature);
-(source.features||[]).filter(f=>f.golf==="fairway").forEach(addFeature);
-(source.features||[]).filter(f=>f.golf==="water_hazard").forEach(addFeature);
-(source.features||[]).filter(f=>f.golf==="green").forEach(addFeature);
-(source.features||[]).filter(f=>f.golf==="bunker").forEach(addFeature);
-(source.features||[]).filter(f=>f.golf==="tee").forEach(addFeature);
+(holeView.features||[]).filter(f=>f.golf==="rough").forEach(addFeature);
+(holeView.features||[]).filter(f=>f.golf==="fairway").forEach(addFeature);
+(holeView.features||[]).filter(f=>f.golf==="water_hazard").forEach(addFeature);
+(holeView.features||[]).filter(f=>f.golf==="green").forEach(addFeature);
+(holeView.features||[]).filter(f=>f.golf==="bunker").forEach(addFeature);
+(holeView.features||[]).filter(f=>f.golf==="tee").forEach(addFeature);
 addPath("playline",source.line_of_play.map(p=>projectLL(p)),false);
 
 if(!meetsSafeViewport(bounds)) throw new Error("No tee/green X combination satisfies the X10-X60 usable hole-view area");
