@@ -44,7 +44,13 @@ def split_hazards(items: list[dict], wanted_type: str) -> list[dict]:
     return [x for x in items if str(x.get("type", "")).upper() == wanted_type]
 
 
-def feature_set(items: list[dict], *, scope: str, notes: list[str] | None = None) -> dict:
+def feature_set(
+    items: list[dict],
+    *,
+    scope: str,
+    notes: list[str] | None = None,
+    explicit_none: bool = False,
+) -> dict:
     items = items or []
     if items:
         return {
@@ -54,8 +60,11 @@ def feature_set(items: list[dict], *, scope: str, notes: list[str] | None = None
             "source_ids": source_ids_for(items),
             "notes": notes or [],
         }
+    # Empty association is not proof that the real course has no such feature.
+    # CONFIRMED_NONE is reserved for an upstream packet that explicitly records
+    # absence; otherwise canonical truth remains UNKNOWN.
     return {
-        "status": "CONFIRMED_NONE" if scope == "source:osm-capture" else "UNKNOWN",
+        "status": "CONFIRMED_NONE" if explicit_none else "UNKNOWN",
         "scope": scope,
         "features": [],
         "source_ids": [],
