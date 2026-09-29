@@ -135,20 +135,17 @@ function meetsSafeViewport(bounds){
 // the established Base 4 X preferences.
 const candidates=[];
 for(let teeX=SAFE_X_MIN;teeX<=SAFE_X_MAX+1e-8;teeX+=X_STEP){
-  for(let greenX=SAFE_X_MIN;greenX<=SAFE_X_MAX+1e-8;greenX+=X_STEP){
-    for(let greenY=GREEN_Y_MIN;greenY<=GREEN_Y_MAX+1e-8;greenY+=Y_STEP){
-      const camera=makeCamera(teeX,greenX,greenY);
-      const bounds=projectedBounds(camera,teeX);
-      if(meetsSafeViewport(bounds)){
-        candidates.push({
-          teeX,greenX,greenY,camera,bounds,
-          balanceX:Math.abs(bounds.centerX-VISUAL_BALANCE_X),
-          balanceY:Math.abs(bounds.centerY-VISUAL_BALANCE_Y),
-          movement:Math.abs(teeX-TEE_X_PREFERRED)+
-            Math.abs(greenX-GREEN_X_PREFERRED)+
-            Math.abs(greenY-GREEN_Y_MIN)
-        });
-      }
+  const greenX=teeX;
+  for(let greenY=GREEN_Y_MIN;greenY<=GREEN_Y_MAX+1e-8;greenY+=Y_STEP){
+    const camera=makeCamera(teeX,greenX,greenY);
+    const bounds=projectedBounds(camera,teeX);
+    if(meetsSafeViewport(bounds)){
+      candidates.push({
+        teeX,greenX,greenY,camera,bounds,
+        balanceX:Math.abs(bounds.centerX-VISUAL_BALANCE_X),
+        balanceY:Math.abs(bounds.centerY-VISUAL_BALANCE_Y),
+        movement:Math.abs(teeX-TEE_X_PREFERRED)+Math.abs(greenY-GREEN_Y_MIN)
+      });
     }
   }
 }
