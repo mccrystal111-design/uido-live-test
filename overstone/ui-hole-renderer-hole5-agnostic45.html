@@ -138,11 +138,27 @@ const scale=
 // The physical Hole View is exactly the renderer's usable 60-unit window.
 // Derive its metres from the proven camera scale rather than inventing a
 // separate spatial extent.
-const holeView=window.UiDoHoleViewBuilder.buildHoleView(canonical,5,{
+const hole5Route=canonical.holes.find(h=>h.hole_number===5).routing;
+const hole5Direction=window.UiDoHoleViewBuilder.directionFromRoute(hole5Route);
+
+// Hole-specific input stops here: direction of travel.
+// The next layer turns that direction into the physical viewing window,
+// then resolves every shared course feature physically inside it.
+const viewingWindow=window.UiDoHoleViewBuilder.buildViewingWindow(hole5Direction,{
   back_m:(VIEW_HEIGHT-teeAnchor[1])/scale,
   forward_m:teeAnchor[1]/scale,
   width_m:60/scale
 });
+const visibleFeatures=window.UiDoHoleViewBuilder.selectCourseGeometry(
+  canonical.geometry.features,
+  hole5Direction,
+  viewingWindow
+);
+const holeView={
+  features:visibleFeatures,
+  direction_of_travel:hole5Direction,
+  viewing_window:viewingWindow
+};
 
 function project(point){
   const local=toLocalMetres(point);
@@ -207,7 +223,7 @@ holeView.features
 
 const routeElement=document.createElementNS(ns,"path");
 routeElement.setAttribute("class","playline");
-routeElement.setAttribute("d",pathFromGeometry(canonical.holes.find(h=>h.hole_number===5).routing.geometry));
+routeElement.setAttribute("d",pathFromGeometry(hole5Route.geometry));
 routeElement.setAttribute("clip-path","url(#holeViewClip)");
 svg.appendChild(routeElement);
 
