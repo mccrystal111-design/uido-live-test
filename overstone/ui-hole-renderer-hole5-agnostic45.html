@@ -233,8 +233,8 @@ const endTangent=[routeLocalMetres[routeLocalMetres.length-1][0]-routeLocalMetre
 const fortyYardsMetres=40*0.9144;
 document.getElementById("direction45Left").setAttribute("d",smoothRouteOffset(routeLocalMetres,fortyYardsMetres));
 document.getElementById("direction45Right").setAttribute("d",smoothRouteOffset(routeLocalMetres,-fortyYardsMetres));
-document.getElementById("direction45TeeCap").setAttribute("d",capPath(routeStart,startTangent,fortyYardsMetres));
-document.getElementById("direction45GreenCap").setAttribute("d",capPath(routeEnd,[-endTangent[0],-endTangent[1]],fortyYardsMetres));
+document.getElementById("direction45TeeCap").setAttribute("d",capPath(routeStart,[-startTangent[0],-startTangent[1]],fortyYardsMetres));
+document.getElementById("direction45GreenCap").setAttribute("d",capPath(routeEnd,endTangent,fortyYardsMetres));
 
 
 function pathFromGeometry(geometry){
