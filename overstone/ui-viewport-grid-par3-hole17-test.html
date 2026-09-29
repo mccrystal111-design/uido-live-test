@@ -208,15 +208,20 @@ function addFeature(f){
     svg.appendChild(outer);
   }else if(f.golf==="fairway")addPath("fairway",pts);
   else if(f.golf==="water_hazard"){
-    // Keep the complete source lake immutable; clip only its presentation
-    // to the hole viewport because the lake extends beyond this hole view.
-    const g=document.createElementNS(ns,"g");
-    g.setAttribute("clip-path","url(#holeViewClip)");
+    // Keep the complete source lake immutable. Presentation fades at the
+    // same viewport breathing edges as the rough; it never constrains camera
+    // placement.
+    const outer=document.createElementNS(ns,"g");
+    outer.setAttribute("clip-path","url(#holeViewClip)");
+    outer.setAttribute("mask","url(#roughEdgeFadeX)");
+    const inner=document.createElementNS(ns,"g");
+    inner.setAttribute("mask","url(#roughEdgeFadeY)");
     const e=document.createElementNS(ns,"path");
     e.setAttribute("class","water");
     e.setAttribute("d",path(pts,true));
-    g.appendChild(e);
-    svg.appendChild(g);
+    inner.appendChild(e);
+    outer.appendChild(inner);
+    svg.appendChild(outer);
   }
   else if(f.golf==="green")addPath("green",pts);
   else if(f.golf==="bunker")addPath("bunker",pts);
