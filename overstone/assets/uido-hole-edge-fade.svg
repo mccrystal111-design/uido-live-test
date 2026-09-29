@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 177.7777777778" preserveAspectRatio="none">
   <defs>
-    <linearGradient id="fadeRight" gradientUnits="userSpaceOnUse" x1="49.98" y1="0" x2="60" y2="0">
+    <linearGradient id="fadeLeft" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="30" y2="0">
       <stop offset="0" stop-color="#f4f1e6" stop-opacity="0"/>
-      <stop offset="100%" stop-color="#f4f1e6" stop-opacity="0.78"/>
+      <stop offset="100%" stop-color="#f4f1e6" stop-opacity="0.72"/>
     </linearGradient>
-    <linearGradient id="fadeLeft" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0.02" y2="0">
-      <stop offset="0" stop-color="#f4f1e6" stop-opacity="0.78"/>
-      <stop offset="100%" stop-color="#f4f1e6" stop-opacity="0"/>
+    <linearGradient id="fadeRight" gradientUnits="userSpaceOnUse" x1="30" y1="0" x2="60" y2="0">
+      <stop offset="0" stop-color="#f4f1e6" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#f4f1e6" stop-opacity="0.72"/>
     </linearGradient>
   </defs>
-  <rect x="0" y="0" width="0.02" height="177.7777777778" fill="url(#fadeLeft)"/>
-  <rect x="49.98" y="0" width="10.02" height="177.7777777778" fill="url(#fadeRight)"/>
+  <rect x="0" y="0" width="30" height="177.7777777778" fill="url(#fadeLeft)"/>
+  <rect x="30" y="0" width="30" height="177.7777777778" fill="url(#fadeRight)"/>
 </svg>
