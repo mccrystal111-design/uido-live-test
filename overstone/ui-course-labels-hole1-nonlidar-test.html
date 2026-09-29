@@ -217,7 +217,7 @@ document.getElementById("greenMarker").setAttribute("cy",greenAnchor[1]);
   ];
   fmb.forEach(([name,p])=>{
     const q=project(p), d=yd(distanceM(hole.tee,p));
-    add("circle",{class:"labelGreenCircle,cx:q[0],cy:q[1],r:"2.7"});
+    add("circle",{class:"labelGreenCircle",cx:q[0],cy:q[1],r:"2.7"});
     const t=add("text",{class:"labelGreenText",x:q[0],y:q[1]});
     t.textContent=String(d);
   });
@@ -274,7 +274,7 @@ document.getElementById("greenMarker").setAttribute("cy",greenAnchor[1]);
     const r=[b[0]-a[0],b[1]-a[1]], s=[d[0]-c[0],d[1]-c[1]];
     const den=r[0]*s[1]-r[1]*s[0];
     if(Math.abs(den)<1e-9)return null;
-    const u=((c[0]-a[0])*r[1]-(c[1]-a[1])*r[0])/(-den);
+    const u=((c[0]-a[0])*r[1]-(c[1]-a[1])*r[0])/den;
     const t=((c[0]-a[0])*s[1]-(c[1]-a[1])*s[0])/den;
     if(t>=-1e-9&&t<=1+1e-9&&u>=-1e-9&&u<=1+1e-9)return [a[0]+t*r[0],a[1]+t*r[1]];
     return null;
