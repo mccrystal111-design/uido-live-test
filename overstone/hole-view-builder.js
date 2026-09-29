@@ -92,7 +92,7 @@
 
   function projectToHoleSpace(point, origin, direction){
     const p=toLocal(point,origin);
-    const forward=direction;
+    const forward=direction.vector;
     const right=[forward[1],-forward[0]];
     return {
       forward:p[0]*forward[0]+p[1]*forward[1],
