@@ -67,13 +67,17 @@
     return [];
   }
 
-  function directionFromRoute(coords){
+  function directionFromRoute(routing){
+    const coords=routeCoordinates(routing);
     if(coords.length < 2) throw new Error("Hole route requires at least two coordinates");
-    const start = coords[0];
-    const end = coords[coords.length-1];
-    const origin = start;
-    const a = toLocal(start, origin);
-    const b = toLocal(end, origin);
+    const start=coords[0];
+    const destination=routing && routing.destination;
+    const end=destination
+      ? [Number(destination.lon),Number(destination.lat)]
+      : coords[coords.length-1];
+    const origin=start;
+    const a=toLocal(start,origin);
+    const b=toLocal(end,origin);
     const dx=b[0]-a[0], dy=b[1]-a[1];
     const length=Math.hypot(dx,dy);
     if(!length) throw new Error("Hole route has zero travel length");
@@ -148,8 +152,7 @@
     const hole=(course.holes||[]).find(h=>Number(h.hole_number)===Number(holeNumber));
     if(!hole) throw new Error("Hole "+holeNumber+" not found");
 
-    const coords=routeCoordinates(hole.routing);
-    const direction=directionFromRoute(coords);
+    const direction=directionFromRoute(hole.routing);
     const polygon=buildWindowPolygon(direction.origin,direction,options);
 
     const windowPoints=polygon.map(p=>toLocal(p,direction.origin));
