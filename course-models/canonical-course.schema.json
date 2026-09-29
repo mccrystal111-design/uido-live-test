@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uido.golf/schemas/canonical-course.v1.json",
+  "title": "UiDo Canonical Course Source of Truth",
+  "type": "object",
+  "required": [
+    "schema",
+    "course",
+    "provenance",
+    "holes",
+    "validation"
+  ],
+  "properties": {
+    "schema": {
+      "const": "uido.course.canonical.v1"
+    },
+    "course": {
+      "type": "object",
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "location": {
+          "type": "object"
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "policy",
+        "sources"
+      ],
+      "properties": {
+        "policy": {
+          "type": "string"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "kind",
+              "status"
+            ]
+          }
+        }
+      }
+    },
+    "holes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 18,
+      "items": {
+        "type": "object",
+        "required": [
+          "hole_number",
+          "truth",
+          "features"
+        ],
+        "properties": {
+          "hole_number": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 18
+          },
+          "par": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "routing": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "truth": {
+            "type": "string",
+            "enum": [
+              "CONFIRMED",
+              "INCOMPLETE",
+              "CONFLICT"
+            ]
+          },
+          "features": {
+            "type": "object",
+            "required": [
+              "tee",
+              "fairway",
+              "rough",
+              "green",
+              "bunkers",
+              "water",
+              "paths",
+              "context"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "tee": {
+                "$ref": "#/$defs/featureSet"
+              },
+              "fairway": {
+                "$ref": "#/$defs/featureSet"
+              },
+              "rough": {
+                "$ref": "#/$defs/featureSet"
+              },
+              "green": {
+                "$ref": "#/$defs/featureSet"
+              },
+              "bunkers": {
+                "$ref": "#/$defs/featureSet"
+              },
+              "water": {
+                "$ref": "#/$defs/featureSet"
+              },
+              "paths": {
+                "$ref": "#/$defs/featureSet"
+              },
+              "context": {
+                "$ref": "#/$defs/featureSet"
+              }
+            }
+          }
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "required": [
+        "course_complete",
+        "holes_complete",
+        "unresolved_features",
+        "conflicts"
+      ],
+      "properties": {
+        "course_complete": {
+          "type": "boolean"
+        },
+        "holes_complete": {
+          "type": "integer"
+        },
+        "unresolved_features": {
+          "type": "array"
+        },
+        "conflicts": {
+          "type": "array"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "featureSet": {
+      "type": "object",
+      "required": [
+        "status",
+        "scope",
+        "features"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "CONFIRMED",
+            "CONFIRMED_NONE",
+            "UNKNOWN",
+            "CONFLICT"
+          ]
+        },
+        "scope": {
+          "type": "string"
+        },
+        "features": {
+          "type": "array"
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
