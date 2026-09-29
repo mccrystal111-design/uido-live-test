@@ -232,6 +232,46 @@
     };
   }
 
+  function buildViewingWindow(direction,options){
+    options=Object.assign({
+      back_m:0,
+      forward_m:450,
+      width_m:180
+    },options||{});
+
+    if(!direction || !direction.origin || !direction.vector){
+      throw new Error("A resolved direction of travel is required");
+    }
+
+    const polygon=buildWindowPolygon(direction.origin,direction,options);
+    const rect={
+      minForward:-options.back_m,
+      maxForward:options.forward_m,
+      minLateral:-options.width_m/2,
+      maxLateral:options.width_m/2
+    };
+
+    return {
+      back_m:options.back_m,
+      forward_m:options.forward_m,
+      width_m:options.width_m,
+      polygon,
+      rect
+    };
+  }
+
+  function selectCourseGeometry(features,direction,viewingWindow){
+    if(!Array.isArray(features)) return [];
+    return features.filter(feature=>
+      geometryIntersectsWindow(
+        feature.geometry,
+        direction.origin,
+        direction,
+        viewingWindow.rect
+      )
+    );
+  }
+
   function buildHoleView(course,holeNumber,options){
     options=Object.assign({
       back_m:0,
@@ -247,18 +287,8 @@
     if(!hole) throw new Error("Hole "+holeNumber+" not found");
 
     const direction=directionFromRoute(hole.routing);
-    const polygon=buildWindowPolygon(direction.origin,direction,options);
-
-    const rect={
-      minForward:-options.back_m,
-      maxForward:options.forward_m,
-      minLateral:-options.width_m/2,
-      maxLateral:options.width_m/2
-    };
-
-    const features=course.geometry.features.filter(feature=>
-      geometryIntersectsWindow(feature.geometry,direction.origin,direction,rect)
-    );
+    const viewingWindow=buildViewingWindow(direction,options);
+    const features=selectCourseGeometry(course.geometry.features,direction,viewingWindow);
 
     return {
       schema:"uido.hole-view.v2",
@@ -274,7 +304,7 @@
         back_m:options.back_m,
         forward_m:options.forward_m,
         width_m:options.width_m,
-        polygon
+        polygon:viewingWindow.polygon
       },
       features,
       feature_ids:features.map(f=>String(f.id)),
@@ -282,5 +312,11 @@
     };
   }
 
-  root.UiDoHoleViewBuilder={buildHoleView,geometryPoints};
+  root.UiDoHoleViewBuilder={
+    directionFromRoute,
+    buildViewingWindow,
+    selectCourseGeometry,
+    buildHoleView,
+    geometryPoints
+  };
 })(typeof window !== "undefined" ? window : globalThis);
