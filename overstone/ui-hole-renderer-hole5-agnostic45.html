@@ -34,6 +34,7 @@ svg{width:100%;height:100%;display:block}
 <clipPath id="holeViewClip" clipPathUnits="userSpaceOnUse"><rect x="0" y="0" width="60" height="177.7777777778"></rect></clipPath>
 </defs>
 <path id="fairway" class="fairway"></path>
+<path id="direction45Border" fill="none" stroke="#3f4b3b" stroke-width="0.55" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"></path>
 <path id="green" class="green"></path>
 <g id="bunkers"></g>
 <g id="tees"></g>
@@ -166,6 +167,26 @@ function project(point){
 }
 
 const svg=document.getElementById("courseSvg");
+const border45=document.getElementById("direction45Border");
+const borderRadiusM=45*0.9144;
+const borderSteps=72;
+const borderHalfAngle=Math.PI/2;
+const borderPoints=[];
+for(let i=0;i<=borderSteps;i++){
+  const t=i/borderSteps;
+  const theta=-borderHalfAngle+t*Math.PI;
+  const local=[Math.cos(theta)*borderRadiusM,Math.sin(theta)*borderRadiusM];
+  const c=Math.cos(rotation),s=Math.sin(rotation);
+  const worldLocal=[
+    local[0]*c+local[1]*s,
+    -local[0]*s+local[1]*c
+  ];
+  const lon=teeLL[0]+worldLocal[0]/(Math.cos(referenceLatitude)*Math.PI/180*EARTH_RADIUS);
+  const lat=teeLL[1]+worldLocal[1]/(Math.PI/180*EARTH_RADIUS);
+  borderPoints.push(project([lon,lat]));
+}
+border45.setAttribute("d",borderPoints.map((p,i)=>(i?"L":"M")+p[0].toFixed(3)+" "+p[1].toFixed(3)).join(" "));
+
 const ns="http://www.w3.org/2000/svg";
 
 function pathFromGeometry(geometry){
