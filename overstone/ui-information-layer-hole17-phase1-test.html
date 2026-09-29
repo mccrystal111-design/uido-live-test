@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UiDo — Overstone Hole 17 — X10-X60 Renderer Test</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dfe4d8}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px}
+#screen{position:relative;width:min(calc(100vw - 40px),calc((100vh - 40px)*9/16));height:min(calc(100vh - 40px),calc((100vw - 40px)*16/9));background:#f4f1e6;border:2px solid #3f4b3b;overflow:hidden}
+.grid{position:absolute;inset:0;background-image:linear-gradient(to right,#16231b22 1px,transparent 1px),linear-gradient(to bottom,#16231b22 1px,transparent 1px);background-size:10% 10%;z-index:1}
+.course{position:absolute;inset:0;z-index:2;pointer-events:none}
+svg{width:100%;height:100%;display:block}
+.rough{fill:#b9c7ae;stroke:#8d9e85;stroke-width:.22}
+.fairway{fill:#9cad83;stroke:#5f7254;stroke-width:.35}
+.green{fill:#b9caa0;stroke:#4d6543;stroke-width:.45}
+.bunker{fill:#d8c9a0;stroke:#8c7950;stroke-width:.4}
+.teeBox{fill:#c8c6a8;stroke:#7d8069;stroke-width:.35}
+.water{fill:#d9dce0;stroke:#4d5258;stroke-width:.35}
+.playline{fill:none;stroke:#3f4b3b;stroke-width:.45;stroke-dasharray:1.2 1}
+.teeMarker{fill:#82956f;stroke:#526348;stroke-width:.4}
+.greenMarker{fill:none;stroke:#3f4b3b;stroke-width:.45}
+.status{position:absolute;left:8px;bottom:6px;font:8px/1.2 Arial,sans-serif;color:#526057;z-index:5;opacity:.75}
+
+#screen{overflow:hidden}
+#infoPanel{position:absolute;right:0;top:0;width:40%;height:100%;z-index:8;background:#f4f1e6ee;border-left:1px solid #3f4b3b55;padding:12px 10px;font:10px/1.25 Arial,sans-serif;color:#3f4b3b}
+.infoTitle{font:700 11px/1.2 Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.infoBlock{margin-bottom:10px}
+.infoRow{display:flex;justify-content:space-between;align-items:center;margin:3px 0}
+.infoValue{font:700 12px/1 Arial,sans-serif}
+.infoMuted{opacity:.65}
+#greenInfo{border:1px solid #3f4b3b55;border-radius:8px;padding:7px;cursor:pointer}
+#radialMap{height:90px;display:flex;align-items:center;justify-content:center;margin:4px 0 7px}
+#radialMap svg{width:82px;height:82px}
+.fmbRow{display:flex;justify-content:space-around;gap:4px}
+.fmbCell{flex:1;text-align:center;border:1px solid #3f4b3b44;border-radius:5px;padding:5px 2px}
+.fmbKey{font-size:8px;opacity:.65}.fmbVal{font-weight:700;font-size:12px}
+.bunkerCard,.fwCard{padding:6px 0;border-top:1px solid #3f4b3b22}
+#greenOverlay{position:absolute;left:10%;top:10%;width:50%;height:80%;z-index:20;display:none;align-items:center;justify-content:center;background:#f4f1e6f2;border:1px solid #3f4b3b66;border-radius:10px;cursor:pointer}
+#greenOverlay.open{display:flex}
+#greenMapSvg{width:92%;height:92%}
+.overlayHint{position:absolute;bottom:7px;left:0;right:0;text-align:center;font:8px/1 Arial,sans-serif;opacity:.7}
+</style>
+</head>
+<body>
+<div id="stage"><div id="screen">
+<div class="grid"></div>
+<div class="course"><svg id="courseSvg" viewBox="0 0 100 177.7777777778" preserveAspectRatio="none">
+<defs>
+  <clipPath id="holeViewClip" clipPathUnits="userSpaceOnUse">
+    <rect x="0" y="0" width="60" height="177.7777777778"></rect>
+  </clipPath>
+  <linearGradient id="roughFadeXGradient" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="60" y2="0">
+    <stop offset="0%" stop-color="black"></stop>
+    <stop offset="16.6667%" stop-color="white"></stop>
+    <stop offset="83.3333%" stop-color="white"></stop>
+    <stop offset="100%" stop-color="black"></stop>
+  </linearGradient>
+  <linearGradient id="roughFadeYGradient" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="177.7777777778">
+    <stop offset="0%" stop-color="black"></stop>
+    <stop offset="10%" stop-color="white"></stop>
+    <stop offset="90%" stop-color="white"></stop>
+    <stop offset="100%" stop-color="black"></stop>
+  </linearGradient>
+  <mask id="roughEdgeFadeX" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="177.7777777778">
+    <rect x="0" y="0" width="60" height="177.7777777778" fill="url(#roughFadeXGradient)"></rect>
+  </mask>
+  <mask id="roughEdgeFadeY" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="177.7777777778">
+    <rect x="0" y="0" width="60" height="177.7777777778" fill="url(#roughFadeYGradient)"></rect>
+  </mask>
+</svg></div>
+
+<div id="infoPanel">
+  <div class="infoTitle">Green</div>
+  <div id="greenInfo" title="Tap to open full green map">
+    <div id="radialMap"></div>
+    <div class="fmbRow">
+      <div class="fmbCell"><div class="fmbKey">F</div><div class="fmbVal" id="fmbFront">—</div></div>
+      <div class="fmbCell"><div class="fmbKey">M</div><div class="fmbVal" id="fmbMiddle">—</div></div>
+      <div class="fmbCell"><div class="fmbKey">B</div><div class="fmbVal" id="fmbBack">—</div></div>
+    </div>
+  </div>
+  <div class="infoTitle">Bunkers</div>
+  <div id="bunkerInfo"></div>
+  <div class="infoTitle">Fairway width</div>
+  <div id="fairwayInfo"></div>
+</div>
+<div id="greenOverlay" title="Tap to return">
+  <svg id="greenMapSvg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"></svg>
+  <div class="overlayHint">Tap green map to return to shot view</div>
+</div>
+<div class="status">Hole 17 · X10-X60 usable hole-view · visual balance ≈ X35 · relevant geometry tee/fairway/green/bunkers · water structural · heavy rough non-constraining</div>
+</div></div>
+<script src="course-source-model.js?v=7188dc0cfe620e6be59111508e0c0ebc6a2d6fb3"></script>
+<script>
+const source=window.UIDO_OVERSTONE_SOURCE_HOLES["17"];
+if(!source) throw new Error("Authoritative Hole 17 source model not found");
+
+const VIEW_W=100, VIEW_H=100*16/9;
+const TEE_Y=VIEW_H*.90;
+const GREEN_Y=VIEW_H*.10;
+const TEE_X_PREFERRED=VIEW_W*.25;
+const GREEN_X_PREFERRED=VIEW_W*.25;
+const SAFE_X_MIN=VIEW_W*.10;
+const SAFE_X_MAX=VIEW_W*.60;
+const X_STEP=.25;
+const VISUAL_BALANCE_X=VIEW_W*.35;
+
+// Source coordinates are [longitude, latitude].
+const teeLL=[source.line_of_play[0][0],source.line_of_play[0][1]];
+const greenMiddleLL=[source.green_fmb.middle[1],source.green_fmb.middle[0]];
+const refLat=teeLL[1]*Math.PI/180;
+const M_LAT=111320, M_LON=111320*Math.cos(refLat);
+
+function local(ll){
+  return [(ll[0]-teeLL[0])*M_LON,(ll[1]-teeLL[1])*M_LAT];
+}
+
+const greenLocal=local(greenMiddleLL);
+
+function makeCamera(teeX,greenX){
+  // Tee remains the rotation pivot. Both presentation anchors are flexible
+  // in X, so the target vector is derived from their chosen screen positions.
+  const targetVector=[greenX-teeX,TEE_Y-GREEN_Y];
+  const targetDistance=Math.hypot(targetVector[0],targetVector[1]);
+  const rotation=Math.atan2(targetVector[1],targetVector[0])
+    -Math.atan2(greenLocal[1],greenLocal[0]);
+  const scale=targetDistance/Math.hypot(greenLocal[0],greenLocal[1]);
+  const c=Math.cos(rotation),s=Math.sin(rotation);
+  function project(ll){
+    const p=local(ll);
+    const x=p[0]*c-p[1]*s, y=p[0]*s+p[1]*c;
+    return [teeX+x*scale,TEE_Y-y*scale];
+  }
+  return {rotation,scale,project};
+}
+
+// Source geometry is immutable. Visual balance and camera constraints use
+// tee + fairway + green + bunker. Water is structural but does not constrain
+// camera placement. Heavy rough remains rendered source
+// geometry but is non-constraining and never participates in the bounds.
+const cameraConstraintFeatures=(source.features||[]).filter(f=>
+  f.geometry && f.geometry.type==="Polygon" &&
+  Array.isArray(f.geometry.coordinates) &&
+  Array.isArray(f.geometry.coordinates[0]) &&
+  ["fairway","green","bunker"].includes(f.golf)
+);
+
+function projectedBounds(camera,teeX){
+  let minX=teeX,maxX=teeX,minY=TEE_Y,maxY=TEE_Y;
+  cameraConstraintFeatures.forEach(f=>{
+    f.geometry.coordinates[0].forEach(ll=>{
+      const p=camera.project(ll);
+      minX=Math.min(minX,p[0]);
+      maxX=Math.max(maxX,p[0]);
+      minY=Math.min(minY,p[1]);
+      maxY=Math.max(maxY,p[1]);
+    });
+  });
+  return {minX,maxX,minY,maxY,centerX:(minX+maxX)/2,width:maxX-minX};
+}
+
+function meetsSafeViewport(bounds){
+  // X10-X60 is the usable hole-view width. Vertically, relevant geometry
+  // defines the camera boundary across the complete application viewport.
+  return bounds.minX>=SAFE_X_MIN-1e-8 &&
+    bounds.maxX<=SAFE_X_MAX+1e-8 &&
+    bounds.minY>=-1e-8 &&
+    bounds.maxY<=VIEW_H+1e-8;
+}
+
+// Search the two flexible X anchors together. Prefer the established 25% /
+// 25% composition, then the smallest total movement from those preferences.
+const candidates=[];
+for(let teeX=SAFE_X_MIN;teeX<=SAFE_X_MAX+1e-8;teeX+=X_STEP){
+  for(let greenX=SAFE_X_MIN;greenX<=SAFE_X_MAX+1e-8;greenX+=X_STEP){
+    const camera=makeCamera(teeX,greenX);
+    const bounds=projectedBounds(camera,teeX);
+    if(meetsSafeViewport(bounds)){
+      candidates.push({
+        teeX,greenX,camera,bounds,
+        balanceError:Math.abs(bounds.centerX-VISUAL_BALANCE_X),
+        movement:Math.abs(teeX-TEE_X_PREFERRED)+Math.abs(greenX-GREEN_X_PREFERRED)
+      });
+    }
+  }
+}
+if(!candidates.length) throw new Error("No tee/green X combination satisfies the safe viewport");
+
+candidates.sort((a,b)=>
+  a.balanceError-b.balanceError ||
+  a.movement-b.movement
+);
+const chosen=candidates[0];
+const teeAnchor=[chosen.teeX,TEE_Y];
+const greenAnchor=[chosen.greenX,GREEN_Y];
+const camera=chosen.camera;
+const bounds=chosen.bounds;
+const rotation=camera.rotation;
+const scale=camera.scale;
+function projectLL(ll){ return camera.project(ll); }
+
+function path(points,close=true){
+  return points.map((p,i)=>(i?"L":"M")+p[0].toFixed(3)+" "+p[1].toFixed(3)).join(" ")+(close?" Z":"");
+}
+const svg=document.getElementById("courseSvg"),ns="http://www.w3.org/2000/svg";
+function addPath(cls,pts,close=true,attrs={}){
+  const e=document.createElementNS(ns,"path");
+  e.setAttribute("class",cls);
+  e.setAttribute("d",path(pts,close));
+  Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));
+  svg.appendChild(e);
+}
+function addFeature(f){
+  if(!f.geometry||f.geometry.type!=="Polygon")return;
+  const pts=f.geometry.coordinates[0].map(p=>projectLL(p));
+  if(f.golf==="rough"){
+    // Heavy rough remains source geometry but is presentation-only:
+    // it never constrains camera placement. It fades through the four
+    // presentation margins: X0-X10, X50-X60, Y0-Y10 and Y90-Y100.
+    const outer=document.createElementNS(ns,"g");
+    outer.setAttribute("clip-path","url(#holeViewClip)");
+    outer.setAttribute("mask","url(#roughEdgeFadeX)");
+    const inner=document.createElementNS(ns,"g");
+    inner.setAttribute("mask","url(#roughEdgeFadeY)");
+    const e=document.createElementNS(ns,"path");
+    e.setAttribute("class","rough");
+    e.setAttribute("d",path(pts,true));
+    inner.appendChild(e);
+    outer.appendChild(inner);
+    svg.appendChild(outer);
+  }else if(f.golf==="fairway")addPath("fairway",pts);
+  else if(f.golf==="water_hazard"){
+    // Keep the complete source lake immutable; clip only its presentation
+    // to the hole viewport because the lake extends beyond this hole view.
+    const g=document.createElementNS(ns,"g");
+    g.setAttribute("clip-path","url(#holeViewClip)");
+    const e=document.createElementNS(ns,"path");
+    e.setAttribute("class","water");
+    e.setAttribute("d",path(pts,true));
+    g.appendChild(e);
+    svg.appendChild(g);
+  }
+  else if(f.golf==="green")addPath("green",pts);
+  else if(f.golf==="bunker")addPath("bunker",pts);
+  else if(f.golf==="tee")addPath("teeBox",pts);
+}
+// Structural layer order: rough is the base surface, fairway sits
+// above it, then water is drawn above playing surfaces so an in-play lake
+// cannot disappear underneath fairway geometry.
+(source.features||[]).filter(f=>f.golf==="rough").forEach(addFeature);
+(source.features||[]).filter(f=>f.golf==="fairway").forEach(addFeature);
+(source.features||[]).filter(f=>f.golf==="water_hazard").forEach(addFeature);
+(source.features||[]).filter(f=>f.golf==="green").forEach(addFeature);
+(source.features||[]).filter(f=>f.golf==="bunker").forEach(addFeature);
+(source.features||[]).filter(f=>f.golf==="tee").forEach(addFeature);
+addPath("playline",source.line_of_play.map(p=>projectLL(p)),false);
+
+if(!meetsSafeViewport(bounds)) throw new Error("No tee/green X combination satisfies the X10-X60 usable hole-view area");
+const tee=document.createElementNS(ns,"circle");
+tee.setAttribute("class","teeMarker");tee.setAttribute("cx",teeAnchor[0]);tee.setAttribute("cy",teeAnchor[1]);tee.setAttribute("r","1.5");svg.appendChild(tee);
+const gm=document.createElementNS(ns,"circle");
+gm.setAttribute("class","greenMarker");gm.setAttribute("cx",greenAnchor[0]);gm.setAttribute("cy",greenAnchor[1]);gm.setAttribute("r","1.4");svg.appendChild(gm);
+
+const EPS=1e-8,pT=projectLL(teeLL),pG=projectLL(greenMiddleLL);
+if(Math.hypot(pT[0]-teeAnchor[0],pT[1]-teeAnchor[1])>EPS)throw new Error("Tee anchor transform failed");
+if(Math.hypot(pG[0]-greenAnchor[0],pG[1]-greenAnchor[1])>EPS)throw new Error("Green anchor transform failed");
+</script>
+
+<script>
+(function(){
+  const panel=document.getElementById("infoPanel");
+  const greenInfo=document.getElementById("greenInfo");
+  const overlay=document.getElementById("greenOverlay");
+  const radial=document.getElementById("radialMap");
+  const mapSvg=document.getElementById("greenMapSvg");
+  const ns="http://www.w3.org/2000/svg";
+
+  function localMeters(ll){
+    const refLat=teeLL[1]*Math.PI/180;
+    return [(ll[0]-teeLL[0])*(111320*Math.cos(refLat)),(ll[1]-teeLL[1])*111320];
+  }
+  const playA=localMeters(source.line_of_play[0]);
+  const playB=localMeters(source.line_of_play[source.line_of_play.length-1]);
+  const ux=(playB[0]-playA[0]),uy=(playB[1]-playA[1]);
+  const len=Math.hypot(ux,uy), L=[ux/len,uy/len], P=[-L[1],L[0]];
+
+  function yards(m){return Math.round(m*1.0936133);}
+  function distanceFromTee(ll){const p=localMeters(ll);return Math.hypot(p[0],p[1]);}
+  function pointOnFeature(f){
+    return (f.geometry.coordinates[0]||[]).map(localMeters);
+  }
+  const bunkerFeatures=(source.features||[]).filter(f=>f.golf==="bunker"&&f.geometry&&f.geometry.type==="Polygon");
+
+  // Phase 1 uses the selected/active tee as the reference. Live GPS can
+  // replace playerReference later without changing the label calculations.
+  const playerReference=[teeLL[0],teeLL[1]];
+
+  // Bunker complexes: group components whose nearest geometry points are
+  // within 10 yd. Distances are measured from the current reference to the
+  // actual component geometry, not the hole centreline.
+  function minGeomDistance(refLL,f){
+    const a=localMeters(refLL), pts=pointOnFeature(f);
+    let d=Infinity; for(const p of pts)d=Math.min(d,Math.hypot(p[0]-a[0],p[1]-a[1]));
+    return d;
+  }
+  function geomDistanceBetween(a,b){
+    let d=Infinity; const pa=pointOnFeature(a),pb=pointOnFeature(b);
+    for(const x of pa)for(const y of pb)d=Math.min(d,Math.hypot(x[0]-y[0],x[1]-y[1]));
+    return d;
+  }
+  const parent=Array.from({length:bunkerFeatures.length},(_,i)=>i);
+  function find(i){while(parent[i]!==i){parent[i]=parent[parent[i]];i=parent[i]}return i}
+  function unite(a,b){a=find(a);b=find(b);if(a!==b)parent[b]=a}
+  for(let i=0;i<bunkerFeatures.length;i++)for(let j=i+1;j<bunkerFeatures.length;j++)
+    if(geomDistanceBetween(bunkerFeatures[i],bunkerFeatures[j])<=10/1.0936133)unite(i,j);
+  const complexes={};
+  bunkerFeatures.forEach((f,i)=>(complexes[find(i)]??=[]).push(f));
+
+  const bunkerItems=Object.values(complexes).map((features,index)=>{
+    let front=Infinity,carry=0;
+    features.forEach(f=>{
+      const pts=pointOnFeature(f),ref=localMeters(playerReference);
+      pts.forEach(p=>{const d=Math.hypot(p[0]-ref[0],p[1]-ref[1]);front=Math.min(front,d);carry=Math.max(carry,d)});
+    });
+    return {index:index+1,front:yards(front),carry:yards(carry)};
+  });
+  document.getElementById("bunkerInfo").innerHTML=bunkerItems.length
+    ? bunkerItems.map(b=>'<div class="bunkerCard"><div class="infoRow"><span>Bunker '+b.index+'</span><span class="infoValue">'+b.front+' / '+b.carry+'</span></div></div>').join("")
+    : '<div class="infoMuted">No bunkers</div>';
+
+  const greenPts=(source.features||[]).filter(f=>f.golf==="green"&&f.geometry?.type==="Polygon").flatMap(f=>f.geometry.coordinates[0].map(localMeters));
+  const fmb=source.green_fmb;
+  document.getElementById("fmbFront").textContent=yards(distanceFromTee([fmb.front[1],fmb.front[0]]));
+  document.getElementById("fmbMiddle").textContent=yards(distanceFromTee([fmb.middle[1],fmb.middle[0]]));
+  document.getElementById("fmbBack").textContent=yards(distanceFromTee([fmb.back[1],fmb.back[0]]));
+
+  // Fairway-width references are measured perpendicular to the line of play.
+  // If the reference line does not intersect the fairway polygon, no label.
+  function pointInPolygon(pt,poly){
+    let inside=false;
+    for(let i=0,j=poly.length-1;i<poly.length;j=i++){
+      const xi=poly[i][0],yi=poly[i][1],xj=poly[j][0],yj=poly[j][1];
+      const hit=((yi>pt[1])!==(yj>pt[1]))&&(pt[0]<(xj-xi)*(pt[1]-yi)/(yj-yi)+xi);
+      if(hit)inside=!inside;
+    } return inside;
+  }
+  function crossSectionWidth(refYards){
+    const fairways=(source.features||[]).filter(f=>f.golf==="fairway"&&f.geometry?.type==="Polygon");
+    const d=refYards/1.0936133, center=[L[0]*d,L[1]*d];
+    let best=null;
+    for(const f of fairways){
+      const poly=f.geometry.coordinates[0].map(localMeters);
+      const hits=[];
+      for(let i=0;i<poly.length;i++){
+        const a=poly[i],b=poly[(i+1)%poly.length];
+        const da=(a[0]-center[0])*P[0]+(a[1]-center[1])*P[1];
+        const db=(b[0]-center[0])*P[0]+(b[1]-center[1])*P[1];
+        if(da===0)hits.push(a); if(da*db<0){
+          const t=da/(da-db); hits.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t]);
+        }
+      }
+      if(hits.length>=2){
+        let width=0; for(let i=0;i<hits.length;i++)for(let j=i+1;j<hits.length;j++)width=Math.max(width,Math.abs((hits[i][0]-hits[j][0])*P[0]+(hits[i][1]-hits[j][1])*P[1]));
+        best=width*1.0936133; break;
+      }
+    }
+    return best;
+  }
+  const w220=crossSectionWidth(220),w260=crossSectionWidth(260);
+  const fw=document.getElementById("fairwayInfo");
+  const rows=[];
+  if(w220!=null)rows.push('<div class="fwCard"><div class="infoRow"><span>220</span><span class="infoValue">'+Math.round(w220)+'</span></div></div>');
+  if(w260!=null && !(w220!=null && Math.abs(w260-w220)<5))rows.push('<div class="fwCard"><div class="infoRow"><span>260</span><span class="infoValue">'+Math.round(w260)+'</span></div></div>');
+  fw.innerHTML=rows.join("")||'<div class="infoMuted">—</div>';
+
+  function drawRadial(){
+    const NS=ns, s=document.createElementNS(NS,"svg");
+    s.setAttribute("viewBox","0 0 100 100");
+    const g=document.createElementNS(NS,"g");
+    const xs=greenPts.map(p=>p[0]),ys=greenPts.map(p=>p[1]);
+    const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
+    const sx=76/(maxX-minX||1),sy=76/(maxY-minY||1),sc=Math.min(sx,sy);
+    const pts=greenPts.map(p=>[12+(p[0]-minX)*sc,88-(p[1]-minY)*sc]);
+    const path=document.createElementNS(NS,"path"); path.setAttribute("d",pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ")+" Z");
+    path.setAttribute("fill","#b9caa0");path.setAttribute("stroke","#4d6543");path.setAttribute("stroke-width","1.2");g.appendChild(path);s.appendChild(g);radial.appendChild(s);
+  }
+  drawRadial();
+
+  function drawFullGreen(){
+    while(mapSvg.firstChild)mapSvg.removeChild(mapSvg.firstChild);
+    const xs=greenPts.map(p=>p[0]),ys=greenPts.map(p=>p[1]);
+    const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
+    const sc=Math.min(82/(maxX-minX||1),82/(maxY-minY||1));
+    const pts=greenPts.map(p=>[50+(p[0]-(minX+maxX)/2)*sc,50-(p[1]-(minY+maxY)/2)*sc]);
+    const p=document.createElementNS(ns,"path");p.setAttribute("d",pts.map((q,i)=>(i?"L":"M")+q[0].toFixed(1)+" "+q[1].toFixed(1)).join(" ")+" Z");p.setAttribute("fill","#b9caa0");p.setAttribute("stroke","#4d6543");p.setAttribute("stroke-width","1");mapSvg.appendChild(p);
+  }
+  drawFullGreen();
+
+  function toggleGreen(){overlay.classList.toggle("open");}
+  greenInfo.addEventListener("click",toggleGreen);
+  overlay.addEventListener("click",toggleGreen);
+})();
+</script>
+</body>
+</html>
