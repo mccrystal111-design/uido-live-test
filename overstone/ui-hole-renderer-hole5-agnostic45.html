@@ -176,8 +176,8 @@ function addFeature(feature){
   else if(type==="GREEN") cls="green";
   else if(type==="BUNKER") cls="bunker";
   else if(type==="TEE") cls="teeBox";
-  else if(type==="WATER") cls="water";
-  else if(type==="PATH") cls="path";
+  else if(type==="WATER" || type==="WATER_HAZARD") cls="water";
+  else if(type==="PATH" || type==="CARTPATH") cls="path";
   if(!cls) return;
 
   const element=document.createElementNS(ns,"path");
@@ -185,10 +185,14 @@ function addFeature(feature){
   element.setAttribute("d",d);
   element.setAttribute("clip-path","url(#holeViewClip)");
   if(type==="PATH") element.setAttribute("fill","none");
-  svg.insertBefore(element,svg.querySelector("#fairway"));
+  svg.appendChild(element);
 }
 
-holeView.features.forEach(addFeature);
+const renderOrder={ROUGH:0,WATER:1,WATER_HAZARD:1,FAIRWAY:2,PATH:3,CARTPATH:3,TEE:4,BUNKER:5,GREEN:6};
+holeView.features
+  .slice()
+  .sort((a,b)=>(renderOrder[String(a.type||"").toUpperCase()]??99)-(renderOrder[String(b.type||"").toUpperCase()]??99))
+  .forEach(addFeature);
 
 const routeElement=document.createElementNS(ns,"path");
 routeElement.setAttribute("class","playline");
