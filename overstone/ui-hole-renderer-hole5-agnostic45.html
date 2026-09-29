@@ -302,11 +302,22 @@ corridorOverlay.forEach(el=>svg.appendChild(el));
 // First-pass presentation fade:
 // the 40-yard corridor remains fully clear, while the area outside it is
 // softly veiled. This is presentation-only; canonical/course geometry is untouched.
+function offsetRouteLocal(points,distance){
+  return points.map((p,i)=>{
+    let dx,dy;
+    if(i===0){ dx=points[1][0]-p[0]; dy=points[1][1]-p[1]; }
+    else if(i===points.length-1){ dx=p[0]-points[i-1][0]; dy=p[1]-points[i-1][1]; }
+    else { dx=points[i+1][0]-points[i-1][0]; dy=points[i+1][1]-points[i-1][1]; }
+    const len=Math.hypot(dx,dy)||1;
+    return [p[0]+(-dy/len)*distance,p[1]+(dx/len)*distance];
+  });
+}
+
 function localMetresToScreen(p){
   return projectLocalMetres(p);
 }
-const leftLocal=offsetRoute(routeLocalMetres,fortyYardsMetres);
-const rightLocal=offsetRoute(routeLocalMetres,-fortyYardsMetres);
+const leftLocal=offsetRouteLocal(routeLocalMetres,fortyYardsMetres);
+const rightLocal=offsetRouteLocal(routeLocalMetres,-fortyYardsMetres);
 const leftScreen=leftLocal.map(localMetresToScreen);
 const rightScreen=rightLocal.map(localMetresToScreen);
 
