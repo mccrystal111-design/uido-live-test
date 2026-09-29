@@ -28,7 +28,8 @@ svg{width:100%;height:100%;display:block}
 <div class="course"><svg id="courseSvg" viewBox="0 0 100 177.7777777778" preserveAspectRatio="none"></svg></div>
 <div class="status">Hole 3 · authoritative GPS/source geometry · fixed geometry / tee pivot / flexible tee X + green X / usable X10-X60</div>
 </div></div>
-<script src="course-source-model.js"></script>\n<script src="hole-view-builder.js"></script>
+<script src="course-source-model.js"></script>
+<script src="hole-view-builder.js"></script>
 <script>
 const holeView=window.UIDO_HOLE_VIEW_BUILDER.build(window.UIDO_OVERSTONE_SOURCE_HOLES, 3);\nconst source=holeView.route;
 if(!source) throw new Error("Authoritative Hole 3 source model not found");
