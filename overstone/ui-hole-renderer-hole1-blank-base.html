@@ -17,6 +17,7 @@ svg{width:100%;height:100%;display:block}
 .bunker{fill:#d8c9a0;stroke:#8c7950;stroke-width:.4}
 .rough{fill:#b9c7ae;stroke:#8d9e85;stroke-width:.22}
 .water{fill:#d9dce0;stroke:#4d5258;stroke-width:.35}
+.path{fill:none;stroke:#a7a28f;stroke-width:.45;stroke-linecap:round;stroke-linejoin:round}
 .playline{fill:none;stroke:#3f4b3b;stroke-width:.45;stroke-dasharray:1.2 1}
 .teeMarker{fill:#82956f;stroke:#526348;stroke-width:.4}
 .greenMarker{fill:none;stroke:#3f4b3b;stroke-width:.45}
@@ -55,6 +56,9 @@ teeBoxes:[
 [[-0.818904,52.276688],[-0.8188869,52.2766794],[-0.8188661,52.2766749],[-0.8188439,52.276675],[-0.8188231,52.2766797],[-0.8188062,52.2766884],[-0.8187951,52.2767001],[-0.8187911,52.2767134],[-0.8187942,52.2767257],[-0.8188034,52.2767367],[-0.8188177,52.2767455],[-0.8188357,52.2767511],[-0.8188757,52.2767509],[-0.8188936,52.2767452],[-0.8189078,52.2767363],[-0.8189167,52.2767252],[-0.8189196,52.276713],[-0.8189154,52.2766997],[-0.818904,52.276688]],
 [[-0.8196246,52.2763378],[-0.8195619,52.2762867],[-0.8192696,52.2763322],[-0.8192308,52.2763676],[-0.8192671,52.2764403],[-0.8193951,52.2764711],[-0.8195206,52.2764504],[-0.8196205,52.2763948],[-0.8196246,52.2763378]]
 ],
+paths:[[
+[-0.8195048,52.2757363],[-0.8195354,52.2758476],[-0.8195843,52.2758828],[-0.8196274,52.2759132],[-0.8196274,52.2759496],[-0.8196133,52.2759841],[-0.8195607,52.2760032],[-0.8195019,52.2760193],[-0.8195157,52.2760453],[-0.819532,52.2760813],[-0.8196208,52.2760958],[-0.8196421,52.2761127],[-0.8196351,52.2761705],[-0.819607,52.2761938],[-0.8195908,52.2762597],[-0.8194181,52.2762865],[-0.8191787,52.2763087]
+]],
 bunkers:[
 [[-0.8164635,52.2768491],[-0.8165136,52.2768213],[-0.8165159,52.2767746],[-0.8165513,52.2767539],[-0.8165605,52.2767425],[-0.8165652,52.2767275],[-0.8166561,52.2767157],[-0.816673,52.2766954],[-0.816653,52.276662],[-0.8165852,52.2766544],[-0.8165752,52.2766756],[-0.816512,52.2766808],[-0.8164804,52.2766874],[-0.8164581,52.2767223],[-0.8164103,52.2767619],[-0.8163972,52.2767737],[-0.8164073,52.2767911],[-0.816435,52.2767958]],
 [[-0.8169604,52.2769965],[-0.8169434,52.2769536],[-0.8168795,52.2769805],[-0.8167686,52.2769654],[-0.8167439,52.2769828],[-0.8167393,52.2769988],[-0.8167386,52.2770215],[-0.816784,52.2770384],[-0.8168579,52.2770356],[-0.8168918,52.277013],[-0.8169319,52.2770177]],
@@ -181,6 +185,8 @@ function openPath(points){
 
 const svg=document.getElementById("courseSvg"),ns="http://www.w3.org/2000/svg";
 function addPath(cls,points,clip=false,mask=null){const e=document.createElementNS(ns,"path");e.setAttribute("class",cls);e.setAttribute("d",closedPath(points));if(clip)e.setAttribute("clip-path","url(#holeViewClip)");if(mask)e.setAttribute("mask","url(#"+mask+")");svg.insertBefore(e,svg.querySelector("#fairway"));}
+function addOpenPath(cls,points,clip=false){const e=document.createElementNS(ns,"path");e.setAttribute("class",cls);e.setAttribute("d",openPath(points));if(clip)e.setAttribute("clip-path","url(#holeViewClip)");svg.insertBefore(e,svg.querySelector("#fairway"));}
+if(hole.paths&&hole.paths.length)hole.paths.forEach(path=>addOpenPath("path",path,true));
 // Structural layer capability. Hole 1 has no water; other course models may supply it.
 if(hole.rough&&hole.rough.length)addPath("rough",hole.rough,true,"roughEdgeFadeX");
 if(hole.water&&hole.water.length)addPath("water",hole.water,true,null);
