@@ -31,10 +31,6 @@ svg{width:100%;height:100%;display:block}
 <path id="green" class="green"></path>
 <g id="bunkers"></g>
 <g id="tees"></g>
-<circle id="pin" class="pin" r="0.65"></circle>
-<path id="playline" class="playline"></path>
-<circle id="teeMarker" class="teeMarker" r="1.5"></circle>
-<circle id="greenMarker" class="greenMarker" r="1.4"></circle>
 </svg>
 </div>
 </div></div>
@@ -191,8 +187,6 @@ hole.bunkers.forEach(bunker=>{
   bunkerLayer.appendChild(element);
 });
 
-document.getElementById("pin").setAttribute("cx",project([-0.8150842,52.2777189])[0]);
-document.getElementById("pin").setAttribute("cy",project([-0.8150842,52.2777189])[1]);
 </script>
 </body>
 </html>
