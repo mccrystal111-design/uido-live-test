@@ -92,12 +92,6 @@ function buildRuntimeCanonical(){
 }
 
 const canonical=buildRuntimeCanonical();
-const holeView=window.UiDoHoleViewBuilder.buildHoleView(canonical,5,{
-  back_m:25,
-  forward_m:425,
-  width_m:180
-});
-
 const VIEW_WIDTH=100;
 const VIEW_HEIGHT=100*16/9;
 const teeAnchor=[VIEW_WIDTH*.25,VIEW_HEIGHT*.90];
@@ -128,6 +122,15 @@ const rotation=
 const scale=
   Math.hypot(targetVector[0],targetVector[1])/
   Math.hypot(courseVector[0],courseVector[1]);
+
+// The physical Hole View is exactly the renderer's usable 60-unit window.
+// Derive its metres from the proven camera scale rather than inventing a
+// separate spatial extent.
+const holeView=window.UiDoHoleViewBuilder.buildHoleView(canonical,5,{
+  back_m:(VIEW_HEIGHT-teeAnchor[1])/scale,
+  forward_m:teeAnchor[1]/scale,
+  width_m:60/scale
+});
 
 function project(point){
   const local=toLocalMetres(point);
@@ -180,6 +183,7 @@ function addFeature(feature){
   const element=document.createElementNS(ns,"path");
   element.setAttribute("class",cls);
   element.setAttribute("d",d);
+  element.setAttribute("clip-path","url(#holeViewClip)");
   if(type==="PATH") element.setAttribute("fill","none");
   svg.insertBefore(element,svg.querySelector("#fairway"));
 }
