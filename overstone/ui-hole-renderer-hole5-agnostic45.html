@@ -230,11 +230,11 @@ const routeStart=routeLocalMetres[0];
 const routeEnd=routeLocalMetres[routeLocalMetres.length-1];
 const startTangent=[routeLocalMetres[1][0]-routeLocalMetres[0][0],routeLocalMetres[1][1]-routeLocalMetres[0][1]];
 const endTangent=[routeLocalMetres[routeLocalMetres.length-1][0]-routeLocalMetres[routeLocalMetres.length-2][0],routeLocalMetres[routeLocalMetres.length-1][1]-routeLocalMetres[routeLocalMetres.length-2][1]];
-const fortyFiveYardsMetres=45*0.9144;
-document.getElementById("direction45Left").setAttribute("d",smoothRouteOffset(routeLocalMetres,fortyFiveYardsMetres));
-document.getElementById("direction45Right").setAttribute("d",smoothRouteOffset(routeLocalMetres,-fortyFiveYardsMetres));
-document.getElementById("direction45TeeCap").setAttribute("d",capPath(routeStart,startTangent,fortyFiveYardsMetres));
-document.getElementById("direction45GreenCap").setAttribute("d",capPath(routeEnd,[-endTangent[0],-endTangent[1]],fortyFiveYardsMetres));
+const fortyYardsMetres=40*0.9144;
+document.getElementById("direction45Left").setAttribute("d",smoothRouteOffset(routeLocalMetres,fortyYardsMetres));
+document.getElementById("direction45Right").setAttribute("d",smoothRouteOffset(routeLocalMetres,-fortyYardsMetres));
+document.getElementById("direction45TeeCap").setAttribute("d",capPath(routeStart,startTangent,fortyYardsMetres));
+document.getElementById("direction45GreenCap").setAttribute("d",capPath(routeEnd,[-endTangent[0],-endTangent[1]],fortyYardsMetres));
 
 
 function pathFromGeometry(geometry){
@@ -287,6 +287,16 @@ routeElement.setAttribute("class","playline");
 routeElement.setAttribute("d",pathFromGeometry(hole5Route.geometry));
 routeElement.setAttribute("clip-path","url(#holeViewClip)");
 svg.appendChild(routeElement);
+
+
+// 40-yard corridor test overlay: deliberately appended last so it is the top SVG layer.
+const corridorOverlay=[
+  document.getElementById("direction45Left"),
+  document.getElementById("direction45Right"),
+  document.getElementById("direction45TeeCap"),
+  document.getElementById("direction45GreenCap")
+];
+corridorOverlay.forEach(el=>svg.appendChild(el));
 
 const pTee=project(teeLL);
 const pGreen=project(greenMiddleLL);
