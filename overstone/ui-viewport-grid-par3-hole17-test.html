@@ -98,13 +98,12 @@ function makeCamera(teeX,greenX,greenY){
     const p=local(ll);
     const rx=p[0]*c-p[1]*s;
     const ry=p[0]*s+p[1]*c;
-    // Preserve the tee-to-green axis and anchor positions, but reverse
-    // only the lateral component. This fixes the observed handedness
-    // without rotating or relocating the hole.
+    // Reflect across the tee-to-green axis. The tee and green anchors
+    // remain fixed while the hole's lateral handedness is reversed.
     const longitudinal=rx*ux+ry*uy;
     const lateral=rx*uy-ry*ux;
-    const mx=longitudinal*ux-lateral*uy;
-    const my=longitudinal*uy+lateral*ux;
+    const mx=longitudinal*ux+lateral*uy;
+    const my=longitudinal*uy-lateral*ux;
     return [teeX+mx*scale,TEE_Y-my*scale];
   }
   return {rotation,scale,project};
