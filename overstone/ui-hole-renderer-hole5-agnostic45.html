@@ -36,6 +36,8 @@ svg{width:100%;height:100%;display:block}
 <path id="fairway" class="fairway"></path>
 <path id="direction45Left" fill="none" stroke="#3f4b3b" stroke-width="0.55" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"></path>
 <path id="direction45Right" fill="none" stroke="#3f4b3b" stroke-width="0.55" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"></path>
+<path id="direction45TeeCap" fill="none" stroke="#3f4b3b" stroke-width="0.7" stroke-linecap="round" opacity="0.95"></path>
+<path id="direction45GreenCap" fill="none" stroke="#3f4b3b" stroke-width="0.7" stroke-linecap="round" opacity="0.95"></path>
 <path id="green" class="green"></path>
 <g id="bunkers"></g>
 <g id="tees"></g>
@@ -208,10 +210,31 @@ function smoothRouteOffset(points,distance){
   return d;
 }
 
+function capPath(centerLocal, tangentLocal, radius){
+  const len=Math.hypot(tangentLocal[0],tangentLocal[1])||1;
+  const ux=tangentLocal[0]/len, uy=tangentLocal[1]/len;
+  const nx=-uy, ny=ux;
+  const pts=[];
+  for(let i=0;i<=24;i++){
+    const a=-Math.PI/2+(Math.PI*i/24);
+    const p=[
+      centerLocal[0]+(ux*Math.cos(a)+nx*Math.sin(a))*radius,
+      centerLocal[1]+(uy*Math.cos(a)+ny*Math.sin(a))*radius
+    ];
+    pts.push(projectLocalMetres(p));
+  }
+  return "M"+pts.map((p,i)=>(i?"L":"")+p[0].toFixed(3)+" "+p[1].toFixed(3)).join(" ");
+}
 const routeLocalMetres=hole5Route.geometry.coordinates.map(toLocalMetres);
+const routeStart=routeLocalMetres[0];
+const routeEnd=routeLocalMetres[routeLocalMetres.length-1];
+const startTangent=[routeLocalMetres[1][0]-routeLocalMetres[0][0],routeLocalMetres[1][1]-routeLocalMetres[0][1]];
+const endTangent=[routeLocalMetres[routeLocalMetres.length-1][0]-routeLocalMetres[routeLocalMetres.length-2][0],routeLocalMetres[routeLocalMetres.length-1][1]-routeLocalMetres[routeLocalMetres.length-2][1]];
 const fortyFiveYardsMetres=45*0.9144;
 document.getElementById("direction45Left").setAttribute("d",smoothRouteOffset(routeLocalMetres,fortyFiveYardsMetres));
 document.getElementById("direction45Right").setAttribute("d",smoothRouteOffset(routeLocalMetres,-fortyFiveYardsMetres));
+document.getElementById("direction45TeeCap").setAttribute("d",capPath(routeStart,startTangent,fortyFiveYardsMetres));
+document.getElementById("direction45GreenCap").setAttribute("d",capPath(routeEnd,[-endTangent[0],-endTangent[1]],fortyFiveYardsMetres));
 
 
 function pathFromGeometry(geometry){
