@@ -15,6 +15,8 @@ svg{width:100%;height:100%;display:block}
 .fairway{fill:#9cad83;stroke:#5f7254;stroke-width:.35}
 .green{fill:#b9caa0;stroke:#4d6543;stroke-width:.45}
 .bunker{fill:#d8c9a0;stroke:#8c7950;stroke-width:.4}
+.rough{fill:#b9c7ae;stroke:#8d9e85;stroke-width:.22}
+.water{fill:#d9dce0;stroke:#4d5258;stroke-width:.35}
 .playline{fill:none;stroke:#3f4b3b;stroke-width:.45;stroke-dasharray:1.2 1}
 .teeMarker{fill:#82956f;stroke:#526348;stroke-width:.4}
 .greenMarker{fill:none;stroke:#3f4b3b;stroke-width:.45}
@@ -27,6 +29,13 @@ svg{width:100%;height:100%;display:block}
 <div class="grid"></div>
 <div class="course">
 <svg id="courseSvg" viewBox="0 0 100 177.7777777778" preserveAspectRatio="none">
+<defs>
+<clipPath id="holeViewClip" clipPathUnits="userSpaceOnUse"><rect x="0" y="0" width="60" height="177.7777777778"></rect></clipPath>
+<linearGradient id="roughFadeXGradient" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="60" y2="0"><stop offset="0%" stop-color="black"></stop><stop offset="16.6667%" stop-color="white"></stop><stop offset="83.3333%" stop-color="white"></stop><stop offset="100%" stop-color="black"></stop></linearGradient>
+<linearGradient id="roughFadeYGradient" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="177.7777777778"><stop offset="0%" stop-color="black"></stop><stop offset="10%" stop-color="white"></stop><stop offset="90%" stop-color="white"></stop><stop offset="100%" stop-color="black"></stop></linearGradient>
+<mask id="roughEdgeFadeX" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="177.7777777778"><rect x="0" y="0" width="60" height="177.7777777778" fill="url(#roughFadeXGradient)"></rect></mask>
+<mask id="roughEdgeFadeY" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="177.7777777778"><rect x="0" y="0" width="60" height="177.7777777778" fill="url(#roughFadeYGradient)"></rect></mask>
+</defs>
 <path id="fairway" class="fairway"></path>
 <path id="green" class="green"></path>
 <g id="bunkers"></g>
@@ -170,6 +179,11 @@ function openPath(points){
   }).join(" ");
 }
 
+const svg=document.getElementById("courseSvg"),ns="http://www.w3.org/2000/svg";
+function addPath(cls,points,clip=false,mask=null){const e=document.createElementNS(ns,"path");e.setAttribute("class",cls);e.setAttribute("d",closedPath(points));if(clip)e.setAttribute("clip-path","url(#holeViewClip)");if(mask)e.setAttribute("mask","url(#"+mask+")");svg.insertBefore(e,svg.querySelector("#fairway"));}
+// Structural layer capability. Hole 1 has no water; other course models may supply it.
+if(hole.rough&&hole.rough.length)addPath("rough",hole.rough,true,"roughEdgeFadeX");
+if(hole.water&&hole.water.length)addPath("water",hole.water,true,null);
 document.getElementById("fairway").setAttribute("d",closedPath(hole.fairway));
 const teeLayer=document.getElementById("tees");
 hole.teeBoxes.forEach(box=>{
