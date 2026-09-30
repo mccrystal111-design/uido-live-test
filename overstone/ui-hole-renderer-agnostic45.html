@@ -11,7 +11,6 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dfe4d8}
 #screen{position:relative;width:min(calc(100vw - 40px),calc((100vh - 40px)*9/16));height:min(calc(100vh - 40px),calc((100vw - 40px)*16/9));background:#f4f1e6;overflow:hidden}
 .grid{position:absolute;inset:0;background-image:linear-gradient(to right,#16231b22 1px,transparent 1px),linear-gradient(to bottom,#16231b22 1px,transparent 1px);background-size:10% 10%;z-index:1}
 .course{position:absolute;inset:0;z-index:2;pointer-events:none}
-.fadeLayer{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}
 svg{width:100%;height:100%;display:block}
 .fairway{fill:#9cad83;stroke:#5f7254;stroke-width:.35}
 .green{fill:#b9caa0;stroke:#4d6543;stroke-width:.45}
@@ -38,7 +37,6 @@ svg{width:100%;height:100%;display:block}
 
 <script src="course-source-model.js"></script>
 <script src="hole-view-builder.js"></script>
-<script src="agnostic45-fade.js"></script>
 <script>
 const sources=window.UIDO_OVERSTONE_SOURCE_HOLES;
 const params=new URLSearchParams(window.location.search);
@@ -204,13 +202,6 @@ routeElement.setAttribute("class","playline");
 routeElement.setAttribute("d",pathFromGeometry(hole.routing.geometry));
 routeElement.setAttribute("clip-path","url(#holeViewClip)");
 document.getElementById("courseSvg").appendChild(routeElement);
-
-window.UiDoAgnostic45Fade.attach(
-  document.getElementById("screen"),
-  pathFromGeometry(hole.routing.geometry),
-  scale,
-  {width:VIEW_WIDTH,height:VIEW_HEIGHT,contentWidth:PLAYABLE_WIDTH,corridorYards:40,fadeYards:60}
-);
 
 console.info("UiDo AGNOSTIC45",{
   hole:holeNumber,
