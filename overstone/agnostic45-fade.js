@@ -27,28 +27,39 @@
     full.setAttribute("fill","white");
     mask.appendChild(full);
 
-    // Build a long-tailed graduation. The visible fade should not have a
-    // detectable outer edge, so the transition continues well beyond the
-    // main 40–60 yd presentation zone.
-    const steps=32;
-    const fadeTailYards=40;
-    const fadeTail=fadeTailYards*0.9144;
-    for(let i=0;i<steps;i++){
-      const t=i/(steps-1);
-      const widthMetres=corridor + fadeTail*(1-t);
+    // Three presentation treatments: a clear playing corridor, a broad
+    // feather around it, then a very soft ambient tail. The treatments
+    // overlap so there is no single visible outer boundary.
+    mask.setAttribute("style","mask-type:luminance");
+    const treatments=[
+      {extraYards:8,  blurYards:5,  opacity:0.92},
+      {extraYards:22, blurYards:12, opacity:0.58},
+      {extraYards:42, blurYards:24, opacity:0.28}
+    ];
+    treatments.forEach((treatment,index)=>{
       const stroke=document.createElementNS(ns,"path");
+      const filterId="agnostic45-fade-treatment-"+index;
+      const filter=document.createElementNS(ns,"filter");
+      filter.setAttribute("id",filterId);
+      filter.setAttribute("x","-50%"); filter.setAttribute("y","-50%");
+      filter.setAttribute("width","200%"); filter.setAttribute("height","200%");
+      const blur=document.createElementNS(ns,"feGaussianBlur");
+      blur.setAttribute("stdDeviation",String(treatment.blurYards*0.9144*metresToViewUnits));
+      filter.appendChild(blur);
+      defs.appendChild(filter);
+
       stroke.setAttribute("d",routePath);
       stroke.setAttribute("fill","none");
       stroke.setAttribute("stroke","black");
-      stroke.setAttribute("stroke-width",String(widthMetres*2*metresToViewUnits));
+      stroke.setAttribute("stroke-width",String((corridor+treatment.extraYards*0.9144)*2*metresToViewUnits));
       stroke.setAttribute("stroke-linecap","round");
       stroke.setAttribute("stroke-linejoin","round");
-      // Very light at the outer edge, progressively stronger toward 40 yd.
-      const opacity=0.018 + 0.032*t;
-      stroke.setAttribute("stroke-opacity",String(opacity));
+      stroke.setAttribute("stroke-opacity",String(treatment.opacity));
+      stroke.setAttribute("filter","url(#"+filterId+")");
       mask.appendChild(stroke);
-    }
+    });
 
+    // The centre remains genuinely clear, independent of the soft treatments.
     const clear=document.createElementNS(ns,"path");
     clear.setAttribute("d",routePath);
     clear.setAttribute("fill","none");
