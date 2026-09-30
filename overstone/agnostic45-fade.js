@@ -27,22 +27,22 @@
     full.setAttribute("fill","white");
     mask.appendChild(full);
 
-    // Three presentation treatments: a clear playing corridor, a broad
-    // feather around it, then a very soft ambient tail. The treatments
-    // overlap so there is no single visible outer boundary.
-    mask.setAttribute("style","mask-type:luminance");
+    // Three nested black strokes create the mask graduation. Each is
+    // blurred by a different amount; because they are opaque mask paint,
+    // the blur produces real luminance values rather than relying on
+    // stroke opacity, which is unreliable inside an SVG luminance mask.
     const treatments=[
-      {extraYards:8,  blurYards:5,  opacity:0.92},
-      {extraYards:22, blurYards:12, opacity:0.58},
-      {extraYards:42, blurYards:24, opacity:0.28}
+      {extraYards:7,  blurYards:4},
+      {extraYards:22, blurYards:11},
+      {extraYards:45, blurYards:24}
     ];
     treatments.forEach((treatment,index)=>{
       const stroke=document.createElementNS(ns,"path");
       const filterId="agnostic45-fade-treatment-"+index;
       const filter=document.createElementNS(ns,"filter");
       filter.setAttribute("id",filterId);
-      filter.setAttribute("x","-50%"); filter.setAttribute("y","-50%");
-      filter.setAttribute("width","200%"); filter.setAttribute("height","200%");
+      filter.setAttribute("x","-100%"); filter.setAttribute("y","-100%");
+      filter.setAttribute("width","300%"); filter.setAttribute("height","300%");
       const blur=document.createElementNS(ns,"feGaussianBlur");
       blur.setAttribute("stdDeviation",String(treatment.blurYards*0.9144*metresToViewUnits));
       filter.appendChild(blur);
@@ -54,7 +54,6 @@
       stroke.setAttribute("stroke-width",String((corridor+treatment.extraYards*0.9144)*2*metresToViewUnits));
       stroke.setAttribute("stroke-linecap","round");
       stroke.setAttribute("stroke-linejoin","round");
-      stroke.setAttribute("stroke-opacity",String(treatment.opacity));
       stroke.setAttribute("filter","url(#"+filterId+")");
       mask.appendChild(stroke);
     });
