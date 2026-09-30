@@ -131,9 +131,10 @@ const scale=Math.min(
 const frameCenterForward=(minForward+maxForward)/2;
 const frameCenterLateral=(minLateral+maxLateral)/2;
 
+const halfViewForward=VIEW_HEIGHT/(2*scale);
 const viewingWindow=window.UiDoHoleViewBuilder.buildViewingWindow(direction,{
-  back_m:Math.max(0,frameCenterForward+VIEW_HEIGHT/(2*scale)),
-  forward_m:Math.max(0,VIEW_HEIGHT/(2*scale)-frameCenterForward),
+  back_m:Math.max(0,halfViewForward-frameCenterForward),
+  forward_m:halfViewForward+frameCenterForward,
   width_m:PLAYABLE_WIDTH/scale
 });
 const fadeMarginM=45*.9144;
