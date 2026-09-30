@@ -1,6 +1,9 @@
 name: AGNOSTIC45 Visual QA
 
 on:
+  push:
+    branches:
+      - qa/window-mask-boundary-20260930
   workflow_dispatch:
     inputs:
       holes:
@@ -66,7 +69,7 @@ jobs:
               pageErrors.push(String(error));
             });
 
-            const url = `http://127.0.0.1:8080/overstone/ui-hole-renderer-agnostic45.html?hole=${hole}`;
+            const url = `http://127.0.0.1:8080/overstone/ui-hole-renderer-agnostic45-window-mask.html?hole=${hole}`;
 
             await page.goto(url, { waitUntil: 'networkidle' });
             await page.locator('#courseSvg').waitFor({ state: 'visible' });
