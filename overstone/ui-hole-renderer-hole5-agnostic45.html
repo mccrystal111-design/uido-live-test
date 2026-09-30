@@ -11,6 +11,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dfe4d8}
 #screen{position:relative;width:min(calc(100vw - 40px),calc((100vh - 40px)*9/16));height:min(calc(100vh - 40px),calc((100vw - 40px)*16/9));background:#f4f1e6;overflow:hidden}
 .grid{position:absolute;inset:0;background-image:linear-gradient(to right,#16231b22 1px,transparent 1px),linear-gradient(to bottom,#16231b22 1px,transparent 1px);background-size:10% 10%;z-index:1}
 .course{position:absolute;inset:0;z-index:2;pointer-events:none}
+.fadeLayer{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}
 svg{width:100%;height:100%;display:block}
 .fairway{fill:#9cad83;stroke:#5f7254;stroke-width:.35}
 .green{fill:#b9caa0;stroke:#4d6543;stroke-width:.45}
@@ -215,6 +216,70 @@ routeElement.setAttribute("class","playline");
 routeElement.setAttribute("d",pathFromGeometry(hole5Route.geometry));
 routeElement.setAttribute("clip-path","url(#holeViewClip)");
 svg.appendChild(routeElement);
+
+// Presentation-only fade layer.
+// The course geometry remains untouched. A single translucent veil covers
+// the screen, with a soft, route-centred opening 40 yards either side of
+// the actual Hole 5 line of play. The opening follows the curved route and
+// therefore closes naturally around the tee and green.
+const fadeSvg=document.createElementNS(ns,"svg");
+fadeSvg.setAttribute("class","fadeLayer");
+fadeSvg.setAttribute("viewBox","0 0 "+VIEW_WIDTH+" "+VIEW_HEIGHT);
+fadeSvg.setAttribute("preserveAspectRatio","none");
+
+const fadeDefs=document.createElementNS(ns,"defs");
+const fadeFilter=document.createElementNS(ns,"filter");
+fadeFilter.setAttribute("id","hole5FadeBlur");
+fadeFilter.setAttribute("x","-20%");
+fadeFilter.setAttribute("y","-20%");
+fadeFilter.setAttribute("width","140%");
+fadeFilter.setAttribute("height","140%");
+
+const blur=document.createElementNS(ns,"feGaussianBlur");
+blur.setAttribute("stdDeviation",(5*scale).toFixed(3));
+fadeFilter.appendChild(blur);
+fadeDefs.appendChild(fadeFilter);
+
+const fadeMask=document.createElementNS(ns,"mask");
+fadeMask.setAttribute("id","hole5RouteFadeMask");
+fadeMask.setAttribute("maskUnits","userSpaceOnUse");
+fadeMask.setAttribute("x","0");
+fadeMask.setAttribute("y","0");
+fadeMask.setAttribute("width",VIEW_WIDTH);
+fadeMask.setAttribute("height",VIEW_HEIGHT);
+
+const maskBase=document.createElementNS(ns,"rect");
+maskBase.setAttribute("x","0");
+maskBase.setAttribute("y","0");
+maskBase.setAttribute("width",VIEW_WIDTH);
+maskBase.setAttribute("height",VIEW_HEIGHT);
+maskBase.setAttribute("fill","white");
+fadeMask.appendChild(maskBase);
+
+const maskRoute=document.createElementNS(ns,"path");
+maskRoute.setAttribute("d",pathFromGeometry(hole5Route.geometry));
+maskRoute.setAttribute("fill","none");
+maskRoute.setAttribute("stroke","black");
+maskRoute.setAttribute("stroke-width",(80*scale).toFixed(3));
+maskRoute.setAttribute("stroke-linecap","round");
+maskRoute.setAttribute("stroke-linejoin","round");
+maskRoute.setAttribute("filter","url(#hole5FadeBlur)");
+fadeMask.appendChild(maskRoute);
+
+fadeDefs.appendChild(fadeMask);
+fadeSvg.appendChild(fadeDefs);
+
+const fadeVeil=document.createElementNS(ns,"rect");
+fadeVeil.setAttribute("x","0");
+fadeVeil.setAttribute("y","0");
+fadeVeil.setAttribute("width",VIEW_WIDTH);
+fadeVeil.setAttribute("height",VIEW_HEIGHT);
+fadeVeil.setAttribute("fill","#f4f1e6");
+fadeVeil.setAttribute("fill-opacity","0.68");
+fadeVeil.setAttribute("mask","url(#hole5RouteFadeMask)");
+fadeSvg.appendChild(fadeVeil);
+
+document.getElementById("screen").appendChild(fadeSvg);
 
 
 const pTee=project(teeLL);
