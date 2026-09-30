@@ -300,8 +300,8 @@ corridorOverlay.forEach(el=>svg.appendChild(el));
 
 
 // First-pass presentation fade:
-// the 40-yard corridor remains fully clear, while the area outside it is
-// softly veiled. This is presentation-only; canonical/course geometry is untouched.
+// 40 yards is the clear corridor. Outside it, the background veil increases
+// progressively with real-world distance from the corridor.
 function offsetRouteLocal(points,distance){
   return points.map((p,i)=>{
     let dx,dy;
@@ -313,13 +313,7 @@ function offsetRouteLocal(points,distance){
   });
 }
 
-function localMetresToScreen(p){
-  return projectLocalMetres(p);
-}
-const leftLocal=offsetRouteLocal(routeLocalMetres,fortyYardsMetres);
-const rightLocal=offsetRouteLocal(routeLocalMetres,-fortyYardsMetres);
-const leftScreen=leftLocal.map(localMetresToScreen);
-const rightScreen=rightLocal.map(localMetresToScreen);
+function localMetresToScreen(p){ return projectLocalMetres(p); }
 
 function smoothScreenPath(points){
   if(points.length<2) return "";
@@ -334,57 +328,76 @@ function smoothScreenPath(points){
   return d;
 }
 
-const corridorD=
-  smoothScreenPath(leftScreen)+" "+
-  smoothScreenPath(rightScreen.slice().reverse()).replace(/^M/,"L")+" Z";
+function capsulePath(radius){
+  const left=offsetRouteLocal(routeLocalMetres,radius);
+  const right=offsetRouteLocal(routeLocalMetres,-radius);
+  const ls=left.map(localMetresToScreen);
+  const rs=right.map(localMetresToScreen);
+
+  const start=routeLocalMetres[0];
+  const end=routeLocalMetres[routeLocalMetres.length-1];
+  const startT=[routeLocalMetres[1][0]-start[0],routeLocalMetres[1][1]-start[1]];
+  const endT=[end[0]-routeLocalMetres[routeLocalMetres.length-2][0],end[1]-routeLocalMetres[routeLocalMetres.length-2][1]];
+
+  function cap(center,tangent,reverse){
+    const len=Math.hypot(tangent[0],tangent[1])||1;
+    const ux=tangent[0]/len,uy=tangent[1]/len;
+    const nx=-uy,ny=ux;
+    const pts=[];
+    const a0=reverse?Math.PI/2:-Math.PI/2;
+    const a1=reverse?-Math.PI/2:Math.PI/2;
+    for(let i=0;i<=24;i++){
+      const a=a0+(a1-a0)*i/24;
+      pts.push(projectLocalMetres([
+        center[0]+(ux*Math.cos(a)+nx*Math.sin(a))*radius,
+        center[1]+(uy*Math.cos(a)+ny*Math.sin(a))*radius
+      ]));
+    }
+    return pts;
+  }
+
+  const startCap=cap(start,startT,true);
+  const endCap=cap(end,endT,false);
+  const all=[
+    ...ls,
+    ...endCap,
+    ...rs.slice().reverse(),
+    ...startCap
+  ];
+  return all.map((p,i)=>(i?"L":"M")+p[0].toFixed(3)+" "+p[1].toFixed(3)).join(" ")+" Z";
+}
 
 const defs=svg.querySelector("defs");
-const fadeMask=document.createElementNS(ns,"mask");
-fadeMask.setAttribute("id","corridorFadeMask");
-fadeMask.setAttribute("maskUnits","userSpaceOnUse");
-fadeMask.setAttribute("x","0");
-fadeMask.setAttribute("y","0");
-fadeMask.setAttribute("width",String(VIEW_WIDTH));
-fadeMask.setAttribute("height",String(VIEW_HEIGHT));
+const fadeGroup=document.createElementNS(ns,"g");
+fadeGroup.setAttribute("id","corridorProgressiveFade");
+fadeGroup.setAttribute("pointer-events","none");
 
-const maskBg=document.createElementNS(ns,"rect");
-maskBg.setAttribute("x","0"); maskBg.setAttribute("y","0");
-maskBg.setAttribute("width",String(VIEW_WIDTH));
-maskBg.setAttribute("height",String(VIEW_HEIGHT));
-maskBg.setAttribute("fill","white");
-fadeMask.appendChild(maskBg);
+const bands=[
+  [40,44,0.06],
+  [44,48,0.12],
+  [48,52,0.20],
+  [52,56,0.30],
+  [56,60,0.42],
+  [60,66,0.56]
+];
 
-const corridorMask=document.createElementNS(ns,"path");
-corridorMask.setAttribute("d",corridorD);
-corridorMask.setAttribute("fill","black");
-fadeMask.appendChild(corridorMask);
+bands.forEach(([inner,outer,opacity])=>{
+  const band=document.createElementNS(ns,"path");
+  band.setAttribute("d",capsulePath(outer)+" "+capsulePath(inner));
+  band.setAttribute("fill","#f4f1e6");
+  band.setAttribute("fill-opacity",String(opacity));
+  band.setAttribute("fill-rule","evenodd");
+  fadeGroup.appendChild(band);
+});
 
-const blur=document.createElementNS(ns,"filter");
-blur.setAttribute("id","corridorFadeBlur");
-blur.setAttribute("x","-20%");
-blur.setAttribute("y","-20%");
-blur.setAttribute("width","140%");
-blur.setAttribute("height","140%");
-const blurNode=document.createElementNS(ns,"feGaussianBlur");
-blurNode.setAttribute("stdDeviation","2.5");
-blur.appendChild(blurNode);
-defs.appendChild(blur);
+const outerFade=document.createElementNS(ns,"path");
+outerFade.setAttribute("d","M0 0 H"+VIEW_WIDTH+" V"+VIEW_HEIGHT+" H0 Z "+capsulePath(66));
+outerFade.setAttribute("fill","#f4f1e6");
+outerFade.setAttribute("fill-opacity","0.68");
+outerFade.setAttribute("fill-rule","evenodd");
+fadeGroup.appendChild(outerFade);
 
-fadeMask.setAttribute("filter","url(#corridorFadeBlur)");
-defs.appendChild(fadeMask);
-
-const fadeOverlay=document.createElementNS(ns,"rect");
-fadeOverlay.setAttribute("x","0");
-fadeOverlay.setAttribute("y","0");
-fadeOverlay.setAttribute("width",String(VIEW_WIDTH));
-fadeOverlay.setAttribute("height",String(VIEW_HEIGHT));
-fadeOverlay.setAttribute("fill","#f4f1e6");
-fadeOverlay.setAttribute("fill-opacity","0.72");
-fadeOverlay.setAttribute("mask","url(#corridorFadeMask)");
-fadeOverlay.setAttribute("pointer-events","none");
-fadeOverlay.setAttribute("id","corridorFadeOverlay");
-svg.appendChild(fadeOverlay);
-
+svg.appendChild(fadeGroup);
 const pTee=project(teeLL);
 const pGreen=project(greenMiddleLL);
 const EPS=1e-7;
