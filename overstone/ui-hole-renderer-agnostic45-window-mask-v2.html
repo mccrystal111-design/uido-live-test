@@ -38,7 +38,21 @@ svg{width:100%;height:100%;display:block}
 <g id="renderedGeometry" clip-path="url(#holeViewClip)"></g>
 </svg>
 </div>
-<img class="windowMask" src="../assets/uido-mask-v2.svg" alt="">
+<div class="windowMask">
+  <svg viewBox="0 0 941 1672" preserveAspectRatio="none">
+    <defs>
+      <filter id="v2CloudToEdge" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+        <feColorMatrix type="matrix"
+          values="0 0 0 0 0.956
+                  0 0 0 0 0.945
+                  0 0 0 0 0.902
+                  -1.5 -1.5 -1.5 0 4.5"/>
+      </filter>
+    </defs>
+    <image href="../assets/uido-mask-v2.svg" x="0" y="0" width="941" height="1672"
+           preserveAspectRatio="none" filter="url(#v2CloudToEdge)"/>
+  </svg>
+</div>
 <div class="windowEdgeTop"></div><div class="windowEdgeBottom"></div>
 </div></div>
 
