@@ -41,7 +41,37 @@
     filter.setAttribute("height","300%");
     const blur=document.createElementNS(ns,"feGaussianBlur");
     blur.setAttribute("stdDeviation",String(fade*0.5*metresToViewUnits));
+    blur.setAttribute("result","softCorridor");
     filter.appendChild(blur);
+
+    // Give the feathered corridor an organic, cloud-like edge while keeping
+    // the corridor itself route-relative. The noise only displaces the
+    // already-blurred boundary; it does not create a second visual layer.
+    const turbulence=document.createElementNS(ns,"feTurbulence");
+    turbulence.setAttribute("type","fractalNoise");
+    turbulence.setAttribute("baseFrequency","0.045 0.075");
+    turbulence.setAttribute("numOctaves","4");
+    turbulence.setAttribute("seed","15");
+    turbulence.setAttribute("result","cloudNoise");
+    filter.appendChild(turbulence);
+
+    const displacement=document.createElementNS(ns,"feDisplacementMap");
+    displacement.setAttribute("in","softCorridor");
+    displacement.setAttribute("in2","cloudNoise");
+    displacement.setAttribute(
+      "scale",
+      String(Math.min(12,Math.max(4,fade*0.16*metresToViewUnits)))
+    );
+    displacement.setAttribute("xChannelSelector","R");
+    displacement.setAttribute("yChannelSelector","G");
+    displacement.setAttribute("result","cloudEdge");
+    filter.appendChild(displacement);
+
+    const finalBlur=document.createElementNS(ns,"feGaussianBlur");
+    finalBlur.setAttribute("in","cloudEdge");
+    finalBlur.setAttribute("stdDeviation","0.8");
+    filter.appendChild(finalBlur);
+
     defs.appendChild(filter);
 
     const clear=document.createElementNS(ns,"path");
