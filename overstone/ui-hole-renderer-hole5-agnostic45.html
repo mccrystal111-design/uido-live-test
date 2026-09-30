@@ -45,6 +45,7 @@ svg{width:100%;height:100%;display:block}
 </div></div>
 <script src="course-source-model.js"></script>
 <script src="hole-view-builder.js"></script>
+<script src="agnostic45-fade.js?v=restore-fade-base"></script>
 <script>
 const sources=window.UIDO_OVERSTONE_SOURCE_HOLES;
 const selectedSource=sources["5"];
@@ -215,6 +216,8 @@ holeView.features.slice().sort((a,b)=>
   (renderOrder[String(a.type||"").toUpperCase()]??99)-
   (renderOrder[String(b.type||"").toUpperCase()]??99)
 ).forEach(addFeature);
+
+UiDoAgnostic45Fade.attach(document.getElementById("screen"), pathFromGeometry(hole5Route.geometry), scale, {width:VIEW_WIDTH,height:VIEW_HEIGHT,corridorYards:40,fadeYards:20});
 
 const svg=document.getElementById("courseSvg");
 
