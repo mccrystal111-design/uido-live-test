@@ -49,7 +49,7 @@
     // already-blurred boundary; it does not create a second visual layer.
     const turbulence=document.createElementNS(ns,"feTurbulence");
     turbulence.setAttribute("type","fractalNoise");
-    turbulence.setAttribute("baseFrequency","0.018 0.032");
+    turbulence.setAttribute("baseFrequency","0.008 0.018");
     turbulence.setAttribute("numOctaves","5");
     turbulence.setAttribute("seed","15");
     turbulence.setAttribute("result","cloudNoise");
@@ -60,7 +60,7 @@
     displacement.setAttribute("in2","cloudNoise");
     displacement.setAttribute(
       "scale",
-      String(Math.min(24,Math.max(12,fade*0.30*metresToViewUnits)))
+      String(Math.min(40,Math.max(24,fade*0.50*metresToViewUnits)))
     );
     displacement.setAttribute("xChannelSelector","R");
     displacement.setAttribute("yChannelSelector","G");
