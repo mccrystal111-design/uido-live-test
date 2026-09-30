@@ -1,4 +1,5 @@
 name: AGNOSTIC45 Window Mask Live QA
+# exact-version QA trigger
 
 on:
   push:
