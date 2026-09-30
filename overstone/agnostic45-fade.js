@@ -27,34 +27,27 @@
     full.setAttribute("fill","white");
     mask.appendChild(full);
 
-    // Full-screen route-relative vignette. The fade is defined by distance
-    // from the route, but its outer field reaches the screen boundary so the
-    // capture window never creates a second visible rectangle.
+    // Deterministic luminance mask: paint a series of increasingly lighter
+    // route strokes. Unlike opacity/blur combinations, these literal grey
+    // values directly define the amount of veil allowed through the mask.
     const treatments=[
-      {extraYards:4,  blurYards:9},
-      {extraYards:18, blurYards:18},
-      {extraYards:42, blurYards:34},
-      {extraYards:70, blurYards:52}
+      {extraYards:0,  grey:0},
+      {extraYards:5,  grey:32},
+      {extraYards:10, grey:58},
+      {extraYards:18, grey:92},
+      {extraYards:28, grey:125},
+      {extraYards:40, grey:158},
+      {extraYards:55, grey:188},
+      {extraYards:75, grey:214}
     ];
-    treatments.forEach((treatment,index)=>{
+    treatments.slice().reverse().forEach(treatment=>{
       const stroke=document.createElementNS(ns,"path");
-      const filterId="agnostic45-vignette-"+index;
-      const filter=document.createElementNS(ns,"filter");
-      filter.setAttribute("id",filterId);
-      filter.setAttribute("x","-100%"); filter.setAttribute("y","-100%");
-      filter.setAttribute("width","300%"); filter.setAttribute("height","300%");
-      const blur=document.createElementNS(ns,"feGaussianBlur");
-      blur.setAttribute("stdDeviation",String(treatment.blurYards*0.9144*metresToViewUnits));
-      filter.appendChild(blur);
-      defs.appendChild(filter);
-
       stroke.setAttribute("d",routePath);
       stroke.setAttribute("fill","none");
-      stroke.setAttribute("stroke","black");
+      stroke.setAttribute("stroke","rgb("+treatment.grey+","+treatment.grey+","+treatment.grey+")");
       stroke.setAttribute("stroke-width",String((corridor+treatment.extraYards*0.9144)*2*metresToViewUnits));
       stroke.setAttribute("stroke-linecap","round");
       stroke.setAttribute("stroke-linejoin","round");
-      stroke.setAttribute("filter","url(#"+filterId+")");
       mask.appendChild(stroke);
     });
 
