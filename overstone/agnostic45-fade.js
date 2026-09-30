@@ -63,7 +63,7 @@
     veil.setAttribute("width",width);
     veil.setAttribute("height",height);
     veil.setAttribute("fill","#f4f1e6");
-    veil.setAttribute("fill-opacity","0.68");
+    veil.setAttribute("fill-opacity","0.72");
     veil.setAttribute("mask","url(#"+id+")");
     svg.appendChild(veil);
 
