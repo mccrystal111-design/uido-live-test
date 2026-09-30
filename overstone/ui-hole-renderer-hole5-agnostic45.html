@@ -165,6 +165,48 @@ function project(point){
   ];
 }
 
+function pathFromGeometry(geometry){
+  if(!geometry) return null;
+  if(geometry.type==="Polygon"){
+    return geometry.coordinates[0].map((p,i)=>{
+      const q=project(p);
+      return (i?"L":"M")+q[0].toFixed(3)+" "+q[1].toFixed(3);
+    }).join(" ")+" Z";
+  }
+  if(geometry.type==="LineString"){
+    return geometry.coordinates.map((p,i)=>{
+      const q=project(p);
+      return (i?"L":"M")+q[0].toFixed(3)+" "+q[1].toFixed(3);
+    }).join(" ");
+  }
+  return null;
+}
+
+function addFeature(feature){
+  const d=pathFromGeometry(feature.geometry);
+  if(!d) return;
+  const type=String(feature.type||"").toUpperCase();
+  let cls=null;
+  if(type==="ROUGH") cls="rough";
+  else if(type==="FAIRWAY") cls="fairway";
+  else if(type==="GREEN") cls="green";
+  else if(type==="BUNKER") cls="bunker";
+  else if(type==="TEE") cls="teeBox";
+  else if(type==="WATER" || type==="WATER_HAZARD") cls="water";
+  else if(type==="PATH" || type==="CARTPATH") cls="path";
+  if(!cls) return;
+  const element=document.createElementNS(ns,"path");
+  element.setAttribute("class",cls);
+  element.setAttribute("d",d);
+  if(type==="PATH" || type==="CARTPATH") element.setAttribute("fill","none");
+  document.getElementById("renderedGeometry").appendChild(element);
+}
+const renderOrder={ROUGH:0,WATER:1,WATER_HAZARD:1,FAIRWAY:2,PATH:3,CARTPATH:3,TEE:4,BUNKER:5,GREEN:6};
+holeView.features.slice().sort((a,b)=>
+  (renderOrder[String(a.type||"").toUpperCase()]??99)-
+  (renderOrder[String(b.type||"").toUpperCase()]??99)
+).forEach(addFeature);
+
 const svg=document.getElementById("courseSvg");
 const ns="http://www.w3.org/2000/svg";
 
