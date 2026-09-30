@@ -10,7 +10,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dfe4d8}
 #stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px}
 #screen{position:relative;width:min(calc(100vw - 40px),calc((100vh - 40px)*9/16));height:min(calc(100vh - 40px),calc((100vw - 40px)*16/9));background:#f4f1e6;overflow:hidden}
 .grid{position:absolute;inset:0;background-image:linear-gradient(to right,#16231b22 1px,transparent 1px),linear-gradient(to bottom,#16231b22 1px,transparent 1px);background-size:10% 10%;z-index:1}
-.course{position:absolute;inset:0;z-index:2;pointer-events:none}
+.course{position:absolute;inset:0;z-index:2;pointer-events:none}.fadeCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}
 svg{width:100%;height:100%;display:block}
 .fairway{fill:#9cad83;stroke:#5f7254;stroke-width:.35}
 .green{fill:#b9caa0;stroke:#4d6543;stroke-width:.45}
@@ -41,6 +41,7 @@ svg{width:100%;height:100%;display:block}
 
 </svg>
 </div>
+<canvas id="fadeCanvas" class="fadeCanvas"></canvas>
 </div></div>
 <script src="course-source-model.js"></script>
 <script src="hole-view-builder.js"></script>
@@ -184,6 +185,72 @@ if(Math.hypot(pTee[0]-teeAnchor[0],pTee[1]-teeAnchor[1])>EPS) {
 if(Math.hypot(pGreen[0]-greenAnchor[0],pGreen[1]-greenAnchor[1])>EPS) {
   throw new Error("Green percentage anchor transform failed");
 }
+
+// Presentation-only fade experiment.
+// The route is stroked as a 40-yard-radius capsule. Canvas compositing then
+// clears that capsule and feathers the outside edge. Course geometry is untouched.
+(function(){
+  const canvas=document.getElementById("fadeCanvas");
+  const screen=document.getElementById("screen");
+  const ctx=canvas.getContext("2d");
+  const dpr=Math.max(1,window.devicePixelRatio||1);
+  const routePoints=hole5Route.geometry.coordinates.map(project);
+  const yardsToSvg=(yards)=>yards*0.9144*scale;
+  const radiusSvg=yardsToSvg(40);
+
+  function drawFade(){
+    const w=screen.clientWidth;
+    const h=screen.clientHeight;
+    canvas.width=Math.round(w*dpr);
+    canvas.height=Math.round(h*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,h);
+
+    const sx=w/VIEW_WIDTH;
+    const sy=h/VIEW_HEIGHT;
+    const points=routePoints.map(p=>[p[0]*sx,p[1]*sy]);
+    const radiusX=radiusSvg*sx;
+    const radiusY=radiusSvg*sy;
+
+    // Background veil.
+    ctx.globalCompositeOperation="source-over";
+    ctx.fillStyle="#f4f1e6";
+    ctx.globalAlpha=0.68;
+    ctx.fillRect(0,0,w,h);
+
+    function routeStroke(lineWidth){
+      ctx.beginPath();
+      points.forEach((p,i)=>{
+        if(i===0) ctx.moveTo(p[0],p[1]);
+        else ctx.lineTo(p[0],p[1]);
+      });
+      ctx.lineCap="round";
+      ctx.lineJoin="round";
+      ctx.lineWidth=lineWidth;
+      ctx.stroke();
+    }
+
+    // Remove everything inside the exact 40-yard capsule.
+    ctx.globalCompositeOperation="destination-out";
+    ctx.globalAlpha=1;
+    ctx.strokeStyle="#000";
+    ctx.filter="none";
+    routeStroke(Math.max(radiusX,radiusY)*2);
+
+    // Feather outward from the 40-yard boundary.
+    // The blurred pass only removes additional veil outside the exact capsule.
+    ctx.filter="blur(10px)";
+    ctx.globalAlpha=0.95;
+    routeStroke(Math.max(radiusX,radiusY)*2);
+    ctx.filter="none";
+
+    ctx.globalCompositeOperation="source-over";
+    ctx.globalAlpha=1;
+  }
+
+  drawFade();
+  window.addEventListener("resize",drawFade);
+})();
 
 document.title="UiDo — Hole 5 — AGNOSTIC45 Canonical Hole View";
 </script>
