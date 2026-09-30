@@ -45,6 +45,7 @@ svg{width:100%;height:100%;display:block}
 </div></div>
 <script src="course-source-model.js"></script>
 <script src="hole-view-builder.js"></script>
+<script src="agnostic45-fade.js"></script>
 <script>
 const sources=window.UIDO_OVERSTONE_SOURCE_HOLES;
 const selectedSource=sources["5"];
@@ -209,6 +210,8 @@ holeView.features.slice().sort((a,b)=>
   (renderOrder[String(b.type||"").toUpperCase()]??99)
 ).forEach(addFeature);
 
+UiDoAgnostic45Fade.attach(document.getElementById("screen"), pathFromGeometry(hole5Route.geometry), scale, {width:VIEW_WIDTH,height:VIEW_HEIGHT,corridorYards:40,fadeYards:20});
+
 const svg=document.getElementById("courseSvg");
 
 const routeElement=document.createElementNS(ns,"path");
@@ -220,83 +223,6 @@ svg.appendChild(routeElement);
 // AGNOSTIC45 presentation layer.
 // The fade receives only the already-projected route and renderer scale.
 // It contains no hole number, course identity, or feature ownership logic.
-function addAgnostic45FadeLayer(screen, routeGeometry, projectRoute, metresToViewUnits, options={}){
-  const corridorWidth_m=options.corridorWidth_m??40;
-  const fadeWidth_m=options.fadeWidth_m??20;
-  const veilOpacity=options.veilOpacity??0.68;
-
-  const fadeSvg=document.createElementNS(ns,"svg");
-  fadeSvg.setAttribute("class","fadeLayer");
-  fadeSvg.setAttribute("viewBox","0 0 "+VIEW_WIDTH+" "+VIEW_HEIGHT);
-  fadeSvg.setAttribute("preserveAspectRatio","none");
-  fadeSvg.setAttribute("overflow","visible");
-
-  const defs=document.createElementNS(ns,"defs");
-  const mask=document.createElementNS(ns,"mask");
-  const maskId="agnostic45FadeMask";
-  mask.setAttribute("id",maskId);
-  mask.setAttribute("maskUnits","userSpaceOnUse");
-  mask.setAttribute("maskContentUnits","userSpaceOnUse");
-  mask.setAttribute("x","0");
-  mask.setAttribute("y","0");
-  mask.setAttribute("width",VIEW_WIDTH);
-  mask.setAttribute("height",VIEW_HEIGHT);
-  mask.setAttribute("mask-type","luminance");
-
-  // White = veil visible. Build the soft opening by layering a broad
-  // grey route stroke first, then a black full-visibility corridor.
-  const base=document.createElementNS(ns,"rect");
-  base.setAttribute("x","0");
-  base.setAttribute("y","0");
-  base.setAttribute("width",VIEW_WIDTH);
-  base.setAttribute("height",VIEW_HEIGHT);
-  base.setAttribute("fill","white");
-  mask.appendChild(base);
-
-  const routePath=projectRoute(routeGeometry);
-
-  const transition=document.createElementNS(ns,"path");
-  transition.setAttribute("d",routePath);
-  transition.setAttribute("fill","none");
-  transition.setAttribute("stroke","#777");
-  transition.setAttribute("stroke-width",((corridorWidth_m+fadeWidth_m)*2*metresToViewUnits).toFixed(3));
-  transition.setAttribute("stroke-linecap","round");
-  transition.setAttribute("stroke-linejoin","round");
-  mask.appendChild(transition);
-
-  const corridor=document.createElementNS(ns,"path");
-  corridor.setAttribute("d",routePath);
-  corridor.setAttribute("fill","none");
-  corridor.setAttribute("stroke","black");
-  corridor.setAttribute("stroke-width",(corridorWidth_m*2*metresToViewUnits).toFixed(3));
-  corridor.setAttribute("stroke-linecap","round");
-  corridor.setAttribute("stroke-linejoin","round");
-  mask.appendChild(corridor);
-
-  defs.appendChild(mask);
-  fadeSvg.appendChild(defs);
-
-  const veil=document.createElementNS(ns,"rect");
-  veil.setAttribute("x","0");
-  veil.setAttribute("y","0");
-  veil.setAttribute("width",VIEW_WIDTH);
-  veil.setAttribute("height",VIEW_HEIGHT);
-  veil.setAttribute("fill","#f4f1e6");
-  veil.setAttribute("fill-opacity",String(veilOpacity));
-  veil.setAttribute("mask","url(#"+maskId+")");
-  fadeSvg.appendChild(veil);
-
-  screen.appendChild(fadeSvg);
-}
-
-addAgnostic45FadeLayer(
-  document.getElementById("screen"),
-  hole5Route.geometry,
-  pathFromGeometry,
-  scale,
-  {corridorWidth_m:40,fadeWidth_m:20,veilOpacity:0.68}
-);
-
 
 const pTee=project(teeLL);
 const pGreen=project(greenMiddleLL);
