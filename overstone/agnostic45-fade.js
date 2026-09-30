@@ -4,6 +4,7 @@
   function attach(screen, routePath, metresToViewUnits, options){
     const width=options.width;
     const height=options.height;
+    const contentWidth=options.contentWidth||width;
     const corridor=options.corridorYards*0.9144;
     const fade=options.fadeYards*0.9144;
     const ns="http://www.w3.org/2000/svg";
@@ -21,13 +22,13 @@
     mask.setAttribute("maskContentUnits","userSpaceOnUse");
     mask.setAttribute("x","0");
     mask.setAttribute("y","0");
-    mask.setAttribute("width",width);
+    mask.setAttribute("width",contentWidth);
     mask.setAttribute("height",height);
 
     const full=document.createElementNS(ns,"rect");
     full.setAttribute("x","0");
     full.setAttribute("y","0");
-    full.setAttribute("width",width);
+    full.setAttribute("width",contentWidth);
     full.setAttribute("height",height);
     full.setAttribute("fill","white");
     mask.appendChild(full);
@@ -85,15 +86,64 @@
     mask.appendChild(clear);
 
     defs.appendChild(mask);
+
+    // Apply the noise as opacity texture to the single veil. This keeps the
+    // cloud treatment continuous and route-relative without adding a second
+    // visible graphic layer.
+    const cloudFilter=document.createElementNS(ns,"filter");
+    const cloudFilterId="agnostic45-cloud-texture";
+    cloudFilter.setAttribute("id",cloudFilterId);
+    cloudFilter.setAttribute("x","-20%");
+    cloudFilter.setAttribute("y","-20%");
+    cloudFilter.setAttribute("width","140%");
+    cloudFilter.setAttribute("height","140%");
+
+    const cloudNoise=document.createElementNS(ns,"feTurbulence");
+    cloudNoise.setAttribute("type","fractalNoise");
+    cloudNoise.setAttribute("baseFrequency","0.012 0.024");
+    cloudNoise.setAttribute("numOctaves","4");
+    cloudNoise.setAttribute("seed","15");
+    cloudNoise.setAttribute("result","cloudNoise");
+    cloudFilter.appendChild(cloudNoise);
+
+    const noiseAlpha=document.createElementNS(ns,"feColorMatrix");
+    noiseAlpha.setAttribute("in","cloudNoise");
+    noiseAlpha.setAttribute("type","matrix");
+    noiseAlpha.setAttribute(
+      "values",
+      "0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.333 0.333 0.333 0 0"
+    );
+    noiseAlpha.setAttribute("result","noiseAlpha");
+    cloudFilter.appendChild(noiseAlpha);
+
+    const alphaRange=document.createElementNS(ns,"feComponentTransfer");
+    alphaRange.setAttribute("in","noiseAlpha");
+    const alphaFunc=document.createElementNS(ns,"feFuncA");
+    alphaFunc.setAttribute("type","linear");
+    alphaFunc.setAttribute("slope","0.35");
+    alphaFunc.setAttribute("intercept","0.65");
+    alphaRange.appendChild(alphaFunc);
+    alphaRange.setAttribute("result","cloudAlpha");
+    cloudFilter.appendChild(alphaRange);
+
+    const texturedVeil=document.createElementNS(ns,"feComposite");
+    texturedVeil.setAttribute("in","SourceGraphic");
+    texturedVeil.setAttribute("in2","cloudAlpha");
+    texturedVeil.setAttribute("operator","in");
+    texturedVeil.setAttribute("result","texturedVeil");
+    cloudFilter.appendChild(texturedVeil);
+
+    defs.appendChild(cloudFilter);
     svg.appendChild(defs);
 
     const veil=document.createElementNS(ns,"rect");
     veil.setAttribute("x","0");
     veil.setAttribute("y","0");
-    veil.setAttribute("width",width);
+    veil.setAttribute("width",contentWidth);
     veil.setAttribute("height",height);
     veil.setAttribute("fill","#f4f1e6");
-    veil.setAttribute("fill-opacity","0.72");
+    veil.setAttribute("fill-opacity","0.82");
+    veil.setAttribute("filter","url(#"+cloudFilterId+")");
     veil.setAttribute("mask","url(#"+id+")");
     svg.appendChild(veil);
 
