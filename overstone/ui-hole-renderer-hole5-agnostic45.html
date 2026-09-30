@@ -221,25 +221,30 @@ svg.appendChild(routeElement);
 // The fade receives only the already-projected route and renderer scale.
 // It contains no hole number, course identity, or feature ownership logic.
 function addAgnostic45FadeLayer(screen, routeGeometry, projectRoute, metresToViewUnits, options={}){
-  const width_m=options.corridorWidth_m??40;
-  const transition_m=options.transitionWidth_m??20;
+  const corridorWidth_m=options.corridorWidth_m??40;
+  const fadeWidth_m=options.fadeWidth_m??20;
   const veilOpacity=options.veilOpacity??0.68;
 
   const fadeSvg=document.createElementNS(ns,"svg");
   fadeSvg.setAttribute("class","fadeLayer");
   fadeSvg.setAttribute("viewBox","0 0 "+VIEW_WIDTH+" "+VIEW_HEIGHT);
   fadeSvg.setAttribute("preserveAspectRatio","none");
+  fadeSvg.setAttribute("overflow","visible");
 
   const defs=document.createElementNS(ns,"defs");
   const mask=document.createElementNS(ns,"mask");
   const maskId="agnostic45FadeMask";
   mask.setAttribute("id",maskId);
   mask.setAttribute("maskUnits","userSpaceOnUse");
+  mask.setAttribute("maskContentUnits","userSpaceOnUse");
   mask.setAttribute("x","0");
   mask.setAttribute("y","0");
   mask.setAttribute("width",VIEW_WIDTH);
   mask.setAttribute("height",VIEW_HEIGHT);
+  mask.setAttribute("mask-type","luminance");
 
+  // White = veil visible. Build the soft opening by layering a broad
+  // grey route stroke first, then a black full-visibility corridor.
   const base=document.createElementNS(ns,"rect");
   base.setAttribute("x","0");
   base.setAttribute("y","0");
@@ -248,28 +253,26 @@ function addAgnostic45FadeLayer(screen, routeGeometry, projectRoute, metresToVie
   base.setAttribute("fill","white");
   mask.appendChild(base);
 
-  const routePath=document.createElementNS(ns,"path");
-  routePath.setAttribute("d",projectRoute(routeGeometry));
-  routePath.setAttribute("fill","none");
-  routePath.setAttribute("stroke","black");
-  routePath.setAttribute("stroke-width",(width_m*2*metresToViewUnits).toFixed(3));
-  routePath.setAttribute("stroke-linecap","round");
-  routePath.setAttribute("stroke-linejoin","round");
+  const routePath=projectRoute(routeGeometry);
 
-  const filter=document.createElementNS(ns,"filter");
-  const filterId="agnostic45FadeSoftness";
-  filter.setAttribute("id",filterId);
-  filter.setAttribute("x","-30%");
-  filter.setAttribute("y","-30%");
-  filter.setAttribute("width","160%");
-  filter.setAttribute("height","160%");
-  const blur=document.createElementNS(ns,"feGaussianBlur");
-  blur.setAttribute("stdDeviation",(transition_m*0.45*metresToViewUnits).toFixed(3));
-  filter.appendChild(blur);
-  defs.appendChild(filter);
+  const transition=document.createElementNS(ns,"path");
+  transition.setAttribute("d",routePath);
+  transition.setAttribute("fill","none");
+  transition.setAttribute("stroke","#777");
+  transition.setAttribute("stroke-width",((corridorWidth_m+fadeWidth_m)*2*metresToViewUnits).toFixed(3));
+  transition.setAttribute("stroke-linecap","round");
+  transition.setAttribute("stroke-linejoin","round");
+  mask.appendChild(transition);
 
-  routePath.setAttribute("filter","url(#"+filterId+")");
-  mask.appendChild(routePath);
+  const corridor=document.createElementNS(ns,"path");
+  corridor.setAttribute("d",routePath);
+  corridor.setAttribute("fill","none");
+  corridor.setAttribute("stroke","black");
+  corridor.setAttribute("stroke-width",(corridorWidth_m*2*metresToViewUnits).toFixed(3));
+  corridor.setAttribute("stroke-linecap","round");
+  corridor.setAttribute("stroke-linejoin","round");
+  mask.appendChild(corridor);
+
   defs.appendChild(mask);
   fadeSvg.appendChild(defs);
 
@@ -286,13 +289,12 @@ function addAgnostic45FadeLayer(screen, routeGeometry, projectRoute, metresToVie
   screen.appendChild(fadeSvg);
 }
 
-const metresToViewUnits=scale;
 addAgnostic45FadeLayer(
   document.getElementById("screen"),
   hole5Route.geometry,
   pathFromGeometry,
-  metresToViewUnits,
-  {corridorWidth_m:40,transitionWidth_m:20,veilOpacity:0.68}
+  scale,
+  {corridorWidth_m:40,fadeWidth_m:20,veilOpacity:0.68}
 );
 
 
