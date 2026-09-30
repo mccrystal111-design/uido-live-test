@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UiDo — AGNOSTICBASE45</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dfe4d8}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px}
+#screen{position:relative;width:min(calc(100vw - 40px),calc((100vh - 40px)*9/16));height:min(calc(100vh - 40px),calc((100vw - 40px)*16/9));background:#f4f1e6;overflow:hidden}
+.grid{position:absolute;inset:0;background-image:linear-gradient(to right,#16231b22 1px,transparent 1px),linear-gradient(to bottom,#16231b22 1px,transparent 1px);background-size:10% 10%;z-index:1}
+.course{position:absolute;inset:0;z-index:2;pointer-events:none}
+svg{width:100%;height:100%;display:block}
+.fairway{fill:#9cad83;stroke:#5f7254;stroke-width:.35}
+.green{fill:#b9caa0;stroke:#4d6543;stroke-width:.45}
+.bunker{fill:#d8c9a0;stroke:#8c7950;stroke-width:.4}
+.rough{fill:#b9c7ae;stroke:#8d9e85;stroke-width:.22}
+.water{fill:#d9dce0;stroke:#4d5258;stroke-width:.35}
+.path{fill:none;stroke:#a7a28f;stroke-width:.45;stroke-linecap:round;stroke-linejoin:round}
+.playline{fill:none;stroke:#3f4b3b;stroke-width:.45;stroke-dasharray:1.2 1}
+.teeBox{fill:#c8c6a8;stroke:#7d8069;stroke-width:.35}
+</style>
+</head>
+<body>
+<div id="stage"><div id="screen">
+<div class="grid"></div>
+<div class="course">
+<svg id="courseSvg" viewBox="0 0 100 177.7777777778" preserveAspectRatio="none">
+<defs>
+<clipPath id="holeViewClip" clipPathUnits="userSpaceOnUse"><rect x="0" y="0" width="60" height="177.7777777778"></rect></clipPath>
+</defs>
+<g id="renderedGeometry" clip-path="url(#holeViewClip)"></g>
+</svg>
+</div>
+</div></div>
+
+<script src="course-source-model.js"></script>
+<script src="hole-view-builder.js"></script>
+<script>
+const sources=window.UIDO_OVERSTONE_SOURCE_HOLES;
+const params=new URLSearchParams(window.location.search);
+const holeNumber=Number(params.get("hole")||"5");
+if(!Number.isInteger(holeNumber)||!sources[String(holeNumber)]){
+  throw new Error("AGNOSTIC45 requires a valid ?hole=N");
+}
+const selectedSource=sources[String(holeNumber)];
+
+function buildRuntimeCanonical(){
+  const featuresById=new Map();
+  const holes=[];
+  Object.keys(sources).sort((a,b)=>Number(a)-Number(b)).forEach(key=>{
+    const s=sources[key];
+    holes.push({
+      hole_number:Number(s.hole),
+      par:s.par,
+      routing:{
+        role:"hole_route",
+        hole_number:Number(s.hole),
+        geometry:{type:"LineString",coordinates:s.line_of_play},
+        destination:{lon:s.green_fmb.middle[1],lat:s.green_fmb.middle[0]}
+      },
+      truth:"CONFIRMED"
+    });
+    (s.features||[]).forEach(feature=>{
+      if(!feature.geometry||feature.id==null) return;
+      if(!featuresById.has(String(feature.id))){
+        featuresById.set(String(feature.id),{
+          id:String(feature.id),
+          type:String(feature.golf||"UNKNOWN").toUpperCase(),
+          geometry:feature.geometry,
+          provenance:feature.source||"source",
+          source_refs:[String(feature.id)]
+        });
+      }
+    });
+  });
+  return {
+    schema:"uido.course.canonical.v2.runtime-adapter",
+    course:{id:"overstone-park",name:"Overstone Park Golf Club"},
+    geometry:{scope:"course",features:Array.from(featuresById.values())},
+    holes
+  };
+}
+
+const canonical=buildRuntimeCanonical();
+const hole=canonical.holes.find(h=>h.hole_number===holeNumber);
+const direction=window.UiDoHoleViewBuilder.directionFromRoute(hole.routing);
+
+const VIEW_WIDTH=100;
+const VIEW_HEIGHT=100*16/9;
+const PLAYABLE_WIDTH=60;
+const FIT_FRACTION=.82;
+const VIEW_CENTER=[PLAYABLE_WIDTH/2,VIEW_HEIGHT/2];
+const EARTH_RADIUS=6371000;
+const origin=direction.origin;
+const lat0=origin[1]*Math.PI/180;
+const forward=direction.vector;
+const right=[forward[1],-forward[0]];
+
+function toLocal(point){
+  return [
+    (point[0]-origin[0])*Math.cos(lat0)*Math.PI/180*EARTH_RADIUS,
+    (point[1]-origin[1])*Math.PI/180*EARTH_RADIUS
+  ];
+}
+function holeSpace(point){
+  const p=toLocal(point);
+  return {
+    forward:p[0]*forward[0]+p[1]*forward[1],
+    lateral:p[0]*right[0]+p[1]*right[1]
+  };
+}
+
+const routePoints=hole.routing.geometry.coordinates.slice();
+const destination=[hole.routing.destination.lon,hole.routing.destination.lat];
+const framingPoints=routePoints.concat([destination]).map(holeSpace);
+const minForward=Math.min(...framingPoints.map(p=>p.forward));
+const maxForward=Math.max(...framingPoints.map(p=>p.forward));
+const minLateral=Math.min(...framingPoints.map(p=>p.lateral));
+const maxLateral=Math.max(...framingPoints.map(p=>p.lateral));
+const forwardSpan=Math.max(1,maxForward-minForward);
+const lateralSpan=Math.max(1,maxLateral-minLateral);
+
+// Fit the actual hole route, not a fixed tee/green distance, into the
+// playable 60-unit frame. The same calculation is used for every hole.
+const scale=Math.min(
+  (VIEW_HEIGHT*FIT_FRACTION)/forwardSpan,
+  (PLAYABLE_WIDTH*FIT_FRACTION)/lateralSpan
+);
+const frameCenterForward=(minForward+maxForward)/2;
+const frameCenterLateral=(minLateral+maxLateral)/2;
+
+const halfViewForward=VIEW_HEIGHT/(2*scale);
+const viewingWindow=window.UiDoHoleViewBuilder.buildViewingWindow(direction,{
+  back_m:Math.max(0,halfViewForward-frameCenterForward),
+  forward_m:halfViewForward+frameCenterForward,
+  width_m:PLAYABLE_WIDTH/scale
+});
+const fadeMarginM=45*.9144;
+const captureWindow=window.UiDoHoleViewBuilder.buildViewingWindow(direction,{
+  back_m:viewingWindow.back_m+fadeMarginM,
+  forward_m:viewingWindow.forward_m+fadeMarginM,
+  width_m:viewingWindow.width_m+fadeMarginM*2
+});
+const visibleFeatures=window.UiDoHoleViewBuilder.selectCourseGeometry(
+  canonical.geometry.features,direction,captureWindow
+);
+const holeView={
+  features:visibleFeatures,
+  direction_of_travel:direction,
+  viewing_window:viewingWindow,
+  capture_window:captureWindow
+};
+
+function project(point){
+  const p=holeSpace(point);
+  return [
+    VIEW_CENTER[0]+(p.lateral-frameCenterLateral)*scale,
+    VIEW_CENTER[1]-(p.forward-frameCenterForward)*scale
+  ];
+}
+function pathFromGeometry(geometry){
+  if(!geometry) return null;
+  if(geometry.type==="Polygon"){
+    return geometry.coordinates[0].map((p,i)=>{
+      const q=project(p);
+      return (i?"L":"M")+q[0].toFixed(3)+" "+q[1].toFixed(3);
+    }).join(" ")+" Z";
+  }
+  if(geometry.type==="LineString"){
+    return geometry.coordinates.map((p,i)=>{
+      const q=project(p);
+      return (i?"L":"M")+q[0].toFixed(3)+" "+q[1].toFixed(3);
+    }).join(" ");
+  }
+  return null;
+}
+function addFeature(feature){
+  const d=pathFromGeometry(feature.geometry);
+  if(!d) return;
+  const type=String(feature.type||"").toUpperCase();
+  const cls={
+    ROUGH:"rough",FAIRWAY:"fairway",GREEN:"green",BUNKER:"bunker",
+    TEE:"teeBox",WATER:"water",WATER_HAZARD:"water",
+    PATH:"path",CARTPATH:"path"
+  }[type];
+  if(!cls) return;
+  const element=document.createElementNS("http://www.w3.org/2000/svg","path");
+  element.setAttribute("class",cls);
+  element.setAttribute("d",d);
+  document.getElementById("renderedGeometry").appendChild(element);
+}
+const renderOrder={ROUGH:0,WATER:1,WATER_HAZARD:1,FAIRWAY:2,PATH:3,CARTPATH:3,TEE:4,BUNKER:5,GREEN:6};
+holeView.features.slice().sort((a,b)=>
+  (renderOrder[String(a.type||"").toUpperCase()]??99)-
+  (renderOrder[String(b.type||"").toUpperCase()]??99)
+).forEach(addFeature);
+
+const routeElement=document.createElementNS("http://www.w3.org/2000/svg","path");
+routeElement.setAttribute("class","playline");
+routeElement.setAttribute("d",pathFromGeometry(hole.routing.geometry));
+routeElement.setAttribute("clip-path","url(#holeViewClip)");
+document.getElementById("courseSvg").appendChild(routeElement);
+
+console.info("UiDo AGNOSTIC45",{
+  hole:holeNumber,
+  direction,
+  scale,
+  frame:{minForward,maxForward,minLateral,maxLateral},
+  viewingWindow,
+  visibleFeatureCount:visibleFeatures.length
+});
+document.title="UiDo — Hole "+holeNumber+" — AGNOSTICBASE45";
+</script>
+</body>
+</html>
