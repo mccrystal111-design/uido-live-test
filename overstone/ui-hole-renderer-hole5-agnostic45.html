@@ -90,6 +90,7 @@ function buildRuntimeCanonical(){
 }
 
 const canonical=buildRuntimeCanonical();
+const ns="http://www.w3.org/2000/svg";
 const VIEW_WIDTH=100;
 const VIEW_HEIGHT=100*16/9;
 const teeAnchor=[VIEW_WIDTH*.25,VIEW_HEIGHT*.90];
@@ -208,7 +209,6 @@ holeView.features.slice().sort((a,b)=>
 ).forEach(addFeature);
 
 const svg=document.getElementById("courseSvg");
-const ns="http://www.w3.org/2000/svg";
 
 const routeElement=document.createElementNS(ns,"path");
 routeElement.setAttribute("class","playline");
