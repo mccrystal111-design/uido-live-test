@@ -1,6 +1,10 @@
 name: AGNOSTIC45 Visual QA
 
 on:
+  push:
+    paths:
+      - 'overstone/**'
+      - '.github/workflows/visual-qa-agnostic45.yml'
   workflow_dispatch:
     inputs:
       holes:
