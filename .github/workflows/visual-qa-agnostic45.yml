@@ -1,7 +1,6 @@
 name: AGNOSTIC45 Visual QA
 
 on:
-  push:
   workflow_dispatch:
     inputs:
       holes:
