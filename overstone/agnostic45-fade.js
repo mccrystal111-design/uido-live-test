@@ -40,7 +40,7 @@
     filter.setAttribute("x","-50%"); filter.setAttribute("y","-50%");
     filter.setAttribute("width","200%"); filter.setAttribute("height","200%");
     const blur=document.createElementNS(ns,"feGaussianBlur");
-    blur.setAttribute("stdDeviation",String(fade*0.55*metresToViewUnits));
+    blur.setAttribute("stdDeviation",String(fade*1.0*metresToViewUnits));
     filter.appendChild(blur);
     defs.appendChild(filter);
     soft.setAttribute("filter","url(#agnostic45-fade-blur)");
