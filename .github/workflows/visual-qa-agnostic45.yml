@@ -1,11 +1,6 @@
 name: AGNOSTIC45 Visual QA
 
 on:
-  push:
-    paths:
-      - "overstone/ui-hole-renderer-agnostic45.html"
-      - "overstone/agnostic45-fade.js"
-      - ".github/workflows/visual-qa-agnostic45.yml"
   workflow_dispatch:
     inputs:
       holes:
