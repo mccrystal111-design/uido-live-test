@@ -11,7 +11,6 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dfe4d8}
 #screen{position:relative;width:min(calc(100vw - 40px),calc((100vh - 40px)*9/16));height:min(calc(100vh - 40px),calc((100vw - 40px)*16/9));background:#f4f1e6;overflow:hidden}
 .grid{position:absolute;inset:0;background-image:linear-gradient(to right,#16231b22 1px,transparent 1px),linear-gradient(to bottom,#16231b22 1px,transparent 1px);background-size:10% 10%;z-index:1}
 .course{position:absolute;inset:0;z-index:2;pointer-events:none}
-.fadeLayer{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}
 svg{width:100%;height:100%;display:block}
 .fairway{fill:#9cad83;stroke:#5f7254;stroke-width:.35}
 .green{fill:#b9caa0;stroke:#4d6543;stroke-width:.45}
@@ -217,69 +216,83 @@ routeElement.setAttribute("d",pathFromGeometry(hole5Route.geometry));
 routeElement.setAttribute("clip-path","url(#holeViewClip)");
 svg.appendChild(routeElement);
 
-// Presentation-only fade layer.
-// The course geometry remains untouched. A single translucent veil covers
-// the screen, with a soft, route-centred opening 40 yards either side of
-// the actual Hole 5 line of play. The opening follows the curved route and
-// therefore closes naturally around the tee and green.
-const fadeSvg=document.createElementNS(ns,"svg");
-fadeSvg.setAttribute("class","fadeLayer");
-fadeSvg.setAttribute("viewBox","0 0 "+VIEW_WIDTH+" "+VIEW_HEIGHT);
-fadeSvg.setAttribute("preserveAspectRatio","none");
+// AGNOSTIC45 presentation layer.
+// The fade receives only the already-projected route and renderer scale.
+// It contains no hole number, course identity, or feature ownership logic.
+function addAgnostic45FadeLayer(screen, routeGeometry, projectRoute, metresToViewUnits, options={}){
+  const width_m=options.corridorWidth_m??40;
+  const transition_m=options.transitionWidth_m??20;
+  const veilOpacity=options.veilOpacity??0.68;
 
-const fadeDefs=document.createElementNS(ns,"defs");
-const fadeFilter=document.createElementNS(ns,"filter");
-fadeFilter.setAttribute("id","hole5FadeBlur");
-fadeFilter.setAttribute("x","-20%");
-fadeFilter.setAttribute("y","-20%");
-fadeFilter.setAttribute("width","140%");
-fadeFilter.setAttribute("height","140%");
+  const fadeSvg=document.createElementNS(ns,"svg");
+  fadeSvg.setAttribute("class","fadeLayer");
+  fadeSvg.setAttribute("viewBox","0 0 "+VIEW_WIDTH+" "+VIEW_HEIGHT);
+  fadeSvg.setAttribute("preserveAspectRatio","none");
 
-const blur=document.createElementNS(ns,"feGaussianBlur");
-blur.setAttribute("stdDeviation",(5*scale).toFixed(3));
-fadeFilter.appendChild(blur);
-fadeDefs.appendChild(fadeFilter);
+  const defs=document.createElementNS(ns,"defs");
+  const mask=document.createElementNS(ns,"mask");
+  const maskId="agnostic45FadeMask";
+  mask.setAttribute("id",maskId);
+  mask.setAttribute("maskUnits","userSpaceOnUse");
+  mask.setAttribute("x","0");
+  mask.setAttribute("y","0");
+  mask.setAttribute("width",VIEW_WIDTH);
+  mask.setAttribute("height",VIEW_HEIGHT);
 
-const fadeMask=document.createElementNS(ns,"mask");
-fadeMask.setAttribute("id","hole5RouteFadeMask");
-fadeMask.setAttribute("maskUnits","userSpaceOnUse");
-fadeMask.setAttribute("x","0");
-fadeMask.setAttribute("y","0");
-fadeMask.setAttribute("width",VIEW_WIDTH);
-fadeMask.setAttribute("height",VIEW_HEIGHT);
+  const base=document.createElementNS(ns,"rect");
+  base.setAttribute("x","0");
+  base.setAttribute("y","0");
+  base.setAttribute("width",VIEW_WIDTH);
+  base.setAttribute("height",VIEW_HEIGHT);
+  base.setAttribute("fill","white");
+  mask.appendChild(base);
 
-const maskBase=document.createElementNS(ns,"rect");
-maskBase.setAttribute("x","0");
-maskBase.setAttribute("y","0");
-maskBase.setAttribute("width",VIEW_WIDTH);
-maskBase.setAttribute("height",VIEW_HEIGHT);
-maskBase.setAttribute("fill","white");
-fadeMask.appendChild(maskBase);
+  const routePath=document.createElementNS(ns,"path");
+  routePath.setAttribute("d",projectRoute(routeGeometry));
+  routePath.setAttribute("fill","none");
+  routePath.setAttribute("stroke","black");
+  routePath.setAttribute("stroke-width",(width_m*2*metresToViewUnits).toFixed(3));
+  routePath.setAttribute("stroke-linecap","round");
+  routePath.setAttribute("stroke-linejoin","round");
 
-const maskRoute=document.createElementNS(ns,"path");
-maskRoute.setAttribute("d",pathFromGeometry(hole5Route.geometry));
-maskRoute.setAttribute("fill","none");
-maskRoute.setAttribute("stroke","black");
-maskRoute.setAttribute("stroke-width",(80*scale).toFixed(3));
-maskRoute.setAttribute("stroke-linecap","round");
-maskRoute.setAttribute("stroke-linejoin","round");
-maskRoute.setAttribute("filter","url(#hole5FadeBlur)");
-fadeMask.appendChild(maskRoute);
+  const filter=document.createElementNS(ns,"filter");
+  const filterId="agnostic45FadeSoftness";
+  filter.setAttribute("id",filterId);
+  filter.setAttribute("x","-30%");
+  filter.setAttribute("y","-30%");
+  filter.setAttribute("width","160%");
+  filter.setAttribute("height","160%");
+  const blur=document.createElementNS(ns,"feGaussianBlur");
+  blur.setAttribute("stdDeviation",(transition_m*0.45*metresToViewUnits).toFixed(3));
+  filter.appendChild(blur);
+  defs.appendChild(filter);
 
-fadeDefs.appendChild(fadeMask);
-fadeSvg.appendChild(fadeDefs);
+  routePath.setAttribute("filter","url(#"+filterId+")");
+  mask.appendChild(routePath);
+  defs.appendChild(mask);
+  fadeSvg.appendChild(defs);
 
-const fadeVeil=document.createElementNS(ns,"rect");
-fadeVeil.setAttribute("x","0");
-fadeVeil.setAttribute("y","0");
-fadeVeil.setAttribute("width",VIEW_WIDTH);
-fadeVeil.setAttribute("height",VIEW_HEIGHT);
-fadeVeil.setAttribute("fill","#f4f1e6");
-fadeVeil.setAttribute("fill-opacity","0.68");
-fadeVeil.setAttribute("mask","url(#hole5RouteFadeMask)");
-fadeSvg.appendChild(fadeVeil);
+  const veil=document.createElementNS(ns,"rect");
+  veil.setAttribute("x","0");
+  veil.setAttribute("y","0");
+  veil.setAttribute("width",VIEW_WIDTH);
+  veil.setAttribute("height",VIEW_HEIGHT);
+  veil.setAttribute("fill","#f4f1e6");
+  veil.setAttribute("fill-opacity",String(veilOpacity));
+  veil.setAttribute("mask","url(#"+maskId+")");
+  fadeSvg.appendChild(veil);
 
-document.getElementById("screen").appendChild(fadeSvg);
+  screen.appendChild(fadeSvg);
+}
+
+const metresToViewUnits=scale;
+addAgnostic45FadeLayer(
+  document.getElementById("screen"),
+  hole5Route.geometry,
+  pathFromGeometry,
+  metresToViewUnits,
+  {corridorWidth_m:40,transitionWidth_m:20,veilOpacity:0.68}
+);
 
 
 const pTee=project(teeLL);
