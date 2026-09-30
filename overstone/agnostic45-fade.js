@@ -27,24 +27,26 @@
     full.setAttribute("fill","white");
     mask.appendChild(full);
 
-    const soft=document.createElementNS(ns,"path");
-    soft.setAttribute("d",routePath);
-    soft.setAttribute("fill","none");
-    soft.setAttribute("stroke","black");
-    soft.setAttribute("stroke-width",String((corridor+fade)*2*metresToViewUnits));
-    soft.setAttribute("stroke-linecap","round");
-    soft.setAttribute("stroke-linejoin","round");
-
-    const filter=document.createElementNS(ns,"filter");
-    filter.setAttribute("id","agnostic45-fade-blur");
-    filter.setAttribute("x","-50%"); filter.setAttribute("y","-50%");
-    filter.setAttribute("width","200%"); filter.setAttribute("height","200%");
-    const blur=document.createElementNS(ns,"feGaussianBlur");
-    blur.setAttribute("stdDeviation",String(fade*1.0*metresToViewUnits));
-    filter.appendChild(blur);
-    defs.appendChild(filter);
-    soft.setAttribute("filter","url(#agnostic45-fade-blur)");
-    mask.appendChild(soft);
+    // Build a true graduated mask from the 40 yd clear corridor
+    // outward to the 60 yd fade limit. Multiple overlapping translucent
+    // strokes give us a stable, continuous-looking falloff without relying
+    // on renderer-specific SVG blur behaviour.
+    const steps=12;
+    for(let i=0;i<steps;i++){
+      const t=i/(steps-1);
+      const widthMetres=corridor + fade*(1-t);
+      const stroke=document.createElementNS(ns,"path");
+      stroke.setAttribute("d",routePath);
+      stroke.setAttribute("fill","none");
+      stroke.setAttribute("stroke","black");
+      stroke.setAttribute("stroke-width",String(widthMetres*2*metresToViewUnits));
+      stroke.setAttribute("stroke-linecap","round");
+      stroke.setAttribute("stroke-linejoin","round");
+      // Stronger masking nearer the clear corridor, very light at the edge.
+      const opacity=0.055 + 0.055*t;
+      stroke.setAttribute("stroke-opacity",String(opacity));
+      mask.appendChild(stroke);
+    }
 
     const clear=document.createElementNS(ns,"path");
     clear.setAttribute("d",routePath);
