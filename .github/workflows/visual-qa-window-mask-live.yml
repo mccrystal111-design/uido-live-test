@@ -1,0 +1,124 @@
+name: AGNOSTIC45 Window Mask Live QA
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      holes:
+        description: "Comma-separated holes to capture"
+        required: true
+        default: "1,11,16"
+
+jobs:
+  visual-qa:
+    name: Render AGNOSTIC45 screenshots
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.55.0-noble
+      options: --user 1001
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Playwright package
+        run: npm install --no-save playwright@1.55.0
+
+      - name: Start local server
+        run: |
+          python3 -m http.server 8080 --bind 127.0.0.1 >/tmp/uido-http.log 2>&1 &
+          echo $! >/tmp/uido-http.pid
+
+      - name: Capture AGNOSTIC45
+        env:
+          HOLES: ${{ inputs.holes }}
+        run: |
+          mkdir -p visual-qa
+          cat > /tmp/capture-agnostic45.mjs <<'EOF'
+          const { chromium } = await import(`${process.cwd()}/node_modules/playwright/index.mjs`);
+          import fs from 'node:fs';
+
+          const holes = (process.env.HOLES || '1,11,16')
+            .split(',')
+            .map(value => Number(value.trim()))
+            .filter(Number.isInteger);
+
+          const browser = await chromium.launch({ headless: true });
+          const context = await browser.newContext({
+            viewport: { width: 390, height: 844 },
+            deviceScaleFactor: 1
+          });
+
+          const diagnostics = [];
+
+          for (const hole of holes) {
+            const page = await context.newPage();
+            const consoleMessages = [];
+            const pageErrors = [];
+
+            page.on('console', message => {
+              consoleMessages.push({
+                type: message.type(),
+                text: message.text()
+              });
+            });
+
+            page.on('pageerror', error => {
+              pageErrors.push(String(error));
+            });
+
+            const url = `http://127.0.0.1:8080/overstone/ui-hole-renderer-agnostic45-window-mask.html?hole=${hole}`;
+
+            await page.goto(url, { waitUntil: 'networkidle' });
+            await page.locator('#courseSvg').waitFor({ state: 'visible' });
+            await page.waitForTimeout(250);
+
+            const state = await page.evaluate(() => ({
+              title: document.title,
+              svg: {
+                width: document.querySelector('#courseSvg')?.getAttribute('viewBox'),
+                renderedGeometryPaths:
+                  document.querySelectorAll('#renderedGeometry path').length,
+                playline:
+                  Boolean(document.querySelector('#courseSvg .playline')),
+                clip:
+                  Boolean(document.querySelector('#holeViewClip'))
+              }
+            }));
+
+            await page.screenshot({
+              path: `visual-qa/agnostic45-hole-${hole}.png`,
+              fullPage: false,
+              animations: 'disabled'
+            });
+
+            diagnostics.push({
+              hole,
+              url,
+              state,
+              consoleMessages,
+              pageErrors
+            });
+
+            await page.close();
+          }
+
+          await browser.close();
+          fs.writeFileSync(
+            'visual-qa/diagnostics.json',
+            JSON.stringify(diagnostics, null, 2)
+          );
+          EOF
+
+          node /tmp/capture-agnostic45.mjs
+
+      - name: Upload screenshots and diagnostics
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: agnostic45-visual-qa
+          path: visual-qa/
+          retention-days: 7
+          if-no-files-found: error
