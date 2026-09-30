@@ -27,14 +27,14 @@
     full.setAttribute("fill","white");
     mask.appendChild(full);
 
-    // Three nested black strokes create the mask graduation. Each is
-    // blurred by a different amount; because they are opaque mask paint,
-    // the blur produces real luminance values rather than relying on
-    // stroke opacity, which is unreliable inside an SVG luminance mask.
+    // Use overlapping soft mask fields only. There is deliberately NO exact
+    // 40-yard mask boundary: an exact black stroke creates the hard ring seen
+    // in the renderer. The innermost field stops short of the corridor edge
+    // and its blur carries the transition across it.
     const treatments=[
-      {extraYards:7,  blurYards:4},
-      {extraYards:22, blurYards:11},
-      {extraYards:45, blurYards:24}
+      {extraYards:3,  blurYards:7},
+      {extraYards:20, blurYards:15},
+      {extraYards:45, blurYards:28}
     ];
     treatments.forEach((treatment,index)=>{
       const stroke=document.createElementNS(ns,"path");
@@ -57,29 +57,6 @@
       stroke.setAttribute("filter","url(#"+filterId+")");
       mask.appendChild(stroke);
     });
-
-    // Finish with a lightly blurred clear corridor. Do not use a hard-edged
-    // unfiltered stroke here: that would create the visible ring we are trying
-    // to remove. The centre is still effectively clear, while its boundary
-    // dissolves into the broader treatments above.
-    const clearFilter=document.createElementNS(ns,"filter");
-    clearFilter.setAttribute("id","agnostic45-fade-clear-soft");
-    clearFilter.setAttribute("x","-50%"); clearFilter.setAttribute("y","-50%");
-    clearFilter.setAttribute("width","200%"); clearFilter.setAttribute("height","200%");
-    const clearBlur=document.createElementNS(ns,"feGaussianBlur");
-    clearBlur.setAttribute("stdDeviation",String(2.5*0.9144*metresToViewUnits));
-    clearFilter.appendChild(clearBlur);
-    defs.appendChild(clearFilter);
-
-    const clear=document.createElementNS(ns,"path");
-    clear.setAttribute("d",routePath);
-    clear.setAttribute("fill","none");
-    clear.setAttribute("stroke","black");
-    clear.setAttribute("stroke-width",String(corridor*2*metresToViewUnits));
-    clear.setAttribute("stroke-linecap","round");
-    clear.setAttribute("stroke-linejoin","round");
-    clear.setAttribute("filter","url(#agnostic45-fade-clear-soft)");
-    mask.appendChild(clear);
 
     defs.appendChild(mask);
     svg.appendChild(defs);
