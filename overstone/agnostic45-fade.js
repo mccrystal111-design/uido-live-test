@@ -27,18 +27,18 @@
     full.setAttribute("fill","white");
     mask.appendChild(full);
 
-    // Use overlapping soft mask fields only. There is deliberately NO exact
-    // 40-yard mask boundary: an exact black stroke creates the hard ring seen
-    // in the renderer. The innermost field stops short of the corridor edge
-    // and its blur carries the transition across it.
+    // Full-screen route-relative vignette. The fade is defined by distance
+    // from the route, but its outer field reaches the screen boundary so the
+    // capture window never creates a second visible rectangle.
     const treatments=[
-      {extraYards:3,  blurYards:7},
-      {extraYards:20, blurYards:15},
-      {extraYards:45, blurYards:28}
+      {extraYards:4,  blurYards:9},
+      {extraYards:18, blurYards:18},
+      {extraYards:42, blurYards:34},
+      {extraYards:70, blurYards:52}
     ];
     treatments.forEach((treatment,index)=>{
       const stroke=document.createElementNS(ns,"path");
-      const filterId="agnostic45-fade-treatment-"+index;
+      const filterId="agnostic45-vignette-"+index;
       const filter=document.createElementNS(ns,"filter");
       filter.setAttribute("id",filterId);
       filter.setAttribute("x","-100%"); filter.setAttribute("y","-100%");
