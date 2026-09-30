@@ -27,14 +27,15 @@
     full.setAttribute("fill","white");
     mask.appendChild(full);
 
-    // Build a true graduated mask from the 40 yd clear corridor
-    // outward to the 60 yd fade limit. Multiple overlapping translucent
-    // strokes give us a stable, continuous-looking falloff without relying
-    // on renderer-specific SVG blur behaviour.
-    const steps=12;
+    // Build a long-tailed graduation. The visible fade should not have a
+    // detectable outer edge, so the transition continues well beyond the
+    // main 40–60 yd presentation zone.
+    const steps=32;
+    const fadeTailYards=40;
+    const fadeTail=fadeTailYards*0.9144;
     for(let i=0;i<steps;i++){
       const t=i/(steps-1);
-      const widthMetres=corridor + fade*(1-t);
+      const widthMetres=corridor + fadeTail*(1-t);
       const stroke=document.createElementNS(ns,"path");
       stroke.setAttribute("d",routePath);
       stroke.setAttribute("fill","none");
@@ -42,8 +43,8 @@
       stroke.setAttribute("stroke-width",String(widthMetres*2*metresToViewUnits));
       stroke.setAttribute("stroke-linecap","round");
       stroke.setAttribute("stroke-linejoin","round");
-      // Stronger masking nearer the clear corridor, very light at the edge.
-      const opacity=0.055 + 0.055*t;
+      // Very light at the outer edge, progressively stronger toward 40 yd.
+      const opacity=0.018 + 0.032*t;
       stroke.setAttribute("stroke-opacity",String(opacity));
       mask.appendChild(stroke);
     }
