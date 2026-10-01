@@ -148,7 +148,7 @@ summary = {
     "schema":"uido.ag45.visual-qa.v1",
     "created_at_utc":datetime.now(timezone.utc).isoformat(),
     "repository":os.environ.get("GITHUB_REPOSITORY",""),
-    "source_sha":source_sha, "run_url":run_url, "candidate_html":target,
+    "source_sha":source_sha, "approved_base_commit":"abf82bf297c439810e2d0a8ae1cac8e75283c91b", "run_url":run_url, "candidate_html":target,
     "requested_change":requested_change, "holes":holes,
     "viewports":[{"width":w,"height":h} for w,h in viewports],
     "important_note":"Automated browser/SVG checks are evidence, not visual approval. Inspect every screenshot and compare SVG geometry with the requested change.",
