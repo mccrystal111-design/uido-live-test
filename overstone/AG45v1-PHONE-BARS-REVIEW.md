@@ -18,18 +18,13 @@
 
 The approved AG45v1 HTML is unchanged. This is a separate review copy. Do not promote it to the canonical base without explicit user approval.
 
-## Manual Playwright visual QA
+## Automated Playwright visual QA
 
 Workflow: [AGNOSTIC45 Phone Bars Visual QA](https://github.com/mccrystal111-design/uido-live-test/actions/workflows/visual-qa-agnostic45.yml)
 
-1. Open the workflow link and select **Run workflow**.
-2. Leave **Use workflow from** on the intended branch (normally `main`).
-3. Default holes: `9`. Default viewports: `390x844,360x640,768x1024,1440x900`.
-4. Start the workflow manually. It is intentionally configured for `workflow_dispatch` only; commits do not trigger it automatically.
-5. Open the completed run and download the `ag45v1-phone-bars-visual-qa` artifact.
-6. Inspect every screenshot in `visual-qa/phone-bars/`, then review `diagnostics.json`.
+The workflow runs automatically on `main` when the candidate HTML, QA script, or workflow file changes. It also retains `workflow_dispatch` as a manual fallback. Automatic runs use the default candidate `overstone/ag45v1-phone-bars-review.html`, hole `9`, and viewport matrix `390x844,360x640,768x1024,1440x900`. Open the resulting Actions run and download its `ag45-visual-qa-*` artifact.
 
-The browser run checks the three bar boundaries, the 8% bar heights, viewport boundaries, page overflow, SVG clipping/playline, rendered geometry, HTTP status, console warnings/errors, and JavaScript exceptions across each hole/viewport combination. These checks are diagnostic, not a substitute for visually inspecting the screenshots: confirm the course is correctly framed, the route is not unexpectedly cropped or distorted, the side panel and bars are flush, and the central viewing area is usable at phone sizes.
+The browser run checks bar geometry and alignment, viewport boundaries, page overflow, SVG clipping/playline, rendered geometry, HTTP status, console warnings/errors, and JavaScript exceptions across each hole/viewport combination. These checks are diagnostic, not a substitute for visually inspecting the screenshots: confirm the course is correctly framed, the route is not unexpectedly cropped or distorted, the side panel and bars are flush, and the central viewing area is usable at phone sizes.
 
 ## Verification status
 
