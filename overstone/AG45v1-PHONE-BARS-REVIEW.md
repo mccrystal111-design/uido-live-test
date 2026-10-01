@@ -34,3 +34,8 @@ The browser run checks the three bar boundaries, the 8% bar heights, viewport bo
 ## Verification status
 
 The workflow has been updated to target this review copy and capture the viewport matrix. **It has not been run**, and GitHub Pages deployment/live rendering and screenshot appearance have not yet been verified. No GitHub Actions run was started by this change.
+
+
+## Isolated QA contract
+
+The manual workflow is defined in [AGNOSTIC45 Visual QA (Manual)](../.github/workflows/visual-qa-agnostic45.yml). The step-by-step approval and evidence protocol is [AG45 Visual QA Protocol](AG45-VISUAL-QA-PROTOCOL.md). The workflow tests a candidate from the selected commit on localhost, captures screenshots and SVG/browser diagnostics, and never deploys or promotes a candidate. Run it only when a requested change is ready for review; do not trigger it automatically on commits.
