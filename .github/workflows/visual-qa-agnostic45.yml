@@ -82,9 +82,9 @@ jobs:
                   Boolean(document.querySelector('#courseSvg .playline')),
                 clip:
                   Boolean(document.querySelector('#holeViewClip')),
-                cloudMaskLoaded: (() => {
+                cloudMask4Loaded: (() => {
                   const mask = document.querySelector('#cloudMaskV3');
-                  return Boolean(mask && mask.href.baseVal && mask.href.baseVal.includes('Uido-mask-v3.svg'));
+                  return Boolean(mask && mask.href.baseVal && mask.href.baseVal.includes('Uido-mask-4.svg'));
                 })()
               }
             }));
