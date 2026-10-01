@@ -2,17 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f4f1e6">
+<link rel="manifest" href="./ag45v1-phone-bars.webmanifest">
 <title>AG45v1 — Phone Bars Review — Hole 9</title>
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dfe4d8}
 #stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px}
 #screen{position:relative;width:min(calc(100vw - 40px),calc((100vh - 40px)*9/16));height:min(calc(100vh - 40px),calc((100vw - 40px)*16/9));background:#f4f1e6;overflow:hidden}
-#topBar{position:absolute;left:0;top:0;width:100%;height:8%;background:#f4f1e6;border-bottom:1px solid #c9c7b8;z-index:5}
-#courseViewport{position:absolute;left:0;top:8%;width:100%;height:84%;overflow:hidden;z-index:1}
-#rightRail{position:absolute;right:0;top:8%;width:40%;height:92%;background:#f4f1e6;border-left:1px solid #c9c7b8;z-index:4}
-#bottomBar{position:absolute;left:0;bottom:0;width:60%;height:8%;background:#f4f1e6;border-top:1px solid #c9c7b8;z-index:5}
+#topBar{position:absolute;left:0;top:0;width:100%;height:3%;background:#f4f1e6;z-index:5}
+#courseViewport{position:absolute;left:0;top:3%;width:100%;height:94%;overflow:hidden;z-index:1}
+#rightRail{position:absolute;right:0;top:3%;width:40%;height:97%;background:#f4f1e6;z-index:4}
+#bottomBar{position:absolute;left:0;bottom:0;width:60%;height:3%;background:#f4f1e6;z-index:5}
 .grid{position:absolute;inset:0;background-image:linear-gradient(to right,#16231b22 1px,transparent 1px),linear-gradient(to bottom,#16231b22 1px,transparent 1px);background-size:10% 10%;z-index:1}
 .course{position:absolute;inset:0;z-index:2;pointer-events:none}
 svg{width:100%;height:100%;display:block}
@@ -24,6 +26,7 @@ svg{width:100%;height:100%;display:block}
 .path{fill:none;stroke:#a7a28f;stroke-width:.45;stroke-linecap:round;stroke-linejoin:round}
 .playline{fill:none;stroke:#3f4b3b;stroke-width:.45;stroke-dasharray:1.2 1}
 .teeBox{fill:#c8c6a8;stroke:#7d8069;stroke-width:.35}
+@media (display-mode:standalone){#stage{padding:0}#screen{width:100vw;width:100dvw;height:100vh;height:100dvh;max-width:none;max-height:none}}
 </style>
 </head>
 <body>
@@ -33,9 +36,9 @@ svg{width:100%;height:100%;display:block}
 <div class="grid"></div>
 <div class="course">
 <!-- The SVG keeps the full portrait frame; the right rail overlays the non-playable 40%. -->
-<svg id="courseSvg" viewBox="0 0 100 149.3333333333" preserveAspectRatio="none">
+<svg id="courseSvg" viewBox="0 0 100 167.1111111111" preserveAspectRatio="none">
 <defs>
-<clipPath id="holeViewClip" clipPathUnits="userSpaceOnUse"><rect x="0" y="0" width="60" height="149.3333333333"></rect></clipPath>
+<clipPath id="holeViewClip" clipPathUnits="userSpaceOnUse"><rect x="0" y="0" width="60" height="167.1111111111"></rect></clipPath>
 </defs>
 <g id="renderedGeometry" clip-path="url(#holeViewClip)"></g>
 </svg>
@@ -98,7 +101,7 @@ const hole=canonical.holes.find(h=>h.hole_number===holeNumber);
 const direction=window.UiDoHoleViewBuilder.directionFromRoute(hole.routing);
 
 const VIEW_WIDTH=100;
-const VIEW_HEIGHT=100*16/9*.84;
+const VIEW_HEIGHT=100*16/9*.94;
 const PLAYABLE_WIDTH=60;
 const FIT_FRACTION=.82;
 const VIEW_CENTER=[PLAYABLE_WIDTH/2,VIEW_HEIGHT/2];
@@ -263,6 +266,9 @@ console.info("AGNOSTICBASE45 geometry review",{
   visibleFeatureCount:visibleFeatures.length
 });
 document.title="AG45v1 — Phone Bars Review — Hole "+holeNumber;
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("../sw.js", {scope:"../"}).catch(error => console.warn("UiDo review service worker registration failed", error)));
+}
 </script>
 </body>
 </html>
