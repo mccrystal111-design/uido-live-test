@@ -19,6 +19,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dfe4d8}
 svg{width:100%;height:100%;display:block}
 .fairway{fill:#9cad83;stroke:#5f7254;stroke-width:.35}
 .green{fill:#b9caa0;stroke:#4d6543;stroke-width:.45}
+.green.activeGreen{stroke:#F2C900;stroke-width:.8}
 .bunker{fill:#d8c9a0;stroke:#8c7950;stroke-width:.4}
 .rough{fill:#b9c7ae;stroke:#8d9e85;stroke-width:.22}
 .water{fill:#d9dce0;stroke:#4d5258;stroke-width:.35}
@@ -233,6 +234,20 @@ function pathFromGeometry(geometry){
   }
   return null;
 }
+// Identify the active hole's green by matching its source polygon's
+// vertex mean to the source model's green-middle coordinate.
+const greenMiddleLonLat=[selectedSource.green_fmb.middle[1],selectedSource.green_fmb.middle[0]];
+const activeGreenFeatureId=(selectedSource.features||[])
+  .filter(feature=>String(feature.golf||"").toUpperCase()==="GREEN"&&feature.geometry&&feature.geometry.type==="Polygon")
+  .map(feature=>{
+    const ring=feature.geometry.coordinates[0]||[];
+    const points=ring.filter(point=>Array.isArray(point)&&point.length>=2);
+    const mean=points.reduce((sum,point)=>[sum[0]+point[0],sum[1]+point[1]],[0,0]).map(value=>value/Math.max(1,points.length));
+    const distance=Math.hypot(mean[0]-greenMiddleLonLat[0],mean[1]-greenMiddleLonLat[1]);
+    return {id:String(feature.id),distance};
+  })
+  .sort((a,b)=>a.distance-b.distance)[0]?.id;
+
 function addFeature(feature){
   const d=pathFromGeometry(feature.geometry);
   if(!d) return;
@@ -244,7 +259,7 @@ function addFeature(feature){
   }[type];
   if(!cls) return;
   const element=document.createElementNS("http://www.w3.org/2000/svg","path");
-  element.setAttribute("class",cls);
+  element.setAttribute("class",cls+(type==="GREEN"&&String(feature.id)===activeGreenFeatureId?" activeGreen":""));
   element.setAttribute("d",d);
   document.getElementById("renderedGeometry").appendChild(element);
 }
