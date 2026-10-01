@@ -77,7 +77,7 @@ with sync_playwright() as p:
                   const shapes = [...geometryRoot.querySelectorAll('path, polygon, polyline, rect, circle, ellipse, line, use')];
                   const counts = {};
                   for (const el of shapes) {
-                    const cls = (el.getAttribute('class') || '').trim().replace(/\\s+/g, '.');
+                    const cls = (el.getAttribute('class') || '').trim().replace(/\s+/g, '.');
                     const key = el.tagName.toLowerCase() + (cls ? '.' + cls : '');
                     counts[key] = (counts[key] || 0) + 1;
                   }
