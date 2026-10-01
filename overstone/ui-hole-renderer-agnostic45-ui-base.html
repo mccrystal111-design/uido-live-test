@@ -159,6 +159,7 @@ let windows=makeWindows(frame);
 let visibleFeatures=window.UiDoHoleViewBuilder.selectCourseGeometry(
   canonical.geometry.features,direction,windows.capture
 );
+// Keep the camera fit local to the active hole with a 25m geometry margin.
 // Use nearby feature vertices around the route, not every vertex in the
 // broad capture window. This avoids adjacent holes dominating the camera fit.
 const geometryFitForwardMin=routeMinForward-25;
