@@ -10,7 +10,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dfe4d8}
 #stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px}
 #screen{position:relative;width:min(calc(100vw - 40px),calc((100vh - 40px)*9/16));height:min(calc(100vh - 40px),calc((100vw - 40px)*16/9));background:#f4f1e6;overflow:hidden}
 .grid{position:absolute;inset:0;background-image:linear-gradient(to right,#16231b22 1px,transparent 1px),linear-gradient(to bottom,#16231b22 1px,transparent 1px);background-size:10% 10%;z-index:1}
- .course{position:absolute;left:0;top:0;width:60%;height:95%;z-index:2;pointer-events:none}.uiRight{position:absolute;right:0;top:0;width:40%;height:100%;background:#f4f1e6;z-index:5;padding:16px 12px 12px;display:flex;justify-content:center;align-items:flex-start;overflow:hidden}.uiRightLogo{display:block;flex:0 1 auto;width:100%;max-width:100%;height:auto;max-height:100%;object-fit:contain}.uiBottom{position:absolute;left:0;bottom:0;width:60%;height:5%;background:#f4f1e6;z-index:5}
+ .course{position:absolute;inset:0;z-index:2;pointer-events:none}
 svg{width:100%;height:100%;display:block}
 .fairway{fill:#9cad83;stroke:#5f7254;stroke-width:.35}
 .green{fill:#b9caa0;stroke:#4d6543;stroke-width:.45}
@@ -26,15 +26,15 @@ svg{width:100%;height:100%;display:block}
 <div id="stage"><div id="screen">
 <div class="grid"></div>
 <div class="course">
-<!-- SVG coordinates match the 60% playable width and 95% screen height. -->
-<svg id="courseSvg" viewBox="0 0 60 168.8888888889" preserveAspectRatio="none">
+<!-- Original full-screen AGNOSTIC45 base viewport. -->
+<svg id="courseSvg" viewBox="0 0 100 177.7777777778" preserveAspectRatio="none">
 <defs>
-<clipPath id="holeViewClip" clipPathUnits="userSpaceOnUse"><rect x="0" y="0" width="60" height="168.8888888889"></rect></clipPath>
+<clipPath id="holeViewClip" clipPathUnits="userSpaceOnUse"><rect x="0" y="0" width="60" height="177.7777777778"></rect></clipPath>
 </defs>
 <g id="renderedGeometry" clip-path="url(#holeViewClip)"></g>
 </svg>
 </div>
-<aside class="uiRight"><img class="uiRightLogo" src="../assets/Uido-Logo-New.svg" alt="UiDo"></aside><div class="uiBottom"></div></div></div>
+</div></div>
 
 <script src="course-source-model.js"></script>
 <script src="hole-view-builder.js"></script>
@@ -88,8 +88,8 @@ const canonical=buildRuntimeCanonical();
 const hole=canonical.holes.find(h=>h.hole_number===holeNumber);
 const direction=window.UiDoHoleViewBuilder.directionFromRoute(hole.routing);
 
-const VIEW_WIDTH=60;
-const VIEW_HEIGHT=(100*16/9)*0.95;
+const VIEW_WIDTH=100;
+const VIEW_HEIGHT=100*16/9;
 const PLAYABLE_WIDTH=60;
 const FIT_FRACTION=.82;
 const VIEW_CENTER=[PLAYABLE_WIDTH/2,VIEW_HEIGHT/2];
@@ -244,20 +244,6 @@ routeElement.setAttribute("class","playline");
 routeElement.setAttribute("d",pathFromGeometry(hole.routing.geometry));
 routeElement.setAttribute("clip-path","url(#holeViewClip)");
 document.getElementById("courseSvg").appendChild(routeElement);
-
-// V6 cloud mask overlays the course rendering only. Its transparent centre
-// leaves the playable hole visible; the ivory/cloud edge softens the viewport.
-// The right-side UI panel and bottom-left bar remain outside this SVG layer.
-const cloudMask=document.createElementNS("http://www.w3.org/2000/svg","image");
-cloudMask.setAttribute("id","cloudMaskV3");
-cloudMask.setAttribute("href","../assets/UiDo-mask-v6.svg");
-cloudMask.setAttribute("x","0");
-cloudMask.setAttribute("y","0");
-cloudMask.setAttribute("width",String(PLAYABLE_WIDTH));
-cloudMask.setAttribute("height",String(VIEW_HEIGHT));
-cloudMask.setAttribute("preserveAspectRatio","none");
-cloudMask.setAttribute("pointer-events","none");
-document.getElementById("courseSvg").appendChild(cloudMask);
 
 console.info("UiDo AGNOSTIC45 UI-base",{
   hole:holeNumber,
