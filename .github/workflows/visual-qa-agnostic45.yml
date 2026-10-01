@@ -1,6 +1,10 @@
 name: AGNOSTIC45 Visual QA
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'overstone/ui-hole-renderer-agnostic45-ui-base.html'
   workflow_dispatch:
     inputs:
       holes:
@@ -66,7 +70,7 @@ jobs:
               pageErrors.push(String(error));
             });
 
-            const url = `http://127.0.0.1:8080/overstone/ui-hole-renderer-agnostic45.html?hole=${hole}`;
+            const url = `http://127.0.0.1:8080/overstone/ui-hole-renderer-agnostic45-ui-base.html?hole=${hole}`;
 
             await page.goto(url, { waitUntil: 'networkidle' });
             await page.locator('#courseSvg').waitFor({ state: 'visible' });
@@ -81,7 +85,11 @@ jobs:
                 playline:
                   Boolean(document.querySelector('#courseSvg .playline')),
                 clip:
-                  Boolean(document.querySelector('#holeViewClip'))
+                  Boolean(document.querySelector('#holeViewClip')),
+                cloudMaskLoaded: (() => {
+                  const mask = document.querySelector('#cloudMaskV3');
+                  return Boolean(mask && mask.href.baseVal && mask.href.baseVal.includes('Uido-mask-v3.svg'));
+                })()
               }
             }));
 
