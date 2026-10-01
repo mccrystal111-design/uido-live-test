@@ -44,15 +44,15 @@ Phone-bars design target:
 - Course viewport uses the remaining central 84% height.
 - Adjust viewport height and SVG viewBox together; keep camera/projection and geometry selection separate.
 
-### QA automation status — do not overstate
-The workflow is configured for both `push` changes to selected candidate/QA files on `main` and manual `workflow_dispatch`. However, the automatic trigger has **not yet been proven end-to-end**: after the workflow configuration commit, a matching AG45 QA run was not found in the queried run results. The reason is not established.
-
-Before describing this as fixed:
-1. Make or identify a real, small candidate change.
-2. Verify whether that commit triggers the AG45 visual QA workflow.
-3. If it does not, inspect the Actions run/event evidence and troubleshoot the trigger.
-4. Current connected GitHub tools did not expose a workflow-dispatch/start-run action when last checked. Recheck available tools rather than assuming manual dispatch is possible.
-5. Never say QA passed unless there is a run and its result/artifacts have actually been inspected.
+### QA automation status
+- **Automatic push trigger proven:** a push to the QA workflow file started the AG45 visual QA workflow.
+- **Push-event defaults repaired:** the workflow now supplies defaults when `workflow_dispatch` inputs are absent.
+- **Playwright dependency repaired:** the job installs the matching Python package `playwright==1.52.0` into the official browser container.
+- **End-to-end run succeeded:** run [36906252066](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36906252066) rendered Hole 9 at all four default viewports, completed browser/SVG diagnostics with no fatal cases, and uploaded screenshots/diagnostics.
+- **Phone-bars layout restored in the candidate:** the review HTML now contains the top bar, course viewport, right rail and bottom bar; the approved canonical HTML was not edited.
+- **Latest layout-geometry QA:** run [36906376177](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36906376177) is testing the new explicit bar-dimension and alignment checks. Verify its final result and inspect its artifact before calling the current candidate QA-passed.
+- The workflow remains local-only: it does not deploy or promote the candidate. Live GitHub Pages state must be checked separately.
+- Manual `workflow_dispatch` remains available as a fallback; if a future tool cannot start a run, be transparent rather than claiming one was launched.
 
 The intended QA viewport matrix is `390x844,360x640,768x1024,1440x900`; the default target is the phone-bars candidate and default hole is `9`. Automated diagnostics cover page/layout bounds, bar dimensions, overflow, SVG details, HTTP status, browser console and JavaScript errors. Human screenshot inspection remains necessary.
 
@@ -66,4 +66,4 @@ The intended QA viewport matrix is `390x844,360x640,768x1024,1440x900`; the defa
 
 ## First task on resuming
 
-Check the current `main` HEAD, read this handover plus the base status, phone-bars review, QA protocol, workflow and QA script. Then continue the open task: **prove and, if needed, repair the automatic AG45 visual-QA trigger without disturbing the approved base**, and resume front-end work once the QA loop is dependable.
+Check the current `main` HEAD, read this handover plus the base status, phone-bars review, QA protocol, workflow and QA script. Then inspect the final result and screenshots from the current layout-geometry QA run. Fix any failed checks or visual defects in the candidate only, keep the approved base protected, and verify the live preview separately.
