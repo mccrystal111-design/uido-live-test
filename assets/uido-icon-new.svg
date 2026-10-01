@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1224" height="1224" viewBox="0 0 1224 1224">
+  <title>uido icon</title>
+  <desc>Gold golf ball above a matching golf tee, with transparent background.</desc>
+  <defs>
+    <radialGradient id="ballGold" cx="34%" cy="25%" r="82%">
+      <stop offset="0%" stop-color="#F3C33C"/>
+      <stop offset="48%" stop-color="#E9B127"/>
+      <stop offset="100%" stop-color="#D99A12"/>
+    </radialGradient>
+    <linearGradient id="teeGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D99A12"/>
+      <stop offset="46%" stop-color="#EAB32B"/>
+      <stop offset="100%" stop-color="#DDA018"/>
+    </linearGradient>
+  </defs>
+  <circle cx="614" cy="498" r="352" fill="url(#ballGold)"/>
+  <path d="M 535,862
+           C 516,862 521,873 535,882
+           C 564,900 583,925 592,956
+           C 600,986 603,1032 609,1141
+           C 610,1150 615,1154 623,1154
+           L 627,1154
+           C 635,1154 639,1150 640,1141
+           C 646,1032 649,986 657,956
+           C 666,925 685,900 714,882
+           C 728,873 733,862 714,862
+           Z"
+        fill="url(#teeGold)"/>
+</svg>
