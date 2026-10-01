@@ -132,16 +132,16 @@ with sync_playwright() as p:
                     def near(actual, expected):
                         return abs(actual - expected) <= tol
                     checks["top_bar_geometry"] = all((near(top_rect["x"], sx), near(top_rect["y"], sy),
-                        near(top_rect["width"], sw), near(top_rect["height"], sh * .08)))
+                        near(top_rect["width"], sw), near(top_rect["height"], sh * .03)))
                     checks["course_viewport_geometry"] = all((near(viewport_rect["x"], sx),
-                        near(viewport_rect["y"], sy + sh * .08), near(viewport_rect["width"], sw),
-                        near(viewport_rect["height"], sh * .84)))
+                        near(viewport_rect["y"], sy + sh * .03), near(viewport_rect["width"], sw),
+                        near(viewport_rect["height"], sh * .94)))
                     checks["right_rail_geometry"] = all((near(rail_rect["x"], sx + sw * .60),
-                        near(rail_rect["y"], sy + sh * .08), near(rail_rect["width"], sw * .40),
-                        near(rail_rect["height"], sh * .92)))
+                        near(rail_rect["y"], sy + sh * .03), near(rail_rect["width"], sw * .40),
+                        near(rail_rect["height"], sh * .97)))
                     checks["bottom_bar_geometry"] = all((near(bottom_rect["x"], sx),
-                        near(bottom_rect["y"], sy + sh * .92), near(bottom_rect["width"], sw * .60),
-                        near(bottom_rect["height"], sh * .08)))
+                        near(bottom_rect["y"], sy + sh * .97), near(bottom_rect["width"], sw * .60),
+                        near(bottom_rect["height"], sh * .03)))
                     checks["bars_meet_without_gaps"] = all((near(top_rect["bottom"], viewport_rect["y"]),
                         near(viewport_rect["bottom"], bottom_rect["y"]),
                         near(viewport_rect["right"], sx + sw),
