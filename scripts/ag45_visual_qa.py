@@ -159,7 +159,7 @@ summary = {
     "# Human visual review checklist\n\n"
     f"- Requested change: {requested_change or '(not supplied)'}\n"
     f"- Candidate: {target}\n- Source commit: {source_sha}\n\n"
-    "Review every PNG and diagnostics.json. Confirm the requested change is present; the approved camera/projection and course geometry have not shifted unexpectedly; SVG viewBox, clipping, rendered shape counts and bounds make sense; there is no unintended cropping, stretching, overflow, blank render, missing asset, console error or uncaught exception; and phone/desktop layouts remain usable.\n\n"
+    "Review every PNG, diagnostics.json, and each SVG dump under visual-qa/phone-bars/svg-dumps/. Confirm the requested change is present; the approved camera/projection and course geometry have not shifted unexpectedly; SVG markup, viewBox, clipping, rendered shape counts and bounds make sense; there is no unintended cropping, stretching, overflow, blank render, missing asset, console error or uncaught exception; and phone/desktop layouts remain usable.\n\n"
     "Automated checks are not visual approval. Record PASS / REVIEW / FAIL after comparing evidence with the requested change. This workflow never deploys, promotes, or overwrites the approved base.\n",
     encoding="utf-8",
 )
