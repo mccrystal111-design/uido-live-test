@@ -23,7 +23,7 @@ This is an isolated, manually started inspection tool for AGNOSTIC45 candidate p
 - Browser: Microsoft's Playwright Python container with Chromium.
 - Candidate source: the checked-out commit is served on localhost; tests do not rely on a potentially stale GitHub Pages deployment.
 - Inputs: candidate repository-relative HTML path, comma-separated hole numbers, viewport matrix, and a short statement of the intended change.
-- Evidence: per-case PNG screenshots, `diagnostics.json`, and `review-checklist.md`, uploaded even when checks fail.
+- Evidence: per-case PNG screenshots, raw rendered SVG dumps under `visual-qa/phone-bars/svg-dumps/`, `diagnostics.json`, and `review-checklist.md`, uploaded even when checks fail.
 - Automated checks: page response, document overflow, SVG presence and render size, SVG geometry presence, failed requests, uncaught page exceptions, and renderer geometry root where available.
 - Human checks: expected visual change, camera/course framing, geometry correctness, SVG clip/viewBox integrity, no unexpected distortion/cropping, bar/rail boundaries where present, and phone usability.
 - Results: **PASS** = requested change appears correct in code and visuals; **REVIEW** = ambiguous or needs human decision; **FAIL** = reproducible regression or requested change not implemented.
