@@ -263,7 +263,8 @@ const greenFlagWidth=6.8;
 const greenFlagHeight=10.2;
 greenFlag.setAttribute("href","../assets/uido-flag-icon.svg");
 greenFlag.setAttribute("x",String(greenMiddleSvg[0]-greenFlagWidth/2));
-greenFlag.setAttribute("y",String(greenMiddleSvg[1]-greenFlagHeight));
+// Anchor the actual pole base (SVG artwork ends at y=474/512) to the fixed green-middle coordinate.
+greenFlag.setAttribute("y",String(greenMiddleSvg[1]-greenFlagHeight*(474/512)));
 greenFlag.setAttribute("width",String(greenFlagWidth));
 greenFlag.setAttribute("height",String(greenFlagHeight));
 greenFlag.setAttribute("preserveAspectRatio","xMidYMid meet");
