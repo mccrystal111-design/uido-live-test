@@ -1,11 +1,6 @@
 name: AGNOSTIC45 Visual QA
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/visual-qa-agnostic45.yml"
-      - "overstone/ui-hole-renderer-agnostic45-ui-base.html"
   workflow_dispatch:
     inputs:
       holes:
@@ -71,7 +66,7 @@ jobs:
               pageErrors.push(String(error));
             });
 
-            const url = `http://127.0.0.1:8080/overstone/ui-hole-renderer-agnostic45-ui-base.html?hole=${hole}`;
+            const url = `http://127.0.0.1:8080/overstone/ui-hole-renderer-agnostic45.html?hole=${hole}`;
 
             await page.goto(url, { waitUntil: 'networkidle' });
             await page.locator('#courseSvg').waitFor({ state: 'visible' });
@@ -81,7 +76,6 @@ jobs:
               title: document.title,
               svg: {
                 width: document.querySelector('#courseSvg')?.getAttribute('viewBox'),
-                courseViewport: (() => { const r=document.querySelector('.course')?.getBoundingClientRect(); return r ? {width:r.width,height:r.height} : null; })(),
                 renderedGeometryPaths:
                   document.querySelectorAll('#renderedGeometry path').length,
                 playline:
