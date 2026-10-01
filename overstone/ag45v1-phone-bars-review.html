@@ -254,26 +254,6 @@ holeView.features.slice().sort((a,b)=>
   (renderOrder[String(b.type||"").toUpperCase()]??99)
 ).forEach(addFeature);
 
-// Subtle destination marker: the existing UiDo flag asset, anchored by its
-// base at the supplied green middle coordinate for whichever hole is selected.
-const greenMiddleGps=selectedSource.green_fmb.middle;
-const greenMiddleSvg=project([greenMiddleGps[1],greenMiddleGps[0]]);
-const greenFlag=document.createElementNS("http://www.w3.org/2000/svg","image");
-const greenFlagWidth=6.8;
-const greenFlagHeight=10.2;
-greenFlag.setAttribute("href","../assets/uido-flag-icon.svg");
-// The pole is at x=151/512 in the SVG artwork, not at the image centre. Anchor the pole itself to green middle.
-greenFlag.setAttribute("x",String(greenMiddleSvg[0]-greenFlagWidth*(151/512)));
-// Anchor the actual pole base (SVG artwork ends at y=474/512) to the fixed green-middle coordinate.
-greenFlag.setAttribute("y",String(greenMiddleSvg[1]-greenFlagHeight*(474/512)));
-greenFlag.setAttribute("width",String(greenFlagWidth));
-greenFlag.setAttribute("height",String(greenFlagHeight));
-greenFlag.setAttribute("preserveAspectRatio","xMidYMid meet");
-greenFlag.setAttribute("class","green-destination-flag");
-greenFlag.setAttribute("aria-label","Green centre");
-greenFlag.setAttribute("pointer-events","none");
-document.getElementById("renderedGeometry").appendChild(greenFlag);
-
 console.info("AGNOSTICBASE45 geometry review",{
   hole:holeNumber,
   direction,
