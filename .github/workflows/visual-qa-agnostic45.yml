@@ -1,6 +1,11 @@
 name: AGNOSTIC45 Visual QA
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/visual-qa-agnostic45.yml"
+      - "overstone/ui-hole-renderer-agnostic45-ui-base.html"
   workflow_dispatch:
     inputs:
       holes:
@@ -10,7 +15,7 @@ on:
 
 jobs:
   visual-qa:
-    name: Render AGNOSTIC45 screenshots
+    name: Render AGNOSTICBASE45 UI-base screenshots
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.55.0-noble
@@ -66,7 +71,7 @@ jobs:
               pageErrors.push(String(error));
             });
 
-            const url = `http://127.0.0.1:8080/overstone/ui-hole-renderer-agnostic45.html?hole=${hole}`;
+            const url = `http://127.0.0.1:8080/overstone/ui-hole-renderer-agnostic45-ui-base.html?hole=${hole}`;
 
             await page.goto(url, { waitUntil: 'networkidle' });
             await page.locator('#courseSvg').waitFor({ state: 'visible' });
