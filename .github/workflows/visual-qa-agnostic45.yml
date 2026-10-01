@@ -97,8 +97,20 @@ jobs:
                 const labels = document.querySelector('.axisLabels');
                 const gridStyle = grid ? getComputedStyle(grid) : null;
                 const labelStyle = labels ? getComputedStyle(labels) : null;
-                const xLabels = [...document.querySelectorAll('.xAxis span')].map(el => el.textContent.trim());
-                const yLabels = [...document.querySelectorAll('.yAxis span')].map(el => el.textContent.trim());
+                const xLabelElements = [...document.querySelectorAll('.xAxis span')];
+                const yLabelElements = [...document.querySelectorAll('.yAxis span')];
+                const xLabels = xLabelElements.map(el => el.textContent.trim());
+                const yLabels = yLabelElements.map(el => el.textContent.trim());
+                const xLabelRects = xLabelElements.map(el => {
+                  const r = el.getBoundingClientRect();
+                  return {left:r.left,right:r.right,top:r.top,bottom:r.bottom};
+                });
+                const xLabelsFitScreen = !!screen && xLabelRects.every(r =>
+                  r.left >= screen.x - 0.5 && r.right <= screen.right + 0.5
+                );
+                const xLabelsDoNotOverlap = xLabelRects.every((r,i) =>
+                  i === 0 || r.left >= xLabelRects[i-1].right - 0.5
+                );
                 const expectedRatio = 9/16;
                 const actualRatio = screen ? screen.width/screen.height : 0;
                 const tolerance = 0.006;
@@ -121,6 +133,8 @@ jobs:
                     labelsAboveGrid: !!labelStyle && Number(labelStyle.zIndex) > Number(gridStyle?.zIndex || 0),
                     xAxisHasElevenPercentLabels: xLabels.length === 11 && xLabels[0] === '0%' && xLabels[10] === '100%',
                     yAxisHasElevenPercentLabels: yLabels.length === 11 && yLabels[0] === '0%' && yLabels[10] === '100%',
+                    xAxisLabelsFitInsideScreen: xLabelsFitScreen,
+                    xAxisLabelsDoNotOverlap: xLabelsDoNotOverlap,
                     noHorizontalPageOverflow: document.documentElement.scrollWidth <= window.innerWidth,
                     noVerticalPageOverflow: document.documentElement.scrollHeight <= window.innerHeight
                   }
