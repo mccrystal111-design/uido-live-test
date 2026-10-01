@@ -1,12 +1,14 @@
 name: AGNOSTIC45 Visual QA
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       holes:
         description: "Comma-separated holes to capture"
         required: true
-        default: "1,11,16"
+        default: "2,13,17"
 
 jobs:
   visual-qa:
@@ -66,7 +68,7 @@ jobs:
               pageErrors.push(String(error));
             });
 
-            const url = `http://127.0.0.1:8080/overstone/ui-hole-renderer-agnostic45.html?hole=${hole}`;
+            const url = `http://127.0.0.1:8080/overstone/ui-viewport-grid-base3-ui.html?hole=${hole}`;
 
             await page.goto(url, { waitUntil: 'networkidle' });
             await page.locator('#courseSvg').waitFor({ state: 'visible' });
