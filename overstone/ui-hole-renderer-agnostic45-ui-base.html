@@ -26,7 +26,7 @@ svg{width:100%;height:100%;display:block}
 <div id="stage"><div id="screen">
 <div class="grid"></div>
 <div class="course">
-<svg id="courseSvg" viewBox="0 0 100 168.8888888889" preserveAspectRatio="none">
+<svg id="courseSvg" viewBox="0 0 60 168.8888888889" preserveAspectRatio="none">
 <defs>
 <clipPath id="holeViewClip" clipPathUnits="userSpaceOnUse"><rect x="0" y="0" width="60" height="168.8888888889"></rect></clipPath>
 </defs>
@@ -87,7 +87,7 @@ const canonical=buildRuntimeCanonical();
 const hole=canonical.holes.find(h=>h.hole_number===holeNumber);
 const direction=window.UiDoHoleViewBuilder.directionFromRoute(hole.routing);
 
-const VIEW_WIDTH=100;
+const VIEW_WIDTH=60;
 const VIEW_HEIGHT=(100*16/9)*0.95;
 const PLAYABLE_WIDTH=60;
 const FIT_FRACTION=.82;
@@ -114,38 +114,73 @@ function holeSpace(point){
 
 const routePoints=hole.routing.geometry.coordinates.slice();
 const destination=[hole.routing.destination.lon,hole.routing.destination.lat];
-const framingPoints=routePoints.concat([destination]).map(holeSpace);
-const minForward=Math.min(...framingPoints.map(p=>p.forward));
-const maxForward=Math.max(...framingPoints.map(p=>p.forward));
-const minLateral=Math.min(...framingPoints.map(p=>p.lateral));
-const maxLateral=Math.max(...framingPoints.map(p=>p.lateral));
-const forwardSpan=Math.max(1,maxForward-minForward);
-const lateralSpan=Math.max(1,maxLateral-minLateral);
-
-// Fit the actual hole route, not a fixed tee/green distance, into the
-// playable 60-unit frame. The same calculation is used for every hole.
-const scale=Math.min(
-  (VIEW_HEIGHT*FIT_FRACTION)/forwardSpan,
-  (PLAYABLE_WIDTH*FIT_FRACTION)/lateralSpan
-);
-const frameCenterForward=(minForward+maxForward)/2;
-const frameCenterLateral=(minLateral+maxLateral)/2;
-
-const halfViewForward=VIEW_HEIGHT/(2*scale);
-const viewingWindow=window.UiDoHoleViewBuilder.buildViewingWindow(direction,{
-  back_m:Math.max(0,halfViewForward-frameCenterForward),
-  forward_m:halfViewForward+frameCenterForward,
-  width_m:PLAYABLE_WIDTH/scale
-});
+const routeFramePoints=routePoints.concat([destination]).map(holeSpace);
+const routeMinForward=Math.min(...routeFramePoints.map(p=>p.forward));
+const routeMaxForward=Math.max(...routeFramePoints.map(p=>p.forward));
+const routeMinLateral=Math.min(...routeFramePoints.map(p=>p.lateral));
+const routeMaxLateral=Math.max(...routeFramePoints.map(p=>p.lateral));
 const fadeMarginM=45*.9144;
-const captureWindow=window.UiDoHoleViewBuilder.buildViewingWindow(direction,{
-  back_m:viewingWindow.back_m+fadeMarginM,
-  forward_m:viewingWindow.forward_m+fadeMarginM,
-  width_m:viewingWindow.width_m+fadeMarginM*2
-});
-const visibleFeatures=window.UiDoHoleViewBuilder.selectCourseGeometry(
-  canonical.geometry.features,direction,captureWindow
+
+function fitFrame(points){
+  const minF=Math.min(...points.map(p=>p.forward));
+  const maxF=Math.max(...points.map(p=>p.forward));
+  const minL=Math.min(...points.map(p=>p.lateral));
+  const maxL=Math.max(...points.map(p=>p.lateral));
+  const spanF=Math.max(1,maxF-minF);
+  const spanL=Math.max(1,maxL-minL);
+  return {
+    minForward:minF,maxForward:maxF,minLateral:minL,maxLateral:maxL,
+    scale:Math.min((VIEW_HEIGHT*FIT_FRACTION)/spanF,(PLAYABLE_WIDTH*FIT_FRACTION)/spanL),
+    centerForward:(minF+maxF)/2,
+    centerLateral:(minL+maxL)/2
+  };
+}
+function makeWindows(frame){
+  const halfViewForward=VIEW_HEIGHT/(2*frame.scale);
+  const viewing=window.UiDoHoleViewBuilder.buildViewingWindow(direction,{
+    back_m:Math.max(0,halfViewForward-frame.centerForward),
+    forward_m:halfViewForward+frame.centerForward,
+    width_m:PLAYABLE_WIDTH/frame.scale
+  });
+  const capture=window.UiDoHoleViewBuilder.buildViewingWindow(direction,{
+    back_m:viewing.back_m+fadeMarginM,
+    forward_m:viewing.forward_m+fadeMarginM,
+    width_m:viewing.width_m+fadeMarginM*2
+  });
+  return {viewing,capture};
+}
+
+// First find the physical features around the route, then include their
+// in-window geometry in the camera fit. This prevents doglegs and wide
+// greens/bunkers from being squeezed or cut off by a route-only fit.
+let frame=fitFrame(routeFramePoints);
+let windows=makeWindows(frame);
+let visibleFeatures=window.UiDoHoleViewBuilder.selectCourseGeometry(
+  canonical.geometry.features,direction,windows.capture
 );
+const captureRect=windows.capture.rect;
+const featureFramePoints=[];
+visibleFeatures.forEach(feature=>{
+  window.UiDoHoleViewBuilder.geometryPoints(feature.geometry).forEach(point=>{
+    const p=holeSpace(point);
+    if(p.forward>=captureRect.minForward&&p.forward<=captureRect.maxForward&&
+       p.lateral>=captureRect.minLateral&&p.lateral<=captureRect.maxLateral){
+      featureFramePoints.push(p);
+    }
+  });
+});
+if(featureFramePoints.length){
+  frame=fitFrame(routeFramePoints.concat(featureFramePoints));
+  windows=makeWindows(frame);
+  visibleFeatures=window.UiDoHoleViewBuilder.selectCourseGeometry(
+    canonical.geometry.features,direction,windows.capture
+  );
+}
+const scale=frame.scale;
+const frameCenterForward=frame.centerForward;
+const frameCenterLateral=frame.centerLateral;
+const viewingWindow=windows.viewing;
+const captureWindow=windows.capture;
 const holeView={
   features:visibleFeatures,
   direction_of_travel:direction,
