@@ -1,10 +1,6 @@
 name: AGNOSTIC45 Visual QA
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'overstone/ui-hole-renderer-agnostic45-ui-base.html'
   workflow_dispatch:
     inputs:
       holes:
