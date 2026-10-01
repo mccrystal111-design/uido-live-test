@@ -1,0 +1,20 @@
+{
+  "id": "./ag45v1-phone-bars-review.html",
+  "name": "UiDo — AG45v1 Hole Review",
+  "short_name": "UiDo Review",
+  "start_url": "./ag45v1-phone-bars-review.html?hole=9",
+  "scope": "../",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f1e6",
+  "theme_color": "#f4f1e6",
+  "description": "UiDo AG45v1 full-screen phone layout review",
+  "icons": [
+    {
+      "src": "../uido-icon-v2.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
