@@ -22,7 +22,7 @@ svg{width:100%;height:100%;display:block}
 .teeMarker{fill:#82956f;stroke:#526348;stroke-width:.4}
 .greenMarker{fill:none;stroke:#3f4b3b;stroke-width:.45}
 .status{position:absolute;left:8px;bottom:6px;font:8px/1.2 Arial,sans-serif;color:#526057;z-index:5;opacity:.75}
- .uiRight{position:absolute;right:0;top:0;width:40%;height:100%;background:#f4f1e6;z-index:5}.uiBottom{position:absolute;left:0;bottom:0;width:60%;height:5%;background:#f4f1e6;z-index:5}\n</style>
+.uiRight{position:absolute;right:0;top:0;width:40%;height:100%;background:#f4f1e6;z-index:5}.uiBottom{position:absolute;left:0;bottom:0;width:60%;height:5%;background:#f4f1e6;z-index:5}</style>
 </head>
 <body>
 <div id="stage"><div id="screen">
@@ -51,12 +51,15 @@ svg{width:100%;height:100%;display:block}
     <rect x="0" y="0" width="60" height="177.7777777778" fill="url(#roughFadeYGradient)"></rect>
   </mask>
 </svg></div>
-<div class="status">Hole 13 · Par 3 renderer · X10-X50 usable hole-view · same Base 3 projection · Par 3 composition only</div>
+<div class="uiRight"></div><div class="uiBottom"></div>
 </div></div>
 <script src="course-source-model.js?v=7188dc0cfe620e6be59111508e0c0ebc6a2d6fb3"></script>
 <script>
-const params=new URLSearchParams(window.location.search);\nconst holeNumber=Number(params.get("hole")||"13");\nconst source=window.UIDO_OVERSTONE_SOURCE_HOLES[String(holeNumber)];\nif(!source) throw new Error("BASE3 requires a valid ?hole=N");
-if(!source) throw new Error("Authoritative Hole 13 source model not found");
+const params=new URLSearchParams(window.location.search);
+const holeNumber=Number(params.get("hole")||"13");
+const source=window.UIDO_OVERSTONE_SOURCE_HOLES[String(holeNumber)];
+if(!source) throw new Error("BASE3 requires a valid ?hole=N");
+
 
 const VIEW_W=100, VIEW_H=(100*16/9)*0.95;
 const TEE_Y=VIEW_H*.90;
