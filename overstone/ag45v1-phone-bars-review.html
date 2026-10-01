@@ -3,18 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AG45v1 Phone Bars — Layout Review — Hole 9</title>
+<title>AG45v1 — APPROVED BASE — HOLE 9</title>
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dfe4d8}
 #stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px}
 #screen{position:relative;width:min(calc(100vw - 40px),calc((100vh - 40px)*9/16));height:min(calc(100vh - 40px),calc((100vw - 40px)*16/9));background:#f4f1e6;overflow:hidden}
-#courseViewport{position:absolute;left:0;right:0;top:8%;bottom:8%;z-index:2;overflow:hidden;pointer-events:none}
-.grid{position:absolute;inset:8% 0 8%;background-image:linear-gradient(to right,#16231b22 1px,transparent 1px),linear-gradient(to bottom,#16231b22 1px,transparent 1px);background-size:10% 10%;z-index:1;pointer-events:none}
-.course{position:absolute;inset:0;pointer-events:none}
-#topBar{position:absolute;left:0;right:0;top:0;height:8%;z-index:5;background:#d8d8d0;border-bottom:1px solid #8d9287}
-#rightBar{position:absolute;left:60%;right:0;top:8%;bottom:0;z-index:4;background:#c8d1c1;border-left:1px solid #8d9287}
-#bottomBar{position:absolute;left:0;right:40%;bottom:0;height:8%;z-index:5;background:#d8d8d0;border-top:1px solid #8d9287}
+.grid{position:absolute;inset:0;background-image:linear-gradient(to right,#16231b22 1px,transparent 1px),linear-gradient(to bottom,#16231b22 1px,transparent 1px);background-size:10% 10%;z-index:1}
+ .course{position:absolute;inset:0;z-index:2;pointer-events:none}
 svg{width:100%;height:100%;display:block}
 .fairway{fill:#9cad83;stroke:#5f7254;stroke-width:.35}
 .green{fill:#b9caa0;stroke:#4d6543;stroke-width:.45}
@@ -28,21 +24,16 @@ svg{width:100%;height:100%;display:block}
 </head>
 <body>
 <div id="stage"><div id="screen">
-<div id="rightBar" aria-label="Right-hand panel area"></div>
 <div class="grid"></div>
-<div id="courseViewport">
 <div class="course">
-<!-- AG45v1 geometry rendered in the reduced viewport; camera and route fitting logic retained. -->
-<svg id="courseSvg" viewBox="0 0 100 149.3333333333" preserveAspectRatio="none">
+<!-- Original full-screen AGNOSTIC45 base viewport. -->
+<svg id="courseSvg" viewBox="0 0 100 177.7777777778" preserveAspectRatio="none">
 <defs>
-<clipPath id="holeViewClip" clipPathUnits="userSpaceOnUse"><rect x="0" y="0" width="60" height="149.3333333333"></rect></clipPath>
+<clipPath id="holeViewClip" clipPathUnits="userSpaceOnUse"><rect x="0" y="0" width="60" height="177.7777777778"></rect></clipPath>
 </defs>
 <g id="renderedGeometry" clip-path="url(#holeViewClip)"></g>
 </svg>
 </div>
-</div>
-<div id="topBar" aria-label="Top notification bar"></div>
-<div id="bottomBar" aria-label="Bottom bar"></div>
 </div></div>
 
 <script src="course-source-model.js"></script>
@@ -98,7 +89,7 @@ const hole=canonical.holes.find(h=>h.hole_number===holeNumber);
 const direction=window.UiDoHoleViewBuilder.directionFromRoute(hole.routing);
 
 const VIEW_WIDTH=100;
-const VIEW_HEIGHT=100*16/9*.84;
+const VIEW_HEIGHT=100*16/9;
 const PLAYABLE_WIDTH=60;
 const FIT_FRACTION=.82;
 const VIEW_CENTER=[PLAYABLE_WIDTH/2,VIEW_HEIGHT/2];
@@ -254,7 +245,7 @@ routeElement.setAttribute("d",pathFromGeometry(hole.routing.geometry));
 routeElement.setAttribute("clip-path","url(#holeViewClip)");
 document.getElementById("courseSvg").appendChild(routeElement);
 
-console.info("AG45v1 phone bars layout review",{
+console.info("AGNOSTICBASE45 geometry review",{
   hole:holeNumber,
   direction,
   scale,
@@ -262,7 +253,7 @@ console.info("AG45v1 phone bars layout review",{
   viewingWindow,
   visibleFeatureCount:visibleFeatures.length
 });
-document.title="AG45v1 Phone Bars — Layout Review — Hole "+holeNumber;
+document.title="AG45v1 — Approved Base — Hole "+holeNumber;
 </script>
 </body>
 </html>
