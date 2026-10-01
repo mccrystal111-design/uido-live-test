@@ -79,6 +79,10 @@ jobs:
           print('Candidate: ' + target + '; holes: ' + ','.join(holes) + '; viewports: ' + ','.join(viewports))
           PY
 
+      - name: Install matching Playwright Python package
+        shell: bash
+        run: python -m pip install --disable-pip-version-check playwright==1.52.0
+
       - name: Start local static server
         shell: bash
         run: |
@@ -94,9 +98,9 @@ jobs:
       - name: Run Chromium visual and SVG diagnostics
         shell: bash
         env:
-          TARGET_HTML: ${{ inputs.target_html }}
-          HOLES: ${{ inputs.holes }}
-          VIEWPORTS: ${{ inputs.viewports }}
+          TARGET_HTML: ${{ inputs.target_html || 'overstone/ag45v1-phone-bars-review.html' }}
+          HOLES: ${{ inputs.holes || '9' }}
+          VIEWPORTS: ${{ inputs.viewports || '390x844,360x640,768x1024,1440x900' }}
           REQUESTED_CHANGE: ${{ inputs.requested_change || 'Automatic push-triggered visual QA' }}
           SOURCE_SHA: ${{ github.sha }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
