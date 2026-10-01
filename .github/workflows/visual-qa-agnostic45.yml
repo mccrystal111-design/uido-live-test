@@ -1,6 +1,15 @@
 name: AGNOSTIC45 Visual QA (Manual)
 
 on:
+  # Run QA automatically for changes to the candidate UI or QA harness.
+  # This workflow only renders locally and uploads diagnostics; it never deploys.
+  push:
+    branches:
+      - main
+    paths:
+      - 'overstone/ag45v1-phone-bars-review.html'
+      - 'scripts/ag45_visual_qa.py'
+      - '.github/workflows/visual-qa-agnostic45.yml'
   workflow_dispatch:
     inputs:
       target_html:
