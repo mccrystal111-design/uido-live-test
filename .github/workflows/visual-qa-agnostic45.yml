@@ -20,7 +20,7 @@ on:
       holes:
         description: "Comma-separated hole numbers to inspect"
         required: true
-        default: "1"
+        default: "1,9"
         type: string
       viewports:
         description: "Comma-separated WIDTHxHEIGHT viewports"
@@ -30,7 +30,7 @@ on:
       requested_change:
         description: "What visual/code change is this run intended to verify?"
         required: true
-        default: "Hole 1 visual QA — phone bars and course geometry"
+        default: "Course-agnostic QA — phone bars and course geometry"
         type: string
 
 permissions:
@@ -57,7 +57,7 @@ jobs:
         shell: bash
         env:
           TARGET_HTML: ${{ inputs.target_html || 'overstone/ag45v1-phone-bars-review.html' }}
-          HOLES: ${{ inputs.holes || '1' }}
+          HOLES: ${{ inputs.holes || '1,9' }}
           VIEWPORTS: ${{ inputs.viewports || '390x844,360x640,768x1024,1440x900' }}
         run: |
           set -euo pipefail
@@ -99,9 +99,9 @@ jobs:
         shell: bash
         env:
           TARGET_HTML: ${{ inputs.target_html || 'overstone/ag45v1-phone-bars-review.html' }}
-          HOLES: ${{ inputs.holes || '9' }}
+          HOLES: ${{ inputs.holes || '1,9' }}
           VIEWPORTS: ${{ inputs.viewports || '390x844,360x640,768x1024,1440x900' }}
-          REQUESTED_CHANGE: ${{ inputs.requested_change || 'Hole 1 visual QA — phone bars and course geometry' }}
+          REQUESTED_CHANGE: ${{ inputs.requested_change || 'Course-agnostic QA — phone bars and course geometry' }}
           SOURCE_SHA: ${{ github.sha }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: python scripts/ag45_visual_qa.py
