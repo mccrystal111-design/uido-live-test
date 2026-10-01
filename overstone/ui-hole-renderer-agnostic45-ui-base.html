@@ -159,13 +159,18 @@ let windows=makeWindows(frame);
 let visibleFeatures=window.UiDoHoleViewBuilder.selectCourseGeometry(
   canonical.geometry.features,direction,windows.capture
 );
-const captureRect=windows.capture.rect;
+// Use nearby feature vertices around the route, not every vertex in the
+// broad capture window. This avoids adjacent holes dominating the camera fit.
+const geometryFitForwardMin=routeMinForward-25;
+const geometryFitForwardMax=routeMaxForward+25;
+const geometryFitLateralMin=routeMinLateral-25;
+const geometryFitLateralMax=routeMaxLateral+25;
 const featureFramePoints=[];
 visibleFeatures.forEach(feature=>{
   window.UiDoHoleViewBuilder.geometryPoints(feature.geometry).forEach(point=>{
     const p=holeSpace(point);
-    if(p.forward>=captureRect.minForward&&p.forward<=captureRect.maxForward&&
-       p.lateral>=captureRect.minLateral&&p.lateral<=captureRect.maxLateral){
+    if(p.forward>=geometryFitForwardMin&&p.forward<=geometryFitForwardMax&&
+       p.lateral>=geometryFitLateralMin&&p.lateral<=geometryFitLateralMax){
       featureFramePoints.push(p);
     }
   });
