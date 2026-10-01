@@ -50,7 +50,7 @@ Phone-bars design target:
 - **Playwright dependency repaired:** the job installs the matching Python package `playwright==1.52.0` into the official browser container.
 - **End-to-end run succeeded:** run [36906252066](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36906252066) rendered Hole 9 at all four default viewports, completed browser/SVG diagnostics with no fatal cases, and uploaded screenshots/diagnostics.
 - **Phone-bars layout restored in the candidate:** the review HTML now contains the top bar, course viewport, right rail and bottom bar; the approved canonical HTML was not edited.
-- **Latest layout-geometry QA:** run [36906376177](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36906376177) is testing the new explicit bar-dimension and alignment checks. Verify its final result and inspect its artifact before calling the current candidate QA-passed.
+- **Layout-geometry QA passed:** run [36906688848](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36906688848) completed successfully on candidate commit `78cad854d177eb64dea1d56357db8a2a95584caa`. All four viewport cases passed every automated check, including top-bar height, course viewport height, right-rail split, bottom-bar dimensions, and gap-free joins; no console errors, page errors, failed HTTP requests, or fatal cases were recorded. Its screenshot/diagnostics artifact is `ag45-visual-qa-56`.
 - The workflow remains local-only: it does not deploy or promote the candidate. Live GitHub Pages state must be checked separately.
 - Manual `workflow_dispatch` remains available as a fallback; if a future tool cannot start a run, be transparent rather than claiming one was launched.
 
@@ -66,4 +66,4 @@ The intended QA viewport matrix is `390x844,360x640,768x1024,1440x900`; the defa
 
 ## First task on resuming
 
-Check the current `main` HEAD, read this handover plus the base status, phone-bars review, QA protocol, workflow and QA script. Then inspect the final result and screenshots from the current layout-geometry QA run. Fix any failed checks or visual defects in the candidate only, keep the approved base protected, and verify the live preview separately.
+Check the current `main` HEAD, read this handover plus the base status, phone-bars review, QA protocol, workflow and QA script. Then verify the live preview/deployment separately, review the phone-bars layout with Kieron, and continue the next front-end task in the candidate only. Keep the approved base protected.
