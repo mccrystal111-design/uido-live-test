@@ -125,25 +125,23 @@ with sync_playwright() as p:
                 rail_rect = rect_for("#rightRail")
                 viewport_rect = rect_for("#courseViewport")
                 bottom_rect = rect_for("#bottomBar")
-                checks["phone_bars_present"] = all((screen_rect, top_rect, rail_rect, viewport_rect, bottom_rect))
+                checks["system_status_bar_layout"] = top_rect is None
+                checks["phone_bars_present"] = all((screen_rect, rail_rect, viewport_rect, bottom_rect)) and top_rect is None
                 if checks["phone_bars_present"]:
                     sx, sy, sw, sh = screen_rect["x"], screen_rect["y"], screen_rect["width"], screen_rect["height"]
                     tol = 1.5
                     def near(actual, expected):
                         return abs(actual - expected) <= tol
-                    checks["top_bar_geometry"] = all((near(top_rect["x"], sx), near(top_rect["y"], sy),
-                        near(top_rect["width"], sw), near(top_rect["height"], sh * .03)))
                     checks["course_viewport_geometry"] = all((near(viewport_rect["x"], sx),
-                        near(viewport_rect["y"], sy + sh * .03), near(viewport_rect["width"], sw),
+                        near(viewport_rect["y"], sy), near(viewport_rect["width"], sw),
                         near(viewport_rect["height"], sh * .94)))
                     checks["right_rail_geometry"] = all((near(rail_rect["x"], sx + sw * .60),
-                        near(rail_rect["y"], sy + sh * .03), near(rail_rect["width"], sw * .40),
-                        near(rail_rect["height"], sh * .97)))
+                        near(rail_rect["y"], sy), near(rail_rect["width"], sw * .40),
+                        near(rail_rect["height"], sh)))
                     checks["bottom_bar_geometry"] = all((near(bottom_rect["x"], sx),
-                        near(bottom_rect["y"], sy + sh * .97), near(bottom_rect["width"], sw * .60),
-                        near(bottom_rect["height"], sh * .03)))
-                    checks["bars_meet_without_gaps"] = all((near(top_rect["bottom"], viewport_rect["y"]),
-                        near(viewport_rect["bottom"], bottom_rect["y"]),
+                        near(bottom_rect["y"], sy + sh * .94), near(bottom_rect["width"], sw * .60),
+                        near(bottom_rect["height"], sh * .06)))
+                    checks["bars_meet_without_gaps"] = all((near(viewport_rect["bottom"], bottom_rect["y"]),
                         near(viewport_rect["right"], sx + sw),
                         near(bottom_rect["right"], rail_rect["x"])))
                 checks["svg_present"] = len(svgs) > 0
