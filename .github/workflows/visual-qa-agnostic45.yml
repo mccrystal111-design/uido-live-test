@@ -1,0 +1,109 @@
+name: AGNOSTIC45 Visual QA (Manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_html:
+        description: "Candidate HTML page path inside the repository (tested locally; no deployment)"
+        required: true
+        default: "overstone/ag45v1-phone-bars-review.html"
+        type: string
+      holes:
+        description: "Comma-separated hole numbers to inspect"
+        required: true
+        default: "9"
+        type: string
+      viewports:
+        description: "Comma-separated WIDTHxHEIGHT viewports"
+        required: true
+        default: "390x844,360x640,768x1024,1440x900"
+        type: string
+      requested_change:
+        description: "What visual/code change is this run intended to verify?"
+        required: true
+        default: "Baseline visual inspection"
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ag45-visual-qa-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  visual-qa:
+    name: Render and inspect candidate (no deployment)
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.52.0-noble
+    timeout-minutes: 20
+    steps:
+      - name: Checkout selected source revision
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Validate requested target and inputs
+        shell: bash
+        env:
+          TARGET_HTML: ${{ inputs.target_html }}
+          HOLES: ${{ inputs.holes }}
+          VIEWPORTS: ${{ inputs.viewports }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os, re
+          from pathlib import Path
+          target = os.environ['TARGET_HTML'].strip()
+          path = Path(target)
+          if path.is_absolute() or '..' in path.parts or not target.lower().endswith('.html'):
+              raise SystemExit('target_html must be a repository-relative .html path without ..')
+          if not path.is_file():
+              raise SystemExit(f'target_html does not exist at the selected commit: {target}')
+          holes = [x.strip() for x in os.environ['HOLES'].split(',') if x.strip()]
+          if not holes or any(not re.fullmatch(r'\\d{1,2}', x) or not 1 <= int(x) <= 18 for x in holes):
+              raise SystemExit('holes must be comma-separated integers from 1 to 18')
+          viewports = [x.strip() for x in os.environ['VIEWPORTS'].split(',') if x.strip()]
+          if not viewports or any(not re.fullmatch(r'\\d{2,4}x\\d{2,4}', x) for x in viewports):
+              raise SystemExit('viewports must be comma-separated WIDTHxHEIGHT values')
+          print(f'Candidate: {target}; holes: {','.join(holes)}; viewports: {','.join(viewports)}')
+          PY
+
+      - name: Start local static server
+        shell: bash
+        run: |
+          python -m http.server 8765 --bind 127.0.0.1 >/tmp/ag45-http.log 2>&1 &
+          echo $! >/tmp/ag45-http.pid
+          for i in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:8765/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/ag45-http.log
+          exit 1
+
+      - name: Run Chromium visual and SVG diagnostics
+        shell: bash
+        env:
+          TARGET_HTML: ${{ inputs.target_html }}
+          HOLES: ${{ inputs.holes }}
+          VIEWPORTS: ${{ inputs.viewports }}
+          REQUESTED_CHANGE: ${{ inputs.requested_change }}
+          SOURCE_SHA: ${{ github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: python scripts/ag45_visual_qa.py
+
+      - name: Stop local static server
+        if: always()
+        shell: bash
+        run: |
+          if [ -f /tmp/ag45-http.pid ]; then kill "$(cat /tmp/ag45-http.pid)" 2>/dev/null || true; fi
+
+      - name: Upload screenshots and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ag45-visual-qa-${{ github.run_number }}
+          path: visual-qa/phone-bars/
+          if-no-files-found: warn
+          retention-days: 21
