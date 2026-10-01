@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>UiDo — AGNOSTICBASE45 — UI VIEWPORT BASE</title>
+<title>UiDo — AGNOSTIC45 — Clean Base Renderer</title>
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dfe4d8}
-#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px}
-#screen{position:relative;width:min(calc(100vw - 40px),calc((100vh - 40px)*9/16));height:min(calc(100vh - 40px),calc((100vw - 40px)*16/9));background:#f4f1e6;overflow:hidden}
-.grid{position:absolute;inset:0;background-image:linear-gradient(to right,#16231b22 1px,transparent 1px),linear-gradient(to bottom,#16231b22 1px,transparent 1px);background-size:10% 10%;z-index:1}
- .statusBar{position:absolute;left:0;top:0;width:100%;height:5%;background:#f4f1e6;z-index:4;display:flex;align-items:center;justify-content:space-between;padding:0 4%;color:#3f4b3b;font:500 10px/1 system-ui,sans-serif;letter-spacing:.01em}.statusLeft,.statusRight{display:flex;align-items:center;gap:8px}.statusIcon{width:12px;height:12px;display:block}.course{position:absolute;left:0;top:5%;width:60%;height:90%;z-index:2;pointer-events:none}.uiRight{position:absolute;right:0;top:5%;width:40%;height:95%;background:#f4f1e6;z-index:5;padding:16px 12px 12px;display:flex;justify-content:center;align-items:flex-start}.uiRightLogo{display:block;width:100%;max-width:100%;height:auto;object-fit:contain}.uiBottom{position:absolute;left:0;bottom:0;width:60%;height:5%;background:#f4f1e6;z-index:5}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:0;background:#f4f1e6}
+#screen{position:relative;width:min(100vw,calc(100vh*9/16));height:min(100vh,calc(100vw*16/9));background:#f4f1e6;overflow:hidden}
+
+.course{position:absolute;inset:0;z-index:2;pointer-events:none}
 svg{width:100%;height:100%;display:block}
 .fairway{fill:#9cad83;stroke:#5f7254;stroke-width:.35}
 .green{fill:#b9caa0;stroke:#4d6543;stroke-width:.45}
@@ -24,18 +24,14 @@ svg{width:100%;height:100%;display:block}
 </head>
 <body>
 <div id="stage"><div id="screen">
-<div class="grid"></div>
-<div class="statusBar" aria-label="Mobile status bar"><div class="statusLeft"><span id="statusTime">9:41</span></div><div class="statusRight" aria-label="Status indicators"><svg class="statusIcon" viewBox="0 0 16 16" aria-label="Notifications"><path d="M8 2.2a3 3 0 0 0-3 3v1.5c0 1.5-.6 2.6-1.6 3.6h9.2c-1-1-1.6-2.1-1.6-3.6V5.2a3 3 0 0 0-3-3ZM6.4 12.1a1.7 1.7 0 0 0 3.2 0" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg><svg class="statusIcon" viewBox="0 0 16 16" aria-hidden="true"><path d="M1 5.5C5 2 11 2 15 5.5M3.5 8C6 5.8 10 5.8 12.5 8M6 10.5C7.2 9.5 8.8 9.5 10 10.5M8 13h.01" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><svg class="statusIcon" viewBox="0 0 16 16" aria-hidden="true"><rect x="1" y="4" width="12" height="8" rx="1.4" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M14 6.5v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><rect x="3" y="6" width="7" height="4" rx=".5" fill="currentColor"/></svg></div></div>
 <div class="course">
-<!-- Course viewport begins below the reserved mobile status bar. -->
-<svg id="courseSvg" viewBox="0 0 100 160" preserveAspectRatio="none">
+<svg id="courseSvg" viewBox="0 0 100 177.7777777778" preserveAspectRatio="none">
 <defs>
-<clipPath id="holeViewClip" clipPathUnits="userSpaceOnUse"><rect x="0" y="0" width="100" height="160"></rect></clipPath>
+<clipPath id="holeViewClip" clipPathUnits="userSpaceOnUse"><rect x="0" y="0" width="100" height="177.7777777778"></rect></clipPath>
 </defs>
 <g id="renderedGeometry" clip-path="url(#holeViewClip)"></g>
 </svg>
 </div>
-<aside class="uiRight" aria-label="UiDo side panel"><img class="uiRightLogo" src="../assets/Uido-Logo-New.svg" alt="UiDo"></aside><div class="uiBottom" aria-label="Lower UI bar"></div>
 </div></div>
 
 <script src="course-source-model.js"></script>
@@ -91,8 +87,8 @@ const hole=canonical.holes.find(h=>h.hole_number===holeNumber);
 const direction=window.UiDoHoleViewBuilder.directionFromRoute(hole.routing);
 
 const VIEW_WIDTH=100;
-const VIEW_HEIGHT=(100*16/9)*0.90;
-const PLAYABLE_WIDTH=60;
+const VIEW_HEIGHT=100*16/9;
+const PLAYABLE_WIDTH=100;
 const FIT_FRACTION=.82;
 const VIEW_CENTER=[PLAYABLE_WIDTH/2,VIEW_HEIGHT/2];
 const EARTH_RADIUS=6371000;
@@ -241,13 +237,7 @@ holeView.features.slice().sort((a,b)=>
   (renderOrder[String(b.type||"").toUpperCase()]??99)
 ).forEach(addFeature);
 
-const routeElement=document.createElementNS("http://www.w3.org/2000/svg","path");
-routeElement.setAttribute("class","playline");
-routeElement.setAttribute("d",pathFromGeometry(hole.routing.geometry));
-routeElement.setAttribute("clip-path","url(#holeViewClip)");
-document.getElementById("courseSvg").appendChild(routeElement);
-
-console.info("UiDo AGNOSTIC45 UI-base",{
+console.info("UiDo AGNOSTIC45 clean base",{
   hole:holeNumber,
   direction,
   scale,
@@ -255,7 +245,7 @@ console.info("UiDo AGNOSTIC45 UI-base",{
   viewingWindow,
   visibleFeatureCount:visibleFeatures.length
 });
-document.title="UiDo — Hole "+holeNumber+" — AGNOSTICBASE45";
+document.title="UiDo — Hole "+holeNumber+" — AGNOSTIC45 Clean Base";
 </script>
 </body>
 </html>
