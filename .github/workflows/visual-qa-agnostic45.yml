@@ -1,4 +1,4 @@
-name: AGNOSTIC45 Phone Bars Visual QA
+name: AGNOSTIC45 Coordinate Grid Visual QA
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ on:
 
 jobs:
   visual-qa:
-    name: Render phone-bars review screenshots
+    name: Render coordinate-grid review screenshots
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.55.0-noble
@@ -32,12 +32,12 @@ jobs:
           python3 -m http.server 8080 --bind 127.0.0.1 >/tmp/uido-http.log 2>&1 &
           echo $! >/tmp/uido-http.pid
 
-      - name: Capture phone-bars review
+      - name: Capture coordinate-grid review
         env:
           HOLES: ${{ inputs.holes }}
           VIEWPORTS: ${{ inputs.viewports }}
         run: |
-          mkdir -p visual-qa/phone-bars
+          mkdir -p visual-qa/coordinate-grid
           cat > /tmp/capture-agnostic45.mjs <<'EOF'
           import fs from 'node:fs';
           const { chromium } = await import(`${process.cwd()}/node_modules/playwright/index.mjs`);
@@ -88,34 +88,39 @@ jobs:
                   const element = document.querySelector(selector);
                   if (!element) return null;
                   const r = element.getBoundingClientRect();
-                  return { x: r.x, y: r.y, width: r.width, height: r.height,
-                    right: r.right, bottom: r.bottom };
+                  return { x:r.x, y:r.y, width:r.width, height:r.height,
+                    right:r.right, bottom:r.bottom };
                 };
-                const top = rect('#topBar');
-                const right = rect('#rightBar');
-                const bottom = rect('#bottomBar');
-                const viewport = rect('#courseViewport');
                 const screen = rect('#screen');
                 const svg = document.querySelector('#courseSvg');
-                const tolerance = 1.1;
-                const close = (a, b) => Math.abs(a - b) <= tolerance;
+                const grid = document.querySelector('.grid');
+                const labels = document.querySelector('.axisLabels');
+                const gridStyle = grid ? getComputedStyle(grid) : null;
+                const labelStyle = labels ? getComputedStyle(labels) : null;
+                const xLabels = [...document.querySelectorAll('.xAxis span')].map(el => el.textContent.trim());
+                const yLabels = [...document.querySelectorAll('.yAxis span')].map(el => el.textContent.trim());
+                const expectedRatio = 9/16;
+                const actualRatio = screen ? screen.width/screen.height : 0;
+                const tolerance = 0.006;
                 return {
-                  title: document.title,
-                  screen, topBar: top, rightBar: right, bottomBar: bottom,
-                  courseViewport: viewport,
+                  title: document.title, screen,
                   svgViewBox: svg?.getAttribute('viewBox'),
+                  svgPreserveAspectRatio: svg?.getAttribute('preserveAspectRatio'),
                   renderedGeometryPaths: document.querySelectorAll('#renderedGeometry path').length,
                   playline: Boolean(document.querySelector('#courseSvg .playline')),
                   clip: Boolean(document.querySelector('#holeViewClip')),
+                  grid: grid ? { rect:rect('.grid'), backgroundImage:gridStyle.backgroundImage,
+                    backgroundSize:gridStyle.backgroundSize, zIndex:gridStyle.zIndex } : null,
+                  labels: labels ? { zIndex:labelStyle.zIndex, xLabels, yLabels } : null,
                   checks: {
-                    topBarFullWidth: !!top && !!screen && close(top.x, screen.x) && close(top.right, screen.right),
-                    topBarEightPercent: !!top && !!screen && close(top.height, screen.height * .08),
-                    rightBarStartsBelowTop: !!right && !!top && close(right.y, top.bottom),
-                    rightBarReachesBottom: !!right && !!screen && close(right.bottom, screen.bottom),
-                    bottomBarEightPercent: !!bottom && !!screen && close(bottom.height, screen.height * .08),
-                    bottomBarMeetsRightBar: !!bottom && !!right && close(bottom.right, right.x),
-                    viewportStartsBelowTop: !!viewport && !!top && close(viewport.y, top.bottom),
-                    viewportEndsAtBottomBar: !!viewport && !!bottom && close(viewport.bottom, bottom.y),
+                    screenNineBySixteen: !!screen && Math.abs(actualRatio-expectedRatio) <= tolerance,
+                    expectedSvgViewBox: svg?.getAttribute('viewBox') === '0 0 100 177.7777777778',
+                    svgPreserveAspectRatioNone: svg?.getAttribute('preserveAspectRatio') === 'none',
+                    gridPresent: !!grid && !!gridStyle.backgroundImage && gridStyle.backgroundImage !== 'none',
+                    gridAboveCourseGeometry: !!gridStyle && Number(gridStyle.zIndex) > 2,
+                    labelsAboveGrid: !!labelStyle && Number(labelStyle.zIndex) > Number(gridStyle?.zIndex || 0),
+                    xAxisHasElevenPercentLabels: xLabels.length === 11 && xLabels[0] === '0%' && xLabels[10] === '100%',
+                    yAxisHasElevenPercentLabels: yLabels.length === 11 && yLabels[0] === '0%' && yLabels[10] === '100%',
                     noHorizontalPageOverflow: document.documentElement.scrollWidth <= window.innerWidth,
                     noVerticalPageOverflow: document.documentElement.scrollHeight <= window.innerHeight
                   }
@@ -123,13 +128,13 @@ jobs:
               });
 
               const safeViewport = viewport.label.replace('x', '-');
-              const imagePath = `visual-qa/phone-bars/hole-${hole}-${safeViewport}.png`;
+              const imagePath = `visual-qa/coordinate-grid/hole-${hole}-${safeViewport}.png`;
               await page.screenshot({ path: imagePath, fullPage: false, animations: 'disabled' });
 
               diagnostics.push({
                 hole, viewport, url, httpStatus: response?.status() ?? null,
                 state, consoleMessages, pageErrors,
-                allLayoutChecksPassed: Object.values(state.checks).every(Boolean)
+                allGridAndScaleChecksPassed: Object.values(state.checks).every(Boolean)
               });
               await page.close();
             }
@@ -137,11 +142,11 @@ jobs:
           }
 
           await browser.close();
-          fs.writeFileSync('visual-qa/phone-bars/diagnostics.json', JSON.stringify(diagnostics, null, 2));
+          fs.writeFileSync('visual-qa/coordinate-grid/diagnostics.json', JSON.stringify(diagnostics, null, 2));
           const failures = diagnostics.filter(item =>
             item.httpStatus !== 200 || item.pageErrors.length ||
-            !item.allLayoutChecksPassed || item.state.renderedGeometryPaths === 0 ||
-            !item.state.playline || !item.state.clip
+            !item.allGridAndScaleChecksPassed || item.state.renderedGeometryPaths === 0 ||
+            !item.state.playline || !item.state.clip || !item.state.grid
           );
           console.log(`Captured ${diagnostics.length} hole/viewport combinations; ${failures.length} diagnostic failures.`);
           if (failures.length) {
@@ -156,7 +161,7 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v6
         with:
-          name: ag45v1-phone-bars-visual-qa
-          path: visual-qa/phone-bars/
+          name: ag45v1-coordinate-grid-visual-qa
+          path: visual-qa/coordinate-grid/
           retention-days: 7
           if-no-files-found: error
