@@ -65,7 +65,7 @@ jobs:
           if not holes or any(not re.fullmatch(r'\d{1,2}', x) or not 1 <= int(x) <= 18 for x in holes):
               raise SystemExit('holes must be comma-separated integers from 1 to 18')
           viewports = [x.strip() for x in os.environ['VIEWPORTS'].split(',') if x.strip()]
-          if not viewports or any(not re.fullmatch(r'\d{2,4}x\\d{2,4}', x) for x in viewports):
+          if not viewports or any(not re.fullmatch(r'\d{2,4}x\d{2,4}', x) for x in viewports):
               raise SystemExit('viewports must be comma-separated WIDTHxHEIGHT values')
           print('Candidate: ' + target + '; holes: ' + ','.join(holes) + '; viewports: ' + ','.join(viewports))
           PY
