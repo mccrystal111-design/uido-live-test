@@ -245,12 +245,12 @@ routeElement.setAttribute("d",pathFromGeometry(hole.routing.geometry));
 routeElement.setAttribute("clip-path","url(#holeViewClip)");
 document.getElementById("courseSvg").appendChild(routeElement);
 
-// V4 cloud mask overlays the course rendering only. Its transparent centre
+// V6 cloud mask overlays the course rendering only. Its transparent centre
 // leaves the playable hole visible; the ivory/cloud edge softens the viewport.
 // The right-side UI panel and bottom-left bar remain outside this SVG layer.
 const cloudMask=document.createElementNS("http://www.w3.org/2000/svg","image");
 cloudMask.setAttribute("id","cloudMaskV3");
-cloudMask.setAttribute("href","../assets/Uido-mask-v5.svg");
+cloudMask.setAttribute("href","../assets/UiDo-mask-v6.svg");
 cloudMask.setAttribute("x","0");
 cloudMask.setAttribute("y","0");
 cloudMask.setAttribute("width",String(PLAYABLE_WIDTH));
