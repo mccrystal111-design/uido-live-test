@@ -67,7 +67,7 @@ jobs:
           viewports = [x.strip() for x in os.environ['VIEWPORTS'].split(',') if x.strip()]
           if not viewports or any(not re.fullmatch(r'\\d{2,4}x\\d{2,4}', x) for x in viewports):
               raise SystemExit('viewports must be comma-separated WIDTHxHEIGHT values')
-          print(f'Candidate: {target}; holes: {','.join(holes)}; viewports: {','.join(viewports)}')
+          print('Candidate: ' + target + '; holes: ' + ','.join(holes) + '; viewports: ' + ','.join(viewports))
           PY
 
       - name: Start local static server
