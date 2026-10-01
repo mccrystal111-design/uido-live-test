@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AG45v1 — APPROVED BASE — HOLE 9</title>
+<title>AG45v1 — Phone Bars Review — Hole 9</title>
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dfe4d8}
 #stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px}
 #screen{position:relative;width:min(calc(100vw - 40px),calc((100vh - 40px)*9/16));height:min(calc(100vh - 40px),calc((100vw - 40px)*16/9));background:#f4f1e6;overflow:hidden}
+#topBar{position:absolute;left:0;top:0;width:100%;height:8%;background:#f4f1e6;border-bottom:1px solid #c9c7b8;z-index:5}
+#courseViewport{position:absolute;left:0;top:8%;width:100%;height:84%;overflow:hidden;z-index:1}
+#rightRail{position:absolute;right:0;top:8%;width:40%;height:92%;background:#f4f1e6;border-left:1px solid #c9c7b8;z-index:4}
+#bottomBar{position:absolute;left:0;bottom:0;width:60%;height:8%;background:#f4f1e6;border-top:1px solid #c9c7b8;z-index:5}
 .grid{position:absolute;inset:0;background-image:linear-gradient(to right,#16231b22 1px,transparent 1px),linear-gradient(to bottom,#16231b22 1px,transparent 1px);background-size:10% 10%;z-index:1}
- .course{position:absolute;inset:0;z-index:2;pointer-events:none}
+.course{position:absolute;inset:0;z-index:2;pointer-events:none}
 svg{width:100%;height:100%;display:block}
 .fairway{fill:#9cad83;stroke:#5f7254;stroke-width:.35}
 .green{fill:#b9caa0;stroke:#4d6543;stroke-width:.45}
@@ -24,16 +28,21 @@ svg{width:100%;height:100%;display:block}
 </head>
 <body>
 <div id="stage"><div id="screen">
+<div id="topBar" aria-hidden="true"></div>
+<div id="courseViewport">
 <div class="grid"></div>
 <div class="course">
-<!-- Original full-screen AGNOSTIC45 base viewport. -->
-<svg id="courseSvg" viewBox="0 0 100 177.7777777778" preserveAspectRatio="none">
+<!-- The SVG keeps the full portrait frame; the right rail overlays the non-playable 40%. -->
+<svg id="courseSvg" viewBox="0 0 100 149.3333333333" preserveAspectRatio="none">
 <defs>
-<clipPath id="holeViewClip" clipPathUnits="userSpaceOnUse"><rect x="0" y="0" width="60" height="177.7777777778"></rect></clipPath>
+<clipPath id="holeViewClip" clipPathUnits="userSpaceOnUse"><rect x="0" y="0" width="60" height="149.3333333333"></rect></clipPath>
 </defs>
 <g id="renderedGeometry" clip-path="url(#holeViewClip)"></g>
 </svg>
 </div>
+</div>
+<div id="rightRail" aria-hidden="true"></div>
+<div id="bottomBar" aria-hidden="true"></div>
 </div></div>
 
 <script src="course-source-model.js"></script>
@@ -89,7 +98,7 @@ const hole=canonical.holes.find(h=>h.hole_number===holeNumber);
 const direction=window.UiDoHoleViewBuilder.directionFromRoute(hole.routing);
 
 const VIEW_WIDTH=100;
-const VIEW_HEIGHT=100*16/9;
+const VIEW_HEIGHT=100*16/9*.84;
 const PLAYABLE_WIDTH=60;
 const FIT_FRACTION=.82;
 const VIEW_CENTER=[PLAYABLE_WIDTH/2,VIEW_HEIGHT/2];
