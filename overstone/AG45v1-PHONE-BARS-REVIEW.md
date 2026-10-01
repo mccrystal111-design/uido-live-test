@@ -28,7 +28,11 @@ The browser run checks bar geometry and alignment, viewport boundaries, page ove
 
 ## Verification status
 
-The workflow has been updated to target this review copy and capture the viewport matrix. **It has not been run**, and GitHub Pages deployment/live rendering and screenshot appearance have not yet been verified. No GitHub Actions run was started by this change.
+- Automated layout QA passed on commit `78cad854d177eb64dea1d56357db8a2a95584caa`: [run 36906688848](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36906688848).
+- Four viewport cases were captured: `390x844`, `360x640`, `768x1024`, and `1440x900`. Every automated check passed, including required bar presence/dimensions, 60%/40% rail split, 84% course viewport, gap-free joins, SVG geometry, no document overflow, and no browser/HTTP errors.
+- Artifact: `ag45-visual-qa-56`, containing PNG screenshots, `diagnostics.json`, rendered SVG dumps, and the review checklist.
+- The screenshot was visually inspected at `390x844`: the top bar, left course viewport, right rail, and bottom-left bar are present and aligned; the course geometry renders. The approved base remains untouched.
+- **Live GitHub Pages deployment/cache freshness is not independently verified.** The local QA result proves the committed candidate renders, not that the public preview has updated. Review the preview URL after confirming it is serving this commit.
 
 
 ## Isolated QA contract
