@@ -1,4 +1,4 @@
-name: AGNOSTIC45 Visual QA
+name: AGNOSTIC45 Phone Bars Visual QA
 
 on:
   workflow_dispatch:
@@ -6,11 +6,15 @@ on:
       holes:
         description: "Comma-separated holes to capture"
         required: true
-        default: "1,11,16"
+        default: "9"
+      viewports:
+        description: "Comma-separated width x height viewports"
+        required: true
+        default: "390x844,360x640,768x1024,1440x900"
 
 jobs:
   visual-qa:
-    name: Render AGNOSTIC45 screenshots
+    name: Render phone-bars review screenshots
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.55.0-noble
@@ -28,89 +32,122 @@ jobs:
           python3 -m http.server 8080 --bind 127.0.0.1 >/tmp/uido-http.log 2>&1 &
           echo $! >/tmp/uido-http.pid
 
-      - name: Capture AGNOSTIC45
+      - name: Capture phone-bars review
         env:
           HOLES: ${{ inputs.holes }}
+          VIEWPORTS: ${{ inputs.viewports }}
         run: |
-          mkdir -p visual-qa
+          mkdir -p visual-qa/phone-bars
           cat > /tmp/capture-agnostic45.mjs <<'EOF'
-          const { chromium } = await import(`${process.cwd()}/node_modules/playwright/index.mjs`);
           import fs from 'node:fs';
+          const { chromium } = await import(`${process.cwd()}/node_modules/playwright/index.mjs`);
 
-          const holes = (process.env.HOLES || '1,11,16')
+          const holes = (process.env.HOLES || '9')
             .split(',')
             .map(value => Number(value.trim()))
-            .filter(Number.isInteger);
+            .filter(value => Number.isInteger(value) && value >= 1 && value <= 18);
+          const viewports = (process.env.VIEWPORTS || '390x844,360x640,768x1024,1440x900')
+            .split(',')
+            .map(value => {
+              const match = value.trim().match(/^(\d+)x(\d+)$/);
+              return match ? { label: value.trim(), width: Number(match[1]), height: Number(match[2]) } : null;
+            })
+            .filter(value => value && value.width >= 240 && value.height >= 320);
+
+          if (!holes.length || !viewports.length) {
+            throw new Error('No valid holes or viewports supplied.');
+          }
 
           const browser = await chromium.launch({ headless: true });
-          const context = await browser.newContext({
-            viewport: { width: 390, height: 844 },
-            deviceScaleFactor: 1
-          });
-
           const diagnostics = [];
 
-          for (const hole of holes) {
-            const page = await context.newPage();
-            const consoleMessages = [];
-            const pageErrors = [];
+          for (const viewport of viewports) {
+            const context = await browser.newContext({
+              viewport: { width: viewport.width, height: viewport.height },
+              deviceScaleFactor: 1
+            });
 
-            page.on('console', message => {
-              consoleMessages.push({
-                type: message.type(),
-                text: message.text()
+            for (const hole of holes) {
+              const page = await context.newPage();
+              const consoleMessages = [];
+              const pageErrors = [];
+              page.on('console', message => {
+                if (message.type() === 'error' || message.type() === 'warning') {
+                  consoleMessages.push({ type: message.type(), text: message.text() });
+                }
               });
-            });
+              page.on('pageerror', error => pageErrors.push(String(error)));
 
-            page.on('pageerror', error => {
-              pageErrors.push(String(error));
-            });
+              const url = `http://127.0.0.1:8080/overstone/ag45v1-phone-bars-review.html?hole=${hole}`;
+              const response = await page.goto(url, { waitUntil: 'networkidle' });
+              await page.locator('#courseSvg').waitFor({ state: 'visible' });
+              await page.waitForTimeout(250);
 
-            const url = `http://127.0.0.1:8080/overstone/ui-hole-renderer-agnostic45-ui-base.html?hole=${hole}`;
+              const state = await page.evaluate(() => {
+                const rect = selector => {
+                  const element = document.querySelector(selector);
+                  if (!element) return null;
+                  const r = element.getBoundingClientRect();
+                  return { x: r.x, y: r.y, width: r.width, height: r.height,
+                    right: r.right, bottom: r.bottom };
+                };
+                const top = rect('#topBar');
+                const right = rect('#rightBar');
+                const bottom = rect('#bottomBar');
+                const viewport = rect('#courseViewport');
+                const screen = rect('#screen');
+                const svg = document.querySelector('#courseSvg');
+                const tolerance = 1.1;
+                const close = (a, b) => Math.abs(a - b) <= tolerance;
+                return {
+                  title: document.title,
+                  screen, topBar: top, rightBar: right, bottomBar: bottom,
+                  courseViewport: viewport,
+                  svgViewBox: svg?.getAttribute('viewBox'),
+                  renderedGeometryPaths: document.querySelectorAll('#renderedGeometry path').length,
+                  playline: Boolean(document.querySelector('#courseSvg .playline')),
+                  clip: Boolean(document.querySelector('#holeViewClip')),
+                  checks: {
+                    topBarFullWidth: !!top && !!screen && close(top.x, screen.x) && close(top.right, screen.right),
+                    topBarEightPercent: !!top && !!screen && close(top.height, screen.height * .08),
+                    rightBarStartsBelowTop: !!right && !!top && close(right.y, top.bottom),
+                    rightBarReachesBottom: !!right && !!screen && close(right.bottom, screen.bottom),
+                    bottomBarEightPercent: !!bottom && !!screen && close(bottom.height, screen.height * .08),
+                    bottomBarMeetsRightBar: !!bottom && !!right && close(bottom.right, right.x),
+                    viewportStartsBelowTop: !!viewport && !!top && close(viewport.y, top.bottom),
+                    viewportEndsAtBottomBar: !!viewport && !!bottom && close(viewport.bottom, bottom.y),
+                    noHorizontalPageOverflow: document.documentElement.scrollWidth <= window.innerWidth,
+                    noVerticalPageOverflow: document.documentElement.scrollHeight <= window.innerHeight
+                  }
+                };
+              });
 
-            await page.goto(url, { waitUntil: 'networkidle' });
-            await page.locator('#courseSvg').waitFor({ state: 'visible' });
-            await page.waitForTimeout(250);
+              const safeViewport = viewport.label.replace('x', '-');
+              const imagePath = `visual-qa/phone-bars/hole-${hole}-${safeViewport}.png`;
+              await page.screenshot({ path: imagePath, fullPage: false, animations: 'disabled' });
 
-            const state = await page.evaluate(() => ({
-              title: document.title,
-              svg: {
-                width: document.querySelector('#courseSvg')?.getAttribute('viewBox'),
-                renderedGeometryPaths:
-                  document.querySelectorAll('#renderedGeometry path').length,
-                playline:
-                  Boolean(document.querySelector('#courseSvg .playline')),
-                clip:
-                  Boolean(document.querySelector('#holeViewClip')),
-                cloudMask4Loaded: (() => {
-                  const mask = document.querySelector('#cloudMaskV3');
-                  return Boolean(mask && mask.href.baseVal && mask.href.baseVal.includes('Uido-mask-4.svg'));
-                })()
-              }
-            }));
-
-            await page.screenshot({
-              path: `visual-qa/agnostic45-hole-${hole}.png`,
-              fullPage: false,
-              animations: 'disabled'
-            });
-
-            diagnostics.push({
-              hole,
-              url,
-              state,
-              consoleMessages,
-              pageErrors
-            });
-
-            await page.close();
+              diagnostics.push({
+                hole, viewport, url, httpStatus: response?.status() ?? null,
+                state, consoleMessages, pageErrors,
+                allLayoutChecksPassed: Object.values(state.checks).every(Boolean)
+              });
+              await page.close();
+            }
+            await context.close();
           }
 
           await browser.close();
-          fs.writeFileSync(
-            'visual-qa/diagnostics.json',
-            JSON.stringify(diagnostics, null, 2)
+          fs.writeFileSync('visual-qa/phone-bars/diagnostics.json', JSON.stringify(diagnostics, null, 2));
+          const failures = diagnostics.filter(item =>
+            item.httpStatus !== 200 || item.pageErrors.length ||
+            !item.allLayoutChecksPassed || item.state.renderedGeometryPaths === 0 ||
+            !item.state.playline || !item.state.clip
           );
+          console.log(`Captured ${diagnostics.length} hole/viewport combinations; ${failures.length} diagnostic failures.`);
+          if (failures.length) {
+            console.error(JSON.stringify(failures, null, 2));
+            process.exitCode = 1;
+          }
           EOF
 
           node /tmp/capture-agnostic45.mjs
@@ -119,7 +156,7 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v6
         with:
-          name: agnostic45-visual-qa
-          path: visual-qa/
+          name: ag45v1-phone-bars-visual-qa
+          path: visual-qa/phone-bars/
           retention-days: 7
           if-no-files-found: error
