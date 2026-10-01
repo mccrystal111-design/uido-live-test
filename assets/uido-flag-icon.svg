@@ -2,11 +2,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
   <title>UiDo golf flag icon</title>
   <desc>Flat vector golf flag with a long dark green pole, ivory waving flag, and gold ball-and-tee emblem. Transparent background.</desc>
-  <g id="pole" fill="#20382A">
+  <g id="pole" fill="#20382A" stroke="#000000" stroke-width="3.5" stroke-linejoin="round">
     <circle cx="151" cy="53" r="22"/>
     <path d="M137 69 H165 V474 H137 Z"/>
   </g>
-  <path id="flag" fill="#F8F6ED"
+  <path id="flag" fill="#F8F6ED" stroke="#000000" stroke-width="3.5" stroke-linejoin="round"
     d="M164 70
        C204 82 238 92 272 108
        C315 128 357 151 396 160
@@ -16,7 +16,7 @@
        C397 309 362 299 326 295
        C286 291 250 279 215 267
        C195 260 179 259 164 263 Z"/>
-  <g id="gold-ball-and-tee" fill="#E6AA20">
+  <g id="gold-ball-and-tee" fill="#E6AA20" stroke="#000000" stroke-width="3.5" stroke-linejoin="round">
     <circle cx="286" cy="168" r="37"/>
     <path d="M269 210 Q268 208 272 208 H300 Q304 208 303 211
              C296 216 291 222 289 231 L285 260
