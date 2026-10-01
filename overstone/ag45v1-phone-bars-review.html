@@ -259,8 +259,8 @@ holeView.features.slice().sort((a,b)=>
 const greenMiddleGps=selectedSource.green_fmb.middle;
 const greenMiddleSvg=project([greenMiddleGps[1],greenMiddleGps[0]]);
 const greenFlag=document.createElementNS("http://www.w3.org/2000/svg","image");
-const greenFlagWidth=3.4;
-const greenFlagHeight=5.1;
+const greenFlagWidth=6.8;
+const greenFlagHeight=10.2;
 greenFlag.setAttribute("href","../assets/uido-flag-icon.svg");
 greenFlag.setAttribute("x",String(greenMiddleSvg[0]-greenFlagWidth/2));
 greenFlag.setAttribute("y",String(greenMiddleSvg[1]-greenFlagHeight));
