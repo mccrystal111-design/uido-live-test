@@ -9,13 +9,8 @@
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dfe4d8}
 #stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px}
 #screen{position:relative;width:min(calc(100vw - 40px),calc((100vh - 40px)*9/16));height:min(calc(100vh - 40px),calc((100vw - 40px)*16/9));background:#f4f1e6;overflow:hidden}
-.grid{position:absolute;inset:0;background-image:linear-gradient(to right,#26312699 1px,transparent 1px),linear-gradient(to bottom,#26312699 1px,transparent 1px);background-size:10% 10%;z-index:3;pointer-events:none}
-.axisLabels{position:absolute;inset:0;z-index:4;pointer-events:none;font:600 clamp(7px,1.8vw,11px)/1.1 Arial,sans-serif;color:#263126}
-.xAxis{position:absolute;left:0;right:0;top:2px;height:12px;display:flex;justify-content:space-between;padding:0 1px;gap:0;min-width:0}
-.xAxis span{padding:1px 1px;white-space:nowrap}
-.yAxis{position:absolute;left:2px;top:0;bottom:0;width:24px;display:flex;flex-direction:column;justify-content:space-between;padding:2px 0}
-.xAxis span,.yAxis span{background:#f4f1e6f2;padding:2px 3px;border:1px solid #9ca393;border-radius:2px}
-.course{position:absolute;inset:0;z-index:2;pointer-events:none}
+.grid{position:absolute;inset:0;background-image:linear-gradient(to right,#16231b22 1px,transparent 1px),linear-gradient(to bottom,#16231b22 1px,transparent 1px);background-size:10% 10%;z-index:1}
+ .course{position:absolute;inset:0;z-index:2;pointer-events:none}
 svg{width:100%;height:100%;display:block}
 .fairway{fill:#9cad83;stroke:#5f7254;stroke-width:.35}
 .green{fill:#b9caa0;stroke:#4d6543;stroke-width:.45}
@@ -29,11 +24,7 @@ svg{width:100%;height:100%;display:block}
 </head>
 <body>
 <div id="stage"><div id="screen">
-<div class="grid" aria-hidden="true"></div>
-<div class="axisLabels" aria-hidden="true">
-  <div class="xAxis"><span>0%</span><span>10%</span><span>20%</span><span>30%</span><span>40%</span><span>50%</span><span>60%</span><span>70%</span><span>80%</span><span>90%</span><span>100%</span></div>
-  <div class="yAxis"><span>0%</span><span>10%</span><span>20%</span><span>30%</span><span>40%</span><span>50%</span><span>60%</span><span>70%</span><span>80%</span><span>90%</span><span>100%</span></div>
-</div>
+<div class="grid"></div>
 <div class="course">
 <!-- Original full-screen AGNOSTIC45 base viewport. -->
 <svg id="courseSvg" viewBox="0 0 100 177.7777777778" preserveAspectRatio="none">
