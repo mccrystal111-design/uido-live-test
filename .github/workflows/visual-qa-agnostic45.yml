@@ -1,6 +1,9 @@
 name: AGNOSTIC45 Phone Bars Visual QA
 
 on:
+  push:
+    paths:
+      - 'overstone/ag45v1-phone-bars-review.html'
   workflow_dispatch:
     inputs:
       holes:
