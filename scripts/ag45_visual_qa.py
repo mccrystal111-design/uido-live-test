@@ -93,6 +93,14 @@ with sync_playwright() as p:
                     emptyGeometryRoot: geometryRoot.children.length === 0
                   };
                 })""")
+                svg_markup = page.evaluate("""() => [...document.querySelectorAll('svg')].map(svg => svg.outerHTML)""")
+                dump_dir = OUT / "svg-dumps"
+                dump_dir.mkdir(parents=True, exist_ok=True)
+                record["svg_dump_paths"] = []
+                for svg_index, markup in enumerate(svg_markup):
+                    dump_path = dump_dir / f"{case}_svg-{svg_index}.svg"
+                    dump_path.write_text(markup, encoding="utf-8")
+                    record["svg_dump_paths"].append(str(dump_path.relative_to(ROOT)))
                 record["layout_elements"] = page.evaluate("""() => {
                   const selectors = ['#stage','#screen','#topBar','#top-bar','#bottomBar','#bottom-bar',
                     '#rightRail','#right-rail','#courseViewport','#course-viewport','.top-bar','.bottom-bar','.right-rail'];
