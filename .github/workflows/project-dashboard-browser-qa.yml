@@ -1,0 +1,106 @@
+name: Project Dashboard Browser QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'project-dashboard.html'
+      - '.github/workflows/project-dashboard-browser-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: project-dashboard-browser-qa
+  cancel-in-progress: false
+
+jobs:
+  browser-qa:
+    name: Check published dashboard in Chromium
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.52.0-noble
+    timeout-minutes: 10
+    steps:
+      - name: Install Playwright Python package
+        run: python -m pip install --disable-pip-version-check playwright==1.52.0
+
+      - name: Verify live dashboard in Chromium
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, time
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+
+          url = "https://mccrystal111-design.github.io/uido-live-test/project-dashboard.html"
+          report = {"url": url, "checks": [], "viewports": [], "console_errors": [], "page_errors": [], "http_failures": []}
+          failures = []
+          with sync_playwright() as p:
+              browser = p.chromium.launch()
+              for width, height in [(390, 844), (1440, 900)]:
+                  page = browser.new_page(viewport={"width": width, "height": height})
+                  page.on("console", lambda msg: report["console_errors"].append(msg.text[:1000]) if msg.type == "error" else None)
+                  page.on("pageerror", lambda exc: report["page_errors"].append(str(exc)))
+                  page.on("response", lambda response: report["http_failures"].append({"status": response.status, "url": response.url}) if response.status >= 400 else None)
+                  response = None
+                  last_error = None
+                  for attempt in range(12):
+                      try:
+                          response = page.goto(url, wait_until="domcontentloaded", timeout=30000)
+                          if response and response.status == 200:
+                              break
+                          last_error = f"HTTP {response.status if response else 'no response'}"
+                      except Exception as exc:
+                          last_error = repr(exc)
+                      time.sleep(10)
+                  record = {"viewport": f"{width}x{height}", "http_status": response.status if response else None}
+                  if not response or response.status != 200:
+                      failures.append(f"{width}x{height}: dashboard did not return HTTP 200 ({last_error})")
+                      report["viewports"].append(record)
+                      page.close()
+                      continue
+                  try:
+                      page.get_by_role("heading", name="Project dashboard", exact=True).wait_for(timeout=15000)
+                      page.wait_for_function("document.querySelector('#updated')?.textContent.includes('Live GitHub data refreshed') || document.querySelector('#updated')?.textContent.includes('Refresh failed')", timeout=25000)
+                      record["title"] = page.title()
+                      record["heading"] = page.locator("h1").inner_text()
+                      record["open_issues"] = page.locator("#openCount").inner_text()
+                      record["open_prs"] = page.locator("#prCount").inner_text()
+                      record["latest_run"] = page.locator("#runStatus").inner_text()
+                      record["updated"] = page.locator("#updated").inner_text()
+                      record["document_width"] = page.evaluate("document.documentElement.scrollWidth")
+                      record["viewport_width"] = width
+                      record["horizontal_overflow"] = record["document_width"] > width + 1
+                      if record["title"] != "UiDo — Project Dashboard":
+                          failures.append(f"{width}x{height}: unexpected title {record['title']!r}")
+                      if record["heading"] != "Project dashboard":
+                          failures.append(f"{width}x{height}: unexpected heading {record['heading']!r}")
+                      if record["open_issues"] in ("—", "") or record["open_prs"] in ("—", ""):
+                          failures.append(f"{width}x{height}: GitHub issue/PR counts did not populate")
+                      if "Refresh failed" in record["updated"]:
+                          failures.append(f"{width}x{height}: dashboard reports failed live-data refresh")
+                      if record["horizontal_overflow"]:
+                          failures.append(f"{width}x{height}: horizontal overflow at viewport width {width}")
+                      page.screenshot(path=f"/tmp/dashboard-{width}x{height}.png", full_page=True)
+                  except Exception as exc:
+                      failures.append(f"{width}x{height}: content/interaction check failed: {exc!r}")
+                  report["viewports"].append(record)
+                  page.close()
+              browser.close()
+          report["failures"] = failures
+          Path("/tmp/dashboard-browser-qa.json").write_text(json.dumps(report, indent=2))
+          print(json.dumps(report, indent=2))
+          if failures:
+              raise SystemExit(1)
+          PY
+
+      - name: Upload dashboard screenshots and report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-dashboard-browser-qa
+          path: /tmp/dashboard-*
+          if-no-files-found: warn
+          retention-days: 21
