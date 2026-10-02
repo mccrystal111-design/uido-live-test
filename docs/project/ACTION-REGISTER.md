@@ -22,7 +22,7 @@ Statuses below are planning baselines unless linked evidence confirms completion
 | UI-002 | Live hole UI | Fix verified UI gaps | P1 | Backlog | ChatGPT | UI-001 | Each defect has reproduction steps and QA evidence |
 | STAT-001 | Stats | Define information architecture and data contracts | P1 | Backlog | ChatGPT + Kieron | OPS-002 | Six agreed sections and handicap handling documented |
 | STAT-002 | Stats | Specify 9-hole WHS-aligned Practice Handicap behaviour | P1 | Backlog | ChatGPT + Kieron | STAT-001 | Rules and edge cases documented; assumptions identified |
-| DATA-001 | Data/storage | Map data packets and decide Supabase responsibilities | P1 | Ready | ChatGPT + Kieron | OPS-002 | Data, retention, access, offline/sync and security needs documented |
+| DATA-001 | Data/storage | Specify course packet contract and decide Supabase responsibilities | P1 | In progress | ChatGPT + Kieron | OPS-002 (reconciliation tracked separately) | [Course Packet Specification draft](../architecture/COURSE-PACKET-SPEC.md); review against real Overstone output, geometry contract and PR #3 before choosing storage |
 | ARCH-001 | Architecture | Define real-golfer trigger inventory and QA isolation | P0 | Ready | ChatGPT | OPS-002 | Every trigger has actor/event, conditions, permissions, idempotency and test isolation |
 | QA-001 | QA | Establish evidence-based release checklist | P1 | Backlog | ChatGPT + Kieron | OPS-002 | Code, workflow, visual, mobile and product behaviour checks separated |
 | DOC-001 | Handover | Maintain current state and session handover | P0 | Ongoing | ChatGPT | OPS-001 | Next action remains singular and evidence-backed |
