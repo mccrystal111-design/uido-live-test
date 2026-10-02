@@ -31,7 +31,7 @@ body.embedded{background:transparent;overflow:hidden}body.embedded #tileFrame{in
 .dialogActions .primary{border-color:var(--yellow);background:rgba(255,214,0,.14)}
 @media(max-width:420px){.customTile{width:91vw;border-radius:24px}.pill{padding:7px 8px}.options{gap:6px}.option{font-size:13px}}
 </style></head><body>
-<script>if(new URLSearchParams(location.search).get('embedded')==='1'){document.addEventListener('DOMContentLoaded',function(){document.body.classList.add('embedded')})}</script>
+<script>if(new URLSearchParams(location.search).get('embedded')==='1')document.body.classList.add('embedded');</script>
 <iframe id="tileFrame" title="UiDo tile"></iframe>
 <div id="customScreen"><section class="customTile"><div class="customKicker" id="customKicker">SHOT DATA</div><div class="customTitle" id="customTitle">STRIKE</div><div class="customSub" id="customSub">Select the strike you made.</div><div class="options" id="customOptions"></div><button class="tick" id="customConfirm" aria-label="Confirm selection">✓</button></section></div>
 <header class="topbar"><div class="pill"><div id="holeTitle">OVERSTONE · HOLE 1</div><div id="flowStatus">WIND · STARTING ROUND</div></div><button class="pill" id="gpsButton">Refresh GPS</button></header>
