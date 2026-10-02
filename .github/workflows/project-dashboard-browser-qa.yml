@@ -1,11 +1,15 @@
 name: Project Dashboard Browser QA
 
 on:
+  # Initial self-check when this workflow changes; future dashboard checks run only after Pages deploy completes.
   push:
     branches: [main]
     paths:
-      - 'project-dashboard.html'
       - '.github/workflows/project-dashboard-browser-qa.yml'
+  workflow_run:
+    workflows: ["Deploy UiDo website"]
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -17,6 +21,7 @@ concurrency:
 
 jobs:
   browser-qa:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     name: Check published dashboard in Chromium
     runs-on: ubuntu-latest
     container:
