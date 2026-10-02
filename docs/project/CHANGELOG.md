@@ -46,3 +46,5 @@
 - Covers immutable revisions, manifest and SHA-256 file inventory, GeoJSON WGS 84 coordinate order, metre-based internal units, provenance/refinement traceability, validation gates, offline cache behavior, version compatibility, delivery/storage boundaries and acceptance tests.
 - Kept geometry cardinality, archive format, storage backend/Supabase responsibilities and local-coordinate strategy explicitly open pending evidence. This is a draft contract, not a schema approval or proof the current builder output conforms.
 - DATA-001 moved to In progress. Next: inspect the actual Overstone builder output and compare the draft with PR #3 before implementing packet build/validation.
+
+- Compared packet draft against PR #3's actual head-branch schema files. Recorded the current feature geometry validation gap and provenance/registration details still needed; preserved the agreed sequence of Overstone/Poult Wood fixtures before changing acquisition code. Updated spec in commit [4741baa](https://github.com/mccrystal111-design/uido-live-test/commit/4741baa260502ba513de2b1a234681ee62391605).
