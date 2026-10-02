@@ -1,0 +1,162 @@
+name: AGNOSTIC45 Base Renderer QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'overstone/ui-hole-renderer-agnostic45-ui-base.html'
+      - '.github/workflows/agnostic45-base-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: agnostic45-base-qa
+  cancel-in-progress: false
+
+jobs:
+  base-qa:
+    name: Inspect standalone base geometry in Chromium
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.52.0-noble
+    timeout-minutes: 10
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install Playwright Python package
+        run: python -m pip install --disable-pip-version-check playwright==1.52.0
+
+      - name: Start local static server
+        shell: bash
+        run: |
+          python -m http.server 8765 --bind 127.0.0.1 >/tmp/base-http.log 2>&1 &
+          echo $! >/tmp/base-http.pid
+          for i in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:8765/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/base-http.log
+          exit 1
+
+      - name: Run standalone base geometry diagnostics
+        shell: bash
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+
+          target = "overstone/ui-hole-renderer-agnostic45-ui-base.html"
+          report = {
+            "schema": "uido.agnostic45.base-qa.v1",
+            "source_sha": os.environ["SOURCE_SHA"],
+            "run_url": os.environ["RUN_URL"],
+            "target": target,
+            "important_note": "Automated geometry evidence is not human visual approval or proof that the canonical geometry contract is approved.",
+            "cases": [],
+            "failures": [],
+          }
+          out = Path("/tmp/agnostic45-base-qa")
+          out.mkdir(parents=True, exist_ok=True)
+          with sync_playwright() as p:
+            browser = p.chromium.launch()
+            for hole in (1, 9):
+              for width, height in ((390, 844), (768, 1024), (1440, 900)):
+                case = {"hole": hole, "viewport": {"width": width, "height": height}, "page_errors": [], "console_errors": [], "http_failures": []}
+                page = browser.new_page(viewport={"width": width, "height": height})
+                page.on("pageerror", lambda exc, c=case: c["page_errors"].append(str(exc)))
+                page.on("console", lambda msg, c=case: c["console_errors"].append(msg.text[:1000]) if msg.type == "error" else None)
+                page.on("response", lambda response, c=case: c["http_failures"].append({"status": response.status, "url": response.url}) if response.status >= 400 else None)
+                url = f"http://127.0.0.1:8765/{target}?hole={hole}"
+                try:
+                  response = page.goto(url, wait_until="networkidle", timeout=45000)
+                  page.wait_for_timeout(500)
+                  case["http_status"] = response.status if response else None
+                  case["title"] = page.title()
+                  case["document"] = page.evaluate("""() => ({
+                    readyState: document.readyState,
+                    documentWidth: document.documentElement.scrollWidth,
+                    documentHeight: document.documentElement.scrollHeight,
+                    viewportWidth: innerWidth,
+                    viewportHeight: innerHeight
+                  })""")
+                  case["svg"] = page.evaluate("""() => {
+                    const svg = document.querySelector('#courseSvg');
+                    const root = document.querySelector('#renderedGeometry');
+                    const r = svg ? svg.getBoundingClientRect() : null;
+                    const shapes = root ? [...root.children] : [];
+                    const classes = {};
+                    for (const el of shapes) {
+                      const cls = el.getAttribute('class') || el.tagName.toLowerCase();
+                      classes[cls] = (classes[cls] || 0) + 1;
+                    }
+                    const route = svg ? svg.querySelector('.playline') : null;
+                    return {
+                      svgPresent: !!svg,
+                      svgRect: r ? {x:r.x,y:r.y,width:r.width,height:r.height} : null,
+                      geometryRootPresent: !!root,
+                      featureCount: shapes.length,
+                      featureClasses: classes,
+                      routePresent: !!route,
+                      routePathLength: route ? (route.getAttribute('d') || '').length : 0
+                    };
+                  }""")
+                  case["horizontal_overflow"] = case["document"]["documentWidth"] > width + 1
+                  case["screenshot"] = str(out / f"hole-{hole}_{width}x{height}.png")
+                  page.screenshot(path=case["screenshot"], full_page=True, animations="disabled")
+                  checks = [
+                    (case["http_status"] == 200, "HTTP response was not 200"),
+                    (f"Hole {hole}" in case["title"] and "AGNOSTICBASE45" in case["title"], "unexpected document title / requested hole not reflected"),
+                    (case["svg"]["svgPresent"], "#courseSvg missing"),
+                    (case["svg"]["geometryRootPresent"], "#renderedGeometry missing"),
+                    (case["svg"]["featureCount"] > 0, "no physical geometry features rendered"),
+                    (case["svg"]["routePresent"] and case["svg"]["routePathLength"] > 0, "hole routing path missing"),
+                    (case["svg"]["svgRect"] is not None and case["svg"]["svgRect"]["width"] > 0 and case["svg"]["svgRect"]["height"] > 0, "SVG has no rendered size"),
+                    (not case["horizontal_overflow"], "document has horizontal overflow"),
+                    (not case["page_errors"], "uncaught page errors present"),
+                    (not case["http_failures"], "HTTP failures present"),
+                  ]
+                  for passed, message in checks:
+                    if not passed:
+                      report["failures"].append(f"hole {hole} at {width}x{height}: {message}")
+                  if case["console_errors"]:
+                    report["failures"].append(f"hole {hole} at {width}x{height}: console errors present")
+                except Exception as exc:
+                  case["fatal_error"] = repr(exc)
+                  report["failures"].append(f"hole {hole} at {width}x{height}: {exc!r}")
+                  try:
+                    page.screenshot(path=str(out / f"hole-{hole}_{width}x{height}-failure.png"), full_page=True)
+                  except Exception:
+                    pass
+                report["cases"].append(case)
+                print(json.dumps(case, indent=2))
+                page.close()
+            browser.close()
+          (out / "diagnostics.json").write_text(json.dumps(report, indent=2))
+          print("SUMMARY: " + json.dumps({"cases": len(report["cases"]), "failures": report["failures"]}, indent=2))
+          if report["failures"]:
+            raise SystemExit(1)
+          PY
+
+      - name: Stop local static server
+        if: always()
+        shell: bash
+        run: |
+          if [ -f /tmp/base-http.pid ]; then kill "$(cat /tmp/base-http.pid)" 2>/dev/null || true; fi
+
+      - name: Upload screenshots and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agnostic45-base-qa
+          path: /tmp/agnostic45-base-qa/
+          if-no-files-found: warn
+          retention-days: 21
