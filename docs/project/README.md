@@ -3,6 +3,7 @@
 This directory is the durable project-management source of truth. Chat history is supporting context, not the project database.
 
 ## Start every session here
+0. Read [PROJECT-BRIEF.md](PROJECT-BRIEF.md) for the stable product and working principles; use [NEW-CHAT-STARTER.md](NEW-CHAT-STARTER.md) to onboard a new conversation.
 1. Open the [live project dashboard](../../project-dashboard.html).
 2. Read CURRENT-STATE.md.
 3. Check ACTION-REGISTER.md for the next unblocked task.
