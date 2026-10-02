@@ -5,7 +5,7 @@ Updated: 2026-10-02. Dashboard source and Pages deployment fix are committed; th
 ## Project control
 - Mandatory tool map: [TOOL-AND-ACCESS-REGISTER.md](TOOL-AND-ACCESS-REGISTER.md). It records confirmed routes and current access gaps; verify needed tools at the start of each session.
 - Live dashboard source: [project-dashboard.html](../../project-dashboard.html).
-- Published URL: https://mccrystal111-design.github.io/uido-live-test/project-dashboard.html. The Pages workflow explicitly copies `project-dashboard.html` into `_site`; deployment run succeeded. Direct live browser rendering remains unverified.
+- Published URL: https://mccrystal111-design.github.io/uido-live-test/project-dashboard.html. The Pages workflow explicitly copies `project-dashboard.html` into `_site`; deployment [run #36982434145](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982434145) succeeded. Dashboard-specific Playwright/Chromium QA [run #36982461137](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982461137) passed at 390×844 and 1440×900: HTTP 200, title/heading correct, live counts loaded (6 open issues, 2 open PRs), no browser console/page errors, no failed HTTP responses and no horizontal overflow. [Screenshots/report artifact](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982461137/artifacts/11216560509).
 - Dashboard fetches public GitHub issues, open pull requests and recent workflow runs directly from the GitHub REST API; refreshes every five minutes and on demand. It is read-only and does not start/rerun workflows.
 - Figma file: https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI .
 - Added editable Figma page **02 — Project Dashboard** with a 66-child dashboard concept frame. This is the visual design, not a live Figma data connection.
@@ -33,7 +33,6 @@ Updated: 2026-10-02. Dashboard source and Pages deployment fix are committed; th
 **OPS-002** — dashboard still needs a dashboard-specific browser check; investigate why the legacy/workflow-dispatch-only workflow records show push-event failures with zero jobs. Then complete control-pack reconciliation before advancing RND-002 geometry contract.
 
 ## Unverified
-- The public GitHub Pages dashboard URL has not been confirmed accessible in a real browser.
-- Latest AGNOSTIC45 run status and current source baseline have not been verified in this setup.
+- - The AG45 phone-bars review candidate passed automated QA, but the standalone base renderer still needs a dedicated QA run.
 - The original concept PNG has not yet been placed unchanged on a dedicated Figma reference page.
 - No timeline dates have been agreed. Do not claim tests or visual QA passed without linked evidence.
