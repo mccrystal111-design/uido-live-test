@@ -39,3 +39,10 @@
 - Confirmed dashboard QA run [#36982461137](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982461137) has a completed successful browser-QA job, and standalone AGNOSTIC45 base QA run [#36982883414](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982883414) has a completed successful Chromium job.
 - The connected GitHub tools exposed in this session do not provide workflow-run metadata/listing, and public web opening of the two zero-job run pages was unavailable. Therefore workflow name, event details, conclusion explanation and check-suite annotations could not be inspected. Root cause remains unresolved; no reruns were initiated.
 - Next: inspect the two run detail pages in GitHub Actions and record workflow/event/conclusion/check-suite evidence before deciding whether the records need a workflow fix or can be dispositioned as non-job runs.
+
+
+## 2026-10-02 — Course packet contract draft
+- Added [`docs/architecture/COURSE-PACKET-SPEC.md`](../architecture/COURSE-PACKET-SPEC.md), draft v0.1 for the provider-neutral UiDo course packet consumed by the course loader/AGNOSTIC45 renderer.
+- Covers immutable revisions, manifest and SHA-256 file inventory, GeoJSON WGS 84 coordinate order, metre-based internal units, provenance/refinement traceability, validation gates, offline cache behavior, version compatibility, delivery/storage boundaries and acceptance tests.
+- Kept geometry cardinality, archive format, storage backend/Supabase responsibilities and local-coordinate strategy explicitly open pending evidence. This is a draft contract, not a schema approval or proof the current builder output conforms.
+- DATA-001 moved to In progress. Next: inspect the actual Overstone builder output and compare the draft with PR #3 before implementing packet build/validation.
