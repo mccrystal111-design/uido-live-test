@@ -26,6 +26,8 @@ body{overscroll-behavior:none}
   position:fixed;inset:0;
   background:#dfe4d8;
 }
+#shotFlowOverlay{position:fixed;z-index:11;right:10px;bottom:72px;width:min(340px,calc(100vw - 20px));height:min(500px,calc(100vh - 92px));border:0;border-radius:18px;background:transparent;box-shadow:0 8px 28px rgba(0,0,0,.18);overflow:hidden}
+@media(max-width:700px){#shotFlowOverlay{right:8px;bottom:74px;width:min(330px,calc(100vw - 16px));height:min(460px,calc(100dvh - 90px));border-radius:16px}}
 canvas{
   position:absolute;inset:0;width:100%;height:100%;
   touch-action:none;
@@ -214,6 +216,7 @@ body.info-hidden #railToggle{right:10px}
   <section id="status" class="panel status info-box">Loading course…</section>
 </aside>
 
+<iframe id="shotFlowOverlay" title="UiDo shot decision sequence" src="shot-flow-field-test.html?embedded=1&amp;hole=1"></iframe>
 <div id="bunkerPopup" aria-live="polite"></div>
 <button id="railToggle" type="button">Hide info</button>
 
@@ -369,7 +372,9 @@ function selectHole(n){
   update(current);
   document.getElementById('status').textContent='Hole '+n+' · authoritative source geometry + live F/M/B';
   draw();
+  var flow=document.getElementById('shotFlowOverlay');if(flow&&flow.contentWindow)flow.contentWindow.postMessage({type:'uido:set-hole',hole:n},'*');
 }
+window.addEventListener('message',function(e){var flow=document.getElementById('shotFlowOverlay');var d=e.data;if(!flow||e.source!==flow.contentWindow||!d||d.type!=='uido:hole-change')return;selectHole(d.hole)});
 function bunkerGeometry(b){
   var feature=(D.features||[]).find(function(f){return f.id===b.id&&f.golf==='bunker'&&f.geometry&&f.geometry.type==='Polygon';});
   return feature ? feature.geometry.coordinates[0] : null;
