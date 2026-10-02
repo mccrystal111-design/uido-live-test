@@ -48,3 +48,9 @@
 - DATA-001 moved to In progress. Next: inspect the actual Overstone builder output and compare the draft with PR #3 before implementing packet build/validation.
 
 - Compared packet draft against PR #3's actual head-branch schema files. Recorded the current feature geometry validation gap and provenance/registration details still needed; preserved the agreed sequence of Overstone/Poult Wood fixtures before changing acquisition code. Updated spec in commit [4741baa](https://github.com/mccrystal111-design/uido-live-test/commit/4741baa260502ba513de2b1a234681ee62391605).
+
+## 2026-10-02 — Full shot-decision and GPS capture
+- Expanded the standalone Overstone field-test page from tile-tap logging to category value capture for Yardage, UiDo Caddie, Wind, Lie, Club, Strike, Trajectory, Start, Shape, Score and Putts.
+- Added a Putts radial tile, touch-friendly value picker, shot/hole phases, per-shot decision snapshots on HIT SHOT, retained hole-level score/putts, GPS attached to each event, and an export with ordered raw events and shot summaries.
+- Values are a practical test vocabulary for today's field trial, not yet an approved canonical UiDo data contract. No device test has been run and live Pages publication remains unverified.
+- Commit: [9b54d56](https://github.com/mccrystal111-design/uido-live-test/commit/9b54d56bb9fa200771887f87b1af30986ecd9764).
