@@ -34,8 +34,9 @@ Updated: 2026-10-02. Tool/access register is linked from the session-start instr
 - Latest dashboard-copy Pages deploy [run #36982434145](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982434145) passed at commit `84140b87432507706ad159e3f2a936d93ef72053`. Dashboard Playwright QA [run #36982461137](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982461137) passed at commit `9bc63015d319a79b0dc7f946137081d54cde5415`.
 - Documentation commits caused several push-event workflow runs to fail with zero jobs (e.g. [#36982036792](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982036792)); GitHub's jobs endpoint returns an empty list, so the failure cause is not yet established. No reruns were started. Avoid claiming these are course-build failures until the trigger/check-suite explanation is confirmed.
 
-## Next action
-**OPS-002** — investigate why several legacy/workflow-dispatch-only workflow records show push-event failures with zero jobs, then finish reconciling open PRs and repository records. The standalone AGNOSTIC45 base has now passed browser geometry QA; after OPS-002, confirm the canonical geometry contract before renderer extension.
+## Next actions
+- **OPS-002** remains open for separate reconciliation; this session has deliberately moved to another workstream.
+- **DATA-001** is now in progress: draft the provider-neutral [Course Packet Specification](../architecture/COURSE-PACKET-SPEC.md) was committed at [53144a8](https://github.com/mccrystal111-design/uido-live-test/commit/53144a8d5bdfb9a410f3142d85f822c2f70df046). Next: compare it with actual Overstone course-builder output and PR #3's proposed schemas, then agree the canonical geometry contract before implementing a builder/validator or choosing storage.
 
 ## Unverified
 - The standalone base passed automated geometry QA, but the canonical hole-by-hole geometry contract still needs agreement before renderer extension.
