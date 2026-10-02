@@ -1,10 +1,10 @@
 # UiDo — Current State
 
-Updated: 2026-10-02. Dashboard source and Pages deployment fix are committed; live publication is being verified.
+Updated: 2026-10-02. Dashboard source and Pages deployment fix are committed; the normal Pages deployment completed successfully (run #36979995902).
 
 ## Project control
 - Live dashboard source: [project-dashboard.html](../../project-dashboard.html).
-- Published URL: https://mccrystal111-design.github.io/uido-live-test/project-dashboard.html. The Pages workflow now explicitly copies `project-dashboard.html` into `_site`; deployment/access verification is pending.
+- Published URL: https://mccrystal111-design.github.io/uido-live-test/project-dashboard.html. The Pages workflow explicitly copies `project-dashboard.html` into `_site`; deployment run succeeded. Direct URL fetch could not be independently confirmed by the browser checker, so reload the URL to confirm from your browser.
 - Dashboard fetches public GitHub issues, open pull requests and recent workflow runs directly from the GitHub REST API; refreshes every five minutes and on demand. It is read-only and does not start/rerun workflows.
 - Figma file: https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI .
 - Added editable Figma page **02 — Project Dashboard** with a 66-child dashboard concept frame. This is the visual design, not a live Figma data connection.
