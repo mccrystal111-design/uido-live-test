@@ -4,16 +4,18 @@ This directory is the durable project-management source of truth. Chat history i
 
 ## Start every session here
 0. Read [PROJECT-BRIEF.md](PROJECT-BRIEF.md) for the stable product and working principles; use [NEW-CHAT-STARTER.md](NEW-CHAT-STARTER.md) to onboard a new conversation.
-1. Open the [live project dashboard](../../project-dashboard.html).
-2. Read CURRENT-STATE.md.
-3. Check ACTION-REGISTER.md for the next unblocked task.
-4. Check DEPENDENCIES.md before choosing work.
-5. Read DECISION-LOG.md before revisiting established choices.
-6. At session end, update CHANGELOG.md and SESSION-HANDOVER.md plus current state and action status.
+1. Read [TOOL-AND-ACCESS-REGISTER.md](TOOL-AND-ACCESS-REGISTER.md) and verify the tools needed for the current task. Do not assume access from an old session.
+2. Open the [live project dashboard](../../project-dashboard.html).
+3. Read CURRENT-STATE.md and SESSION-HANDOVER.md.
+4. Check ACTION-REGISTER.md for the next unblocked task.
+5. Check DEPENDENCIES.md before choosing work.
+6. Read DECISION-LOG.md before revisiting established choices.
+7. Inspect actual source, commit and workflow evidence before treating any status as verified.
+8. At session end, update CHANGELOG.md and SESSION-HANDOVER.md plus current state and action status. Update the tool register when an access route or process changes.
 
 ## Dashboard
 - [Live dashboard source](../../project-dashboard.html) — reads public GitHub issues, open PRs and recent workflow runs, with manual and five-minute refresh.
-- [Intended GitHub Pages URL](https://mccrystal111-design.github.io/uido-live-test/project-dashboard.html) — the workflow now copies the file into the published site; verify the normal deployment after workflow changes.
+- [Intended GitHub Pages URL](https://mccrystal111-design.github.io/uido-live-test/project-dashboard.html) — the workflow copies the file into the published site; verify the rendered page after deployment changes.
 - [Figma dashboard design](https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI) — editable visual design; it is not itself a live GitHub data connection.
 - GitHub's native Projects board and saved views are not yet configured. OPS-003 tracks the remaining work.
 
