@@ -32,3 +32,10 @@
 - [Run #36982883414](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982883414) passed six cases: holes 1 and 9 at 390×844, 768×1024 and 1440×900.
 - Checks confirmed HTTP 200, expected hole-specific title, SVG and rendered geometry root, physical feature paths, routing path, positive SVG size, no horizontal overflow, no uncaught page errors, no console errors and no failed HTTP responses.
 - [Screenshots and diagnostics artifact](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982883414/artifacts/11216462231). This is automated structural evidence, not human visual approval or approval of the canonical geometry contract.
+
+
+## 2026-10-02 — OPS-002 zero-job failure investigation checkpoint
+- Rechecked workflow jobs for runs [#36982036792](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982036792) and [#36982882178](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982882178); both returned an empty jobs array.
+- Confirmed dashboard QA run [#36982461137](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982461137) has a completed successful browser-QA job, and standalone AGNOSTIC45 base QA run [#36982883414](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982883414) has a completed successful Chromium job.
+- The connected GitHub tools exposed in this session do not provide workflow-run metadata/listing, and public web opening of the two zero-job run pages was unavailable. Therefore workflow name, event details, conclusion explanation and check-suite annotations could not be inspected. Root cause remains unresolved; no reruns were initiated.
+- Next: inspect the two run detail pages in GitHub Actions and record workflow/event/conclusion/check-suite evidence before deciding whether the records need a workflow fix or can be dispositioned as non-job runs.
