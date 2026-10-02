@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uido.golf/schema/course.schema.json",
+  "title": "UiDo Course",
+  "type": "object",
+  "required": ["course_id", "canonical_name", "status", "location", "current_version"],
+  "properties": {
+    "course_id": {"type": "string"},
+    "canonical_name": {"type": "string"},
+    "club_name": {"type": ["string", "null"]},
+    "address": {"type": ["string", "null"]},
+    "city": {"type": ["string", "null"]},
+    "region": {"type": ["string", "null"]},
+    "country_code": {"type": "string", "minLength": 2, "maxLength": 2},
+    "timezone": {"type": ["string", "null"]},
+    "location": {
+      "type": "object",
+      "required": ["latitude", "longitude"],
+      "properties": {
+        "latitude": {"type": "number", "minimum": -90, "maximum": 90},
+        "longitude": {"type": "number", "minimum": -180, "maximum": 180}
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "temporarily_closed", "closed", "unknown"]
+    },
+    "current_version": {"type": "string"},
+    "source_ids": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  },
+  "additionalProperties": false
+}

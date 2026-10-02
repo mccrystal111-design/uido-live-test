@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uido.golf/schema/issue.schema.json",
+  "title": "UiDo Course Issue",
+  "type": "object",
+  "required": ["issue_id", "course_id", "issue_type", "status", "description", "created_at"],
+  "properties": {
+    "issue_id": {"type": "string"},
+    "course_id": {"type": "string"},
+    "course_version_id": {"type": ["string", "null"]},
+    "reported_by": {"type": ["string", "null"]},
+    "issue_type": {"type": "string"},
+    "description": {"type": "string"},
+    "location": {
+      "type": ["object", "null"],
+      "description": "GeoJSON geometry or point identifying the reported location."
+    },
+    "severity": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+    "status": {
+      "type": "string",
+      "enum": [
+        "reported",
+        "triaged",
+        "investigating",
+        "evidence_collected",
+        "verified",
+        "canonical_update",
+        "published",
+        "rejected"
+      ]
+    },
+    "created_at": {"type": "string", "format": "date-time"},
+    "resolved_at": {"type": ["string", "null"], "format": "date-time"},
+    "evidence_ids": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  },
+  "additionalProperties": false
+}
