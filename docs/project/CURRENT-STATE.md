@@ -1,6 +1,6 @@
 # UiDo — Current State
 
-Updated: 2026-10-02. Dashboard source and Pages deployment fix are committed; the normal Pages deployment completed successfully (run #36979995902). Tool/access register added and linked from the session-start instructions.
+Updated: 2026-10-02. Tool/access register is linked from the session-start instructions; dashboard deployment and Playwright verification are complete.
 
 ## Project control
 - Mandatory tool map: [TOOL-AND-ACCESS-REGISTER.md](TOOL-AND-ACCESS-REGISTER.md). It records confirmed routes and current access gaps; verify needed tools at the start of each session.
@@ -9,7 +9,7 @@ Updated: 2026-10-02. Dashboard source and Pages deployment fix are committed; th
 - Dashboard fetches public GitHub issues, open pull requests and recent workflow runs directly from the GitHub REST API; refreshes every five minutes and on demand. It is read-only and does not start/rerun workflows.
 - Figma file: https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI .
 - Added editable Figma page **02 — Project Dashboard** with a 66-child dashboard concept frame. This is the visual design, not a live Figma data connection.
-- GitHub connector access was verified by reading and committing repository docs. Figma connector responded to an identity/workspace query. Supabase connector returned no accessible projects on 2026-10-02. No direct browser-control integration is exposed in this chat session, but repository-hosted Playwright/Chromium QA is available through `.github/workflows/visual-qa-agnostic45.yml`.
+- GitHub connector access was verified by reading and committing repository docs. Figma connector responded to an identity/workspace query. Supabase connector returned no accessible projects on 2026-10-02. No direct interactive browser-control integration is exposed in this chat session, but repository-hosted Playwright/Chromium QA is available through `.github/workflows/visual-qa-agnostic45.yml` and `.github/workflows/project-dashboard-browser-qa.yml`.
 - Created GitHub issues: [OPS-002](https://github.com/mccrystal111-design/uido-live-test/issues/5), [OPS-003](https://github.com/mccrystal111-design/uido-live-test/issues/6), [DES-001](https://github.com/mccrystal111-design/uido-live-test/issues/7), [RND-001](https://github.com/mccrystal111-design/uido-live-test/issues/8).
 - GitHub Project (the native Projects board with saved views) has not been created; connected GitHub tools available in this session do not expose a create/configure Project action. OPS-003 tracks this setup and owner-UI steps if needed.
 
@@ -26,13 +26,13 @@ Updated: 2026-10-02. Dashboard source and Pages deployment fix are committed; th
 ## Workflow evidence checked on 2026-10-02
 - Latest relevant AGNOSTIC45 Visual QA run found: [run #36925474787](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36925474787), completed successfully on source commit `fc51a6d624bf00e2c290bce7cc40f004e2d76bd6`. The job ran Playwright + Chromium, checked the phone-bars/geometry layout at configured viewports and uploaded artifact `ag45-visual-qa-74` with screenshots and diagnostics. This is automated evidence, not human visual approval and not a test of the dashboard.
 - AG45 candidate page currently exists at `overstone/ag45v1-phone-bars-review.html` (blob `f9ed5b1113cb5823c1c52b4b2c3bad5bea26cf40`); the standalone unbranded base source `overstone/ui-hole-renderer-agnostic45-ui-base.html` exists (blob `4abe22707f0d000b0cbb3567c22639719ac16c47`). The QA run tested the phone-bars review page, not the standalone base page.
-- Latest Pages deploy [run #36979995902](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36979995902) passed all deploy steps at commit `436f612f8acff69cab1f96eb80c576145147add4`.
+- Latest dashboard-copy Pages deploy [run #36982434145](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982434145) passed at commit `84140b87432507706ad159e3f2a936d93ef72053`. Dashboard Playwright QA [run #36982461137](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982461137) passed at commit `9bc63015d319a79b0dc7f946137081d54cde5415`.
 - Documentation commits caused several push-event workflow runs to fail with zero jobs (e.g. [#36982036792](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982036792)); GitHub's jobs endpoint returns an empty list, so the failure cause is not yet established. No reruns were started. Avoid claiming these are course-build failures until the trigger/check-suite explanation is confirmed.
 
 ## Next action
-**OPS-002** — dashboard still needs a dashboard-specific browser check; investigate why the legacy/workflow-dispatch-only workflow records show push-event failures with zero jobs. Then complete control-pack reconciliation before advancing RND-002 geometry contract.
+**OPS-002** — investigate why several legacy/workflow-dispatch-only workflow records show push-event failures with zero jobs, then finish reconciling open PRs and repository records. After that, run QA against the standalone AGNOSTIC45 base and confirm the canonical geometry contract before renderer extension.
 
 ## Unverified
-- - The AG45 phone-bars review candidate passed automated QA, but the standalone base renderer still needs a dedicated QA run.
+- The AG45 phone-bars review candidate passed automated QA, but the standalone base renderer still needs a dedicated QA run.
 - The original concept PNG has not yet been placed unchanged on a dedicated Figma reference page.
 - No timeline dates have been agreed. Do not claim tests or visual QA passed without linked evidence.
