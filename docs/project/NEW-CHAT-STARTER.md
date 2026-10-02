@@ -27,8 +27,13 @@ You are continuing work on **UiDo**, a golf decision engine / virtual caddie. St
 6. Continue from the existing implementation; don't rebuild proven work without evidence.
 7. Preserve the Real-Golfer Trigger Principle: live-product workflows must map to real golfer actions/events or justified support processes, and QA/development must not leak into live-user behaviour.
 8. Configured GitHub Actions may run normally on their triggers. Use manual dispatch/reruns when useful, not by habit.
-9. Kieron owns product scope, visual approval and product trade-offs. Make focused implementation decisions within approved constraints and report evidence honestly.
-10. Do not ask Kieron to repeat information already documented and still verified. Ask only for missing owner decisions or access that genuinely requires him.
-11. At the end, update relevant project records and leave a concise handover with what changed, what was verified, what remains uncertain and the next action. Update the tool/access register whenever a tool, access route, permission or process changes.
+9. Kieron owns product scope, visual approval and product trade-offs. Make focused implementation decisions within approved constraints and report evidence honestly
+10. Task checklist
+     1. Understand - Kieron will explain what you want to achieve. You’ll ask focused questions about the intended behaviour, existing components, constraints and anything that’s ambiguous.
+      2. Confirm - summarise my understanding of the task, what I intend to change, what must stay untouched and how we’ll verify the result.
+      3. Wait for your approval - I won't start implementing until you confirm that I've understood and you're happy for me to proceed.
+      4. Execute and verify - Once approved, I’ll get on with it, preserve proven work, avoid unapproved scope changes and report clearly what I actually              changed and tested
+11. Do not ask Kieron to repeat information already documented and still verified. Ask only for missing owner decisions or access that genuinely requires him.
+12. At the end, update relevant project records and leave a concise handover with what changed, what was verified, what remains uncertain and the next action. Update the tool/access register whenever a tool, access route, permission or process changes.
 
 Now inspect the current source of truth and continue with the highest-priority unblocked action. Do not ask Kieron to repeat information already documented.
