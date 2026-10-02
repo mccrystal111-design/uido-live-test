@@ -9,7 +9,7 @@ Updated: 2026-10-02
 4. DECISION-LOG.md
 
 ## Immediate next action
-OPS-002: inspect actual repository source, recent commits and relevant workflow runs, then reconcile statuses against evidence. Dashboard setup is done; current AGNOSTIC45 status remains unverified. Do not automatically run GitHub Actions; Kieron starts runs manually.
+OPS-002: inspect actual repository source, recent commits and relevant workflow runs, then reconcile statuses against evidence. Dashboard Pages fix is committed; verify the normal push-triggered deployment. Current AGNOSTIC45 status remains unverified.
 
 ## Project links
 - Repo: https://github.com/mccrystal111-design/uido-live-test
@@ -27,7 +27,7 @@ OPS-002: inspect actual repository source, recent commits and relevant workflow 
 - Stats: Handicap (Official + Practice, edit/connect, explanation and 9-hole WHS-aligned handling), Performance, Scoring, Driving, Approach, Short Game.
 - Supabase: classify data and offline/sync/security needs before deciding its responsibilities.
 - Real-Golfer Trigger Principle applies to all live-product workflows.
-- Kieron manually triggers GitHub Actions; never auto-rerun.
+- Workflow triggers may run normally when configured; use manual dispatch/reruns only when needed. Preserve human approval for product and visual decisions.
 
 ## End-of-session protocol
 Update action status and evidence, CURRENT-STATE with one next action, decisions and verified changes, and this handover. State blockers and any required human action. Do not claim tests passed without evidence.
