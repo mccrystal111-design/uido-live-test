@@ -26,6 +26,12 @@ OPS-002 is being handled separately; continue with DATA-001 rather than duplicat
 - Explicitly left the archive format, storage provider/Supabase split, local coordinate generation and geometry cardinality open; no implementation or storage choice is claimed.
 - DATA-001 moved from Ready to In progress. The draft has not been tested against a real packet yet and is not an approved geometry contract.
 
+## Work completed in this session
+- Created and refined [Course Packet Specification v0.1](../architecture/COURSE-PACKET-SPEC.md), including a comparison with PR #3's actual head-branch schemas.
+- PR #3's feature schema currently accepts any object for `geometry`; it does not enforce GeoJSON structure, geometry-to-feature compatibility, coordinate semantics or cardinality. Provenance also needs feature-level links and a defined place for registration/error metrics. Treat these as fixture-driven schema gaps, not a blanket rejection of the draft.
+- The next data-workstream step is still to locate and inspect the actual current Overstone and Poult Wood builder outputs, then create a fixture and validator plan. No builder code was changed and no fixture tests were run.
+- OPS-002 remains delegated/separate; do not repeat its workflow investigation in this workstream.
+
 ## Active context
 - Concept PNG supplied on 2026-10-02; place unchanged on dedicated Figma reference page.
 - Design: warm ivory, forest green, golden-yellow circular mark, restrained topographic/course imagery. Correct errors; don't reinterpret via image generation.
