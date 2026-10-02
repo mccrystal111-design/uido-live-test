@@ -9,11 +9,16 @@ Updated: 2026-10-02
 4. DECISION-LOG.md
 
 ## Immediate next action
-OPS-002: inspect actual repository files, recent commits and relevant workflow runs, then reconcile statuses against evidence. Do not automatically run GitHub Actions; Kieron starts runs manually.
+OPS-002: inspect actual repository source, recent commits and relevant workflow runs, then reconcile statuses against evidence. Dashboard setup is done; current AGNOSTIC45 status remains unverified. Do not automatically run GitHub Actions; Kieron starts runs manually.
+
+## Project links
+- Repo: https://github.com/mccrystal111-design/uido-live-test
+- [Live dashboard page](../../project-dashboard.html) — intended published URL: https://mccrystal111-design.github.io/uido-live-test/project-dashboard.html (publication not verified yet).
+- Figma: https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI
+- Figma dashboard design page: 02 — Project Dashboard.
+- Issues: [OPS-002 #5](https://github.com/mccrystal111-design/uido-live-test/issues/5), [OPS-003 #6](https://github.com/mccrystal111-design/uido-live-test/issues/6), [DES-001 #7](https://github.com/mccrystal111-design/uido-live-test/issues/7), [RND-001 #8](https://github.com/mccrystal111-design/uido-live-test/issues/8).
 
 ## Active context
-- Repo: https://github.com/mccrystal111-design/uido-live-test
-- Figma: https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI
 - Concept PNG supplied on 2026-10-02; place unchanged on dedicated Figma reference page.
 - Design: warm ivory, forest green, golden-yellow circular mark, restrained topographic/course imagery. Correct errors; don't reinterpret via image generation.
 - AGNOSTIC45: extend proven geometry-driven par-4/5 base; tee, fairway, rough, green, bunkers, water, paths; no labels/profile/UI overlays.
