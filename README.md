@@ -6,6 +6,9 @@
 
 Start at [docs/project/README.md](docs/project/README.md).
 
+- [UiDo Project Brief](docs/project/PROJECT-BRIEF.md) — stable orientation for any new chat.
+- [New Chat Starter](docs/project/NEW-CHAT-STARTER.md) — copy/paste prompt to get a fresh conversation up to speed.
+
 - [Current state and next action](docs/project/CURRENT-STATE.md)
 - [Master action register](docs/project/ACTION-REGISTER.md)
 - [Dependencies](docs/project/DEPENDENCIES.md)
