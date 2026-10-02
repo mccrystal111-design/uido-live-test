@@ -13,6 +13,11 @@ Updated: 2026-10-02. Tool/access register is linked from the session-start instr
 - Created GitHub issues: [OPS-002](https://github.com/mccrystal111-design/uido-live-test/issues/5), [OPS-003](https://github.com/mccrystal111-design/uido-live-test/issues/6), [DES-001](https://github.com/mccrystal111-design/uido-live-test/issues/7), [RND-001](https://github.com/mccrystal111-design/uido-live-test/issues/8).
 - GitHub Project (the native Projects board with saved views) has not been created; connected GitHub tools available in this session do not expose a create/configure Project action. OPS-003 tracks this setup and owner-UI steps if needed.
 
+## Open pull requests reviewed on 2026-10-02
+- [PR #3 — Define UiDo canonical global course database architecture](https://github.com/mccrystal111-design/uido-live-test/pull/3): open draft targeting `main`; adds course/feature/provenance/issue schemas and Git-backed versioning. Its feature geometry schema currently describes GeoJSON but does not yet constrain geometry structure; treat as a proposal, not an approved geometry contract. Mergeability/check status was not established.
+- [PR #1 — Test EA machine acquisition path](https://github.com/mccrystal111-design/uido-live-test/pull/1): open draft targeting `main`; adds a direct EA survey-tile endpoint probe to the Overstone acquisition test. Mergeability/check status was not established.
+- Neither PR was merged or changed during this reconciliation.
+
 ## Product and technical baseline
 - Brand direction: warm ivory, forest green, golden-yellow circular mark, restrained topographic/course imagery and premium understated golf identity. Existing preferences include #3F4B3B, Montserrat and Bodoni Moda; verify actual palette from the concept before approval.
 - AGNOSTIC45 goal: extend the proven geometry-driven base renderer for par-4/par-5 holes, supporting tee, fairway, rough, green, bunkers, water and paths, with no labels/player profile/UI overlays in the base.
