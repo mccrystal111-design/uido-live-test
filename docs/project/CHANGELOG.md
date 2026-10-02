@@ -16,3 +16,12 @@
 - Recorded manual GitHub Actions rule and Real-Golfer Trigger Principle.
 - Evidence: this commit contains these control documents.
 - Not done at that point: repository reconciliation; GitHub Issues/Project views; concept PNG placement in Figma; current AGNOSTIC45 workflow verification.
+
+## 2026-10-02 — Tool register and browser verification
+- Added `docs/project/TOOL-AND-ACCESS-REGISTER.md` and made it mandatory in the project control entry point and new-chat starter.
+- Recorded actual access routes and limits: GitHub and Figma integrations respond; no Supabase project was visible to the connected project-list call; Playwright/Chromium is available through repository-hosted GitHub Actions rather than a direct browser-control tool in the chat session.
+- Added `.github/workflows/project-dashboard-browser-qa.yml` to test the published dashboard using Playwright/Chromium at mobile and desktop sizes, check live GitHub data, capture browser errors and detect horizontal overflow.
+- Dashboard QA passed: [run #36982461137](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982461137), artifact [screenshots/report](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982461137/artifacts/11216560509). Dashboard rendered at 390×844 and 1440×900 with live data, no console/page errors, failed HTTP responses or horizontal overflow.
+- Updated dashboard copy to reflect normal configured workflow triggers rather than instructing the user to run Actions manually.
+- AGNOSTIC45 QA evidence recorded: [run #36925474787](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36925474787) passed for the phone-bars review candidate, but the standalone base renderer still needs its own QA and the geometry contract remains outstanding.
+- Remaining issue: several legacy workflow records fail on push events with zero jobs. Cause not established; no reruns were started. OPS-002 remains open to diagnose these records and finish reconciling recent PRs.
