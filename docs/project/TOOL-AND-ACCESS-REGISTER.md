@@ -76,6 +76,7 @@
 | 2026-10-02 | Supabase connector | Project-list call returned an empty project list. No UiDo Supabase project was verified as accessible. |
 | 2026-10-02 | Playwright/Chromium | AG45 phone-bars QA #36925474787, standalone base QA #36982883414, and dashboard QA #36982461137 passed using Playwright + Chromium. The base QA covered holes 1 and 9 at three viewports; no page errors, console errors, failed responses or horizontal overflow. Artifacts linked above. |
 | 2026-10-02 | GitHub Pages dashboard | Deployment #36982434145 succeeded; Playwright QA #36982461137 confirmed HTTP 200, expected page content, live data and no browser errors or horizontal overflow. |
+| 2026-10-02 | Workflow-run diagnosis tools | Verified repository/file, PR, commit-search, and workflow-job/artifact tools. For runs #36982036792 and #36982882178, the available jobs endpoint returned an empty array; the exposed connector has no workflow-run metadata/list endpoint to retrieve the event, workflow name, conclusion details, or check-suite context. Public web opening of the run pages was unavailable. Root cause therefore remains unverified; do not infer a trigger/configuration cause or rerun blindly. |
 
 ## Maintenance
 
