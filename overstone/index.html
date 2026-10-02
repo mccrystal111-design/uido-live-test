@@ -375,6 +375,7 @@ function selectHole(n){
   var flow=document.getElementById('shotFlowOverlay');if(flow&&flow.contentWindow)flow.contentWindow.postMessage({type:'uido:set-hole',hole:n},'*');
 }
 window.addEventListener('message',function(e){var flow=document.getElementById('shotFlowOverlay');var d=e.data;if(!flow||e.source!==flow.contentWindow||!d||d.type!=='uido:hole-change')return;selectHole(d.hole)});
+document.getElementById('shotFlowOverlay').addEventListener('load',function(){this.contentWindow.postMessage({type:'uido:set-hole',hole:holeNumber},'*')});
 function bunkerGeometry(b){
   var feature=(D.features||[]).find(function(f){return f.id===b.id&&f.golf==='bunker'&&f.geometry&&f.geometry.type==='Polygon';});
   return feature ? feature.geometry.coordinates[0] : null;
