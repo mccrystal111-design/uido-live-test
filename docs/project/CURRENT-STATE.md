@@ -1,10 +1,17 @@
 # UiDo — Current State
 
-Updated: 2026-10-02. This is a partial snapshot from project context; verify live repository and workflow state before technical changes.
+Updated: 2026-10-02. Dashboard setup is implemented; repository and workflow reconciliation is still pending.
 
-## Where we are
-- Project control pack is being established; it must be reconciled against actual repository files and workflow runs.
-- Figma file: https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI . Initial editable foundations page exists. The chosen concept PNG is not yet embedded.
+## Project control
+- Live dashboard source: [project-dashboard.html](../../project-dashboard.html).
+- Intended published URL: https://mccrystal111-design.github.io/uido-live-test/project-dashboard.html. Publication/access has not yet been confirmed in this session.
+- Dashboard fetches public GitHub issues, open pull requests and recent workflow runs directly from the GitHub REST API; refreshes every five minutes and on demand. It is read-only and does not start/rerun workflows.
+- Figma file: https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI .
+- Added editable Figma page **02 — Project Dashboard** with a 66-child dashboard concept frame. This is the visual design, not a live Figma data connection.
+- Created GitHub issues: [OPS-002](https://github.com/mccrystal111-design/uido-live-test/issues/5), [OPS-003](https://github.com/mccrystal111-design/uido-live-test/issues/6), [DES-001](https://github.com/mccrystal111-design/uido-live-test/issues/7), [RND-001](https://github.com/mccrystal111-design/uido-live-test/issues/8).
+- GitHub Project (the native Projects board with saved views) has not been created; connected GitHub tools available in this session do not expose a create/configure Project action. OPS-003 tracks this setup and owner-UI steps if needed.
+
+## Product and technical baseline
 - Brand direction: warm ivory, forest green, golden-yellow circular mark, restrained topographic/course imagery and premium understated golf identity. Existing preferences include #3F4B3B, Montserrat and Bodoni Moda; verify actual palette from the concept before approval.
 - AGNOSTIC45 goal: extend the proven geometry-driven base renderer for par-4/par-5 holes, supporting tee, fairway, rough, green, bunkers, water and paths, with no labels/player profile/UI overlays in the base.
 - Course geometry: canonical hole-by-hole geometry and provenance should be agreed before extending renderer work.
@@ -15,9 +22,10 @@ Updated: 2026-10-02. This is a partial snapshot from project context; verify liv
 - Kieron manually starts GitHub Actions; never automatically rerun them.
 
 ## Next action
-OPS-002 — Inspect actual repository files, recent commits and relevant workflow runs, then reconcile this snapshot against evidence.
-
-After reconciliation: create actionable GitHub Issues and Project views; then continue DES-001, placing the concept PNG unchanged on a dedicated Figma reference page.
+**OPS-002** — inspect actual repository source, recent commits and relevant workflow runs, then reconcile the control pack against evidence. No workflows have been triggered by this dashboard setup.
 
 ## Unverified
-Latest AGNOSTIC45 run status is not verified in this setup. No timeline dates have been agreed. Do not claim tests or visual QA passed without linked evidence.
+- The public GitHub Pages dashboard URL has not been confirmed accessible.
+- Latest AGNOSTIC45 run status and current source baseline have not been verified in this setup.
+- The original concept PNG has not yet been placed unchanged on a dedicated Figma reference page.
+- No timeline dates have been agreed. Do not claim tests or visual QA passed without linked evidence.
