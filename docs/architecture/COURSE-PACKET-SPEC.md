@@ -187,3 +187,25 @@ These are intentionally not guessed in v0.1:
 6. Decide delivery/storage responsibilities from measured package size and update needs, then map only the required metadata/index to Supabase if appropriate.
 
 This document is a draft implementation contract. It does not approve the current PR #3 schema, certify existing course geometry as accurate, or decide the production storage provider.
+
+## 13. Alignment with the current canonical database proposal (PR #3)
+
+The open draft [PR #3](https://github.com/mccrystal111-design/uido-live-test/pull/3) proposes a canonical database model, while this document defines the **delivery packet** consumed by the loader. They are related but should not be the same serialization by accident: the packet builder maps a specific immutable canonical course version into a self-contained renderer-facing package and retains links back to evidence/provenance.
+
+Inspection of PR #3's head branch at `feature/global-course-database-architecture` on 2026-10-02 found:
+
+- `course.schema.json` requires `course_id`, `canonical_name`, `status`, `location` and `current_version`; it has latitude/longitude metadata and rejects undeclared fields.
+- `feature.schema.json` lists feature types and confidence/verification fields, but `geometry` is only constrained to be an object with a description. It does not yet validate GeoJSON `type`, coordinate nesting, geometry-to-feature-type compatibility, coordinate reference semantics or cardinality.
+- `provenance.schema.json` captures source/snapshot identifiers, timestamps, transformation and notes, but the packet still needs a clear feature-to-provenance linkage and source-file checksum/registration-error representation.
+- The PR description explicitly calls for Overstone and Poult Wood fixtures before changing acquisition code. That sequencing is retained here.
+
+These are observed schema gaps, not a rejection of PR #3. Before approval, use real fixtures to decide whether canonical storage keeps normalized feature records with separate provenance links, while packet output groups the required per-hole data and adds a manifest/file integrity layer. Do not duplicate conflicting definitions of course identity, feature enums or geometry semantics across schemas; make one canonical geometry contract and reference it from both database and packet validation.
+
+## 14. Review checklist before implementation
+
+- [ ] Inspect the actual current Overstone and Poult Wood builder outputs and preserve any useful existing fields.
+- [ ] Build at least one real-hole fixture without discarding source geometry or provenance.
+- [ ] Agree feature geometry types/cardinality and explicit direction-of-play semantics with the canonical geometry contract.
+- [ ] Decide how canonical `course_version_id` maps to packet `course_revision` and how revisions remain immutable.
+- [ ] Define a validator report format and decide which conditions are fatal versus warnings.
+- [ ] Only after fixture and loader tests pass, decide package archive/container and storage/delivery topology.
