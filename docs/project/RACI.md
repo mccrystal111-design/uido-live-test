@@ -1,9 +1,9 @@
 # UiDo RACI
 
 Roles:
-- Kieron (Product Owner): sets product intent, approves design/behaviour, manually triggers workflows, confirms outcomes.
+- Kieron (Product Owner): sets product intent, approves design/behaviour, confirms outcomes.
 - ChatGPT (Coordinator/Implementer): inspects source, implements agreed changes, maintains records, tests where possible and reports evidence/uncertainty.
-- GitHub Actions/tooling: executes only when explicitly triggered by Kieron or an independently approved production design; it does not make decisions.
+- GitHub Actions/tooling: runs according to configured push, schedule, dispatch or other approved triggers; it does not make product decisions.
 
 | Activity | ChatGPT | Kieron |
 |---|---|---|
@@ -13,7 +13,8 @@ Roles:
 | Product scope and priority | C | A |
 | Brand/design approval | C | A |
 | Define geometry/product acceptance criteria | R | A |
-| Manually trigger GitHub Actions | I | R/A |
+| Configure and maintain workflow triggers | R | A/C |
+| Monitor workflow results and diagnose defects | R | C |
 | Inspect workflow results and diagnose defects | R | C |
 | Approve design or release outcome | C | A |
 | Confirm behaviour meets golfer needs | R | A |
