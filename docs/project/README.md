@@ -12,7 +12,7 @@ This directory is the durable project-management source of truth. Chat history i
 
 ## Dashboard
 - [Live dashboard source](../../project-dashboard.html) — reads public GitHub issues, open PRs and recent workflow runs, with manual and five-minute refresh.
-- [Intended GitHub Pages URL](https://mccrystal111-design.github.io/uido-live-test/project-dashboard.html) — publication/access is not yet verified.
+- [Intended GitHub Pages URL](https://mccrystal111-design.github.io/uido-live-test/project-dashboard.html) — the workflow now copies the file into the published site; verify the normal deployment after workflow changes.
 - [Figma dashboard design](https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI) — editable visual design; it is not itself a live GitHub data connection.
 - GitHub's native Projects board and saved views are not yet configured. OPS-003 tracks the remaining work.
 
@@ -23,7 +23,7 @@ Suggested fields: Status, Priority, Workstream, Owner, Blocked by, Start date, T
 Status vocabulary: Backlog, Ready, In progress, Blocked, Awaiting Kieron, In QA, Done, Parked, Needs verification.
 
 ## Operating constraints
-- Do not automatically run or rerun GitHub Actions. Kieron starts runs manually; then inspect results and update records.
+- Let configured GitHub Actions triggers run normally for code changes, tests and deployments. Use manual dispatch/reruns when they serve a clear purpose; do not duplicate an automatic run unnecessarily.
 - A green workflow proves only that workflow/run passed, not that the whole product is correct.
 - Product triggers map to real golfer actions, relevant real-world events/conditions, or justified support processes.
 - Keep development, deployment and QA triggers isolated from live-user side effects.
