@@ -20,7 +20,7 @@ Start at [docs/project/README.md](docs/project/README.md).
 2. Choose the next unblocked, highest-priority action.
 3. Record acceptance criteria and evidence; intention is not completion.
 4. Update current state, action register, decisions, changelog and handover after work.
-5. Kieron manually triggers GitHub Actions. Do not trigger or rerun workflows automatically.
+5. Let configured GitHub Actions triggers run normally for code changes, tests and deployments. Use manual dispatch/reruns when useful; do not duplicate automatic runs unnecessarily.
 6. Live-product triggers must represent real golfer activity, relevant real-world conditions, or justified supporting processes. Isolate development/QA activity from live golfer behaviour.
 
 The dashboard reads public repository data in the browser. It does not require a token and does not trigger workflows.
