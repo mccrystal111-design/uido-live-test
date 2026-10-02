@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UiDo — Project Dashboard</title>
+<style>
+:root{color-scheme:light;--ivory:#f6f3ea;--forest:#3f4b3b;--deep:#293128;--yellow:#f0c52e;--sage:#dce1d3;--line:#d5d5c9;--muted:#687064;--white:#fffef9}
+*{box-sizing:border-box}body{margin:0;background:var(--ivory);color:var(--deep);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+a{color:var(--forest);text-decoration:none}a:hover{text-decoration:underline}.wrap{max-width:1440px;margin:auto;padding:32px clamp(18px,4vw,64px) 56px}
+.eyebrow{font-size:11px;letter-spacing:.16em;font-weight:800;color:var(--forest)}header{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin:14px 0 26px}h1{font-size:clamp(30px,4vw,44px);letter-spacing:-.04em;line-height:1.08;margin:0 0 10px}h2{font-size:20px;letter-spacing:-.02em;margin:0 0 6px}h3{font-size:13px;letter-spacing:.07em;margin:0 0 14px}.muted{color:var(--muted)}.toplinks{display:flex;flex-wrap:wrap;gap:10px}.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--white);border-radius:999px;padding:10px 15px;font-weight:700;font-size:12px}.btn.primary{background:var(--forest);border-color:var(--forest);color:white}.hero{background:var(--forest);color:var(--white);padding:28px 30px;border-radius:18px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center}.hero .eyebrow{color:var(--yellow)}.hero h2{font-size:clamp(22px,2.5vw,30px);max-width:800px;margin:8px 0 10px}.hero p{color:#e0e4da;max-width:850px;margin:0}.pill{display:inline-flex;align-items:center;border-radius:99px;padding:7px 12px;background:var(--yellow);color:var(--deep);font-size:11px;font-weight:800;white-space:nowrap}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:18px 0 30px}.stat,.panel,.workcard{background:var(--white);border:1px solid #e7e5db;border-radius:14px}.stat{padding:18px 20px}.stat strong{display:block;font-size:30px;letter-spacing:-.04em}.stat span{font-size:12px;color:var(--muted)}.sectionhead{display:flex;justify-content:space-between;align-items:end;gap:16px;margin:32px 0 14px}.sectionhead p{margin:0;font-size:13px;color:var(--muted)}.workstreams{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.workcard{padding:18px}.workcard .code{font-size:11px;font-weight:800;color:var(--forest);letter-spacing:.1em}.workcard h3{margin:8px 0 6px;letter-spacing:0;font-size:15px}.workcard p{font-size:13px;color:var(--muted);margin:0;min-height:56px}.statusline{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:16px;padding-top:12px;border-top:1px solid var(--line);font-size:11px;font-weight:800}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--yellow);margin-right:6px}.columns{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,.75fr);gap:16px}.panel{padding:20px;min-width:0}.list{display:grid;gap:0}.item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;padding:14px 0;border-top:1px solid var(--line)}.item:first-child{border-top:0}.item a{font-weight:750;font-size:13px}.item small{display:block;color:var(--muted);margin-top:4px;font-size:11px}.tag{border-radius:99px;background:var(--sage);padding:4px 8px;font-size:10px;font-weight:800;align-self:start;white-space:nowrap}.tag.closed,.tag.success{background:#dce8d6}.tag.failure{background:#f1ddd7}.empty,.loading{color:var(--muted);font-size:13px;padding:16px 0}.footer{margin-top:32px;padding-top:18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;font-size:11px;color:var(--muted)}.error{color:#8d3e2e;font-size:12px}
+@media(max-width:1000px){.workstreams{grid-template-columns:repeat(2,minmax(0,1fr))}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.columns{grid-template-columns:1fr}}
+@media(max-width:560px){.wrap{padding-top:22px}header{display:block}.toplinks{margin-top:18px}.hero{grid-template-columns:1fr;padding:22px}.stats{gap:9px}.stat{padding:14px}.stat strong{font-size:25px}.workstreams{grid-template-columns:1fr}.workcard p{min-height:0}.footer{display:block}.footer span{display:block;margin-bottom:8px}}
+</style>
+</head>
+<body><main class="wrap">
+<div class="eyebrow">UIDO / PROJECT CONTROL</div>
+<header><div><h1>Project dashboard</h1><div class="muted">One place to see what matters, what is blocked, and what needs a decision.</div></div><nav class="toplinks"><a class="btn primary" href="https://github.com/mccrystal111-design/uido-live-test/issues">Open issues ↗</a><a class="btn" href="https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI">Figma design ↗</a><button class="btn" id="refresh" type="button">↻ Refresh</button></nav></header>
+<section class="hero"><div><div class="eyebrow">CURRENT FOCUS · OPS-002</div><h2>Verify the real repository state before we move the build forward.</h2><p>Check source, commits, pull requests and the latest manually-run workflow results. Statuses should follow evidence, not assumptions.</p></div><div class="pill">P0 · PROJECT CONTROL</div></section>
+<section class="stats" aria-label="Live project summary"><div class="stat"><strong id="openCount">—</strong><span>Open issues</span></div><div class="stat"><strong id="closedCount">—</strong><span>Closed issues (recent page)</span></div><div class="stat"><strong id="prCount">—</strong><span>Open pull requests</span></div><div class="stat"><strong id="runStatus">—</strong><span>Latest workflow run</span></div></section>
+<div class="sectionhead"><div><h2>Workstreams</h2><p>Live counts and links from the repository; workstream notes are the current planning baseline.</p></div></div>
+<section class="workstreams">
+<article class="workcard"><div class="code">OPS · CONTROL</div><h3>Project operations</h3><p>Source of truth, priorities, issue structure, decisions and handover.</p><div class="statusline"><span><i class="dot"></i><span id="opsStatus">Loading</span></span><a href="https://github.com/mccrystal111-design/uido-live-test/issues?q=is%3Aissue+OPS-">View ↗</a></div></article>
+<article class="workcard"><div class="code">DES · DESIGN</div><h3>Brand and design system</h3><p>Concept reference, editable marks, verified palette and reusable components.</p><div class="statusline"><span><i class="dot"></i><span id="desStatus">Loading</span></span><a href="https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI">Figma ↗</a></div></article>
+<article class="workcard"><div class="code">RND · RENDERER</div><h3>AGNOSTIC45</h3><p>Verify the proven base and canonical geometry contract before extending it.</p><div class="statusline"><span><i class="dot"></i><span id="rndStatus">Loading</span></span><a href="https://github.com/mccrystal111-design/uido-live-test/issues?q=is%3Aissue+RND-">View ↗</a></div></article>
+<article class="workcard"><div class="code">CRS · COURSE DATA</div><h3>Course acquisition</h3><p>Geometry, refinement, provenance and offline-ready course packages.</p><div class="statusline"><span><i class="dot"></i><span id="crsStatus">Loading</span></span><a href="https://github.com/mccrystal111-design/uido-live-test/issues?q=is%3Aissue+CRS-">View ↗</a></div></article>
+</section>
+<div class="columns">
+<section><div class="sectionhead"><div><h2>Latest issues</h2><p>Fetched directly from the public GitHub repository API.</p></div></div><div class="panel"><div class="list loading" id="issues">Loading issues…</div></div></section>
+<section><div class="sectionhead"><div><h2>Workflow activity</h2><p>Read-only status; this page never starts or reruns a workflow.</p></div></div><div class="panel"><div class="list loading" id="runs">Loading workflows…</div><div id="runError" class="error"></div><div style="margin-top:12px"><a class="btn" href="https://github.com/mccrystal111-design/uido-live-test/actions">All workflow runs ↗</a></div></div>
+<div class="sectionhead"><div><h2>Needs attention</h2><p>Human decisions and manual checks.</p></div></div><div class="panel"><div class="list">
+<div class="item"><div><a href="https://github.com/mccrystal111-design/uido-live-test/issues">Confirm canonical hole geometry contract</a><small>Needed before continuing AGNOSTIC45.</small></div><span class="tag">KIERON</span></div>
+<div class="item"><div><a href="https://github.com/mccrystal111-design/uido-live-test/actions">Run Actions manually when ready</a><small>ChatGPT must not trigger or rerun workflows.</small></div><span class="tag">MANUAL</span></div>
+<div class="item"><div><a href="https://github.com/mccrystal111-design/uido-live-test/blob/main/docs/project/ACTION-REGISTER.md">Review master action register</a><small>Planning baseline; update statuses only with evidence.</small></div><span class="tag">DOCS</span></div>
+</div></div></section>
+</div>
+<footer class="footer"><span>REAL-GOLFER TRIGGER PRINCIPLE · Live product triggers must map to a real golfer action, real-world condition or justified support process.</span><span id="updated">Waiting for first refresh…</span></footer>
+</main>
+<script>
+const owner="mccrystal111-design", repo="uido-live-test", api="https://api.github.com/repos/"+owner+"/"+repo;
+const $=id=>document.getElementById(id);
+async function get(path){const r=await fetch(api+path,{headers:{Accept:"application/vnd.github+json"}});if(!r.ok)throw new Error("GitHub API "+r.status+" for "+path);return r.json()}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function age(s){if(!s)return "";const d=Math.max(0,Math.floor((Date.now()-new Date(s).getTime())/86400000));return d===0?"today":d+"d ago"}
+function stateTag(i){const closed=i.state==="closed";return '<span class="tag '+(closed?"closed":"")+'">'+(closed?"CLOSED":"OPEN")+"</span>"}
+function renderIssues(items){$("issues").className="list";$("issues").innerHTML=items.slice(0,8).map(i=>'<div class="item"><div><a href="'+esc(i.html_url)+'">'+esc(i.title)+'</a><small>#'+i.number+' · '+esc(i.user?.login||"")+' · updated '+age(i.updated_at)+'</small></div>'+stateTag(i)+'</div>').join("")||'<div class="empty">No issues returned.</div>'}
+function countPrefix(items,prefix){return items.filter(i=>i.title.startsWith(prefix+"-")).length}
+function workStatus(items,prefix){const subset=items.filter(i=>i.title.startsWith(prefix+"-"));if(!subset.length)return "No tagged issues yet";const open=subset.filter(i=>i.state==="open").length;return open+" open · "+(subset.length-open)+" closed"}
+async function refresh(){ $("refresh").disabled=true;$("refresh").textContent="Refreshing…";$("runError").textContent="";
+try{
+ const [issues,prs,runs]=await Promise.all([get("/issues?state=all&per_page=100"),get("/pulls?state=open&per_page=100"),get("/actions/runs?per_page=6")]);
+ const onlyIssues=issues.filter(i=>!i.pull_request);
+ $("openCount").textContent=onlyIssues.filter(i=>i.state==="open").length;
+ $("closedCount").textContent=onlyIssues.filter(i=>i.state==="closed").length;
+ $("prCount").textContent=prs.length;
+ $("runStatus").textContent=runs.workflow_runs?.length?(runs.workflow_runs[0].conclusion||runs.workflow_runs[0].status||"Unknown"):"None";
+ renderIssues(onlyIssues.sort((a,b)=>new Date(b.updated_at)-new Date(a.updated_at)));
+ $("opsStatus").textContent=workStatus(onlyIssues,"OPS");$("desStatus").textContent=workStatus(onlyIssues,"DES");$("rndStatus").textContent=workStatus(onlyIssues,"RND");$("crsStatus").textContent=workStatus(onlyIssues,"CRS");
+ const list=runs.workflow_runs||[];
+ $("runs").className="list";
+ $("runs").innerHTML=list.slice(0,5).map(r=>{const status=r.conclusion||r.status||"unknown";const klass=status==="success"?"success":(["failure","cancelled","timed_out"].includes(status)?"failure":"");return '<div class="item"><div><a href="'+esc(r.html_url)+'">'+esc(r.name||r.display_title||"Workflow run")+'</a><small>'+esc(r.event||"event")+' · '+age(r.updated_at||r.created_at)+' · '+esc(r.head_branch||"")+'</small></div><span class="tag '+klass+'">'+esc(status.toUpperCase())+'</span></div>'}).join("")||'<div class="empty">No workflow runs returned.</div>';
+ $("updated").textContent="Live GitHub data refreshed "+new Date().toLocaleString();
+}catch(e){$("issues").innerHTML='<div class="error">Could not load GitHub data. '+esc(e.message)+'. Open the repository links above to check manually.</div>';$("runs").innerHTML='<div class="empty">Workflow data unavailable.</div>';$("runError").textContent="Public API access can be rate-limited; refresh later or open GitHub Actions directly."; $("updated").textContent="Refresh failed · "+new Date().toLocaleTimeString()}
+finally{$("refresh").disabled=false;$("refresh").textContent="↻ Refresh"}}
+$("refresh").addEventListener("click",refresh);refresh();setInterval(refresh,300000);
+</script></body></html>
