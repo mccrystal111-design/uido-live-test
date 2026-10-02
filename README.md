@@ -1,6 +1,9 @@
 # UiDo — Live Test Repository
 
 ## Project control centre
+
+**[Open the live project dashboard](https://mccrystal111-design.github.io/uido-live-test/project-dashboard.html)** — read-only live summary of GitHub issues, pull requests and recent workflow runs.
+
 Start at [docs/project/README.md](docs/project/README.md).
 
 - [Current state and next action](docs/project/CURRENT-STATE.md)
@@ -10,6 +13,7 @@ Start at [docs/project/README.md](docs/project/README.md).
 - [Decision log](docs/project/DECISION-LOG.md)
 - [Change log](docs/project/CHANGELOG.md)
 - [Session handover](docs/project/SESSION-HANDOVER.md)
+- [Dashboard design in Figma](https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI)
 
 ## Operating rules
 1. Read the control pack before project work.
@@ -18,3 +22,5 @@ Start at [docs/project/README.md](docs/project/README.md).
 4. Update current state, action register, decisions, changelog and handover after work.
 5. Kieron manually triggers GitHub Actions. Do not trigger or rerun workflows automatically.
 6. Live-product triggers must represent real golfer activity, relevant real-world conditions, or justified supporting processes. Isolate development/QA activity from live golfer behaviour.
+
+The dashboard reads public repository data in the browser. It does not require a token and does not trigger workflows.
