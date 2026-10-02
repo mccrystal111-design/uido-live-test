@@ -13,7 +13,7 @@ Statuses below are planning baselines unless linked evidence confirms completion
 | DES-004 | Design | Construct yellow ball/tee and flag icons | P1 | Backlog | ChatGPT | DES-002 | Clean editable vector geometry |
 | DES-005 | Design | Export and validate SVG assets | P1 | Backlog | ChatGPT | DES-003, DES-004 | Transparent background, clean paths, rendered at target sizes |
 | DES-006 | Design system | Define tokens and reusable components | P1 | Backlog | ChatGPT | DES-002, DES-003 | Figma styles/components documented |
-| RND-001 | Renderer | Verify AGNOSTIC45 base and latest manual workflow result | P0 | In progress | ChatGPT + Kieron | OPS-002 | [Issue #8](https://github.com/mccrystal111-design/uido-live-test/issues/8); phone-bars candidate and last successful Playwright run inspected; standalone base needs its own QA evidence |
+| RND-001 | Renderer | Verify AGNOSTIC45 base and latest relevant workflow result | P0 | In progress | ChatGPT + Kieron | OPS-002 | [Issue #8](https://github.com/mccrystal111-design/uido-live-test/issues/8); phone-bars and standalone base Playwright QA passed; canonical geometry contract remains a dependency |
 | RND-002 | Renderer | Confirm canonical hole-by-hole geometry contract | P0 | Backlog | ChatGPT + Kieron | RND-001 | Feature types, coordinate system, direction and provenance documented |
 | RND-003 | Renderer | Continue AGNOSTIC45 from proven baseline | P1 | Blocked | ChatGPT | RND-001, RND-002 | Required par-4/5 base features render without UI overlays |
 | CRS-001 | Course data | Validate geometry acquisition/refinement pipeline | P1 | Needs verification | ChatGPT + Kieron | OPS-002 | Source geometry, registration/error, refinement and provenance inspectable |

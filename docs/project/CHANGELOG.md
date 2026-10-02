@@ -25,3 +25,10 @@
 - Updated dashboard copy to reflect normal configured workflow triggers rather than instructing the user to run Actions manually.
 - AGNOSTIC45 QA evidence recorded: [run #36925474787](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36925474787) passed for the phone-bars review candidate, but the standalone base renderer still needs its own QA and the geometry contract remains outstanding.
 - Remaining issue: several legacy workflow records fail on push events with zero jobs. Cause not established; no reruns were started. OPS-002 remains open to diagnose these records and finish reconciling recent PRs.
+
+
+## 2026-10-02 — AGNOSTIC45 standalone base QA
+- Added `.github/workflows/agnostic45-base-qa.yml` to run Playwright/Chromium geometry checks on the standalone base when its source or the QA workflow changes.
+- [Run #36982883414](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982883414) passed six cases: holes 1 and 9 at 390×844, 768×1024 and 1440×900.
+- Checks confirmed HTTP 200, expected hole-specific title, SVG and rendered geometry root, physical feature paths, routing path, positive SVG size, no horizontal overflow, no uncaught page errors, no console errors and no failed HTTP responses.
+- [Screenshots and diagnostics artifact](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982883414/artifacts/11216462231). This is automated structural evidence, not human visual approval or approval of the canonical geometry contract.

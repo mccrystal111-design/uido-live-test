@@ -24,15 +24,15 @@ Updated: 2026-10-02. Tool/access register is linked from the session-start instr
 - Workflow automation is permitted where configured triggers reflect legitimate development, QA, deployment or support processes. Do not manually dispatch/rerun a workflow unless it is needed; allow normal push-triggered deployment to run.
 
 ## Workflow evidence checked on 2026-10-02
-- Latest relevant AGNOSTIC45 Visual QA run found: [run #36925474787](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36925474787), completed successfully on source commit `fc51a6d624bf00e2c290bce7cc40f004e2d76bd6`. The job ran Playwright + Chromium, checked the phone-bars/geometry layout at configured viewports and uploaded artifact `ag45-visual-qa-74` with screenshots and diagnostics. This is automated evidence, not human visual approval and not a test of the dashboard.
+- Latest relevant AGNOSTIC45 phone-bars QA: [run #36925474787](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36925474787), completed successfully on source commit `fc51a6d624bf00e2c290bce7cc40f004e2d76bd6`. The job ran Playwright + Chromium, checked the phone-bars/geometry layout at configured viewports and uploaded artifact `ag45-visual-qa-74` with screenshots and diagnostics. This is automated evidence, not human visual approval and not a test of the dashboard.
 - AG45 candidate page currently exists at `overstone/ag45v1-phone-bars-review.html` (blob `f9ed5b1113cb5823c1c52b4b2c3bad5bea26cf40`); the standalone unbranded base source `overstone/ui-hole-renderer-agnostic45-ui-base.html` exists (blob `4abe22707f0d000b0cbb3567c22639719ac16c47`). The QA run tested the phone-bars review page, not the standalone base page.
 - Latest dashboard-copy Pages deploy [run #36982434145](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982434145) passed at commit `84140b87432507706ad159e3f2a936d93ef72053`. Dashboard Playwright QA [run #36982461137](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982461137) passed at commit `9bc63015d319a79b0dc7f946137081d54cde5415`.
 - Documentation commits caused several push-event workflow runs to fail with zero jobs (e.g. [#36982036792](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982036792)); GitHub's jobs endpoint returns an empty list, so the failure cause is not yet established. No reruns were started. Avoid claiming these are course-build failures until the trigger/check-suite explanation is confirmed.
 
 ## Next action
-**OPS-002** — investigate why several legacy/workflow-dispatch-only workflow records show push-event failures with zero jobs, then finish reconciling open PRs and repository records. After that, run QA against the standalone AGNOSTIC45 base and confirm the canonical geometry contract before renderer extension.
+**OPS-002** — investigate why several legacy/workflow-dispatch-only workflow records show push-event failures with zero jobs, then finish reconciling open PRs and repository records. The standalone AGNOSTIC45 base has now passed browser geometry QA; after OPS-002, confirm the canonical geometry contract before renderer extension.
 
 ## Unverified
-- The AG45 phone-bars review candidate passed automated QA, but the standalone base renderer still needs a dedicated QA run.
+- The standalone base passed automated geometry QA, but the canonical hole-by-hole geometry contract still needs agreement before renderer extension.
 - The original concept PNG has not yet been placed unchanged on a dedicated Figma reference page.
 - No timeline dates have been agreed. Do not claim tests or visual QA passed without linked evidence.
