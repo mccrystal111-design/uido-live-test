@@ -11,7 +11,7 @@ Updated: 2026-10-02
 6. DECISION-LOG.md
 
 ## Immediate next action
-OPS-002: inspect actual repository source, recent commits and relevant workflow runs, then reconcile statuses against evidence. Tool/access register has been created and is now part of mandatory session startup. Dashboard Pages fix is committed; normal push-triggered deployment succeeded in run [#36979995902](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36979995902). Current AGNOSTIC45 status remains unverified. Live dashboard rendering also remains unverified in a real browser.
+OPS-002: inspect the conclusion/artifact from dashboard Playwright run #36982461137, diagnose the recurring zero-job workflow failures without rerunning them, then reconcile remaining repository records. Tool/access register has been created and is now part of mandatory session startup. Dashboard Pages fix is committed; deployment [#36982434145](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982434145) succeeded after the dashboard copy correction. Dashboard-specific Playwright run [#36982461137](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982461137) was in progress at last check. AG45 candidate Playwright QA [#36925474787](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36925474787) passed, but tested the phone-bars review page rather than the standalone base renderer.
 
 ## Project links
 - Repo: https://github.com/mccrystal111-design/uido-live-test
@@ -29,7 +29,7 @@ OPS-002: inspect actual repository source, recent commits and relevant workflow 
 - Live hole UI: verify GPS, F/M/B yardages, bunker distances, orientation, viewfinder and right-side panels.
 - Stats: Handicap (Official + Practice, edit/connect, explanation and 9-hole WHS-aligned handling), Performance, Scoring, Driving, Approach, Short Game.
 - Supabase: classify data and offline/sync/security needs before deciding its responsibilities. The connector returned no accessible projects on 2026-10-02, so confirm intended project/account before implementation.
-- Playwright/Chromium: no direct browser-control integration was exposed in the current session. Do not claim a Playwright run until an executable runtime or browser service is verified.
+- Playwright/Chromium: no direct interactive browser-control tool is exposed in the chat session, but repository-hosted GitHub Actions Playwright routes are available. AG45 QA run #36925474787 passed. Dashboard-specific QA workflow was added in commit `9bc63015d319a79b0dc7f946137081d54cde5415`; run #36982461137 is the first live-page check and was still in progress at last check. Do not claim dashboard QA passed until its conclusion and artifact are inspected.
 - Real-Golfer Trigger Principle applies to all live-product workflows.
 - Workflow triggers may run normally when configured; use manual dispatch/reruns only when needed. Preserve human approval for product and visual decisions.
 
