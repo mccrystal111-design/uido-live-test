@@ -23,6 +23,7 @@ Updated: 2026-10-02. Tool/access register is linked from the session-start instr
 - AGNOSTIC45 goal: extend the proven geometry-driven base renderer for par-4/par-5 holes, supporting tee, fairway, rough, green, bunkers, water and paths, with no labels/player profile/UI overlays in the base.
 - Course geometry: canonical hole-by-hole geometry and provenance should be agreed before extending renderer work.
 - Live hole UI previously covered GPS/player position, front/middle/back green yardages, bunker distances, orientation, viewfinder and right-side info panels. Verify implementation before reopening defects.
+- **Shot/GPS field test:** standalone additive page `overstone/shot-capture-gps-test.html` committed at [1a15b63](https://github.com/mccrystal111-design/uido-live-test/commit/1a15b63db29478e6c9cb88677bec34ce27f2d82a). It records radial tile taps and HIT SHOT events with UTC timestamps, phone GPS coordinates/accuracy and local JSON export; a mini Overstone wireframe plots captured points. Intended test URL: https://mccrystal111-design.github.io/uido-live-test/overstone/shot-capture-gps-test.html. Device testing and live Pages publication have not been verified yet; no field data captured.
 - Stats sections: Handicap (Official + Practice, explanation/edit/connect and 9-hole WHS-aligned handling), Performance, Scoring, Driving, Approach, Short Game.
 - Supabase is under consideration for data packets; define data and offline/sync needs before deciding storage architecture.
 - Real-Golfer Trigger Principle applies to all product workflows.
