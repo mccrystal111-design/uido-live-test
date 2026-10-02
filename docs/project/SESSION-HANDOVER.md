@@ -9,11 +9,11 @@ Updated: 2026-10-02
 4. DECISION-LOG.md
 
 ## Immediate next action
-OPS-002: inspect actual repository source, recent commits and relevant workflow runs, then reconcile statuses against evidence. Dashboard Pages fix is committed; verify the normal push-triggered deployment. Current AGNOSTIC45 status remains unverified.
+OPS-002: inspect actual repository source, recent commits and relevant workflow runs, then reconcile statuses against evidence. Dashboard Pages fix is committed; normal push-triggered deployment succeeded in run [#36979995902](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36979995902). Current AGNOSTIC45 status remains unverified.
 
 ## Project links
 - Repo: https://github.com/mccrystal111-design/uido-live-test
-- [Live dashboard page](../../project-dashboard.html) — intended published URL: https://mccrystal111-design.github.io/uido-live-test/project-dashboard.html (publication not verified yet).
+- [Live dashboard page](../../project-dashboard.html) — intended published URL: https://mccrystal111-design.github.io/uido-live-test/project-dashboard.html (deployment run succeeded; browser-side URL confirmation was unavailable in the checker).
 - Figma: https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI
 - Figma dashboard design page: 02 — Project Dashboard.
 - Issues: [OPS-002 #5](https://github.com/mccrystal111-design/uido-live-test/issues/5), [OPS-003 #6](https://github.com/mccrystal111-design/uido-live-test/issues/6), [DES-001 #7](https://github.com/mccrystal111-design/uido-live-test/issues/7), [RND-001 #8](https://github.com/mccrystal111-design/uido-live-test/issues/8).
