@@ -30,7 +30,8 @@ function render(){
  document.getElementById('front').textContent=fix?yards(dist([fix.latitude,fix.longitude],g.front)):'—';
  document.getElementById('middle').textContent=fix?yards(dist([fix.latitude,fix.longitude],g.middle)):'—';
  document.getElementById('back').textContent=fix?yards(dist([fix.latitude,fix.longitude],g.back)):'—';
- yardagePanel.classList.toggle('hidden',!fix);
+ yardagePanel.classList.remove('hidden');
+ document.getElementById('continue').textContent=fix?'Continue to Wind':'Continue without GPS';
  sel.value=String(currentHole);
 }
 function applyFix(p){
