@@ -42,10 +42,9 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; touch-action: 
   border: 0;
   border-radius: 12px;
   background-color: transparent;
-  background-image: url('../assets/wind-arrow.svg');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
+  background-color: var(--wind-arrow);
+  -webkit-mask: url('../assets/wind-arrow.svg') center / contain no-repeat;
+  mask: url('../assets/wind-arrow.svg') center / contain no-repeat;
   filter: none;
   cursor: pointer;
 }
