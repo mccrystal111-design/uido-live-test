@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#183b27">
+  <title>UiDo — Wind Gauge</title>
+  <link rel="stylesheet" href="wind-gauge.css">
+  <script src="wind-gauge.js" defer></script>
+</head>
+<body>
+  <main class="wind-app" data-wind-gauge>
+    <header class="wind-header">
+      <div class="wind-heading">
+        <div class="wind-step">SHOT 1 · WIND</div>
+        <p>Tap a direction · centre changes strength</p>
+      </div>
+      <button class="yardages-button" type="button" data-action="yardages">Yardages</button>
+    </header>
+
+    <section class="wind-stage" aria-label="Player wind gauge">
+      <div class="wind-gauge" role="group" aria-label="Wind direction and strength">
+        <img class="wind-rings" src="assets/uido-wind-ring.svg" alt="">
+        <button class="wind-arrow wind-arrow--top" type="button" data-direction="Top" aria-label="Wind from ahead"></button>
+        <button class="wind-arrow wind-arrow--top-right" type="button" data-direction="Top-right" aria-label="Wind from front right"></button>
+        <button class="wind-arrow wind-arrow--right" type="button" data-direction="Right" aria-label="Wind from the right"></button>
+        <button class="wind-arrow wind-arrow--bottom-right" type="button" data-direction="Bottom-right" aria-label="Wind from rear right"></button>
+        <button class="wind-arrow wind-arrow--bottom" type="button" data-direction="Bottom" aria-label="Wind from behind"></button>
+        <button class="wind-arrow wind-arrow--bottom-left" type="button" data-direction="Bottom-left" aria-label="Wind from rear left"></button>
+        <button class="wind-arrow wind-arrow--left" type="button" data-direction="Left" aria-label="Wind from the left"></button>
+        <button class="wind-arrow wind-arrow--top-left" type="button" data-direction="Top-left" aria-label="Wind from front left"></button>
+
+        <button class="wind-strength" type="button" data-action="cycle-strength" aria-label="Change wind strength. Current strength half a club">
+          <span class="wind-glyph" aria-hidden="true">≋</span>
+          <span class="wind-strength-value" data-strength-value>1/2</span>
+          <span class="wind-strength-unit">CLUB</span>
+        </button>
+      </div>
+    </section>
+    <output class="wind-live-status" aria-live="polite" data-status>Choose wind direction and strength</output>
+  </main>
+</body>
+</html>
