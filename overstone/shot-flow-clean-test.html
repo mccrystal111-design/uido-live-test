@@ -101,7 +101,7 @@ document.getElementById('windButton').addEventListener('click',()=>{openShotFlow
 <script>
 (function(){
  const overlay=document.getElementById('shotOverlay'),frame=document.getElementById('tileFrame'),stepLabel=document.getElementById('shotStepLabel'),flowStatus=document.getElementById('flowStatus'),continueBtn=document.getElementById('flowContinue'),backBtn=document.getElementById('flowBack'),exitBtn=document.getElementById('flowExit'),footer=document.getElementById('shotFooter'),summary=document.getElementById('flowSummary'),recordsEl=document.getElementById('flowRecords'),custom=document.getElementById('customChoice'),customTitle=document.getElementById('customTitle'),customOptions=document.getElementById('customOptions');
- const steps=[{key:'WIND',url:'wind-gauge.html',kind:'wind'},{key:'LIE',url:'../lie-tile.html',kind:'result'}];
+ const steps=[{key:'WIND',url:'wind-gauge.html',kind:'wind'},{key:'LIE',url:'../lie-tile.html',kind:'result'},{key:'STRIKE',url:'../strike-tile.html',kind:'result'},{key:'TRAJECTORY',url:'../trajectory-tile.html',kind:'trajectory'}];
  let stepIndex=0,shotNo=1,selectedWind=null,records=[],customValue=null,observer=null;
  function current(){return steps[stepIndex]}
  window.openShotFlow=function(){overlay.style.display='flex';stepIndex=0;shotNo=1;records=[];selectedWind=null;loadStep()};
@@ -122,6 +122,7 @@ document.getElementById('windButton').addEventListener('click',()=>{openShotFlow
  }
  function tileValue(s){const d=frame.contentDocument;if(!d)return null;
    if(s.key==='LIE')return d.getElementById('lieLabel')?.textContent.trim()||'Unknown';
+   if(s.key==='STRIKE')return {vertical:d.querySelector('[data-axis="vertical"][aria-pressed="true"]')?.dataset.value||null,horizontal:d.querySelector('[data-axis="horizontal"][aria-pressed="true"]')?.dataset.value||null};
    if(s.key==='CLUB')return d.querySelector('.club-row.selected .club')?.textContent.trim()||'Unknown';
    if(s.key==='START')return d.getElementById('resultMain')?.textContent.trim()||'Unknown';
    if(s.key==='SHAPE')return d.getElementById('resultMain')?.textContent.trim()||d.querySelector('.shape.active')?.textContent.trim()||'Unknown';
@@ -135,6 +136,12 @@ document.getElementById('windButton').addEventListener('click',()=>{openShotFlow
       selectedWind={direction:event.data.direction,strength:event.data.strength||'1/2'};
       records=[{shot:shotNo,step:'WIND',value:selectedWind}];
       stepIndex++;
+      loadStep();
+    }
+    if(event.data.type==='uido:trajectory-selected'&&current().key==='TRAJECTORY'){
+      records.push({shot:shotNo,step:'TRAJECTORY',value:event.data.value});
+      stepIndex++;
+      if(stepIndex>=steps.length){showSummary();return}
       loadStep();
     }
   });
