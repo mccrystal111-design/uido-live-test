@@ -70,14 +70,14 @@ var greens={"1":{"front":[52.2776675,-0.8151979],"middle":[52.2777593548,-0.8150
 var tilePaths={WIND:'../wind-tile.html',LIE:'../lie-tile.html',CLUB:'../club-tile.html',START:'../start-tile.html',SHAPE:'../shape-tile-v2.html','SCORE + PUTTS':'../putts-score-tile.html'};
 var strikeOptions=['Solid','Thin','Fat','Toe','Heel','Sky / pop-up','Shank','Unknown'];
 var trajectoryOptions=['Low','Mid','High','Punch','Flop'];
-var state=loadState(),fix=null,watchId=null,transitionLocked=false,customSelected='',lastExportText='';
+var roundStore=window.UiDoRoundState.create({onError:function(e){setStatus('LOCAL SAVE FAILED · '+e.message)}}),state=roundStore.state,fix=null,watchId=null,transitionLocked=false,customSelected='',lastExportText='';
 var initialHole=Number(new URLSearchParams(location.search).get('hole'));if(initialHole>=1&&initialHole<=18){state.current_hole=initialHole;state.current_step=0;}
-function loadState(){try{var s=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');if(s&&s.round_id&&!s.ended_at_utc)return s}catch(e){}return freshState()}
-function freshState(){return{schema:'uido.field-test-round.v1',round_id:'uido-'+new Date().toISOString().replace(/[:.]/g,'-'),course_id:'overstone-park',course_name:'Overstone Park Golf Club',started_at_utc:new Date().toISOString(),ended_at_utc:null,current_hole:1,current_step:0,latest_gps:null,holes:{},events:[]}}
-function persist(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}catch(e){setStatus('LOCAL SAVE FAILED · '+e.message)}}
-function holeData(n){if(!state.holes[n])state.holes[n]={hole_number:n,shot:{},score:null,putts:null,penalties:null,events:[]};return state.holes[n]}
-function currentShotNumber(){var h=holeData(state.current_hole);return (h.shot_count||0)+1}
-function stamp(){return new Date().toISOString()}
+function loadState(){return roundStore.state}
+function freshState(){return roundStore.freshState()}
+function persist(){return roundStore.persist()}
+function holeData(n){return roundStore.holeData(n)}
+function currentShotNumber(){return roundStore.currentShotNumber()}
+function stamp(){return roundStore.stamp()}
 function setStatus(text){document.getElementById('flowStatus').textContent=text}
 function refreshHeader(){document.getElementById('holeTitle').textContent='OVERSTONE · HOLE '+state.current_hole;setStatus(steps[state.current_step]+' · STEP '+(state.current_step+1)+' OF '+steps.length)}
 function renderWindYardages(){var g=greens[String(state.current_hole)];function y(p){if(!state.latest_gps||!p)return'—';var a=state.latest_gps.latitude*Math.PI/180,b=p[0]*Math.PI/180,dl=(p[1]-state.latest_gps.longitude)*Math.PI/180,dp=b-a,h=Math.sin(dp/2)**2+Math.cos(a)*Math.cos(b)*Math.sin(dl/2)**2;return String(Math.round(2*6371000*Math.asin(Math.sqrt(h))*1.0936133))}document.getElementById('windBack').textContent=y(g&&g.back);document.getElementById('windMiddle').textContent=y(g&&g.middle);document.getElementById('windFront').textContent=y(g&&g.front);if(!state.latest_gps)captureGPS().then(function(){if(steps[state.current_step]==='WIND')renderWindYardages()})}
@@ -108,7 +108,7 @@ document.getElementById('scorecardBack').addEventListener('click',function(){doc
 document.getElementById('scorecardExport').addEventListener('click',exportRound);
 
 document.getElementById('downloadAgain').addEventListener('click',function(){if(lastExportText)downloadJSON(lastExportText,'uido-overstone-field-test-'+state.round_id+'.json');else exportRound()});
-document.getElementById('newRoundButton').addEventListener('click',function(){state=freshState();fix=null;lastExportText='';persist();state.current_hole=1;state.current_step=0;showStep()});
+document.getElementById('newRoundButton').addEventListener('click',function(){state=roundStore.replaceState(roundStore.freshState());fix=null;lastExportText='';state.current_hole=1;state.current_step=0;persist();showStep()});
 window.addEventListener('beforeunload',persist);
 if(state.latest_gps)fix=state.latest_gps;
 showStep();
