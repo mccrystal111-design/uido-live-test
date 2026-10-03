@@ -61,7 +61,7 @@ button,.btn,.option-button,.choice,.action{font-family:inherit}
   <div class="yardage-circle">
     <img class="yardage-photo" src="assets/golf_hole_1.jpg" alt="">
     <div class="yardage-shade"></div>
-    <div class="yardage-meta" id="yardageMeta">HOLE 1 · PAR 4 · NETT —</div>
+    <div class="yardage-meta" id="yardageMeta">HOLE 1 · PAR 4</div>
     <div class="yardage-values" aria-label="Front, middle and back yardages">
       <div class="yardage-value" id="yardageFront">—</div>
       <div class="yardage-rule"></div>
@@ -105,7 +105,7 @@ renderLie();
    const info=d.getElementById('greenInfo');
    if(header){
     const holeMeta=header.textContent.replace('Hole ','HOLE ').replace(' · Par ',' · PAR ');
-    meta.textContent=holeMeta+' · NETT —';
+    meta.textContent=holeMeta;
    }
    if(info){
     info.querySelectorAll('.metric').forEach(function(el){
