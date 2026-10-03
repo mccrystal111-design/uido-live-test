@@ -55,7 +55,7 @@ button,.btn,.option-button,.choice,.action{font-family:inherit}
 </style>
 </head>
 <body><script>if(new URLSearchParams(location.search).get('embedded')==='1')document.documentElement.classList.add('embedded-tile');</script>
-<iframe id="courseData" title="Course yardage data" src="overstone/index.html" aria-hidden="true" tabindex="-1" style="position:fixed;left:-2px;top:-2px;width:2px;height:2px;opacity:0;pointer-events:none;border:0"></iframe>
+<iframe id="courseData" title="Course yardage data" src="overstone/index.html" aria-hidden="true" tabindex="-1" style="position:fixed;left:-12000px;top:0;width:390px;height:844px;opacity:0;pointer-events:none;border:0"></iframe>
 <main class="stage">
 <section class="tile yardage-tile" aria-label="Yardage Tile">
   <div class="yardage-circle">
@@ -74,7 +74,6 @@ button,.btn,.option-button,.choice,.action{font-family:inherit}
 <section class="tile" aria-label="UiDo Lie Tile">
 <button class="help" id="help"><img src="assets/uido-question-mark-white.svg?v=1" alt="Help"></button>
 <div class="lie-circle" id="lieCircle"><img class="lie-photo" id="liePhoto" src="assets/teebox.png" alt=""><div class="photo-shade"></div><div class="lie-label" id="lieLabel">TEE BOX</div><div class="swipe-hint">SWIPE TO CHANGE LIE</div><div class="answer-row"><button class="answer" id="confirm" aria-label="Confirm lie"><img src="assets/uido-check-white.svg" alt="Confirm"></button></div></div>
-</div>
 <div class="result" id="result"><div class="result-main">SHAPE</div><div class="result-sub" id="resultSub">Lie confirmed.</div></div>
 <div class="modal" id="modal"><div class="modal-card"><h2>Lie</h2><p>UiDo predicts the lie from the available course and location data. Swipe to change the lie if needed, then tap the tick to confirm.</p><button class="close" id="close">Got it</button></div></div>
 </section></main>
@@ -130,4 +129,5 @@ renderLie();
  });
  setInterval(syncCourse,700);
 })();
-</script>\n</body></html>
+</script>
+</body></html>
