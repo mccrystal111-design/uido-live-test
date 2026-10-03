@@ -101,7 +101,7 @@ document.getElementById('windButton').addEventListener('click',()=>{openShotFlow
 <script>
 (function(){
  const overlay=document.getElementById('shotOverlay'),frame=document.getElementById('tileFrame'),stepLabel=document.getElementById('shotStepLabel'),flowStatus=document.getElementById('flowStatus'),continueBtn=document.getElementById('flowContinue'),backBtn=document.getElementById('flowBack'),exitBtn=document.getElementById('flowExit'),footer=document.getElementById('shotFooter'),summary=document.getElementById('flowSummary'),recordsEl=document.getElementById('flowRecords'),custom=document.getElementById('customChoice'),customTitle=document.getElementById('customTitle'),customOptions=document.getElementById('customOptions');
- const steps=[{key:'WIND',url:'wind-gauge.html',kind:'wind'},{key:'LIE',url:'../lie-tile.html',kind:'result'},{key:'STRIKE',url:'../strike-tile.html',kind:'result'},{key:'TRAJECTORY',url:'../trajectory-tile.html',kind:'trajectory'}];
+ const steps=[{key:'WIND',url:'wind-gauge.html',kind:'wind'},{key:'LIE',url:'../lie-tile.html',kind:'result'},{key:'CLUB',url:'../club-tile.html',kind:'result'},{key:'STRIKE',url:'../strike-tile.html',kind:'result'},{key:'TRAJECTORY',url:'../trajectory-tile.html',kind:'trajectory'}];
  let stepIndex=0,shotNo=1,selectedWind=null,records=[],customValue=null,observer=null;
  function current(){return steps[stepIndex]}
  window.openShotFlow=function(){overlay.style.display='flex';stepIndex=0;shotNo=1;records=[];selectedWind=null;loadStep()};
