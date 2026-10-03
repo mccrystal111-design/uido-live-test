@@ -20,6 +20,14 @@ A measured registration record should contain the exact transform parameters plu
 ## Refinement
 Derived polygons retain source references, evidence, confidence, processing parameters, registration version and residual/error metrics. If satellite evidence disagrees with OSM, retain the OSM source and create a conflict record; do not silently replace it.
 
+## Derived bunker side (course-agnostic logic)
+
+- Left/right bunker presentation is derived from the hole's `line_of_play` polyline, using the nearest local segment to the bunker midpoint (front/back GPS midpoint).
+- The tee-to-green line defines orientation: looking along the line of play, the positive cross-product side is left and the negative side is right. This is course-relative and must not depend on the player's current GPS fix or compass heading.
+- `line_of_play` coordinates are `[longitude, latitude]`; bunker `front_gps` and `back_gps` coordinates are `[latitude, longitude]`. Keep this distinction explicit at integration boundaries.
+- If geometry is missing or degenerate, retain the source `side` value as a fallback and flag the hole for QA rather than silently guessing.
+- The shared implementation lives in `overstone/course-agnostic-logic.js` and is consumed by yardage and shot-capture prototypes. Renderers must not implement separate left/right rules.
+
 ## Validation
 Verified GPS/mapped geometry is consumed only after candidate extraction. Store predicted geometry, verified geometry, position error, directional error, validation source and timestamp.
 
