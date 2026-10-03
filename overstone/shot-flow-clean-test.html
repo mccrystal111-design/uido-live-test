@@ -117,7 +117,7 @@ document.getElementById('windButton').addEventListener('click',()=>{openShotFlow
        d.querySelectorAll('.arrow').forEach(a=>a.addEventListener('click',()=>{selectedWind={direction:a.dataset.section,strength:(d.getElementById('strength')||{}).textContent||'1/2'};records.push({shot:shotNo,step:s.key,value:selectedWind});stepIndex++;loadStep()},true));
      } else {
        const confirm=d.getElementById('confirm');
-       if(confirm)confirm.addEventListener('click',()=>{setTimeout(()=>{const value=tileValue(s);if(value===null||value===undefined)return;records.push({shot:shotNo,step:s.key,value});stepIndex++;if(stepIndex>=steps.length){showSummary();return}loadStep()},0),true);
+       if(confirm)confirm.addEventListener('click',()=>{setTimeout(()=>{const value=tileValue(s);if(value===null||value===undefined)return;records.push({shot:shotNo,step:s.key,value});stepIndex++;if(stepIndex>=steps.length){showSummary();return}loadStep()},0)},true);
      }
    };
    frame.src=s.url+'?embedded=1&hole='+currentHole;
