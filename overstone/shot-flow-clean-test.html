@@ -113,7 +113,7 @@ document.getElementById('windButton').addEventListener('click',()=>{openShotFlow
    if(s.kind==='wind'){selectedWind=null;frame.style.display='block';custom.style.display='none';}
    if(s.kind==='custom'){frame.style.display='none';custom.style.display='flex';customOptions.style.gridTemplateColumns='repeat(2,minmax(0,1fr))';customTitle.textContent=s.key;customOptions.innerHTML='';customValue=null;s.options.forEach(v=>{const b=document.createElement('button');b.type='button';b.textContent=v;b.onclick=()=>{customValue=v;records.push({shot:shotNo,step:s.key,value:v});stepIndex++;if(stepIndex>=steps.length){showSummary();return}loadStep()};customOptions.appendChild(b)});return}
    frame.onload=()=>{const d=frame.contentDocument;if(!d)return;
-      if(s.kind!=='wind'){
+      if(s.kind!=='wind'&&s.key!=='CLUB'){
         const confirm=d.getElementById('confirm');
         if(confirm)confirm.addEventListener('click',()=>{setTimeout(()=>{const value=tileValue(s);if(value===null||value===undefined)return;records.push({shot:shotNo,step:s.key,value});stepIndex++;if(stepIndex>=steps.length){showSummary();return}loadStep()},0)},true);
       }
@@ -138,6 +138,7 @@ document.getElementById('windButton').addEventListener('click',()=>{openShotFlow
       stepIndex++;
       loadStep();
     }
+    if(event.data.type==='uido:club-selected'&&current().key==='CLUB'){records.push({shot:shotNo,step:'CLUB',value:event.data.value});stepIndex++;if(stepIndex>=steps.length){showSummary();return}loadStep()}
     if(event.data.type==='uido:trajectory-selected'&&current().key==='TRAJECTORY'){
       records.push({shot:shotNo,step:'TRAJECTORY',value:event.data.value});
       stepIndex++;
