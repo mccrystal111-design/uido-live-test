@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>UiDo · Strike</title>
+<link rel="stylesheet" href="strike-tile.css">
+</head>
+<body>
+<main class="tile" data-tile="strike">
+  <header><div class="eyebrow">SHOT INPUT</div><h1>Strike</h1><p>Select the contact point, then confirm.</p></header>
+  <section class="options" aria-label="Strike contact">
+    <button class="option" type="button" data-value="Pure" aria-pressed="false">Pure</button>
+    <button class="option" type="button" data-value="Toe" aria-pressed="false">Toe</button>
+    <button class="option" type="button" data-value="Heel" aria-pressed="false">Heel</button>
+    <button class="option" type="button" data-value="Thin" aria-pressed="false">Thin</button>
+    <button class="option wide" type="button" data-value="Fat" aria-pressed="false">Fat</button>
+  </section>
+  <footer><span id="selectionStatus" aria-live="polite">Choose one option</span><button id="confirm" class="confirm" type="button" disabled aria-label="Confirm strike">✓</button></footer>
+</main>
+<script src="strike-tile.js"></script>
+</body>
+</html>
