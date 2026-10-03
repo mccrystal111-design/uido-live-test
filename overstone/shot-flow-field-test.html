@@ -18,7 +18,7 @@ body.embedded{background:transparent;overflow:hidden}body.embedded #tileFrame{in
 .bottomAction{position:absolute;bottom:max(12px,env(safe-area-inset-bottom));left:18px;right:18px;z-index:20;display:flex;justify-content:center;pointer-events:none}
 .action{pointer-events:auto;min-width:180px;max-width:360px;width:100%;min-height:48px;padding:12px 18px;border:1px solid rgba(255,214,0,.9);border-radius:14px;background:rgba(16,32,25,.94);color:#fff;font-weight:600;font-size:16px;box-shadow:0 4px 20px #0003}
 .action.secondary{border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.1)}
-#customScreen{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:22px;background:linear-gradient(rgba(18,28,24,.56),rgba(18,28,24,.56)),url('../assets/home-exact.jpg') center/cover no-repeat;z-index:2}
+#customScreen{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:22px;background:var(--uido-green);z-index:2}
 .customTile{position:relative;width:min(88vw,520px);aspect-ratio:1;border:1px solid rgba(255,255,255,.24);border-radius:28px;background:rgba(18,31,27,.78);backdrop-filter:blur(10px);overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:9%}
 .customKicker{font-size:clamp(12px,3vw,17px);letter-spacing:.12em;color:rgba(255,255,255,.6);margin-bottom:20px}
 .customTitle{font-size:clamp(30px,8vw,48px);font-weight:600;letter-spacing:.04em;text-align:center}
@@ -34,6 +34,15 @@ body.embedded{background:transparent;overflow:hidden}body.embedded #tileFrame{in
 .dialogActions button{min-height:48px;border:1px solid rgba(255,255,255,.25);border-radius:13px;background:rgba(255,255,255,.08);color:#fff;font-size:16px}
 .dialogActions .primary{border-color:var(--yellow);background:rgba(255,214,0,.14)}
 @media(max-width:420px){.customTile{width:91vw;border-radius:24px}.pill{padding:7px 8px}.options{gap:6px}.option{font-size:13px}}
+
+/* UiDo unified field-test skin */
+:root{--uido-green:#183b27;--uido-panel:#14291f;--uido-panel-2:#1b3428;--uido-border:rgba(244,241,230,.24);--uido-ivory:#f4f1e6;--uido-yellow:#ffd600}
+html,body{background:var(--uido-green);color:var(--uido-ivory)}
+.stage{background:var(--uido-green)!important;padding:16px!important}
+.tile{border:1px solid var(--uido-border)!important;border-radius:24px!important;background:var(--uido-panel)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:none!important}
+.help{border:1px solid rgba(255,214,0,.75)!important;background:var(--uido-panel-2)!important}
+/* Keep radial controls and rollers intact; standardise their surrounding surface only. */
+button,.btn,.option-button,.choice,.action{font-family:inherit}
 </style></head><body>
 <script>if(new URLSearchParams(location.search).get('embedded')==='1')document.body.classList.add('embedded');</script>
 <iframe id="tileFrame" title="UiDo tile"></iframe>
