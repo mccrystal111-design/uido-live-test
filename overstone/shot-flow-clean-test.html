@@ -107,16 +107,20 @@ document.getElementById('windButton').addEventListener('click',()=>{openShotFlow
  window.openShotFlow=function(){overlay.style.display='flex';stepIndex=0;shotNo=1;records=[];selectedWind=null;loadStep()};
  function setStatus(s){flowStatus.textContent=s}
  function loadStep(){
-   summary.style.display='none';custom.style.display='none';frame.style.display='block';continueBtn.style.display='block';backBtn.style.display=stepIndex===0?'none':'block';
-   const s=current();stepLabel.textContent='SHOT '+shotNo+' · '+s.key;setStatus(s.key==='WIND'?'Tap a wind arrow, then save':s.kind==='custom'?'Choose one option':'Confirm your choice on the original tile, then save');
+   summary.style.display='none';custom.style.display='none';frame.style.display='block';continueBtn.style.display='none';backBtn.style.display=stepIndex===0?'none':'block';
+   const s=current();stepLabel.textContent='SHOT '+shotNo+' · '+s.key;setStatus(s.key==='WIND'?'Tap a direction · centre changes strength':s.kind==='custom'?'Tap a selection':'Make your selection');
    if(observer){observer.disconnect();observer=null}
    if(s.kind==='wind'){selectedWind=null;frame.style.display='block';custom.style.display='none';}
-   if(s.kind==='custom'){frame.style.display='none';custom.style.display='flex';customOptions.style.gridTemplateColumns='repeat(2,minmax(0,1fr))';customTitle.textContent=s.key;customOptions.innerHTML='';customValue=null;s.options.forEach(v=>{const b=document.createElement('button');b.type='button';b.textContent=v;b.onclick=()=>{customValue=v;customOptions.querySelectorAll('button').forEach(x=>x.classList.toggle('selected',x===b));setStatus('Selected: '+v)};customOptions.appendChild(b)});continueBtn.textContent='Save selection';return}
+   if(s.kind==='custom'){frame.style.display='none';custom.style.display='flex';customOptions.style.gridTemplateColumns='repeat(2,minmax(0,1fr))';customTitle.textContent=s.key;customOptions.innerHTML='';customValue=null;s.options.forEach(v=>{const b=document.createElement('button');b.type='button';b.textContent=v;b.onclick=()=>{customValue=v;records.push({shot:shotNo,step:s.key,value:v});stepIndex++;if(stepIndex>=steps.length){showSummary();return}loadStep()};customOptions.appendChild(b)});return}
    frame.onload=()=>{const d=frame.contentDocument;if(!d)return;
-     if(s.kind==='wind'){d.querySelectorAll('.arrow').forEach(a=>a.addEventListener('click',()=>{selectedWind={direction:a.dataset.section,strength:(d.getElementById('strength')||{}).textContent||'1/2'};setStatus('Wind: '+selectedWind.direction+' · Strength '+selectedWind.strength)},true));}
-     else {const result=d.getElementById('result');if(result){observer=new MutationObserver(()=>{if(result.classList.contains('show'))setStatus('Tile confirmed. Tap Save selection.')});observer.observe(result,{attributes:true,attributeFilter:['class']})}}
+     if(s.kind==='wind'){
+       d.querySelectorAll('.arrow').forEach(a=>a.addEventListener('click',()=>{selectedWind={direction:a.dataset.section,strength:(d.getElementById('strength')||{}).textContent||'1/2'};records.push({shot:shotNo,step:s.key,value:selectedWind});stepIndex++;loadStep()},true));
+     } else {
+       const confirm=d.getElementById('confirm');
+       if(confirm)confirm.addEventListener('click',()=>{setTimeout(()=>{const value=tileValue(s);if(value===null||value===undefined)return;records.push({shot:shotNo,step:s.key,value});stepIndex++;if(stepIndex>=steps.length){showSummary();return}loadStep()},0),true);
+     }
    };
-   frame.src=s.url+'?embedded=1&hole='+currentHole;continueBtn.textContent=s.kind==='wind'?'Save wind':'Save selection';
+   frame.src=s.url+'?embedded=1&hole='+currentHole;
  }
  function tileValue(s){const d=frame.contentDocument;if(!d)return null;
    if(s.key==='LIE')return d.getElementById('lieLabel')?.textContent.trim()||'Unknown';
@@ -126,12 +130,7 @@ document.getElementById('windButton').addEventListener('click',()=>{openShotFlow
    if(s.key==='SCORE + PUTTS'){const val=id=>d.querySelector('#'+id+' .row.sel')?.textContent.trim()||null;return {putts:val('r0'),score:val('r1'),penalties:val('r2')}}
    return null;
  }
- function saveCurrent(){const s=current();let value;
-   if(s.kind==='wind'){const d=frame.contentDocument;if(!selectedWind){setStatus('Tap a wind arrow first.');return}value={direction:selectedWind.direction,strength:d?.getElementById('strength')?.textContent.trim()||selectedWind.strength||'1/2'};}
-   else if(s.kind==='custom'){value=customValue;if(!value){setStatus('Choose an option first.');return}}
-   else {const d=frame.contentDocument;if(!d||!d.getElementById('result')?.classList.contains('show')){setStatus('Confirm your choice on the tile first.');return}value=tileValue(s);if(!value)return}
-   records.push({shot:shotNo,step:s.key,value});stepIndex++;if(stepIndex>=steps.length){showSummary();return}loadStep();
- }
+ function saveCurrent(){}
  function showSummary(){if(observer){observer.disconnect();observer=null}frame.style.display='none';custom.style.display='none';summary.style.display='block';continueBtn.style.display='none';backBtn.style.display='none';stepLabel.textContent='SHOT '+shotNo+' SAVED';setStatus('Selections captured in this field-test session');recordsEl.innerHTML=records.filter(r=>r.shot===shotNo).map(r=>'<div class="flow-record"><strong>'+r.step+'</strong><br>'+String(typeof r.value==='object'?JSON.stringify(r.value):r.value)+'</div>').join('')}
  continueBtn.addEventListener('click',saveCurrent);backBtn.addEventListener('click',()=>{if(stepIndex>0){stepIndex--;loadStep()}});
  exitBtn.addEventListener('click',()=>{if(observer){observer.disconnect();observer=null}overlay.style.display='none'});
