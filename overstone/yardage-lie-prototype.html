@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>UiDo · Yardage + Lie Prototype</title>
+<style>
+:root{--ivory:#F4F1E6;--ink:#101110;--yellow:#E9C928}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--ivory);font-family:Arial,sans-serif}
+#courseFrame{position:fixed;inset:0;width:100%;height:100%;border:0}
+#tileStack{position:fixed;z-index:30;top:max(10px,env(safe-area-inset-top));right:10px;width:min(38vw,150px);display:flex;flex-direction:column;gap:8px}
+.tile{position:relative;width:100%;aspect-ratio:1;border:1px solid rgba(16,17,16,.25);border-radius:22px;background:var(--ivory);overflow:hidden;color:var(--ink)}
+#yardageTile{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 7px}
+#holeMeta{position:absolute;top:8%;left:0;width:100%;text-align:center;font-size:clamp(9px,2.5vw,12px);font-weight:700;white-space:nowrap}
+#fmb{position:absolute;inset:19% 4% 4%;border:1.5px solid rgba(16,17,16,.35);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.12}
+.distance{font-size:clamp(20px,6vw,31px);font-weight:700;letter-spacing:-.04em;color:var(--ink)}
+.distance.middle{color:var(--yellow);text-shadow:0 0 1px #101110}
+#lieFrame{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent}
+#statusNote{position:fixed;z-index:31;left:8px;top:8px;padding:5px 7px;border-radius:6px;background:rgba(244,241,230,.92);color:#101110;font-size:10px;display:none}
+@media(min-width:600px){#tileStack{width:150px;right:16px;top:16px;gap:10px}}
+</style>
+</head>
+<body>
+<iframe id="courseFrame" title="Live Overstone course view" src="index.html"></iframe>
+<div id="tileStack">
+  <section id="yardageTile" class="tile" aria-label="Live yardages">
+    <div id="holeMeta">HOLE 1 · PAR 4 · NETT —</div>
+    <div id="fmb">
+      <div class="distance" id="front">—</div>
+      <div class="distance middle" id="middle">—</div>
+      <div class="distance" id="back">—</div>
+    </div>
+  </section>
+  <section class="tile" aria-label="Lie selection">
+    <iframe id="lieFrame" title="Lie tile" src="../lie-tile.html?embedded=1" allow="fullscreen"></iframe>
+  </section>
+</div>
+<script>
+(function(){
+  const course=document.getElementById('courseFrame');
+  const fields={front:document.getElementById('front'),middle:document.getElementById('middle'),back:document.getElementById('back')};
+  function sync(){
+    try{
+      const doc=course.contentDocument;
+      if(!doc)return;
+      const meta=doc.getElementById('holeHeaderMeta');
+      const select=doc.getElementById('holeSelect');
+      const info=doc.getElementById('greenInfo');
+      const holeText=meta?meta.textContent.replace(' · ',' · ').toUpperCase():'HOLE — · PAR —';
+      document.getElementById('holeMeta').textContent=holeText+' · NETT —';
+      if(info){
+        const metrics=info.querySelectorAll('.metric');
+        metrics.forEach(function(metric){
+          const label=(metric.querySelector('label')?.textContent||'').trim().toUpperCase();
+          const value=(metric.querySelector('strong')?.textContent||'—').trim();
+          if(label==='F')fields.front.textContent=value;
+          if(label==='M')fields.middle.textContent=value;
+          if(label==='B')fields.back.textContent=value;
+        });
+      }
+      // The new tile stack replaces the old information rail visually; retain
+      // the course canvas and existing bottom controls as the proven interaction surface.
+      const rail=doc.getElementById('infoRail');
+      if(rail)rail.style.display='none';
+      const toggle=doc.getElementById('railToggle');
+      if(toggle)toggle.style.display='none';
+    }catch(e){/* Same-origin access is required for live data; leave placeholders if unavailable. */}
+  }
+  course.addEventListener('load',function(){
+    sync();
+    try{
+      const doc=course.contentDocument;
+      const info=doc.getElementById('greenInfo');
+      const meta=doc.getElementById('holeHeaderMeta');
+      if(info)new MutationObserver(sync).observe(info,{childList:true,subtree:true,characterData:true});
+      if(meta)new MutationObserver(sync).observe(meta,{childList:true,subtree:true,characterData:true});
+      const select=doc.getElementById('holeSelect');
+      if(select)select.addEventListener('change',()=>setTimeout(sync,0));
+      doc.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.hole-option'))setTimeout(sync,0)});
+    }catch(e){}
+  });
+  setInterval(sync,700);
+})();
+</script>
+</body>
+</html>
