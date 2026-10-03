@@ -1,13 +1,78 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="refresh" content="0;url=index.html">
-<title>UiDo · Yardage Prototype</title>
-<script>location.replace('index.html'+location.search+location.hash);</script>
-</head>
-<body>
-<p><a href="index.html">Open the UiDo yardage page</a></p>
-</body>
-</html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>UiDo · Clean Field Test</title>
+<style>
+:root{--ink:#18241c;--green:#3f4b3b;--ivory:#f4f1e6;--line:#d9dcd2;--muted:#697165;--yellow:#f4d21f}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;height:auto;background:var(--ivory);color:var(--ink);font-family:Montserrat,Arial,sans-serif}body{padding:12px 12px calc(120px + env(safe-area-inset-bottom));display:block;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}.app{width:min(100%,520px);margin:0 auto;height:auto;overflow:visible}.brand{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--green);margin:0 0 8px}.card{border:1px solid var(--line);border-radius:20px;padding:16px;background:#fbfaf5;box-shadow:0 8px 28px #17251b12;overflow:visible;height:auto;max-height:none}.topline{display:flex;align-items:center;justify-content:space-between;gap:12px}.eyebrow{font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}.title{font-size:23px;line-height:1.15;margin:6px 0 0}.hole-select{display:grid;grid-template-columns:minmax(0,1fr) minmax(185px,230px);gap:10px;align-items:center;margin:12px 0 0;font-size:12px;font-weight:700}.hole-select label{min-width:0}.hole-select select{min-width:0;width:100%;font-size:14px;padding:0 8px}button,select{font:inherit}button{border:0;border-radius:12px;background:var(--green);color:var(--ivory);font-weight:700;padding:13px 16px;min-height:46px;cursor:pointer;touch-action:manipulation}.secondary{background:#e8e9e1;color:var(--ink);border:1px solid var(--line)}.full{width:100%}select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:11px;padding:0 10px;background:white;color:var(--ink)}.status{font-size:11px;line-height:1.4;color:var(--muted);margin:10px 0 0}.status strong{color:var(--green)}.accuracy{font-size:11px;color:var(--muted);margin:6px 0 0}.yardages{display:flex;flex-direction:column;gap:6px;margin:14px 0 10px}.yardage{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:12px;padding:10px 14px;text-align:left;background:#f4f3eb}.yardage .label{font-size:10px;letter-spacing:.1em;color:var(--muted);font-weight:700}.yardage .number{font-size:clamp(30px,8vw,40px);font-weight:700;line-height:1.1;margin-left:auto}.unit{display:none}.yardage .label{font-size:11px}.bunkers-head{display:flex;justify-content:space-between;align-items:center;margin:12px 0 8px;padding-top:11px;border-top:1px solid var(--line)}.bunkers-head strong{font-size:12px}.bunkers-head span{font-size:10px;color:var(--muted)}.bunker-columns{display:grid;grid-template-columns:1fr 1fr;gap:9px;align-items:stretch;overflow:visible;height:auto;max-height:none}.bunker-column{border:1px solid var(--line);border-radius:13px;padding:10px;min-width:0;overflow:visible;height:auto;max-height:none}.bunker-column.left{background:#f0f1e9}.bunker-column.right{background:#f5efe1}.bunker-title{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px}.bunker-row{padding:8px 0;border-top:1px solid #18241c12}.bunker-row:first-of-type{border-top:0;padding-top:0}.bunker-name{font-size:10px;color:var(--muted);margin-bottom:4px}.bunker-values{display:grid;grid-template-columns:1fr 1fr;gap:4px}.bunker-value{font-size:10px;font-weight:700}.bunker-value small{display:block;font-size:8px;font-weight:600;color:var(--muted);margin-bottom:2px}.empty{font-size:10px;color:var(--muted);line-height:1.4}.notice{border-radius:10px;background:#eef0e8;padding:9px;font-size:10px;line-height:1.4;color:var(--muted);margin:10px 0}.hidden{display:none!important}.actions{position:fixed;z-index:10;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr 1fr;gap:0;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:var(--ivory);border-top:1px solid var(--line)}.action-button{width:100%;min-height:48px;border-radius:12px;padding:0 22px}.gps-icon{width:100%;min-height:48px;height:48px;padding:0;display:grid;place-items:center;border-radius:12px}.gps-icon svg{width:21px;height:21px}.gpsdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#a3a99d;margin-right:6px}.gpsdot.good{background:#318451}@media(max-width:360px){body{padding:8px}.card{padding:12px}.title{font-size:20px}.yardage .number{font-size:30px}.bunker-column{padding:8px}}
+/* Mobile browser page-scroll safeguard: keep the document as the scroll container. */
+html{overflow-y:scroll!important;min-height:100%!important;height:auto!important}body{height:auto!important;min-height:100vh!important;overflow:visible!important;overflow-x:hidden!important;touch-action:pan-y!important}.app,.card,#yardagePanel,.bunker-columns,.bunker-column{height:auto!important;max-height:none!important;overflow:visible!important;contain:none!important}.actions{position:fixed!important;bottom:0!important}
+
+</style></head><body><main class="app">
+<p class="brand">UIDO · OVERSTONE</p>
+<section class="card">
+<div class="topline"><div><div class="eyebrow">Live yardages</div><h1 class="title" id="title">Hole 1 · Par 4</h1></div><div id="accuracy" class="accuracy">GPS waiting</div></div>
+<div class="hole-select"><label for="holeSelect">SELECT HOLE</label><select id="holeSelect" aria-label="Select hole"></select></div>
+<p class="status" id="status">Waiting for GPS fix…</p>
+<div id="gpsPanel" class="actions"><button id="gpsButton" class="gps-icon" type="button" aria-label="Get GPS fix" title="Get GPS fix"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path></svg></button></div>
+<div id="yardagePanel"><div class="yardages"><div class="yardage"><div class="label">BACK</div><div class="number" id="back">—</div><div class="unit">yards</div></div><div class="yardage"><div class="label">MIDDLE</div><div class="number" id="middle">—</div><div class="unit">yards</div></div><div class="yardage"><div class="label">FRONT</div><div class="number" id="front">—</div><div class="unit">yards</div></div></div>
+<div class="bunkers-head"><strong>Bunkers</strong></div>
+<div class="bunker-columns"><section class="bunker-column left"><div class="bunker-title">← Left</div><div id="leftBunkers" class="empty">Waiting for course data…</div></section><section class="bunker-column right"><div class="bunker-title">Right →</div><div id="rightBunkers" class="empty">Waiting for course data…</div></section></div>
+
+</div>
+</section></main>
+<script src="course-agnostic-logic.js"></script>
+<script src="course-source-model.js"></script>
+<script>
+const greens={"1":{"front":[52.2776675,-0.8151979],"middle":[52.2777593548,-0.8150508742],"back":[52.2778714,-0.8149234]},"2":{"front":[52.2762446,-0.8166103],"middle":[52.2761187565,-0.8166885565],"back":[52.2759866,-0.8167443]},"3":{"front":[52.2778812,-0.8090129],"middle":[52.2778988565,-0.8087891217],"back":[52.2779135,-0.8085902]},"4":{"front":[52.2772533,-0.8087878],"middle":[52.2771159346,-0.8087677038],"back":[52.2769427,-0.8087173]},"5":{"front":[52.2776584,-0.8078104],"middle":[52.277808219,-0.8077740714],"back":[52.2779524,-0.8077361]},"6":{"front":[52.2781104,-0.8122362],"middle":[52.27808518,-0.812469884],"back":[52.2780397,-0.8126753]},"7":{"front":[52.2794216,-0.8088696],"middle":[52.2795195045,-0.8087506273],"back":[52.2796419,-0.8085806]},"8":{"front":[52.2786921,-0.813574],"middle":[52.2786696441,-0.8137855971],"back":[52.2786162,-0.8139867]},"9":{"front":[52.2769114,-0.8196546],"middle":[52.2768185621,-0.8197574241],"back":[52.2767091,-0.819892]},"10":{"front":[52.278392,-0.8150479],"middle":[52.278398615,-0.81486075],"back":[52.2784586,-0.8146675]},"11":{"front":[52.2796879,-0.8217361],"middle":[52.279755232,-0.821899464],"back":[52.2798081,-0.8220921]},"12":{"front":[52.2794821,-0.8176194],"middle":[52.2793910406,-0.8174479594],"back":[52.2792755,-0.8173131]},"13":{"front":[52.2807912,-0.8178728],"middle":[52.2808534417,-0.818040525],"back":[52.2809468,-0.8181271]},"14":{"front":[52.2803959,-0.8220366],"middle":[52.2802766038,-0.8221441346],"back":[52.2801546,-0.8222846]},"15":{"front":[52.2778876,-0.8191666],"middle":[52.2777620348,-0.8190806174],"back":[52.2776311,-0.8190402]},"16":{"front":[52.2790903,-0.8226127],"middle":[52.2791599318,-0.8228008455],"back":[52.2792116,-0.8229746]},"17":{"front":[52.2794846,-0.8250631],"middle":[52.2794704294,-0.8252090294],"back":[52.2794893,-0.8253495]},"18":{"front":[52.2765729,-0.8200444],"middle":[52.27643659697,-0.8199714121],"back":[52.2762961,-0.8198744]}};
+const pars={"1":{"par":4},"2":{"par":3},"3":{"par":5},"4":{"par":3},"5":{"par":4},"6":{"par":4},"7":{"par":4},"8":{"par":4},"9":{"par":5},"10":{"par":4},"11":{"par":5},"12":{"par":4},"13":{"par":3},"14":{"par":4},"15":{"par":4},"16":{"par":4},"17":{"par":3},"18":{"par":5}};
+const sel=document.getElementById('holeSelect'),statusEl=document.getElementById('status'),accEl=document.getElementById('accuracy'),titleEl=document.getElementById('title'),yardagePanel=document.getElementById('yardagePanel');
+const requestedHole=Number(new URLSearchParams(location.search).get('hole'));
+let currentHole=requestedHole>=1&&requestedHole<=18?requestedHole:0,fix=null,watchId=null,manual=false;
+if(currentHole)manual=true;else currentHole=1;
+for(let n=1;n<=18;n++){const o=document.createElement('option');o.value=n;o.textContent='Hole '+n+' · Par '+pars[n].par;sel.appendChild(o)}
+render();
+function dist(a,b){const R=6371000,rad=x=>x*Math.PI/180,lat1=rad(a[0]),lat2=rad(b[0]),dlat=lat2-lat1,dlon=rad(b[1]-a[1]);const h=Math.sin(dlat/2)**2+Math.cos(lat1)*Math.cos(lat2)*Math.sin(dlon/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+function yards(m){return Math.round(m*1.0936133)}
+function render(){
+ const g=greens[String(currentHole)];if(!g)return;
+ const holeData=window.UIDO_OVERSTONE_SOURCE_HOLES&&window.UIDO_OVERSTONE_SOURCE_HOLES[String(currentHole)];
+ titleEl.textContent='Hole '+currentHole+' · Par '+pars[currentHole].par;
+ document.getElementById('front').textContent=fix?yards(dist([fix.latitude,fix.longitude],g.front)):'—';
+ document.getElementById('middle').textContent=fix?yards(dist([fix.latitude,fix.longitude],g.middle)):'—';
+ document.getElementById('back').textContent=fix?yards(dist([fix.latitude,fix.longitude],g.back)):'—';
+ yardagePanel.classList.remove('hidden');
+ sel.value=String(currentHole);
+ function bunkerKind(b){
+   // Classify by proximity to this hole's green, not by array order.
+   const centre=[(b.front_gps[0]+b.back_gps[0])/2,(b.front_gps[1]+b.back_gps[1])/2];
+   const greenDistance=dist(centre,g.middle);
+   return greenDistance<=55?'Green-side':'Fairway';
+ }
+ function bunkerMarkup(b){
+   const f=fix?yards(dist([fix.latitude,fix.longitude],b.front_gps)):'—';
+   const carry=fix?yards(dist([fix.latitude,fix.longitude],b.back_gps)):'—';
+   const label=bunkerKind(b);
+   return '<div class="bunker-row"><div class="bunker-name">'+label+'</div><div class="bunker-values"><div class="bunker-value"><small>FRONT</small>'+f+'</div><div class="bunker-value"><small>CARRY</small>'+carry+'</div></div></div>';
+ }
+ const bunkers=(holeData&&Array.isArray(holeData.bunkers))?holeData.bunkers:[];
+ const left=bunkers.filter(b=>(window.UIDO_COURSE_LOGIC?.getBunkerSide(holeData,b)||b.side)==='left').sort((a,b)=>dist([(a.front_gps[0]+a.back_gps[0])/2,(a.front_gps[1]+a.back_gps[1])/2],g.middle)-dist([(b.front_gps[0]+b.back_gps[0])/2,(b.front_gps[1]+b.back_gps[1])/2],g.middle));
+ const right=bunkers.filter(b=>(window.UIDO_COURSE_LOGIC?.getBunkerSide(holeData,b)||b.side)==='right').sort((a,b)=>dist([(a.front_gps[0]+a.back_gps[0])/2,(a.front_gps[1]+a.back_gps[1])/2],g.middle)-dist([(b.front_gps[0]+b.back_gps[0])/2,(b.front_gps[1]+b.back_gps[1])/2],g.middle));
+ document.getElementById('leftBunkers').innerHTML=left.length?left.map(bunkerMarkup).join(''):'<div class="empty">No mapped left bunkers</div>';
+ document.getElementById('rightBunkers').innerHTML=right.length?right.map(bunkerMarkup).join(''):'<div class="empty">No mapped right bunkers</div>';
+}
+function applyFix(p){
+ fix={latitude:p.coords.latitude,longitude:p.coords.longitude,accuracy:p.coords.accuracy,timestamp:p.timestamp};
+ const nearest=Object.keys(greens).map(n=>({hole:Number(n),distance:dist([fix.latitude,fix.longitude],greens[n].middle)})).sort((a,b)=>a.distance-b.distance)[0];
+ accEl.innerHTML='<span class="gpsdot good"></span>±'+Math.round(fix.accuracy)+' m';
+ if(!manual&&nearest&&nearest.distance<=100&&fix.accuracy<=60){currentHole=nearest.hole;statusEl.innerHTML='<strong>GPS fix acquired.</strong> Nearest mapped green is '+Math.round(nearest.distance)+' m away.';}
+ else{statusEl.innerHTML='<strong>GPS connected.</strong> Choose or confirm the hole you are playing.';}
+ render();
+}
+document.getElementById('gpsButton').addEventListener('click',()=>{
+ if(!navigator.geolocation){statusEl.textContent='Location is not available in this browser.';return}
+ statusEl.textContent='Waiting for GPS fix…';accEl.textContent='Requesting high-accuracy location.';
+ navigator.geolocation.getCurrentPosition(applyFix,e=>{statusEl.textContent=e.code===1?'Location permission was denied. Allow location access in browser settings and try again.':e.code===3?'GPS timed out. Try again in a more open area.':'Could not get a GPS fix. Try again.';accEl.textContent='No fix received.'},{enableHighAccuracy:true,maximumAge:0,timeout:20000});
+});
+sel.addEventListener('change',()=>{currentHole=Number(sel.value);manual=true;render();if(fix){statusEl.innerHTML='<strong>Hole '+currentHole+' selected.</strong> Yardages update from GPS.';}});
+</script>
+</body></html>
