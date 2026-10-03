@@ -1,21 +1,16 @@
-(function(){
-  const options=[...document.querySelectorAll('.option')];
-  const confirm=document.getElementById('confirm');
-  const status=document.getElementById('selectionStatus');
-  let selected=null;
-  options.forEach(button=>button.addEventListener('click',()=>{
-    selected=button.dataset.value;
-    options.forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
-    confirm.disabled=false;
-    status.textContent=selected+' selected';
-  }));
-  confirm.addEventListener('click',()=>{
-    if(!selected)return;
-    document.documentElement.dataset.confirmed='true';
-    status.textContent='Trajectory confirmed: '+selected;
-    window.dispatchEvent(new CustomEvent('uido:trajectory-confirmed',{detail:{value:selected}}));
-    if(window.parent!==window){
-      window.parent.postMessage({type:'uido:trajectory-confirmed',value:selected},window.location.origin);
+const options = Array.from(document.querySelectorAll('.option'));
+let completed = false;
+options.forEach((button) => {
+  button.addEventListener('click', () => {
+    if (completed) return;
+    completed = true;
+    const value = button.dataset.value;
+    window.dispatchEvent(new CustomEvent('uido:trajectory-selected', { detail: { value: value } }));
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'uido:trajectory-selected', value: value }, window.location.origin);
+    } else {
+      document.querySelector('header p').textContent = value + ' selected';
+      completed = false;
     }
   });
-})();
+});
