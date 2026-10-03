@@ -101,20 +101,20 @@ document.getElementById('windButton').addEventListener('click',()=>{openShotFlow
 <script>
 (function(){
  const overlay=document.getElementById('shotOverlay'),frame=document.getElementById('tileFrame'),stepLabel=document.getElementById('shotStepLabel'),flowStatus=document.getElementById('flowStatus'),continueBtn=document.getElementById('flowContinue'),backBtn=document.getElementById('flowBack'),exitBtn=document.getElementById('flowExit'),footer=document.getElementById('shotFooter'),summary=document.getElementById('flowSummary'),recordsEl=document.getElementById('flowRecords'),custom=document.getElementById('customChoice'),customTitle=document.getElementById('customTitle'),customOptions=document.getElementById('customOptions');
- const steps=[{key:'WIND',url:'../wind-tile.html',kind:'wind'},{key:'LIE',url:'../lie-tile.html',kind:'result'},{key:'CLUB',url:'../club-tile.html',kind:'result'},{key:'HIT SHOT',kind:'custom',options:['Hit shot','Practice swing','No shot']},{key:'STRIKE',kind:'custom',options:['Pure','Good','Thin','Fat','Toe','Heel','Top','Shank']},{key:'TRAJECTORY',kind:'custom',options:['Low','Mid','High']},{key:'START',url:'../start-tile.html',kind:'result'},{key:'SHAPE',url:'../shape-tile-v2.html',kind:'result'},{key:'SCORE + PUTTS',url:'../putts-score-tile.html',kind:'score'}];
+ const steps=[{key:'WIND',url:'../wind-tile.html',kind:'wind'}];
  let stepIndex=0,shotNo=1,selectedWind=null,records=[],customValue=null,observer=null;
  function current(){return steps[stepIndex]}
  window.openShotFlow=function(){overlay.style.display='flex';stepIndex=0;shotNo=1;records=[];selectedWind=null;loadStep()};
  function setStatus(s){flowStatus.textContent=s}
  function loadStep(){
-   summary.style.display='none';custom.style.display='none';frame.style.display='block';continueBtn.style.display='none';backBtn.style.display=stepIndex===0?'none':'block';
+   summary.style.display='none';custom.style.display='none';frame.style.display='block';continueBtn.style.display='none';backBtn.style.display='none';
    const s=current();footer.style.display=s.key==='WIND'?'none':'flex';stepLabel.textContent='SHOT '+shotNo+' · '+s.key;setStatus(s.key==='WIND'?'Tap a direction · centre changes strength':s.kind==='custom'?'Tap a selection':'Make your selection');
    if(observer){observer.disconnect();observer=null}
    if(s.kind==='wind'){selectedWind=null;frame.style.display='block';custom.style.display='none';}
    if(s.kind==='custom'){frame.style.display='none';custom.style.display='flex';customOptions.style.gridTemplateColumns='repeat(2,minmax(0,1fr))';customTitle.textContent=s.key;customOptions.innerHTML='';customValue=null;s.options.forEach(v=>{const b=document.createElement('button');b.type='button';b.textContent=v;b.onclick=()=>{customValue=v;records.push({shot:shotNo,step:s.key,value:v});stepIndex++;if(stepIndex>=steps.length){showSummary();return}loadStep()};customOptions.appendChild(b)});return}
    frame.onload=()=>{const d=frame.contentDocument;if(!d)return;
      if(s.kind==='wind'){
-       d.querySelectorAll('.arrow').forEach(a=>a.addEventListener('click',()=>{selectedWind={direction:a.dataset.section,strength:(d.getElementById('strength')||{}).textContent||'1/2'};records.push({shot:shotNo,step:s.key,value:selectedWind});stepIndex++;loadStep()},true));
+       d.querySelectorAll('.arrow').forEach(a=>a.addEventListener('click',()=>{selectedWind={direction:a.dataset.section,strength:(d.getElementById('strength')||{}).textContent||'1/2'};records=[{shot:shotNo,step:s.key,value:selectedWind}];setStatus('Wind selected');overlay.style.display='none';},true));
      } else {
        const confirm=d.getElementById('confirm');
        if(confirm)confirm.addEventListener('click',()=>{setTimeout(()=>{const value=tileValue(s);if(value===null||value===undefined)return;records.push({shot:shotNo,step:s.key,value});stepIndex++;if(stepIndex>=steps.length){showSummary();return}loadStep()},0)},true);
