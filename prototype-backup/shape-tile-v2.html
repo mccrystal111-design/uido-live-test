@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>UiDo — Shape Tile V2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600&display=swap');
+:root{--yellow:#ffd600;--green:#183b27}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{font-family:Oxanium,sans-serif;color:#fff;background:var(--green)}
+.stage{width:100vw;height:100dvh;display:grid;place-items:center;padding:22px;background:var(--uido-green)}
+.tile{position:relative;width:min(88vw,520px);aspect-ratio:1;border:1px solid rgba(255,255,255,.24);border-radius:28px;background:rgba(18,31,27,.62);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);overflow:hidden}
+.circle{position:absolute;left:50%;top:50%;width:96%;height:96%;transform:translate(-50%,-50%);border-radius:50%;overflow:hidden;background:rgba(18,31,27,.34);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.help{position:absolute;right:5.5%;top:5.5%;width:10%;aspect-ratio:1;border:1.5px solid rgba(255,214,0,.78);border-radius:50%;background:rgba(18,31,27,.38);cursor:pointer;z-index:50;display:grid;place-items:center;padding:0;color:#fff;font:600 22px/1 Oxanium,sans-serif}
+.roller{position:absolute;left:9%;right:9%;top:27%;height:42%;overflow:visible;touch-action:none;user-select:none;-webkit-user-select:none;z-index:10;cursor:grab}
+.track{position:absolute;left:0;top:50%;display:flex;align-items:center;gap:4px;height:100%;will-change:transform}
+.shape{position:relative;flex:0 0 calc((100vw - 18vw - 16px)/5);max-width:112px;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;color:rgba(255,255,255,.25);cursor:pointer}
+.shape.active{color:#fff}
+.shape-arrow{width:246%;height:calc(100% - 38px);object-fit:contain;display:block;pointer-events:none}
+.shape-arrow.draw,.shape-arrow.fade{width:209%}
+.shape-arrow.straight{transform:rotate(-90deg)}
+.shape-arrow.draw{transform:scaleX(-1) rotate(-85deg)}
+.shape-arrow.hook{transform:scaleX(-1) rotate(-96deg)}
+.shape-arrow.fade{transform:rotate(265deg)}
+.shape-arrow.slice{transform:rotate(276deg)}
+.shape:not(.active) .shape-arrow{opacity:.25}.shape.active .shape-arrow{opacity:1;filter:brightness(1.2)}
+.shape-label{position:absolute;left:0;right:0;bottom:0;text-align:center;font-size:clamp(10px,2.7vw,14px);font-weight:500;white-space:nowrap}.shape.active .shape-label{font-weight:600}
+.marker{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);width:34px;height:3px;border-radius:3px;background:rgba(255,255,255,.24);pointer-events:none;z-index:18}
+.check{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);width:12%;min-width:50px;max-width:62px;aspect-ratio:1;border:1.5px solid rgba(255,214,0,.9);border-radius:50%;background:rgba(18,31,27,.94);display:grid;place-items:center;padding:0;z-index:20;cursor:pointer}
+.check img{width:62%;height:62%;object-fit:contain}.check:active{transform:translateX(-50%) scale(.96)}
+.result{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(8,16,13,.94);z-index:60}.result.show{display:flex}.result-main{font-size:clamp(28px,7vw,46px);font-weight:600}
+.help-panel{position:absolute;inset:0;background:rgba(8,16,13,.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:none;place-items:center;padding:9%;z-index:70}
+.help-panel.show{display:grid}
+.help-card{width:100%;max-width:360px;border:1px solid rgba(255,255,255,.24);border-radius:20px;background:rgba(25,39,34,.94);padding:24px;color:#fff;text-align:center}
+.help-card h2{margin:0 0 12px;font-size:24px;font-weight:500}.help-card p{margin:0 0 20px;font:400 15px/1.45 Arial,sans-serif;color:rgba(255,255,255,.8)}
+.help-close{border:1px solid rgba(255,255,255,.24);border-radius:15px;background:rgba(255,255,255,.1);color:#fff;padding:12px 22px;font:500 16px Oxanium;cursor:pointer}
+@media(max-width:420px){.tile{width:91vw;border-radius:24px}.roller{left:8%;right:8%;top:29%;height:39%}.shape{flex-basis:calc((100vw - 16vw - 16px)/5)}}
+.embedded-tile, .embedded-tile body{background:transparent!important}.embedded-tile body{overflow:hidden}.embedded-tile .stage{width:100%;height:100%;min-height:0;padding:0;background:transparent!important}.embedded-tile .tile{width:100%;height:100%;max-width:none;aspect-ratio:1;border:0!important;border-radius:22px!important;background:transparent!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;overflow:hidden}.embedded-tile .help{display:none!important}.embedded-tile .modal-card{padding:14px}.embedded-tile .modal-card h2{font-size:18px}.embedded-tile .modal-card p{font-size:12px}.embedded-tile .close{padding:8px 14px;font-size:13px}
+/* UiDo unified field-test skin */
+:root{--uido-green:#183b27;--uido-panel:#14291f;--uido-panel-2:#1b3428;--uido-border:rgba(244,241,230,.24);--uido-ivory:#f4f1e6;--uido-yellow:#ffd600}
+html,body{background:var(--uido-green);color:var(--uido-ivory)}
+.stage{background:var(--uido-green)!important;padding:16px!important}
+.tile{border:1px solid var(--uido-border)!important;border-radius:24px!important;background:var(--uido-panel)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:none!important}
+.help{border:1px solid rgba(255,214,0,.75)!important;background:var(--uido-panel-2)!important}
+/* Keep radial controls and rollers intact; standardise their surrounding surface only. */
+button,.btn,.option-button,.choice,.action{font-family:inherit}
+</style>
+</head>
+<body><script>if(new URLSearchParams(location.search).get('embedded')==='1')document.documentElement.classList.add('embedded-tile');</script>
+<main class="stage"><section class="tile" aria-label="UiDo Shape Tile V2">
+<div class="circle">
+<div class="roller" id="roller"><div class="track" id="track">
+<div class="shape"><img class="shape-arrow hook" src="assets/uido-curved-arrow-white-hook.svg" alt="Hook"><div class="shape-label">Hook</div></div>
+<div class="shape"><img class="shape-arrow draw" src="assets/uido-curved-arrow-white-draw.svg" alt="Draw"><div class="shape-label">Draw</div></div>
+<div class="shape active"><img class="shape-arrow straight" src="assets/uido-straight-arrow-white.svg" alt="Straight"><div class="shape-label">Straight</div></div>
+<div class="shape"><img class="shape-arrow fade" src="assets/uido-curved-arrow-white-draw.svg" alt="Fade"><div class="shape-label">Fade</div></div>
+<div class="shape"><img class="shape-arrow slice" src="assets/uido-curved-arrow-white-hook.svg" alt="Slice"><div class="shape-label">Slice</div></div>
+</div></div>
+<div class="marker" aria-hidden="true"></div>
+<button class="check" id="confirm" aria-label="Confirm"><img src="assets/uido-check-white.svg" alt="Confirm"></button>
+<div class="result" id="result"><div class="result-main" id="resultMain"></div></div>
+</div>
+<div class="help-panel" id="helpPanel" role="dialog" aria-modal="true" aria-label="Shape help">
+<div class="help-card"><h2>Shape</h2><p>UiDo predicts the shot shape from the available player and shot data. Drag to change the shape if needed, then tap the tick to confirm.</p><button class="help-close" id="helpClose">Got it</button></div>
+</div>
+<button class="help" id="help" aria-label="Help">?</button>
+</section></main>
+<script>
+const roller=document.getElementById('roller'),track=document.getElementById('track'),items=[...document.querySelectorAll('.shape')],names=['Hook','Draw','Straight','Fade','Slice'];
+let index=2,offset=0,drag=false,pid=null,startX=0,startOffset=0,moved=false;
+function target(i){return roller.clientWidth/2-(items[i].offsetLeft+items[i].offsetWidth/2)}
+function limits(){return{min:target(4),max:target(0)}}
+function clampOffset(x){const l=limits();return Math.max(l.min,Math.min(l.max,x))}
+function apply(x){offset=clampOffset(x);track.style.transform=`translate3d(${offset}px,-50%,0)`}
+function nearest(){const c=roller.clientWidth/2;let best=0,d=Infinity;items.forEach((el,i)=>{const x=el.offsetLeft+el.offsetWidth/2+offset,dd=Math.abs(x-c);if(dd<d){d=dd;best=i}});return best}
+function highlight(i){index=Math.max(0,Math.min(4,i));items.forEach((el,n)=>el.classList.toggle('active',n===index))}
+function snap(i){highlight(i);track.style.transition='transform 180ms cubic-bezier(.2,.75,.2,1)';apply(target(index));setTimeout(()=>track.style.transition='none',200)}
+function currentOffset(){const rr=roller.getBoundingClientRect(),tr=track.getBoundingClientRect();return tr.left-rr.left}
+function down(e){if(e.pointerType==='mouse'&&e.button!==0)return;track.style.transition='none';offset=currentOffset();drag=true;pid=e.pointerId;startX=e.clientX;startOffset=offset;moved=false;roller.setPointerCapture(e.pointerId);roller.style.cursor='grabbing';e.preventDefault()}
+function move(e){if(!drag||e.pointerId!==pid)return;const dx=e.clientX-startX;if(Math.abs(dx)>5)moved=true;apply(startOffset+dx);highlight(nearest());e.preventDefault()}
+function up(e){if(!drag||e.pointerId!==pid)return;drag=false;roller.style.cursor='grab';if(roller.hasPointerCapture(e.pointerId))roller.releasePointerCapture(e.pointerId);if(moved){snap(nearest())}else{const hit=e.target.closest('.shape');if(hit){const i=items.indexOf(hit);if(i>=0)snap(i)}}pid=null}
+roller.addEventListener('pointerdown',down);roller.addEventListener('pointermove',move);roller.addEventListener('pointerup',up);roller.addEventListener('pointercancel',up);
+window.addEventListener('resize',()=>{track.style.transition='none';apply(target(index))});
+document.getElementById('confirm').addEventListener('click',()=>{document.getElementById('resultMain').textContent=names[index];document.getElementById('result').classList.add('show')});
+const help=document.getElementById('help'),helpPanel=document.getElementById('helpPanel'),helpClose=document.getElementById('helpClose');
+function closeHelp(){helpPanel.classList.remove('show');help.focus()}
+help.addEventListener('click',()=>{helpPanel.classList.add('show');helpClose.focus()});
+helpClose.addEventListener('click',closeHelp);
+helpPanel.addEventListener('click',e=>{if(e.target===helpPanel)closeHelp()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&helpPanel.classList.contains('show'))closeHelp()});
+requestAnimationFrame(()=>{track.style.transition='none';highlight(2);apply(target(2))});
+</script>
+</body></html>
