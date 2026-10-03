@@ -20,8 +20,9 @@ const pars={"1":{"par":4},"2":{"par":3},"3":{"par":5},"4":{"par":3},"5":{"par":4
 const sel=document.getElementById('holeSelect'),statusEl=document.getElementById('status'),accEl=document.getElementById('accuracy'),titleEl=document.getElementById('title'),matchNote=document.getElementById('matchNote'),yardagePanel=document.getElementById('yardagePanel');
 const requestedHole=Number(new URLSearchParams(location.search).get('hole'));
 let currentHole=requestedHole>=1&&requestedHole<=18?requestedHole:0,fix=null,watchId=null,manual=false;
-if(currentHole)manual=true;
+if(currentHole)manual=true;else currentHole=1;
 for(let n=1;n<=18;n++){const o=document.createElement('option');o.value=n;o.textContent='Hole '+n+' · Par '+pars[n].par;sel.appendChild(o)}
+render();
 function dist(a,b){const R=6371000,rad=x=>x*Math.PI/180,lat1=rad(a[0]),lat2=rad(b[0]),dlat=lat2-lat1,dlon=rad(b[1]-a[1]);const h=Math.sin(dlat/2)**2+Math.cos(lat1)*Math.cos(lat2)*Math.sin(dlon/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
 function yards(m){return Math.round(m*1.0936133)}
 function render(){
