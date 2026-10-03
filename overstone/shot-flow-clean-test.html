@@ -101,7 +101,7 @@ document.getElementById('windButton').addEventListener('click',()=>{openShotFlow
 <script>
 (function(){
  const overlay=document.getElementById('shotOverlay'),frame=document.getElementById('tileFrame'),stepLabel=document.getElementById('shotStepLabel'),flowStatus=document.getElementById('flowStatus'),continueBtn=document.getElementById('flowContinue'),backBtn=document.getElementById('flowBack'),exitBtn=document.getElementById('flowExit'),footer=document.getElementById('shotFooter'),summary=document.getElementById('flowSummary'),recordsEl=document.getElementById('flowRecords'),custom=document.getElementById('customChoice'),customTitle=document.getElementById('customTitle'),customOptions=document.getElementById('customOptions');
- const steps=[{key:'WIND',url:'../wind-tile.html',kind:'wind'}];
+ const steps=[{key:'WIND',url:'wind-gauge.html',kind:'wind'},{key:'LIE',url:'../lie-tile.html',kind:'result'}];
  let stepIndex=0,shotNo=1,selectedWind=null,records=[],customValue=null,observer=null;
  function current(){return steps[stepIndex]}
  window.openShotFlow=function(){overlay.style.display='flex';stepIndex=0;shotNo=1;records=[];selectedWind=null;loadStep()};
@@ -113,14 +113,12 @@ document.getElementById('windButton').addEventListener('click',()=>{openShotFlow
    if(s.kind==='wind'){selectedWind=null;frame.style.display='block';custom.style.display='none';}
    if(s.kind==='custom'){frame.style.display='none';custom.style.display='flex';customOptions.style.gridTemplateColumns='repeat(2,minmax(0,1fr))';customTitle.textContent=s.key;customOptions.innerHTML='';customValue=null;s.options.forEach(v=>{const b=document.createElement('button');b.type='button';b.textContent=v;b.onclick=()=>{customValue=v;records.push({shot:shotNo,step:s.key,value:v});stepIndex++;if(stepIndex>=steps.length){showSummary();return}loadStep()};customOptions.appendChild(b)});return}
    frame.onload=()=>{const d=frame.contentDocument;if(!d)return;
-     if(s.kind==='wind'){
-       d.querySelectorAll('.arrow').forEach(a=>a.addEventListener('click',()=>{selectedWind={direction:a.dataset.section,strength:(d.getElementById('strength')||{}).textContent||'1/2'};records=[{shot:shotNo,step:s.key,value:selectedWind}];setStatus('Wind selected');overlay.style.display='none';},true));
-     } else {
-       const confirm=d.getElementById('confirm');
-       if(confirm)confirm.addEventListener('click',()=>{setTimeout(()=>{const value=tileValue(s);if(value===null||value===undefined)return;records.push({shot:shotNo,step:s.key,value});stepIndex++;if(stepIndex>=steps.length){showSummary();return}loadStep()},0)},true);
-     }
-   };
-   frame.src=s.url+'?embedded=1&hole='+currentHole;
+      if(s.kind!=='wind'){
+        const confirm=d.getElementById('confirm');
+        if(confirm)confirm.addEventListener('click',()=>{setTimeout(()=>{const value=tileValue(s);if(value===null||value===undefined)return;records.push({shot:shotNo,step:s.key,value});stepIndex++;if(stepIndex>=steps.length){showSummary();return}loadStep()},0)},true);
+      }
+    };
+    frame.src=s.url+'?embedded=1&hole='+currentHole;
  }
  function tileValue(s){const d=frame.contentDocument;if(!d)return null;
    if(s.key==='LIE')return d.getElementById('lieLabel')?.textContent.trim()||'Unknown';
@@ -130,7 +128,17 @@ document.getElementById('windButton').addEventListener('click',()=>{openShotFlow
    if(s.key==='SCORE + PUTTS'){const val=id=>d.querySelector('#'+id+' .row.sel')?.textContent.trim()||null;return {putts:val('r0'),score:val('r1'),penalties:val('r2')}}
    return null;
  }
- function saveCurrent(){}
+ window.addEventListener('message',event=>{
+    if(event.origin!==window.location.origin||!event.data)return;
+    if(event.data.type==='uido:wind-back'){overlay.style.display='none';return}
+    if(event.data.type==='uido:wind-change'&&event.data.direction&&current().key==='WIND'){
+      selectedWind={direction:event.data.direction,strength:event.data.strength||'1/2'};
+      records=[{shot:shotNo,step:'WIND',value:selectedWind}];
+      stepIndex++;
+      loadStep();
+    }
+  });
+  function saveCurrent(){}
  function showSummary(){if(observer){observer.disconnect();observer=null}footer.style.display='flex';frame.style.display='none';custom.style.display='none';summary.style.display='block';continueBtn.style.display='none';backBtn.style.display='none';stepLabel.textContent='SHOT '+shotNo+' SAVED';setStatus('Selections captured in this field-test session');recordsEl.innerHTML=records.filter(r=>r.shot===shotNo).map(r=>'<div class="flow-record"><strong>'+r.step+'</strong><br>'+String(typeof r.value==='object'?JSON.stringify(r.value):r.value)+'</div>').join('')}
  continueBtn.addEventListener('click',saveCurrent);backBtn.addEventListener('click',()=>{if(stepIndex>0){stepIndex--;loadStep()}});
  exitBtn.addEventListener('click',()=>{if(observer){observer.disconnect();observer=null}overlay.style.display='none'});
