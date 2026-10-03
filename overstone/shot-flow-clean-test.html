@@ -93,4 +93,48 @@ document.getElementById('gpsButton').addEventListener('click',()=>{
 });
 sel.addEventListener('change',()=>{currentHole=Number(sel.value);manual=true;render();if(fix){statusEl.innerHTML='<strong>Hole '+currentHole+' selected.</strong> Yardages update from GPS.';}});
 document.getElementById('windButton').addEventListener('click',()=>{openShotFlow()});
+</script>
+<section id="shotOverlay" aria-label="Shot capture flow">
+<header id="shotHeader"><div><div id="shotStepLabel">WIND</div><div id="flowStatus">Choose wind direction</div></div><button type="button" class="secondary" id="flowExit" style="min-height:40px;padding:8px 12px">Yardages</button></header>
+<div id="shotStage"><iframe id="tileFrame" title="Shot selection tile"></iframe><div id="customChoice"><h2 id="customTitle">HIT SHOT</h2><div id="customOptions"></div></div><div id="flowSummary"><h2>SHOT SAVED</h2><div id="flowRecords"></div><button id="anotherShot" class="full" style="margin-top:18px">NEXT SHOT</button><button id="finishHole" class="full secondary" style="margin-top:8px">FINISH HOLE / SCORE</button></div></div>
+<footer id="shotFooter"><button id="flowBack" class="secondary">Back</button><button id="flowContinue">Save wind</button></footer></section>
+<script>
+(function(){
+ const overlay=document.getElementById('shotOverlay'),frame=document.getElementById('tileFrame'),stepLabel=document.getElementById('shotStepLabel'),flowStatus=document.getElementById('flowStatus'),continueBtn=document.getElementById('flowContinue'),backBtn=document.getElementById('flowBack'),exitBtn=document.getElementById('flowExit'),summary=document.getElementById('flowSummary'),recordsEl=document.getElementById('flowRecords'),custom=document.getElementById('customChoice'),customTitle=document.getElementById('customTitle'),customOptions=document.getElementById('customOptions');
+ const steps=[{key:'WIND',url:'../wind-tile.html',kind:'wind'},{key:'LIE',url:'../lie-tile.html',kind:'result'},{key:'CLUB',url:'../club-tile.html',kind:'result'},{key:'HIT SHOT',kind:'custom',options:['Hit shot','Practice swing','No shot']},{key:'STRIKE',kind:'custom',options:['Pure','Good','Thin','Fat','Toe','Heel','Top','Shank']},{key:'TRAJECTORY',kind:'custom',options:['Low','Mid','High']},{key:'START',url:'../start-tile.html',kind:'result'},{key:'SHAPE',url:'../shape-tile-v2.html',kind:'result'},{key:'SCORE + PUTTS',url:'../putts-score-tile.html',kind:'score'}];
+ let stepIndex=0,shotNo=1,selectedWind=null,records=[],customValue=null,observer=null;
+ function current(){return steps[stepIndex]}
+ window.openShotFlow=function(){overlay.style.display='flex';stepIndex=0;shotNo=1;records=[];selectedWind=null;loadStep()};
+ function setStatus(s){flowStatus.textContent=s}
+ function loadStep(){
+   summary.style.display='none';custom.style.display='none';frame.style.display='block';continueBtn.style.display='block';backBtn.style.display=stepIndex===0?'none':'block';
+   const s=current();stepLabel.textContent='SHOT '+shotNo+' · '+s.key;setStatus(s.key==='WIND'?'Tap a wind arrow, then save':s.kind==='custom'?'Choose one option':'Confirm your choice on the original tile, then save');
+   if(observer){observer.disconnect();observer=null}
+   if(s.kind==='custom'){frame.style.display='none';custom.style.display='flex';customTitle.textContent=s.key;customOptions.innerHTML='';customValue=null;s.options.forEach(v=>{const b=document.createElement('button');b.type='button';b.textContent=v;b.onclick=()=>{customValue=v;customOptions.querySelectorAll('button').forEach(x=>x.classList.toggle('selected',x===b));setStatus('Selected: '+v)};customOptions.appendChild(b)});continueBtn.textContent='Save selection';return}
+   frame.onload=()=>{const d=frame.contentDocument;if(!d)return;
+     if(s.kind==='wind'){d.querySelectorAll('.arrow').forEach(a=>a.addEventListener('click',()=>{selectedWind={direction:a.dataset.section,strength:(d.getElementById('strength')||{}).textContent||'1/2'};setStatus('Wind: '+selectedWind.direction+' · Strength '+selectedWind.strength)},true));}
+     else {const result=d.getElementById('result');if(result){observer=new MutationObserver(()=>{if(result.classList.contains('show'))setStatus('Tile confirmed. Tap Save selection.')});observer.observe(result,{attributes:true,attributeFilter:['class']})}}
+   };
+   frame.src=s.url+'?embedded=1&hole='+currentHole;continueBtn.textContent=s.kind==='wind'?'Save wind':'Save selection';
+ }
+ function tileValue(s){const d=frame.contentDocument;if(!d)return null;
+   if(s.key==='LIE')return d.getElementById('lieLabel')?.textContent.trim()||'Unknown';
+   if(s.key==='CLUB')return d.querySelector('.club-row.selected .club')?.textContent.trim()||'Unknown';
+   if(s.key==='START')return d.getElementById('resultMain')?.textContent.trim()||'Unknown';
+   if(s.key==='SHAPE')return d.getElementById('resultMain')?.textContent.trim()||d.querySelector('.shape.active')?.textContent.trim()||'Unknown';
+   if(s.key==='SCORE + PUTTS'){const val=id=>d.querySelector('#'+id+' .row.sel')?.textContent.trim()||null;return {putts:val('r0'),score:val('r1'),penalties:val('r2')}}
+   return null;
+ }
+ function saveCurrent(){const s=current();let value;
+   if(s.kind==='wind'){value=selectedWind;if(!value){setStatus('Tap a wind arrow first.');return}}
+   else if(s.kind==='custom'){value=customValue;if(!value){setStatus('Choose an option first.');return}}
+   else {const d=frame.contentDocument;if(!d||!d.getElementById('result')?.classList.contains('show')){setStatus('Confirm your choice on the tile first.');return}value=tileValue(s);if(!value)return}
+   records.push({shot:shotNo,step:s.key,value});stepIndex++;if(stepIndex>=steps.length){showSummary();return}loadStep();
+ }
+ function showSummary(){if(observer){observer.disconnect();observer=null}frame.style.display='none';custom.style.display='none';summary.style.display='block';continueBtn.style.display='none';backBtn.style.display='none';stepLabel.textContent='SHOT '+shotNo+' SAVED';setStatus('Selections captured in this field-test session');recordsEl.innerHTML=records.filter(r=>r.shot===shotNo).map(r=>'<div class="flow-record"><strong>'+r.step+'</strong><br>'+String(typeof r.value==='object'?JSON.stringify(r.value):r.value)+'</div>').join('')}
+ continueBtn.addEventListener('click',saveCurrent);backBtn.addEventListener('click',()=>{if(stepIndex>0){stepIndex--;loadStep()}});
+ exitBtn.addEventListener('click',()=>{if(observer){observer.disconnect();observer=null}overlay.style.display='none'});
+ document.getElementById('anotherShot').addEventListener('click',()=>{shotNo++;stepIndex=0;selectedWind=null;loadStep()});
+ document.getElementById('finishHole').addEventListener('click',()=>{overlay.style.display='none'});
+})();
 </script></body></html>
