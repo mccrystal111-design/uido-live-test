@@ -15,7 +15,7 @@
 <div class="bunkers-head"><strong>Bunkers</strong></div>
 <div class="bunker-columns"><section class="bunker-column left"><div class="bunker-title">← Left bunkers</div><div id="leftBunkers" class="empty">Waiting for course data…</div></section><section class="bunker-column right"><div class="bunker-title">Right bunkers →</div><div id="rightBunkers" class="empty">Waiting for course data…</div></section></div>
 
-<button class="full" id="continue">Continue to Wind</button></div>
+</div>
 </section></main>
 <script src="course-source-model.js"></script>
 <script>
@@ -37,7 +37,6 @@ function render(){
  document.getElementById('middle').textContent=fix?yards(dist([fix.latitude,fix.longitude],g.middle)):'—';
  document.getElementById('back').textContent=fix?yards(dist([fix.latitude,fix.longitude],g.back)):'—';
  yardagePanel.classList.remove('hidden');
- document.getElementById('continue').textContent='Continue to Wind';
  sel.value=String(currentHole);
  function bunkerMarkup(b){
    const f=fix?yards(dist([fix.latitude,fix.longitude],b.front_gps)):'—';
@@ -64,6 +63,5 @@ document.getElementById('gpsButton').addEventListener('click',()=>{
  navigator.geolocation.getCurrentPosition(applyFix,e=>{statusEl.textContent=e.code===1?'Location permission was denied. Allow location access in browser settings and try again.':e.code===3?'GPS timed out. Try again in a more open area.':'Could not get a GPS fix. Try again.';accEl.textContent='No fix received.'},{enableHighAccuracy:true,maximumAge:0,timeout:20000});
 });
 sel.addEventListener('change',()=>{currentHole=Number(sel.value);manual=true;render();if(fix){statusEl.innerHTML='<strong>Hole '+currentHole+' selected.</strong> Yardages update from GPS.';}});
-document.getElementById('windButton').addEventListener('click',()=>{location.href='wind-tile.html?embedded=0&hole='+currentHole});
-document.getElementById('continue').addEventListener('click',()=>{location.href='shot-flow-field-test.html?hole='+currentHole});
+document.getElementById('windButton').addEventListener('click',()=>{location.href='shot-flow-field-test.html?hole='+currentHole});
 </script></body></html>
