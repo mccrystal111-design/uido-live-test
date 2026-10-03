@@ -27,13 +27,13 @@ button { font: inherit; -webkit-tap-highlight-color: transparent; touch-action: 
 .wind-arrow:focus-visible, .wind-strength:focus-visible, .yardages-button:focus-visible { outline: 3px solid var(--wind-yellow); outline-offset: 4px; }
 .wind-arrow[aria-pressed="true"] { filter: drop-shadow(0 0 5px var(--wind-yellow)); }
 .wind-arrow--top { left: 45.5%; top: 8%; transform: rotate(180deg); }
-.wind-arrow--top-right { left: 68%; top: 20%; transform: rotate(135deg); }
+.wind-arrow--top-right { left: 68%; top: 20%; transform: rotate(225deg); }
 .wind-arrow--right { left: 82%; top: 45.5%; transform: rotate(270deg); }
-.wind-arrow--bottom-right { left: 68%; top: 69%; transform: rotate(225deg); }
+.wind-arrow--bottom-right { left: 68%; top: 69%; transform: rotate(315deg); }
 .wind-arrow--bottom { left: 45.5%; top: 81%; transform: rotate(0deg); }
-.wind-arrow--bottom-left { left: 22%; top: 69%; transform: rotate(315deg); }
+.wind-arrow--bottom-left { left: 22%; top: 69%; transform: rotate(45deg); }
 .wind-arrow--left { left: 8%; top: 45.5%; transform: rotate(90deg); }
-.wind-arrow--top-left { left: 22%; top: 20%; transform: rotate(45deg); }
+.wind-arrow--top-left { left: 22%; top: 20%; transform: rotate(135deg); }
 .wind-strength { position: absolute; z-index: 3; left: 50%; top: 50%; width: var(--wind-center-size); aspect-ratio: 1; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 2%; border: 2px solid var(--wind-yellow); border-radius: 50%; background: #10291fee; color: var(--wind-ivory); cursor: pointer; }
 .wind-glyph { color: var(--wind-yellow); font-family: Arial, sans-serif; font-size: clamp(24px, 6vw, 42px); font-weight: 700; line-height: .9; margin-bottom: 5%; }
 .wind-strength-value { font-size: clamp(38px, 10.5vw, 74px); line-height: 1.05; font-weight: 700; font-variant-numeric: tabular-nums; }
