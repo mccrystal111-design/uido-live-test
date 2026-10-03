@@ -46,10 +46,6 @@
   strengthButton.addEventListener('click', cycleStrength);
   directionButtons.forEach(button => button.addEventListener('click', () => chooseDirection(button)));
 
-  root.querySelector('[data-action="yardages"]').addEventListener('click', () => {
-    root.dispatchEvent(new CustomEvent('uido:wind-back', { bubbles: true }));
-    window.parent?.postMessage({ type: 'uido:wind-back' }, window.location.origin);
-  });
 
   publish();
 })();
