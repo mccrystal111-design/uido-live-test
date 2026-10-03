@@ -1,21 +1,17 @@
-(function(){
-  const options=[...document.querySelectorAll('.option')];
-  const confirm=document.getElementById('confirm');
-  const status=document.getElementById('selectionStatus');
-  let selected=null;
-  options.forEach(button=>button.addEventListener('click',()=>{
-    selected=button.dataset.value;
-    options.forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
-    confirm.disabled=false;
-    status.textContent=selected+' selected';
-  }));
-  confirm.addEventListener('click',()=>{
-    if(!selected)return;
-    document.documentElement.dataset.confirmed='true';
-    status.textContent='Strike confirmed: '+selected;
-    window.dispatchEvent(new CustomEvent('uido:strike-confirmed',{detail:{value:selected}}));
-    if(window.parent!==window){
-      window.parent.postMessage({type:'uido:strike-confirmed',value:selected},window.location.origin);
-    }
+const buttons = Array.from(document.querySelectorAll('.option'));
+const confirmButton = document.getElementById('confirm');
+const status = document.getElementById('selectionStatus');
+const chosen = { vertical: '', horizontal: '' };
+buttons.forEach((button) => {
+  button.addEventListener('click', () => {
+    const axis = button.dataset.axis;
+    chosen[axis] = button.dataset.value;
+    buttons.filter((item) => item.dataset.axis === axis).forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+    confirmButton.disabled = !(chosen.vertical && chosen.horizontal);
+    status.textContent = confirmButton.disabled ? 'Choose both contact points' : chosen.vertical + ' ' + chosen.horizontal.toLowerCase() + ' selected';
   });
-})();
+});
+confirmButton.addEventListener('click', () => {
+  if (!chosen.vertical || !chosen.horizontal) return;
+  status.textContent = 'Strike confirmed';
+});
