@@ -105,8 +105,8 @@ renderLie();
    const header=d.getElementById('holeHeaderMeta');
    const info=d.getElementById('greenInfo');
    if(header){
-    const m=header.textContent.match(/Hole\\s+(\\d+)\\s+·\\s+Par\\s+(\\d+)/i);
-    if(m)meta.textContent='HOLE '+m[1]+' · PAR '+m[2]+' · NETT —';
+    const holeMeta=header.textContent.replace('Hole ','HOLE ').replace(' · Par ',' · PAR ');
+    meta.textContent=holeMeta+' · NETT —';
    }
    if(info){
     info.querySelectorAll('.metric').forEach(function(el){
