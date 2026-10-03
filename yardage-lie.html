@@ -55,6 +55,7 @@ button,.btn,.option-button,.choice,.action{font-family:inherit}
 </style>
 </head>
 <body><script>if(new URLSearchParams(location.search).get('embedded')==='1')document.documentElement.classList.add('embedded-tile');</script>
+<iframe id="courseData" title="Course yardage data" src="overstone/index.html" aria-hidden="true" tabindex="-1" style="position:fixed;left:-2px;top:-2px;width:2px;height:2px;opacity:0;pointer-events:none;border:0"></iframe>
 <main class="stage">
 <section class="tile yardage-tile" aria-label="Yardage Tile">
   <div class="yardage-circle">
@@ -62,11 +63,11 @@ button,.btn,.option-button,.choice,.action{font-family:inherit}
     <div class="yardage-shade"></div>
     <div class="yardage-meta" id="yardageMeta">HOLE 1 · PAR 4 · NETT —</div>
     <div class="yardage-values" aria-label="Front, middle and back yardages">
-      <div class="yardage-value" id="yardageFront">162</div>
+      <div class="yardage-value" id="yardageFront">—</div>
       <div class="yardage-rule"></div>
-      <div class="yardage-value middle" id="yardageMiddle">144</div>
+      <div class="yardage-value middle" id="yardageMiddle">—</div>
       <div class="yardage-rule"></div>
-      <div class="yardage-value" id="yardageBack">128</div>
+      <div class="yardage-value" id="yardageBack">—</div>
     </div>
   </div>
 </section>
@@ -90,4 +91,43 @@ let startX=0,startY=0,tracking=false;circle.addEventListener('touchstart',e=>{if
 let mouseDown=false,mouseStart=0;circle.addEventListener('mousedown',e=>{mouseDown=true;mouseStart=e.clientX});circle.addEventListener('mouseup',e=>{if(!mouseDown)return;mouseDown=false;const dx=e.clientX-mouseStart;if(Math.abs(dx)>45)nextLie(dx<0?1:-1)});
 renderLie();
 </script>
-</body></html>
+<script>
+(function(){
+ const frame=document.getElementById('courseData');
+ const meta=document.getElementById('yardageMeta');
+ const front=document.getElementById('yardageFront');
+ const middle=document.getElementById('yardageMiddle');
+ const back=document.getElementById('yardageBack');
+ function syncCourse(){
+  try{
+   const d=frame.contentDocument;
+   if(!d)return;
+   const header=d.getElementById('holeHeaderMeta');
+   const info=d.getElementById('greenInfo');
+   if(header){
+    const m=header.textContent.match(/Hole\\s+(\\d+)\\s+·\\s+Par\\s+(\\d+)/i);
+    if(m)meta.textContent='HOLE '+m[1]+' · PAR '+m[2]+' · NETT —';
+   }
+   if(info){
+    info.querySelectorAll('.metric').forEach(function(el){
+     const key=(el.querySelector('label')?.textContent||'').trim().toUpperCase();
+     const value=(el.querySelector('strong')?.textContent||'—').trim();
+     if(key==='F')front.textContent=value;
+     if(key==='M')middle.textContent=value;
+     if(key==='B')back.textContent=value;
+    });
+    if(!info.querySelector('.metric')){front.textContent=middle.textContent=back.textContent='—'}
+   }
+  }catch(e){front.textContent=middle.textContent=back.textContent='—'}
+ }
+ frame.addEventListener('load',function(){
+  syncCourse();
+  try{
+   const d=frame.contentDocument,info=d.getElementById('greenInfo'),header=d.getElementById('holeHeaderMeta');
+   if(info)new MutationObserver(syncCourse).observe(info,{childList:true,subtree:true,characterData:true});
+   if(header)new MutationObserver(syncCourse).observe(header,{childList:true,subtree:true,characterData:true});
+  }catch(e){}
+ });
+ setInterval(syncCourse,700);
+})();
+</script>\n</body></html>
