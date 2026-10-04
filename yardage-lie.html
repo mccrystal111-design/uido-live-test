@@ -36,9 +36,10 @@ body{font-family:Oxanium,sans-serif;color:#F4F1E6}
 .yardage-circle{position:absolute;left:50%;top:50%;width:96%;height:96%;transform:translate(-50%,-50%);border:1.5px solid rgba(63,75,59,.42);border-radius:50%;overflow:hidden;background:var(--uido-ivory)}
 .bunker-tile{position:relative!important;background:var(--uido-ivory)!important;isolation:isolate}
 .bunker-circle{position:absolute;left:50%;top:50%;width:96%;height:96%;transform:translate(-50%,-50%);border:1.5px solid rgba(63,75,59,.42);border-radius:50%;background:var(--uido-ivory);overflow:hidden;color:#101110}
-.bunker-heading{position:absolute;left:15%;width:50%;text-align:center;color:#3F4B3B;font:600 clamp(13px,3.5vw,19px)/1 Oxanium,sans-serif;letter-spacing:.07em}
+.bunker-heading{position:absolute;left:0;right:0;text-align:center;color:#3F4B3B;font:600 clamp(13px,3.5vw,19px)/1 Oxanium,sans-serif;letter-spacing:.07em}
 .greenside-heading{top:10%}.fairway-heading{top:55%}
-.bunker-page{position:absolute;right:10%;display:flex;align-items:center;justify-content:center;gap:clamp(5px,1.5vw,10px);color:#3F4B3B;font:600 clamp(11px,3vw,15px)/1 Oxanium,sans-serif;letter-spacing:.04em}
+.bunker-page{position:absolute;left:50%;transform:translateX(-50%);width:82%;display:flex;align-items:center;justify-content:space-between;color:#3F4B3B;font:600 clamp(11px,3vw,15px)/1 Oxanium,sans-serif;letter-spacing:.04em;pointer-events:none}
+.bunker-page .page-arrow{pointer-events:auto;padding:4px 10px;font-size:30px}
 .greenside-page{top:8%}.fairway-page{top:53%}
 .page-arrow{border:0;background:transparent;color:#3F4B3B;font:400 26px/0.8 Oxanium,sans-serif;padding:3px 5px;cursor:pointer;touch-action:manipulation}
 .bunker-half{position:absolute;left:8%;right:8%;display:grid;grid-template-columns:1fr 1fr;align-items:center}
@@ -97,13 +98,13 @@ button,.btn,.option-button,.choice,.action{font-family:inherit}
 <section class="tile bunker-tile" id="bunkerTile" aria-label="Bunker distances">
   <div class="bunker-circle">
     <div class="bunker-heading greenside-heading">GREENSIDE</div>
-    <div class="bunker-page greenside-page"><button class="page-arrow" type="button" data-zone="greenside" data-step="-1" aria-label="Previous greenside bunker">‹</button><span id="greensidePage">1/1</span><button class="page-arrow" type="button" data-zone="greenside" data-step="1" aria-label="Next greenside bunker">›</button></div>
+    <div class="bunker-page greenside-page"><button class="page-arrow" type="button" data-zone="greenside" data-step="-1" aria-label="Previous greenside bunker">‹</button><button class="page-arrow" type="button" data-zone="greenside" data-step="1" aria-label="Next greenside bunker">›</button></div>
     <div class="bunker-half greenside-half">
       <div class="bunker-distance-pair"><div><span class="distance-label">FR</span><strong id="greensideFront">—</strong></div><div><span class="distance-label">CR</span><strong id="greensideCarry">—</strong></div></div>
       <div class="bunker-distance-pair"><div><span class="distance-label">FR</span><strong id="greensideRightFront">—</strong></div><div><span class="distance-label">CR</span><strong id="greensideRightCarry">—</strong></div></div>
     </div>
     <div class="bunker-heading fairway-heading">FAIRWAY</div>
-    <div class="bunker-page fairway-page"><button class="page-arrow" type="button" data-zone="fairway" data-step="-1" aria-label="Previous fairway bunker">‹</button><span id="fairwayPage">1/1</span><button class="page-arrow" type="button" data-zone="fairway" data-step="1" aria-label="Next fairway bunker">›</button></div>
+    <div class="bunker-page fairway-page"><button class="page-arrow" type="button" data-zone="fairway" data-step="-1" aria-label="Previous fairway bunker">‹</button><button class="page-arrow" type="button" data-zone="fairway" data-step="1" aria-label="Next fairway bunker">›</button></div>
     <div class="bunker-half fairway-half">
       <div class="bunker-distance-pair"><div><span class="distance-label">FR</span><strong id="fairwayFront">—</strong></div><div><span class="distance-label">CR</span><strong id="fairwayCarry">—</strong></div></div>
       <div class="bunker-distance-pair"><div><span class="distance-label">FR</span><strong id="fairwayRightFront">—</strong></div><div><span class="distance-label">CR</span><strong id="fairwayRightCarry">—</strong></div></div>
@@ -129,7 +130,7 @@ button,.btn,.option-button,.choice,.action{font-family:inherit}
  document.querySelectorAll('.page-arrow').forEach(function(button){button.addEventListener('click',function(){
   const zone=button.dataset.zone;
   bunkerPages[zone]=0;
-  document.getElementById(zone+'Page').textContent='1/1';
+  /* Paging awaits connection to real bunker records. */
  })});
  const frame=document.getElementById('courseData');
  const meta=document.getElementById('yardageMeta');
