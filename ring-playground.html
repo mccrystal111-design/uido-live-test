@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>UiDo — Fixed Ring Playground</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600&display=swap');
+:root{--ivory:#F4F1E6;--ink:#101110;--yellow:#E9C928;--sage:#3F4B3B;--ring:rgba(63,75,59,.42);--line:rgba(16,17,16,.18);--blue:#4c6570}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#e8e6de;color:var(--ink);font-family:Oxanium,system-ui,sans-serif}button,input,select{font:inherit}button{cursor:pointer;touch-action:manipulation}
+header{padding:14px 18px;background:var(--ivory);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}header strong{letter-spacing:.1em;font-size:16px}header span{font:12px/1.4 Arial,sans-serif;color:#5d6258}
+.app{display:grid;grid-template-columns:minmax(280px,390px) minmax(270px,1fr);gap:18px;padding:18px;max-width:1100px;margin:0 auto;align-items:start}
+.phone-wrap{display:flex;justify-content:center}.phone{width:min(100%,360px);padding:12px;border:1px solid #c8c6bd;border-radius:28px;background:#d8d7cf;box-shadow:0 3px 12px rgba(16,17,16,.07)}
+.canvas{position:relative;width:100%;aspect-ratio:9/19.5;background:var(--ivory);border:1px solid #c6c3b8;border-radius:20px;overflow:hidden}
+.status{position:absolute;left:7%;right:7%;top:2%;display:flex;justify-content:space-between;font-size:9px;letter-spacing:.08em;color:#77796f;pointer-events:none}
+.ring-frame{position:absolute;left:7%;width:86%;aspect-ratio:1;border:1px solid rgba(16,17,16,.24);border-radius:20px;background:var(--ivory);overflow:hidden}
+.ring-frame:before{content:"";position:absolute;inset:2%;border:1.5px solid var(--ring);border-radius:50%;pointer-events:none}
+.ring-frame.top{top:5.7%}.ring-frame.bottom{bottom:5.7%}
+.ring-tag{position:absolute;z-index:2;left:7%;top:4%;font-size:8px;letter-spacing:.12em;color:#6b7166;pointer-events:none}
+.ring-content{position:absolute;inset:5%;border-radius:50%;overflow:hidden}
+.grid-overlay{position:absolute;inset:8%;display:none;pointer-events:none;z-index:4;background-image:linear-gradient(to right,rgba(63,75,59,.15) 1px,transparent 1px),linear-gradient(to bottom,rgba(63,75,59,.15) 1px,transparent 1px);background-size:10% 10%;border:1px dashed rgba(63,75,59,.35);border-radius:50%}
+.show-grid .grid-overlay{display:block}
+.canvas-footer{position:absolute;bottom:1.8%;left:0;right:0;text-align:center;font-size:8px;letter-spacing:.1em;color:#77796f}
+.object{position:absolute;z-index:5;min-width:24px;min-height:18px;display:flex;align-items:center;justify-content:center;text-align:center;touch-action:none;user-select:none;cursor:grab;white-space:pre-line;line-height:1.05;border:1px solid transparent;border-radius:5px;padding:2px;transform:translate(-50%,-50%);font-variant-numeric:tabular-nums}
+.object:active{cursor:grabbing}.object.selected{outline:1px dashed var(--blue);outline-offset:2px}.object .small{display:block;font-size:.45em;letter-spacing:.06em}
+.object.yellow{color:var(--yellow)}.object.sage{color:var(--sage)}.object.muted{color:#77796f}.object.outline{border-color:var(--ring);border-radius:50%}
+.quad{width:42%;height:38%;border:1px solid rgba(63,75,59,.3);border-radius:50%;display:flex;flex-direction:column;gap:3px;align-items:center;justify-content:center;background:rgba(244,241,230,.55)}
+.quad strong{font-size:1.15em;font-weight:600}.quad span{font-size:.58em;letter-spacing:.04em;color:var(--sage)}
+.tools{display:grid;gap:12px}.panel{background:var(--ivory);border:1px solid #cfcdc3;border-radius:14px;padding:14px}.panel h2{font-size:13px;letter-spacing:.1em;margin:0 0 10px}.panel p{font:12px/1.5 Arial,sans-serif;color:#65685f;margin:0 0 10px}
+.row{display:flex;gap:7px;flex-wrap:wrap}.btn{border:1px solid #c8c7bc;background:transparent;color:var(--ink);border-radius:9px;padding:8px 10px;font-size:11px}.btn.active,.btn.primary{background:var(--sage);color:var(--ivory);border-color:var(--sage)}.btn.yellow{border-color:#c7ab20}
+.asset-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.asset{border:1px solid #d0cec3;border-radius:9px;background:#f8f6ee;padding:9px 6px;font-size:11px;color:#32372f}.asset:active{background:#e5e2d5}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.field{display:grid;gap:4px;font:11px Arial,sans-serif;color:#5e6259}.field input,.field select{width:100%;min-width:0;border:1px solid #cbc9bf;border-radius:7px;padding:8px;background:#fbfaf5;color:var(--ink);font:12px Oxanium}
+.note{font:11px/1.45 Arial,sans-serif;color:#6b6e64}.statusline{min-height:16px;font:11px Arial,sans-serif;color:var(--sage)}
+@media(max-width:700px){.app{grid-template-columns:1fr;padding:10px;gap:12px}.phone{width:min(100%,360px)}.tools{grid-row:2}header{padding:12px}.asset-list{grid-template-columns:repeat(3,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header><div><strong>UiDo / RING PLAYGROUND</strong><br><span>Fixed canvas · layout experiments only</span></div><div class="row"><button class="btn" id="reset">Reset layout</button><button class="btn primary" id="export">Export layout JSON</button></div></header>
+<main class="app">
+ <div class="phone-wrap"><div class="phone"><div class="canvas" id="canvas">
+  <div class="status"><span>UiDo TEST</span><span>GPS ···</span></div>
+  <section class="ring-frame top" id="topRing"><span class="ring-tag">TOP RING</span><div class="ring-content" id="topContent"></div></section>
+  <section class="ring-frame bottom" id="bottomRing"><span class="ring-tag">BOTTOM RING</span><div class="ring-content" id="bottomContent"></div></section>
+  <div class="canvas-footer">PROTOTYPE · NOT LIVE COURSE DATA</div>
+ </div></div></div>
+ <aside class="tools">
+  <section class="panel"><h2>VIEW / STAGE</h2><p>Both ring frames are fixed. Change the stage to preview different contents without moving the rings.</p><div class="row" id="stages"><button class="btn active" data-stage="yardage">Yardage</button><button class="btn" data-stage="shot">Shot review</button><button class="btn" data-stage="score">Score</button></div><div style="height:9px"></div><div class="row"><button class="btn" id="gridToggle">Show coordinate grid</button><button class="btn" id="snapToggle">Snap 2%</button></div></section>
+  <section class="panel"><h2>ADD PLACEHOLDER</h2><p>Tap an item to add it to the selected ring, then drag it into position. These are editable placeholders, not final art.</p><div class="row" style="margin-bottom:8px"><button class="btn active" data-target="top">Target: top</button><button class="btn" data-target="bottom">Target: bottom</button></div><div class="asset-list" id="assets"></div></section>
+  <section class="panel"><h2>SELECTED OBJECT</h2><p id="selectionHelp">Select an object on the canvas to inspect and edit its position and size.</p><div class="fields"><label class="field">Label<input id="fLabel" type="text" disabled></label><label class="field">Font size (px)<input id="fSize" type="number" min="6" max="90" disabled></label><label class="field">X position (%)<input id="fX" type="number" min="0" max="100" step="0.5" disabled></label><label class="field">Y position (%)<input id="fY" type="number" min="0" max="100" step="0.5" disabled></label><label class="field">Width (%)<input id="fW" type="number" min="4" max="100" step="1" disabled></label><label class="field">Height (%)<input id="fH" type="number" min="3" max="100" step="1" disabled></label><label class="field">Style<select id="fStyle" disabled><option value="">Plain</option><option value="yellow">Yellow</option><option value="sage">Sage</option><option value="muted">Muted</option><option value="outline">Outlined circle</option></select></label><label class="field">Ring<select id="fRing" disabled><option value="top">Top ring</option><option value="bottom">Bottom ring</option></select></label></div><div class="row" style="margin-top:10px"><button class="btn" id="delete" disabled>Remove selected</button><button class="btn" id="duplicate" disabled>Duplicate</button></div></section>
+  <section class="panel"><h2>LAYOUT DATA</h2><p id="summary">No objects selected.</p><div class="row"><button class="btn" id="copy" >Copy JSON</button><button class="btn" id="download">Download JSON</button></div><div class="statusline" id="status" aria-live="polite"></div></section>
+ </aside>
+</main>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const assets=[
+ {type:'yardage',label:'FRONT 352',size:22,w:36,h:15,style:''},
+ {type:'yardage',label:'MIDDLE 367',size:27,w:42,h:17,style:'yellow'},
+ {type:'yardage',label:'BACK 382',size:22,w:36,h:15,style:''},
+ {type:'meta',label:'HOLE 1 · PAR 4',size:12,w:72,h:9,style:'sage'},
+ {type:'quad',label:'STRIKE',size:13,w:42,h:38,style:'outline'},
+ {type:'quad',label:'TRAJ',size:13,w:42,h:38,style:'outline'},
+ {type:'quad',label:'START',size:13,w:42,h:38,style:'outline'},
+ {type:'quad',label:'SHAPE',size:13,w:42,h:38,style:'outline'},
+ {type:'distance',label:'FR 28',size:18,w:22,h:12,style:'sage'},
+ {type:'distance',label:'CR 41',size:18,w:22,h:12,style:''},
+ {type:'label',label:'GREENSIDE',size:12,w:54,h:10,style:'sage'},
+ {type:'label',label:'FAIRWAY',size:12,w:44,h:10,style:'sage'},
+ {type:'label',label:'WIND',size:13,w:24,h:12,style:'outline'},
+ {type:'label',label:'LIE',size:13,w:24,h:12,style:'outline'},
+ {type:'label',label:'CLUB',size:13,w:24,h:12,style:'outline'},
+ {type:'label',label:'SCORE',size:15,w:35,h:13,style:''},
+ {type:'label',label:'PUTTS',size:11,w:28,h:10,style:'sage'},
+ {type:'label',label:'TOTAL +2',size:17,w:48,h:13,style:''},
+ {type:'label',label:'NET -1',size:17,w:42,h:13,style:'yellow'},
+ {type:'label',label:'NEXT SHOT',size:13,w:45,h:13,style:'outline'},
+ {type:'label',label:'BALL ICON',size:11,w:18,h:12,style:'yellow'}
+];
+let items=[],selected=null,target='top',stage='yardage',counter=0,grid=false,snap=false,drag=null;
+function addItem(a,ring=target,x=50,y=50){
+ const it={id:'obj-'+(++counter),type:a.type,label:a.label,size:a.size,w:a.w,h:a.h,style:a.style||'',ring,x,y};
+ items.push(it);renderItem(it);select(it.id);return it;
+}
+function ringEl(r){return $(r==='top'?'topContent':'bottomContent')}
+function renderItem(it){
+ let el=document.querySelector('[data-id="'+it.id+'"]');
+ if(!el){el=document.createElement('div');el.className='object';el.dataset.id=it.id;el.addEventListener('pointerdown',down);el.addEventListener('click',e=>{e.stopPropagation();select(it.id)});ringEl(it.ring).appendChild(el)}
+ else if(el.parentElement!==ringEl(it.ring))ringEl(it.ring).appendChild(el);
+ el.className='object'+(it.id===selected?' selected':'')+(it.style?' '+it.style:'');
+ el.style.left=it.x+'%';el.style.top=it.y+'%';el.style.width=it.w+'%';el.style.height=it.h+'%';el.style.fontSize=it.size+'px';
+ if(it.type==='quad'){el.classList.add('quad');el.innerHTML='<strong>'+esc(it.label)+'</strong><span>SELECTED</span>'}
+ else if(it.type==='yardage'){const p=it.label.split(' ');el.textContent=p.slice(-1)[0];el.title=it.label}
+ else if(it.type==='distance'){el.innerHTML=esc(it.label).replace(' ','<br>')}
+ else el.textContent=it.label;
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function renderAll(){document.querySelectorAll('.object').forEach(e=>e.remove());items.forEach(renderItem);updateInspector();updateSummary()}
+function select(id){selected=id;document.querySelectorAll('.object').forEach(e=>e.classList.toggle('selected',e.dataset.id===id));updateInspector()}
+function updateInspector(){
+ const it=items.find(o=>o.id===selected),ids=['fLabel','fSize','fX','fY','fW','fH','fStyle','fRing','delete','duplicate'];
+ ids.forEach(id=>$(id).disabled=!it);
+ $('selectionHelp').textContent=it?'Selected: '+it.id+' · drag on canvas or edit values below.':'Select an object on the canvas to inspect and edit its position and size.';
+ if(!it)return;
+ $('fLabel').value=it.label;$('fSize').value=it.size;$('fX').value=it.x;$('fY').value=it.y;$('fW').value=it.w;$('fH').value=it.h;$('fStyle').value=it.style;$('fRing').value=it.ring;
+}
+function updateSummary(){$('summary').textContent=items.length+' objects · '+items.filter(i=>i.ring==='top').length+' top ring · '+items.filter(i=>i.ring==='bottom').length+' bottom ring. Layout is a local draft until exported.'}
+function updateSelected(key,val){const it=items.find(o=>o.id===selected);if(!it)return;if(['size','x','y','w','h'].includes(key)){val=Number(val);if(!Number.isFinite(val))return;val=Math.max(key==='x'||key==='y'?0:key==='size'?6:4,Math.min(key==='x'||key==='y'?100:key==='size'?90:100,val))}it[key]=val;renderItem(it);updateInspector();updateSummary()}
+['fLabel','fSize','fX','fY','fW','fH','fStyle','fRing'].forEach(id=>$(id).addEventListener('change',()=>{const map={fLabel:'label',fSize:'size',fX:'x',fY:'y',fW:'w',fH:'h',fStyle:'style',fRing:'ring'};updateSelected(map[id],$(id).value)}));
+function down(e){if(e.button!==undefined&&e.button!==0)return;e.preventDefault();const id=e.currentTarget.dataset.id;select(id);const it=items.find(o=>o.id===id);drag={id,startX:e.clientX,startY:e.clientY,x:it.x,y:it.y,el:e.currentTarget};e.currentTarget.setPointerCapture(e.pointerId)}
+document.addEventListener('pointermove',e=>{if(!drag)return;const box=ringEl(items.find(o=>o.id===drag.id).ring).getBoundingClientRect();let x=drag.x+(e.clientX-drag.startX)/box.width*100,y=drag.y+(e.clientY-drag.startY)/box.height*100;if(snap){x=Math.round(x/2)*2;y=Math.round(y/2)*2}const it=items.find(o=>o.id===drag.id);it.x=Math.max(0,Math.min(100,x));it.y=Math.max(0,Math.min(100,y));drag.el.style.left=it.x+'%';drag.el.style.top=it.y+'%';updateInspector()});
+document.addEventListener('pointerup',()=>{if(drag){drag=null;updateSummary()}});
+$('assets').innerHTML=assets.map((a,i)=>'<button class="asset" data-asset="'+i+'">'+esc(a.label)+'</button>').join('');
+$('assets').addEventListener('click',e=>{const b=e.target.closest('[data-asset]');if(!b)return;const a=assets[Number(b.dataset.asset)];const pos={yardage:[50,42],meta:[50,17],quad:[30,32],distance:[30,50],label:[50,50]};const p=pos[a.type]||[50,50];addItem(a,target,p[0],p[1])});
+document.querySelectorAll('[data-target]').forEach(b=>b.addEventListener('click',()=>{target=b.dataset.target;document.querySelectorAll('[data-target]').forEach(x=>x.classList.toggle('active',x===b))}));
+function seed(){items=[];counter=0;const seedTop=[{...assets[3],ring:'top',x:50,y:14},{...assets[0],ring:'top',x:50,y:37},{...assets[1],ring:'top',x:50,y:52},{...assets[2],ring:'top',x:50,y:67}];seedTop.forEach(a=>addItem(a,a.ring,a.x,a.y));items.forEach(i=>{if(i.ring==='top'&&i.type==='yardage')i.w=34});items.forEach(i=>{if(i.type==='yardage'&&i.label.startsWith('MIDDLE'))i.size=27});renderAll();select(null)}
+function applyStage(s){
+ stage=s;document.querySelectorAll('[data-stage]').forEach(b=>b.classList.toggle('active',b.dataset.stage===s));
+ if(s==='yardage'){target='top';seed();return}
+ items=[];counter=0;
+ if(s==='shot'){
+  addItem({...assets[3],label:'HOLE 1 · PAR 4'},'top',50,13);
+  [['STRIKE',30,31],['TRAJ',70,31],['START',30,69],['SHAPE',70,69]].forEach(([label,x,y])=>addItem({...assets[4],label},'top',x,y));
+  addItem({...assets[12],label:'WIND'},'bottom',30,29);addItem({...assets[13],label:'LIE'},'bottom',70,29);addItem({...assets[14],label:'CLUB'},'bottom',50,52);addItem({...assets[19],label:'HIT SHOT'},'bottom',50,77);
+ }else{
+  addItem({...assets[17],label:'TOTAL +2'},'top',50,38);addItem({...assets[18],label:'NET -1'},'top',50,59);
+  addItem({...assets[15],label:'SCORE 5'},'bottom',50,36);addItem({...assets[16],label:'PUTTS 2'},'bottom',50,55);addItem({...assets[19],label:'NEXT SHOT'},'bottom',50,77);
+ }
+ renderAll();select(null);target='top';document.querySelectorAll('[data-target]').forEach(b=>b.classList.toggle('active',b.dataset.target==='top'));
+}
+$('stages').addEventListener('click',e=>{const b=e.target.closest('[data-stage]');if(b)applyStage(b.dataset.stage)});
+$('gridToggle').onclick=()=>{$('canvas').classList.toggle('show-grid',grid=!grid);$('gridToggle').classList.toggle('active',grid);$('gridToggle').textContent=grid?'Hide coordinate grid':'Show coordinate grid'};
+$('snapToggle').onclick=()=>{snap=!snap;$('snapToggle').classList.toggle('active',snap);$('snapToggle').textContent=snap?'Snap: on (2%)':'Snap 2%'};
+$('delete').onclick=()=>{items=items.filter(o=>o.id!==selected);selected=null;renderAll()};
+$('duplicate').onclick=()=>{const it=items.find(o=>o.id===selected);if(it){const copy={...it,id:undefined,x:Math.min(92,it.x+5),y:Math.min(92,it.y+5)};addItem(copy,copy.ring,copy.x,copy.y)}};
+function output(){return {schema:'uido-ring-layout-v1',canvas:{aspectRatio:'9:19.5',rings:[{id:'top',position:'fixed',x:7,y:5.7,width:86,aspectRatio:1},{id:'bottom',position:'fixed',x:7,bottom:5.7,width:86,aspectRatio:1}]},stage,objects:items.map(({id,...o})=>({...o,id}))}}
+function download(){const blob=new Blob([JSON.stringify(output(),null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='uido-ring-layout.json';a.click();URL.revokeObjectURL(url);$('status').textContent='Layout JSON downloaded.'}
+$('export').onclick=download;$('download').onclick=download;
+$('copy').onclick=async()=>{const data=JSON.stringify(output(),null,2);try{await navigator.clipboard.writeText(data);$('status').textContent='Layout JSON copied.'}catch(e){const ta=document.createElement('textarea');ta.value=data;document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();$('status').textContent=ok?'Layout JSON copied.':'Clipboard unavailable — use Download JSON.'}};
+$('reset').onclick=()=>applyStage(stage);
+$('topContent').addEventListener('click',e=>{if(e.target.id==='topContent')select(null)});
+$('bottomContent').addEventListener('click',e=>{if(e.target.id==='bottomContent')select(null)});
+seed();
+})();
+</script>
+</body>
+</html>
