@@ -136,6 +136,85 @@ button,.btn,.option-button,.choice,.action{font-family:inherit}
  })});
  const frame=document.getElementById('courseData');
  const meta=document.getElementById('yardageMeta');
+ const bunkerEls={
+  greenside:[document.getElementById('greensideFront'),document.getElementById('greensideCarry'),document.getElementById('greensideRightFront'),document.getElementById('greensideRightCarry')],
+  fairway:[document.getElementById('fairwayFront'),document.getElementById('fairwayCarry'),document.getElementById('fairwayRightFront'),document.getElementById('fairwayRightCarry')]
+ };
+ let livePosition=null, gpsWatchId=null, activeHole=1, bunkerRecords={greenside:[],fairway:[]}, bunkerIndexes={greenside:0,fairway:0};
+ function metres(a,b){
+  const rad=Math.PI/180,R=6371008.8,lat1=a[0]*rad,lat2=b[0]*rad,dLat=(b[0]-a[0])*rad,dLon=(b[1]-a[1])*rad;
+  const h=Math.sin(dLat/2)**2+Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)**2;
+  return 2*R*Math.asin(Math.min(1,Math.sqrt(h)));
+ }
+ function yard(v){return String(Math.round(v*1.093613298));}
+ function lineProgress(point,line){
+  if(!line||line.length<2)return 0;
+  let total=0,best=Infinity,bestAt=0,walked=0;
+  for(let i=0;i<line.length-1;i++){
+   const a=[line[i][1],line[i][0]],b=[line[i+1][1],line[i+1][0]],seg=metres(a,b);
+   const latScale=111320,lonScale=111320*Math.cos(point[0]*Math.PI/180);
+   const ax=(a[1]-point[1])*lonScale,ay=(a[0]-point[0])*latScale,bx=(b[1]-point[1])*lonScale,by=(b[0]-point[0])*latScale;
+   const dx=bx-ax,dy=by-ay,den=dx*dx+dy*dy,t=den?Math.max(0,Math.min(1,-(ax*dx+ay*dy)/den)):0;
+   const ex=ax+t*dx,ey=ay+t*dy,d=ex*ex+ey*ey;
+   if(d<best){best=d;bestAt=walked+t*seg}
+   walked+=seg;total+=seg;
+  }
+  return total?bestAt/total:0;
+ }
+ function refreshBunkers(){
+  try{
+   const w=frame.contentWindow,holes=w.UIDO_OVERSTONE_SOURCE_HOLES;
+   const d=holes&&holes[String(activeHole)];
+   if(!d)return;
+   const line=d.line_of_play||[];
+   const all=(d.bunkers||[]).map(b=>{
+    const f=(d.features||[]).find(x=>x.id===b.id&&x.golf==='bunker');
+    const ring=f&&f.geometry&&f.geometry.coordinates&&f.geometry.coordinates[0];
+    const anchor=b.anchor_gps||b.front_gps;
+    return {...b,ring,progress:lineProgress(anchor,line)};
+   }).filter(b=>b.ring&&b.ring.length);
+   bunkerRecords.greenside=all.filter(b=>b.progress>=0.55).sort((a,b)=>a.progress-b.progress);
+   bunkerRecords.fairway=all.filter(b=>b.progress<0.55).sort((a,b)=>a.progress-b.progress);
+   ['greenside','fairway'].forEach(zone=>{
+    const list=bunkerRecords[zone];bunkerIndexes[zone]=Math.min(bunkerIndexes[zone],Math.max(0,list.length-1));
+    const page=list.length?list[bunkerIndexes[zone]]:null;
+    const els=bunkerEls[zone];
+    if(!page){els.forEach(el=>el.textContent='—');return;}
+    const pos=livePosition||[line[0][1],line[0][0]];
+    const distances=page.ring.map(p=>metres(pos,[p[1],p[0]]));
+    const fr=Math.min(...distances),cr=Math.max(...distances);
+    els[0].textContent=yard(fr);els[1].textContent=yard(cr);
+    // The second pair remains blank unless a second bunker exists on the same side/zone.
+    const sameSide=list.filter(b=>b.side===page.side);
+    const next=sameSide.find(b=>b.id!==page.id);
+    if(next){
+     const ds=next.ring.map(p=>metres(pos,[p[1],p[0]]));
+     els[2].textContent=yard(Math.min(...ds));els[3].textContent=yard(Math.max(...ds));
+    }else{els[2].textContent='—';els[3].textContent='—'}
+   });
+  }catch(e){}
+ }
+ function startLiveGps(){
+  if(!navigator.geolocation)return;
+  navigator.geolocation.watchPosition(pos=>{
+   livePosition=[pos.coords.latitude,pos.coords.longitude];
+   syncCourse();
+   refreshBunkers();
+  },()=>{}, {enableHighAccuracy:true,maximumAge:3000,timeout:12000});
+ }
+ document.querySelectorAll('.page-arrow').forEach(button=>button.addEventListener('click',function(){
+  const zone=button.dataset.zone,list=bunkerRecords[zone];
+  if(!list||list.length<2)return;
+  bunkerIndexes[zone]=(bunkerIndexes[zone]+(Number(button.dataset.step)||1)+list.length)%list.length;
+  const page=list[bunkerIndexes[zone]];
+  const els=bunkerEls[zone],pos=livePosition||[52.2763578,-0.8194224];
+  const ds=page.ring.map(p=>metres(pos,[p[1],p[0]]));
+  els[0].textContent=yard(Math.min(...ds));els[1].textContent=yard(Math.max(...ds));
+  const same=list.filter(b=>b.side===page.side),next=same.find(b=>b.id!==page.id);
+  if(next){const nd=next.ring.map(p=>metres(pos,[p[1],p[0]]));els[2].textContent=yard(Math.min(...nd));els[3].textContent=yard(Math.max(...nd))}
+  else{els[2].textContent='—';els[3].textContent='—'}
+ }));
+
  const front=document.getElementById('yardageFront');
  const middle=document.getElementById('yardageMiddle');
  const back=document.getElementById('yardageBack');
@@ -163,13 +242,19 @@ button,.btn,.option-button,.choice,.action{font-family:inherit}
  }
  frame.addEventListener('load',function(){
   syncCourse();
+  refreshBunkers();
+  startLiveGps();
   try{
    const d=frame.contentDocument,info=d.getElementById('greenInfo'),header=d.getElementById('holeHeaderMeta');
    if(info)new MutationObserver(syncCourse).observe(info,{childList:true,subtree:true,characterData:true});
    if(header)new MutationObserver(syncCourse).observe(header,{childList:true,subtree:true,characterData:true});
+   const w=frame.contentWindow;
+   if(w&&w.UIDO_OVERSTONE_SOURCE_HOLES){
+    const originalSelect=w.selectHole;
+   }
   }catch(e){}
  });
- setInterval(syncCourse,700);
+ setInterval(function(){syncCourse();refreshBunkers()},1500);
 })();
 </script>
 </body></html>
