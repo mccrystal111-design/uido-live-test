@@ -43,6 +43,7 @@ jobs:
           cp index.html _site/index.html
           cp home-preview.html _site/home-preview.html
           cp project-dashboard.html _site/project-dashboard.html
+          if [ -f ring-playground.html ]; then cp ring-playground.html _site/ring-playground.html; fi
           if [ -f wind-tile.html ]; then cp wind-tile.html _site/wind-tile.html; fi
           if [ -f lie-tile.html ]; then cp lie-tile.html _site/lie-tile.html; fi
           if [ -f club-tile.html ]; then cp club-tile.html _site/club-tile.html; fi
