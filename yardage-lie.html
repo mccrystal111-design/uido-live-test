@@ -3,255 +3,129 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>UiDo — Yardage + Lie</title>
+<title>UiDo — Yardage & Bunkers</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600&display=swap');
-:root{--yellow:#E9C928}
+:root{--ivory:#F4F1E6;--ink:#101110;--yellow:#E9C928;--sage:#3F4B3B;--ring:rgba(63,75,59,.42)}
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;min-height:100%;overflow-x:hidden;overflow-y:auto;background:#F4F1E6}
-body{font-family:Oxanium,sans-serif;color:#F4F1E6}
-.stage{width:100%;min-height:100dvh;height:auto;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:8px;padding:22px 16px max(22px,env(safe-area-inset-bottom));background:var(--uido-ivory)}
-.tile{position:relative;flex:0 0 auto;width:min(88vw,520px);aspect-ratio:1;border:1px solid rgba(244,241,230,.24);border-radius:28px;background:rgba(16,17,16,.94);backdrop-filter:blur(10px) saturate(110%);-webkit-backdrop-filter:blur(10px) saturate(110%);overflow:hidden}
-.help{position:absolute;right:5.5%;top:5.5%;width:10%;aspect-ratio:1;border:1.5px solid rgba(233,201,40,.78);border-radius:50%;background:rgba(16,17,16,.92);color:#fff;cursor:pointer;z-index:8;display:grid;place-items:center;padding:0}
-.help img{width:62%;height:62%;display:block;object-fit:contain}
-.lie-circle{position:absolute;left:50%;top:50%;width:96%;height:96%;transform:translate(-50%,-50%);border-radius:50%;overflow:hidden;z-index:1;background:#34463d;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
-.lie-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 65%;display:block}
-.photo-shade{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(8,15,12,.04) 0%,rgba(8,15,12,.01) 48%,rgba(8,15,12,.10) 68%,rgba(8,15,12,.20) 100%)}
-.lie-label{position:absolute;left:50%;top:20%;transform:translate(-50%,-50%);font-size:clamp(25px,6.5vw,42px);font-weight:600;letter-spacing:.04em;text-shadow:0 2px 10px rgba(0,0,0,.55);white-space:nowrap;z-index:3}
-.swipe-hint{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);font:500 clamp(13px,3.2vw,18px)/1 Oxanium;color:rgba(255,255,255,.84);letter-spacing:.09em;text-shadow:0 2px 8px rgba(0,0,0,.8);white-space:nowrap;z-index:3;pointer-events:none}
-.answer-row{position:absolute;left:0;right:0;bottom:3.5%;height:auto;display:flex;justify-content:center;align-items:center;z-index:4}
-.answer{width:13%;min-width:50px;max-width:62px;aspect-ratio:1;border:1.5px solid rgba(233,201,40,.88);border-radius:50%;background:rgba(16,17,16,.96);color:#fff;cursor:pointer;touch-action:manipulation;display:grid;place-items:center;padding:0;overflow:hidden}
-.answer img{width:62%;height:62%;display:block;object-fit:contain}
-.answer:active{filter:brightness(1.18);transform:scale(.96)}
-.countdown{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(16,17,16,.78);backdrop-filter:blur(3px);z-index:12}
-.countdown.show{display:flex}
-.count-number{font:600 110px/1 Oxanium;color:#fff;text-shadow:0 0 28px rgba(255,214,0,.32)}
-.next-advice{margin-top:20px;text-align:center}.next-label{font:500 14px/1 Oxanium;color:rgba(244,241,230,.58);letter-spacing:.12em;margin-bottom:7px}.next-value{font:500 clamp(18px,4.8vw,28px)/1.1 Oxanium;color:#fff}.next-value strong{color:var(--yellow);font-weight:600}
-.modal{position:absolute;inset:0;background:rgba(8,16,13,.72);backdrop-filter:blur(4px);display:none;place-items:center;padding:9%;z-index:15}.modal.show{display:grid}.modal-card{width:100%;max-width:360px;border:1px solid rgba(255,255,255,.24);border-radius:20px;background:rgba(16,17,16,.97);padding:24px;color:#fff;text-align:center}.modal-card h2{margin:0 0 12px;font-size:24px;font-weight:500}.modal-card p{margin:0 0 20px;font:400 15px/1.45 Arial,sans-serif;color:rgba(244,241,230,.80)}.close{border:1px solid rgba(255,255,255,.24);border-radius:15px;background:rgba(244,241,230,.10);color:#fff;padding:12px 22px;font:500 16px Oxanium;cursor:pointer}
-.result{position:absolute;inset:0;background:rgba(16,17,16,.96);z-index:11;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:12%}.result.show{display:flex}.result-main{font-size:clamp(28px,7vw,46px);font-weight:600;margin-bottom:12px}.result-sub{font-size:15px;color:rgba(244,241,230,.62);line-height:1.45}
-@media(max-width:420px){.tile{width:91vw;border-radius:24px}.answer{width:14%;min-width:50px}.swipe-hint{top:42%;font-size:13px}}
-.embedded-tile, .embedded-tile body{background:transparent!important}.embedded-tile body{overflow:hidden}.embedded-tile .stage{width:100%;height:100%;min-height:0;padding:0;background:transparent!important}.embedded-tile .tile{width:100%;height:100%;max-width:none;aspect-ratio:1;border:0!important;border-radius:22px!important;background:transparent!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;overflow:hidden}.embedded-tile .lie-circle{width:96%;height:auto;aspect-ratio:1;max-width:none;}.embedded-tile .help{display:none!important}.embedded-tile .modal-card{padding:14px}.embedded-tile .modal-card h2{font-size:18px}.embedded-tile .modal-card p{font-size:12px}.embedded-tile .close{padding:8px 14px;font-size:13px}
-/* Yardage tile: same framed-square and circular-photo language as the existing Lie tile. */
-.yardage-tile{position:relative;isolation:isolate;display:block;background:var(--uido-ivory)!important}
-.yardage-circle{position:absolute;left:50%;top:50%;width:96%;height:96%;transform:translate(-50%,-50%);border:1.5px solid rgba(63,75,59,.42);border-radius:50%;overflow:hidden;background:var(--uido-ivory)}
-.bunker-tile{position:relative!important;background:var(--uido-ivory)!important;isolation:isolate}
-.bunker-circle{position:absolute;left:50%;top:50%;width:96%;height:96%;transform:translate(-50%,-50%);border:1.5px solid rgba(63,75,59,.42);border-radius:50%;background:var(--uido-ivory);overflow:hidden;color:#101110}
-.bunker-heading{position:absolute;left:0;right:0;text-align:center;color:#3F4B3B;font:600 clamp(13px,3.5vw,19px)/1 Oxanium,sans-serif;letter-spacing:.07em}
-.greenside-heading{top:10%}.fairway-heading{top:55%}
-.bunker-page{position:absolute;left:50%;transform:translateX(-50%);width:100%;display:flex;align-items:center;justify-content:center;gap:clamp(2px,1vw,6px);color:#3F4B3B;font:600 clamp(11px,3vw,15px)/1 Oxanium,sans-serif;letter-spacing:.04em;pointer-events:none}
-.greenside-page{top:9.4%;padding:0 19%;box-sizing:border-box}
-.fairway-page{top:54.4%;padding:0 19%;box-sizing:border-box}
-.bunker-page .page-arrow{pointer-events:auto;padding:4px 7px;font-size:25px;line-height:1}
-.greenside-page{top:8%}.fairway-page{top:53%}
-.page-arrow{border:0;background:transparent;color:#3F4B3B;font:400 26px/0.8 Oxanium,sans-serif;padding:3px 5px;cursor:pointer;touch-action:manipulation}
-.bunker-half{position:absolute;left:8%;right:8%;display:grid;grid-template-columns:1fr 1fr;align-items:center}
-.greenside-half{top:22%;height:25%;border-bottom:1px solid rgba(63,75,59,.42)}
-.fairway-half{top:67%;height:25%}
-.bunker-distance-pair{display:grid;grid-template-columns:1fr 1fr;align-items:center;text-align:center;min-width:0}
-.bunker-distance-pair:first-child{border-right:1px solid rgba(63,75,59,.42)}
-.bunker-distance-pair>div{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
-.distance-label{font:600 clamp(10px,2.7vw,14px)/1 Oxanium,sans-serif;color:#3F4B3B;letter-spacing:.05em}
-.bunker-distance-pair strong{font:600 clamp(22px,6vw,35px)/1 Oxanium,sans-serif;color:#101110;font-variant-numeric:tabular-nums}
-.wind-entry{position:absolute;right:13%;bottom:13%;width:10%;max-width:44px;min-width:34px;aspect-ratio:1;border:1.5px solid rgba(233,201,40,.9);border-radius:50%;background:#F4F1E6;padding:2px;display:grid;place-items:center;z-index:9;cursor:pointer;touch-action:manipulation}
-.wind-entry img{width:100%;height:100%;object-fit:contain;display:block;border-radius:50%}
-.wind-entry:active{transform:scale(.95)}
-.wind-view{position:absolute;inset:0;z-index:10;background:var(--uido-ivory);display:grid;place-items:center}
+html,body{margin:0;width:100%;min-height:100%;background:var(--ivory);color:var(--ink);font-family:Oxanium,sans-serif}
+body{overflow-x:hidden}
+.stage{width:100%;min-height:100dvh;display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 16px max(22px,env(safe-area-inset-bottom));background:var(--ivory)}
+.tile{position:relative;flex:0 0 auto;width:min(91vw,520px);aspect-ratio:1;border:1px solid rgba(16,17,16,.25);border-radius:24px;background:var(--ivory);overflow:hidden}
+.circle{position:absolute;inset:2%;border:1.5px solid var(--ring);border-radius:50%;background:var(--ivory)}
+.yardage-meta{position:absolute;top:8%;left:0;right:0;text-align:center;font-size:clamp(12px,3.2vw,19px);font-weight:600;line-height:1.1;letter-spacing:.025em;white-space:nowrap}
+.yardage-values{position:absolute;left:50%;top:51%;transform:translate(-50%,-50%);width:38%;display:flex;flex-direction:column;align-items:stretch;text-align:center;font-variant-numeric:tabular-nums}
+.value{font-size:clamp(42px,12vw,62px);font-weight:600;line-height:1.12;color:var(--ink)}
+.value.middle{color:var(--yellow)}
+.rule{height:1px;width:100%;margin:5px 0;background:rgba(16,17,16,.68)}
+.bunker-circle{color:var(--ink)}
+.zone-heading{position:absolute;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:clamp(8px,3vw,18px);height:9%;color:var(--sage);font-size:clamp(13px,3.5vw,19px);font-weight:600;letter-spacing:.07em;line-height:1}
+.zone-heading.greenside{top:6.5%}
+.zone-heading.fairway{top:51%}
+.zone-title{white-space:nowrap}
+.arrow{display:grid;place-items:center;border:0;background:transparent;color:var(--sage);font:400 27px/1 Oxanium,sans-serif;padding:3px 0;width:20px;min-height:32px;cursor:pointer;touch-action:manipulation}
+.arrow:disabled{opacity:.18;cursor:default}
+.bunker-half{position:absolute;left:7%;right:7%;height:23%;display:grid;grid-template-columns:1fr 1fr;align-items:center}
+.bunker-half.greenside{top:19%;border-bottom:1px solid var(--ring)}
+.bunker-half.fairway{top:66%}
+.bunker-pair{min-width:0;display:grid;grid-template-columns:1fr 1fr;align-items:center;text-align:center}
+.bunker-pair:first-child{border-right:1px solid var(--ring)}
+.distance{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.distance-label{font-size:clamp(10px,2.7vw,14px);font-weight:600;letter-spacing:.05em;color:var(--sage)}
+.distance strong{font-size:clamp(22px,6vw,35px);line-height:1;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.wind-entry{position:absolute;right:11%;bottom:11%;width:11%;max-width:46px;min-width:36px;aspect-ratio:1;border:1.5px solid var(--yellow);border-radius:50%;background:var(--ivory);padding:5px;display:grid;place-items:center;z-index:4;cursor:pointer;touch-action:manipulation}
+.wind-entry img{width:100%;height:100%;object-fit:contain;display:block}
+.wind-view{position:absolute;inset:0;z-index:5;background:var(--ivory)}
 .wind-view[hidden]{display:none}
 .wind-view iframe{width:100%;height:100%;border:0;display:block}
-@media(max-width:420px){.bunker-distance-pair strong{font-size:clamp(21px,5.9vw,29px)}.bunker-half{left:7%;right:7%}.wind-entry{right:13%;bottom:13%;width:10%;min-width:34px}}
-
-.yardage-photo{display:none!important}
-.yardage-shade{display:none!important}
-.yardage-meta{position:absolute;left:0;right:0;top:8%;z-index:2;text-align:center;color:#101110;font:600 clamp(12px,3.2vw,19px)/1.1 Oxanium,sans-serif;letter-spacing:.025em;text-shadow:none;white-space:nowrap}
-.yardage-values{position:absolute;left:50%;top:51%;transform:translate(-50%,-50%);z-index:2;width:34%;min-width:130px;display:flex;flex-direction:column;align-items:stretch;text-align:center;color:#101110;text-shadow:none}
-.yardage-value{font:600 clamp(43px,11vw,70px)/1.12 Oxanium,sans-serif;color:#101110;text-shadow:none}
-.yardage-value.middle{color:#E9C928;text-shadow:none}
-.yardage-rule{height:1px;background:rgba(16,17,16,.68);width:100%;margin:5px 0}
-@media(max-width:420px){.yardage-values{width:38%;min-width:0}.yardage-value{font-size:clamp(42px,12vw,58px)}.yardage-meta{font-size:clamp(11px,3.2vw,14px)}}
-.embedded-tile .stage{display:grid;place-items:center;padding:0}
-.embedded-tile .yardage-tile{display:none!important}
-/* UiDo unified field-test skin */
-:root{--uido-green:#F4F1E6;--uido-panel:#101110;--uido-panel-2:#101110;--uido-border:rgba(244,241,230,.24);--uido-ivory:#F4F1E6;--uido-yellow:#E9C928}
-html,body{background:var(--uido-ivory);color:var(--uido-ivory)}
-.stage{background:var(--uido-green)!important;padding:16px!important}
-.tile{border:1px solid rgba(16,17,16,.25)!important;border-radius:24px!important;background:var(--uido-ivory)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:none!important}
-.help{border:1px solid rgba(233,201,40,.75)!important;background:#101110!important}
-/* Keep radial controls and rollers intact; standardise their surrounding surface only. */
-button,.btn,.option-button,.choice,.action{font-family:inherit}
+@media(max-width:420px){.stage{padding:16px}.tile{width:91vw}.yardage-values{width:38%}.value{font-size:clamp(42px,12vw,58px)}.bunker-half{left:7%;right:7%}.distance strong{font-size:clamp(21px,5.9vw,29px)}.wind-entry{right:11%;bottom:11%;width:11%;min-width:36px}}
+.embedded-tile .stage{min-height:0;height:100dvh;padding:0;display:grid;place-items:center}
+.embedded-tile .tile{width:100vw;max-width:none;border:0;border-radius:0}
+.embedded-tile .yardage-tile{display:none}
 </style>
 </head>
-<body><script>if(new URLSearchParams(location.search).get('embedded')==='1')document.documentElement.classList.add('embedded-tile');</script>
-<iframe id="courseData" title="Course yardage data" src="overstone/index.html" aria-hidden="true" tabindex="-1" style="position:fixed;left:-12000px;top:0;width:390px;height:844px;opacity:0;pointer-events:none;border:0"></iframe>
+<body>
+<iframe id="courseData" title="Course data" src="overstone/index.html" aria-hidden="true" tabindex="-1" style="position:fixed;left:-12000px;top:0;width:390px;height:844px;opacity:0;pointer-events:none;border:0"></iframe>
 <main class="stage">
-<section class="tile yardage-tile" aria-label="Yardage Tile">
-  <div class="yardage-circle">
-    <img class="yardage-photo" src="assets/golf_hole_1.jpg" alt="">
-    <div class="yardage-shade"></div>
-    <div class="yardage-meta" id="yardageMeta">HOLE 1 · PAR 4</div>
-    <div class="yardage-values" aria-label="Front, middle and back yardages">
-      <div class="yardage-value" id="yardageFront">—</div>
-      <div class="yardage-rule"></div>
-      <div class="yardage-value middle" id="yardageMiddle">—</div>
-      <div class="yardage-rule"></div>
-      <div class="yardage-value" id="yardageBack">—</div>
-    </div>
+<section class="tile yardage-tile" aria-label="Live yardages">
+ <div class="circle">
+  <div class="yardage-meta" id="yardageMeta">HOLE 1 · PAR 4</div>
+  <div class="yardage-values" aria-label="Front, middle and back yardages">
+   <div class="value" id="yardageFront">—</div><div class="rule"></div>
+   <div class="value middle" id="yardageMiddle">—</div><div class="rule"></div>
+   <div class="value" id="yardageBack">—</div>
   </div>
+ </div>
 </section>
 <section class="tile bunker-tile" id="bunkerTile" aria-label="Bunker distances">
-  <div class="bunker-circle">
-    <div class="bunker-heading greenside-heading">GREENSIDE</div>
-    <div class="bunker-page greenside-page"><button class="page-arrow" type="button" data-zone="greenside" data-step="-1" aria-label="Previous greenside bunker">‹</button><button class="page-arrow" type="button" data-zone="greenside" data-step="1" aria-label="Next greenside bunker">›</button></div>
-    <div class="bunker-half greenside-half">
-      <div class="bunker-distance-pair"><div><span class="distance-label">FR</span><strong id="greensideFront">—</strong></div><div><span class="distance-label">CR</span><strong id="greensideCarry">—</strong></div></div>
-      <div class="bunker-distance-pair"><div><span class="distance-label">FR</span><strong id="greensideRightFront">—</strong></div><div><span class="distance-label">CR</span><strong id="greensideRightCarry">—</strong></div></div>
-    </div>
-    <div class="bunker-heading fairway-heading">FAIRWAY</div>
-    <div class="bunker-page fairway-page"><button class="page-arrow" type="button" data-zone="fairway" data-step="-1" aria-label="Previous fairway bunker">‹</button><button class="page-arrow" type="button" data-zone="fairway" data-step="1" aria-label="Next fairway bunker">›</button></div>
-    <div class="bunker-half fairway-half">
-      <div class="bunker-distance-pair"><div><span class="distance-label">FR</span><strong id="fairwayFront">—</strong></div><div><span class="distance-label">CR</span><strong id="fairwayCarry">—</strong></div></div>
-      <div class="bunker-distance-pair"><div><span class="distance-label">FR</span><strong id="fairwayRightFront">—</strong></div><div><span class="distance-label">CR</span><strong id="fairwayRightCarry">—</strong></div></div>
-    </div>
-    
+ <div class="circle bunker-circle" id="bunkerCircle">
+  <div class="zone-heading greenside"><button class="arrow" data-zone="greenside" data-step="-1" aria-label="Previous greenside bunker">‹</button><span class="zone-title">GREENSIDE</span><button class="arrow" data-zone="greenside" data-step="1" aria-label="Next greenside bunker">›</button></div>
+  <div class="bunker-half greenside">
+   <div class="bunker-pair"><div class="distance"><span class="distance-label">FR</span><strong id="gsLeftFr">—</strong></div><div class="distance"><span class="distance-label">CR</span><strong id="gsLeftCr">—</strong></div></div>
+   <div class="bunker-pair"><div class="distance"><span class="distance-label">FR</span><strong id="gsRightFr">—</strong></div><div class="distance"><span class="distance-label">CR</span><strong id="gsRightCr">—</strong></div></div>
   </div>
-  <button class="wind-entry" id="windEntry" type="button" aria-label="Open wind tile and continue to shot flow"><img src="assets/uido-golf-ball.svg" alt=""></button>
-  <div class="wind-view" id="windView" aria-label="Wind tile" hidden><iframe title="Wind direction and strength" src="wind-tile.html?embedded=1" loading="lazy"></iframe></div>
-</section></main>
+  <div class="zone-heading fairway"><button class="arrow" data-zone="fairway" data-step="-1" aria-label="Previous fairway bunker">‹</button><span class="zone-title">FAIRWAY</span><button class="arrow" data-zone="fairway" data-step="1" aria-label="Next fairway bunker">›</button></div>
+  <div class="bunker-half fairway">
+   <div class="bunker-pair"><div class="distance"><span class="distance-label">FR</span><strong id="fwLeftFr">—</strong></div><div class="distance"><span class="distance-label">CR</span><strong id="fwLeftCr">—</strong></div></div>
+   <div class="bunker-pair"><div class="distance"><span class="distance-label">FR</span><strong id="fwRightFr">—</strong></div><div class="distance"><span class="distance-label">CR</span><strong id="fwRightCr">—</strong></div></div>
+  </div>
+ </div>
+ <button class="wind-entry" id="windEntry" type="button" aria-label="Open wind tile"><img src="assets/uido-golf-ball.svg" alt=""></button>
+ <div class="wind-view" id="windView" hidden><iframe title="Wind tile" src="wind-tile.html?embedded=1"></iframe></div>
+</section>
+</main>
 <script>
 (function(){
- const bunkerTile=document.getElementById('bunkerTile');
- const bunkerCircle=bunkerTile.querySelector('.bunker-circle');
- const windView=document.getElementById('windView');
- document.getElementById('windEntry').addEventListener('click',function(){
-  bunkerCircle.hidden=true;
-  windView.hidden=false;
-  const windFrame=windView.querySelector('iframe');
-  if(windFrame.dataset.loaded!=='1'){windFrame.src='wind-tile.html?embedded=1';windFrame.dataset.loaded='1'}
- });
- const bunkerPages={greenside:0,fairway:0};
- // The navigation is ready for multiple bunker records; keep 1/1 until real bunker data is connected.
- document.querySelectorAll('.page-arrow').forEach(function(button){button.addEventListener('click',function(){
-  const zone=button.dataset.zone;
-  bunkerPages[zone]=0;
-  /* Paging awaits connection to real bunker records. */
- })});
- const frame=document.getElementById('courseData');
- const meta=document.getElementById('yardageMeta');
- const bunkerEls={
-  greenside:[document.getElementById('greensideFront'),document.getElementById('greensideCarry'),document.getElementById('greensideRightFront'),document.getElementById('greensideRightCarry')],
-  fairway:[document.getElementById('fairwayFront'),document.getElementById('fairwayCarry'),document.getElementById('fairwayRightFront'),document.getElementById('fairwayRightCarry')]
+ const $=id=>document.getElementById(id),frame=$('courseData');
+ const fields={
+  greenside:{left:['gsLeftFr','gsLeftCr'],right:['gsRightFr','gsRightCr']},
+  fairway:{left:['fwLeftFr','fwLeftCr'],right:['fwRightFr','fwRightCr']}
  };
- let livePosition=null, gpsWatchId=null, activeHole=1, bunkerRecords={greenside:[],fairway:[]}, bunkerIndexes={greenside:0,fairway:0};
- function metres(a,b){
-  const rad=Math.PI/180,R=6371008.8,lat1=a[0]*rad,lat2=b[0]*rad,dLat=(b[0]-a[0])*rad,dLon=(b[1]-a[1])*rad;
-  const h=Math.sin(dLat/2)**2+Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)**2;
-  return 2*R*Math.asin(Math.min(1,Math.sqrt(h)));
- }
- function yard(v){return String(Math.round(v*1.093613298));}
- function refreshBunkers(){
-  try{
-   const w=frame.contentWindow,holes=w.UIDO_OVERSTONE_SOURCE_HOLES;
-   const d=holes&&holes[String(activeHole)];
-   if(!d)return;
-   const green=d.green_fmb&&d.green_fmb.middle;
-   if(!green)return;
-   const pos=livePosition||(d.line_of_play.length?[d.line_of_play[0][1],d.line_of_play[0][0]]:null);
-   if(!pos)return;
-   // Match the course renderer's established rule: within 60 yards of green centre is greenside.
-   const all=(d.bunkers||[]).map(b=>({...b,greenDistance:metres(b.anchor_gps||b.front_gps,green)}));
-   bunkerRecords.greenside=all.filter(b=>b.greenDistance<=60*0.9144).sort((a,b)=>a.greenDistance-b.greenDistance);
-   bunkerRecords.fairway=all.filter(b=>b.greenDistance>60*0.9144).sort((a,b)=>metres(pos,a.front_gps)-metres(pos,b.front_gps));
-   ['greenside','fairway'].forEach(zone=>{
-    const list=bunkerRecords[zone];bunkerIndexes[zone]=Math.min(bunkerIndexes[zone],Math.max(0,list.length-1));
-    const page=list.length?list[bunkerIndexes[zone]]:null,els=bunkerEls[zone];
-    if(!page){els.forEach(el=>el.textContent='—');return;}
-    // Use the course model's verified front/back GPS edge points, not polygon vertices.
-    els[0].textContent=yard(metres(pos,page.front_gps));
-    els[1].textContent=yard(metres(pos,page.back_gps));
-    const other=list.filter(b=>b.side!==page.side).sort((a,b)=>metres(pos,a.front_gps)-metres(pos,b.front_gps))[0];
-    if(other){els[2].textContent=yard(metres(pos,other.front_gps));els[3].textContent=yard(metres(pos,other.back_gps))}
-    else{els[2].textContent='—';els[3].textContent='—'}
+ let position=null,activeHole=1,watchId=null,records={greenside:{left:[],right:[]},fairway:{left:[],right:[]}},indexes={greenside:0,fairway:0},lastCourse=null;
+ const rad=Math.PI/180;
+ function metres(a,b){if(!a||!b)return NaN;const R=6371008.8,p1=a[0]*rad,p2=b[0]*rad,dp=(b[0]-a[0])*rad,dl=(b[1]-a[1])*rad;const h=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;return 2*R*Math.asin(Math.min(1,Math.sqrt(h)))}
+ function yards(m){return Number.isFinite(m)&&m>=0?String(Math.round(m*1.093613298)):'—'}
+ function holeData(){try{return frame.contentWindow.UIDO_OVERSTONE_SOURCE_HOLES[String(activeHole)]||null}catch(e){return null}}
+ function teePosition(d){const p=d&&d.line_of_play&&d.line_of_play[0];return p?[p[1],p[0]]:null}
+ function playerPosition(d){const tee=teePosition(d);if(position&&tee&&metres(position,tee)<2500)return position;return tee}
+ function setYardages(d,pos){if(!d||!d.green_fmb||!pos)return;$('yardageFront').textContent=yards(metres(pos,d.green_fmb.front));$('yardageMiddle').textContent=yards(metres(pos,d.green_fmb.middle));$('yardageBack').textContent=yards(metres(pos,d.green_fmb.back));$('yardageMeta').textContent='HOLE '+activeHole+' · PAR '+d.par}
+ function bunkerGroup(d,pos){
+  const green=d.green_fmb&&d.green_fmb.middle;if(!green)return;
+  const all=(d.bunkers||[]).filter(b=>b.front_gps&&b.back_gps).map(b=>({...b,greenDistance:metres(b.anchor_gps||b.front_gps,green)}));
+  const next={greenside:{left:[],right:[]},fairway:{left:[],right:[]}};
+  all.forEach(b=>{const zone=b.greenDistance<=60*0.9144?'greenside':'fairway';const side=b.side==='left'?'left':'right';next[zone][side].push(b)});
+  Object.keys(next).forEach(zone=>Object.keys(next[zone]).forEach(side=>next[zone][side].sort((a,b)=>metres(pos,a.front_gps)-metres(pos,b.front_gps))));
+  records=next;
+  ['greenside','fairway'].forEach(zone=>{
+   const allZone=[...next[zone].left,...next[zone].right];indexes[zone]=allZone.length?indexes[zone]%allZone.length:0;
+   document.querySelectorAll('.arrow[data-zone="'+zone+'"]').forEach(btn=>btn.disabled=allZone.length<2);
+   ['left','right'].forEach(side=>{
+    const list=next[zone][side],chosen=list.length?list[indexes[zone]%list.length]:null,els=fields[zone][side];
+    $(els[0]).textContent=chosen?yards(metres(pos,chosen.front_gps)):'—';
+    $(els[1]).textContent=chosen?yards(metres(pos,chosen.back_gps)):'—';
    });
-  }catch(e){}
+  });
  }
- function startLiveGps(){
-  if(!navigator.geolocation)return;
-  navigator.geolocation.watchPosition(pos=>{
-   livePosition=[pos.coords.latitude,pos.coords.longitude];
-   syncCourse();
-   refreshBunkers();
-  },()=>{}, {enableHighAccuracy:true,maximumAge:3000,timeout:12000});
+ function sync(){
+  const d=holeData();if(!d)return;
+  const pos=playerPosition(d);if(!pos)return;
+  setYardages(d,pos);bunkerGroup(d,pos);
  }
- document.querySelectorAll('.page-arrow').forEach(button=>button.addEventListener('click',function(){
-  const zone=button.dataset.zone,list=bunkerRecords[zone];
-  if(!list||list.length<2)return;
-  bunkerIndexes[zone]=(bunkerIndexes[zone]+(Number(button.dataset.step)||1)+list.length)%list.length;
-  const page=list[bunkerIndexes[zone]];
-  const els=bunkerEls[zone],pos=livePosition||[52.2763578,-0.8194224];
-  const ds=page.ring.map(p=>metres(pos,[p[1],p[0]]));
-  els[0].textContent=yard(Math.min(...ds));els[1].textContent=yard(Math.max(...ds));
-  const same=list.filter(b=>b.side===page.side),next=same.find(b=>b.id!==page.id);
-  if(next){const nd=next.ring.map(p=>metres(pos,[p[1],p[0]]));els[2].textContent=yard(Math.min(...nd));els[3].textContent=yard(Math.max(...nd))}
-  else{els[2].textContent='—';els[3].textContent='—'}
+ document.querySelectorAll('.arrow').forEach(btn=>btn.addEventListener('click',()=>{
+  const z=btn.dataset.zone,list=[...records[z].left,...records[z].right];if(list.length<2)return;
+  indexes[z]=(indexes[z]+Number(btn.dataset.step)+list.length)%list.length;sync();
  }));
-
- const front=document.getElementById('yardageFront');
- const middle=document.getElementById('yardageMiddle');
- const back=document.getElementById('yardageBack');
- function wSource(frame,header){
+ frame.addEventListener('load',()=>{
+  sync();
   try{
-   const w=frame.contentWindow;
-   const n=header&&header.textContent.match(/Hole\s+(\d+)/i);
-   const h=n?n[1]:'1';
-   return w.UIDO_OVERSTONE_SOURCE_HOLES&&w.UIDO_OVERSTONE_SOURCE_HOLES[h];
-  }catch(e){return null}
- }
- function syncCourse(){
-  try{
-   const d=frame.contentDocument;
-   if(!d)return;
-   const header=d.getElementById('holeHeaderMeta');
-   const info=d.getElementById('greenInfo');
-   if(header){
-    const holeMeta=header.textContent.replace('Hole ','HOLE ').replace(' · Par ',' · PAR ');
-    meta.textContent=holeMeta;
-   }
-   if(info){
-    info.querySelectorAll('.metric').forEach(function(el){
-     const key=(el.querySelector('label')?.textContent||'').trim().toUpperCase();
-     const value=(el.querySelector('strong')?.textContent||'—').trim();
-     if(key==='F')front.textContent=value;
-     if(key==='M')middle.textContent=value;
-     if(key==='B')back.textContent=value;
-    });
-    if(!info.querySelector('.metric')){front.textContent=middle.textContent=back.textContent='—'}
-   }
-   const source=wSource(frame,header);
-   if(source&&source.green_fmb){
-    const line=source.line_of_play||[];
-    const pos=livePosition|| (line.length?[line[0][1],line[0][0]]:null);
-    if(pos){
-     front.textContent=yard(metres(pos,source.green_fmb.front));
-     middle.textContent=yard(metres(pos,source.green_fmb.middle));
-     back.textContent=yard(metres(pos,source.green_fmb.back));
-    }
-   }
-  }catch(e){front.textContent=middle.textContent=back.textContent='—'}
- }
- frame.addEventListener('load',function(){
-  syncCourse();
-  refreshBunkers();
-  startLiveGps();
-  try{
-   const d=frame.contentDocument,info=d.getElementById('greenInfo'),header=d.getElementById('holeHeaderMeta');
-   if(info)new MutationObserver(syncCourse).observe(info,{childList:true,subtree:true,characterData:true});
-   if(header)new MutationObserver(syncCourse).observe(header,{childList:true,subtree:true,characterData:true});
-   const w=frame.contentWindow;
-   if(w&&w.UIDO_OVERSTONE_SOURCE_HOLES){
-    const originalSelect=w.selectHole;
-   }
+   const w=frame.contentWindow,doc=frame.contentDocument;
+   const header=doc.getElementById('holeHeaderMeta');
+   if(header)new MutationObserver(()=>{const m=header.textContent.match(/Hole\s+(\d+)/i);if(m)activeHole=Number(m[1]);sync()}).observe(header,{childList:true,subtree:true,characterData:true});
   }catch(e){}
+  if(navigator.geolocation&&watchId===null)watchId=navigator.geolocation.watchPosition(p=>{position=[p.coords.latitude,p.coords.longitude];sync()},()=>{}, {enableHighAccuracy:true,maximumAge:3000,timeout:12000});
  });
- setInterval(function(){syncCourse();refreshBunkers()},1500);
+ setInterval(sync,2000);
+ $('windEntry').addEventListener('click',()=>{$('bunkerCircle').hidden=true;$('windView').hidden=false});
 })();
 </script>
 </body></html>
