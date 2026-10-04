@@ -218,6 +218,14 @@ button,.btn,.option-button,.choice,.action{font-family:inherit}
  const front=document.getElementById('yardageFront');
  const middle=document.getElementById('yardageMiddle');
  const back=document.getElementById('yardageBack');
+ function wSource(frame,header){
+  try{
+   const w=frame.contentWindow;
+   const n=header&&header.textContent.match(/Hole\s+(\d+)/i);
+   const h=n?n[1]:'1';
+   return w.UIDO_OVERSTONE_SOURCE_HOLES&&w.UIDO_OVERSTONE_SOURCE_HOLES[h];
+  }catch(e){return null}
+ }
  function syncCourse(){
   try{
    const d=frame.contentDocument;
@@ -237,6 +245,16 @@ button,.btn,.option-button,.choice,.action{font-family:inherit}
      if(key==='B')back.textContent=value;
     });
     if(!info.querySelector('.metric')){front.textContent=middle.textContent=back.textContent='—'}
+   }
+   const source=wSource(frame,header);
+   if(source&&source.green_fmb){
+    const line=source.line_of_play||[];
+    const pos=livePosition|| (line.length?[line[0][1],line[0][0]]:null);
+    if(pos){
+     front.textContent=yard(metres(pos,source.green_fmb.front));
+     middle.textContent=yard(metres(pos,source.green_fmb.middle));
+     back.textContent=yard(metres(pos,source.green_fmb.back));
+    }
    }
   }catch(e){front.textContent=middle.textContent=back.textContent='—'}
  }
