@@ -38,10 +38,10 @@ body{font-family:Oxanium,sans-serif;color:#F4F1E6}
 .bunker-circle{position:absolute;left:50%;top:50%;width:96%;height:96%;transform:translate(-50%,-50%);border:1.5px solid rgba(63,75,59,.42);border-radius:50%;background:var(--uido-ivory);overflow:hidden;color:#101110}
 .bunker-heading{position:absolute;left:0;right:0;text-align:center;color:#3F4B3B;font:600 clamp(13px,3.5vw,19px)/1 Oxanium,sans-serif;letter-spacing:.07em}
 .greenside-heading{top:10%}.fairway-heading{top:55%}
-.bunker-page{position:absolute;left:50%;transform:translateX(-50%);width:auto;display:flex;align-items:center;justify-content:center;gap:clamp(2px,1vw,6px);color:#3F4B3B;font:600 clamp(11px,3vw,15px)/1 Oxanium,sans-serif;letter-spacing:.04em;pointer-events:none}
-.greenside-page{top:9%;width:100%;justify-content:space-between;padding:0 8%;box-sizing:border-box}
-.fairway-page{top:54%;width:100%;justify-content:space-between;padding:0 8%;box-sizing:border-box}
-.bunker-page .page-arrow{pointer-events:auto;padding:4px 7px;font-size:28px;line-height:1}
+.bunker-page{position:absolute;left:50%;transform:translateX(-50%);width:100%;display:flex;align-items:center;justify-content:center;gap:clamp(2px,1vw,6px);color:#3F4B3B;font:600 clamp(11px,3vw,15px)/1 Oxanium,sans-serif;letter-spacing:.04em;pointer-events:none}
+.greenside-page{top:9.4%;padding:0 19%;box-sizing:border-box}
+.fairway-page{top:54.4%;padding:0 19%;box-sizing:border-box}
+.bunker-page .page-arrow{pointer-events:auto;padding:4px 7px;font-size:25px;line-height:1}
 .greenside-page{top:8%}.fairway-page{top:53%}
 .page-arrow{border:0;background:transparent;color:#3F4B3B;font:400 26px/0.8 Oxanium,sans-serif;padding:3px 5px;cursor:pointer;touch-action:manipulation}
 .bunker-half{position:absolute;left:8%;right:8%;display:grid;grid-template-columns:1fr 1fr;align-items:center}
@@ -147,50 +147,29 @@ button,.btn,.option-button,.choice,.action{font-family:inherit}
   return 2*R*Math.asin(Math.min(1,Math.sqrt(h)));
  }
  function yard(v){return String(Math.round(v*1.093613298));}
- function lineProgress(point,line){
-  if(!line||line.length<2)return 0;
-  let total=0,best=Infinity,bestAt=0,walked=0;
-  for(let i=0;i<line.length-1;i++){
-   const a=[line[i][1],line[i][0]],b=[line[i+1][1],line[i+1][0]],seg=metres(a,b);
-   const latScale=111320,lonScale=111320*Math.cos(point[0]*Math.PI/180);
-   const ax=(a[1]-point[1])*lonScale,ay=(a[0]-point[0])*latScale,bx=(b[1]-point[1])*lonScale,by=(b[0]-point[0])*latScale;
-   const dx=bx-ax,dy=by-ay,den=dx*dx+dy*dy,t=den?Math.max(0,Math.min(1,-(ax*dx+ay*dy)/den)):0;
-   const ex=ax+t*dx,ey=ay+t*dy,d=ex*ex+ey*ey;
-   if(d<best){best=d;bestAt=walked+t*seg}
-   walked+=seg;total+=seg;
-  }
-  return total?bestAt/total:0;
- }
  function refreshBunkers(){
   try{
    const w=frame.contentWindow,holes=w.UIDO_OVERSTONE_SOURCE_HOLES;
    const d=holes&&holes[String(activeHole)];
    if(!d)return;
-   const line=d.line_of_play||[];
-   const all=(d.bunkers||[]).map(b=>{
-    const f=(d.features||[]).find(x=>x.id===b.id&&x.golf==='bunker');
-    const ring=f&&f.geometry&&f.geometry.coordinates&&f.geometry.coordinates[0];
-    const anchor=b.anchor_gps||b.front_gps;
-    return {...b,ring,progress:lineProgress(anchor,line)};
-   }).filter(b=>b.ring&&b.ring.length);
-   bunkerRecords.greenside=all.filter(b=>b.progress>=0.55).sort((a,b)=>a.progress-b.progress);
-   bunkerRecords.fairway=all.filter(b=>b.progress<0.55).sort((a,b)=>a.progress-b.progress);
+   const green=d.green_fmb&&d.green_fmb.middle;
+   if(!green)return;
+   const pos=livePosition||(d.line_of_play.length?[d.line_of_play[0][1],d.line_of_play[0][0]]:null);
+   if(!pos)return;
+   // Match the course renderer's established rule: within 60 yards of green centre is greenside.
+   const all=(d.bunkers||[]).map(b=>({...b,greenDistance:metres(b.anchor_gps||b.front_gps,green)}));
+   bunkerRecords.greenside=all.filter(b=>b.greenDistance<=60*0.9144).sort((a,b)=>a.greenDistance-b.greenDistance);
+   bunkerRecords.fairway=all.filter(b=>b.greenDistance>60*0.9144).sort((a,b)=>metres(pos,a.front_gps)-metres(pos,b.front_gps));
    ['greenside','fairway'].forEach(zone=>{
     const list=bunkerRecords[zone];bunkerIndexes[zone]=Math.min(bunkerIndexes[zone],Math.max(0,list.length-1));
-    const page=list.length?list[bunkerIndexes[zone]]:null;
-    const els=bunkerEls[zone];
+    const page=list.length?list[bunkerIndexes[zone]]:null,els=bunkerEls[zone];
     if(!page){els.forEach(el=>el.textContent='—');return;}
-    const pos=livePosition||[line[0][1],line[0][0]];
-    const distances=page.ring.map(p=>metres(pos,[p[1],p[0]]));
-    const fr=Math.min(...distances),cr=Math.max(...distances);
-    els[0].textContent=yard(fr);els[1].textContent=yard(cr);
-    // The second pair remains blank unless a second bunker exists on the same side/zone.
-    const sameSide=list.filter(b=>b.side===page.side);
-    const next=sameSide.find(b=>b.id!==page.id);
-    if(next){
-     const ds=next.ring.map(p=>metres(pos,[p[1],p[0]]));
-     els[2].textContent=yard(Math.min(...ds));els[3].textContent=yard(Math.max(...ds));
-    }else{els[2].textContent='—';els[3].textContent='—'}
+    // Use the course model's verified front/back GPS edge points, not polygon vertices.
+    els[0].textContent=yard(metres(pos,page.front_gps));
+    els[1].textContent=yard(metres(pos,page.back_gps));
+    const other=list.filter(b=>b.side!==page.side).sort((a,b)=>metres(pos,a.front_gps)-metres(pos,b.front_gps))[0];
+    if(other){els[2].textContent=yard(metres(pos,other.front_gps));els[3].textContent=yard(metres(pos,other.back_gps))}
+    else{els[2].textContent='—';els[3].textContent='—'}
    });
   }catch(e){}
  }
