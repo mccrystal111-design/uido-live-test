@@ -36,10 +36,10 @@ body{font-family:Oxanium,sans-serif;color:#F4F1E6}
 .yardage-circle{position:absolute;left:50%;top:50%;width:96%;height:96%;transform:translate(-50%,-50%);border:1.5px solid rgba(63,75,59,.42);border-radius:50%;overflow:hidden;background:var(--uido-ivory)}
 .bunker-tile{position:relative!important;background:var(--uido-ivory)!important;isolation:isolate}
 .bunker-circle{position:absolute;left:50%;top:50%;width:96%;height:96%;transform:translate(-50%,-50%);border:1.5px solid rgba(63,75,59,.42);border-radius:50%;background:var(--uido-ivory);overflow:hidden;color:#101110}
-.bunker-heading{position:absolute;left:0;right:0;text-align:center;color:#3F4B3B;font:600 clamp(13px,3.5vw,19px)/1 Oxanium,sans-serif;letter-spacing:.07em}
-.greenside-heading{top:8%}.fairway-heading{top:53%}
-.bunker-page{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:clamp(8px,2.5vw,16px);color:#3F4B3B;font:600 clamp(11px,3vw,15px)/1 Oxanium,sans-serif;letter-spacing:.08em}
-.greenside-page{top:15%}.fairway-page{top:60%}
+.bunker-heading{position:absolute;left:15%;width:50%;text-align:center;color:#3F4B3B;font:600 clamp(13px,3.5vw,19px)/1 Oxanium,sans-serif;letter-spacing:.07em}
+.greenside-heading{top:10%}.fairway-heading{top:55%}
+.bunker-page{position:absolute;right:10%;display:flex;align-items:center;justify-content:center;gap:clamp(5px,1.5vw,10px);color:#3F4B3B;font:600 clamp(11px,3vw,15px)/1 Oxanium,sans-serif;letter-spacing:.04em}
+.greenside-page{top:8%}.fairway-page{top:53%}
 .page-arrow{border:0;background:transparent;color:#3F4B3B;font:400 26px/0.8 Oxanium,sans-serif;padding:3px 5px;cursor:pointer;touch-action:manipulation}
 .bunker-half{position:absolute;left:8%;right:8%;display:grid;grid-template-columns:1fr 1fr;align-items:center}
 .greenside-half{top:22%;height:25%;border-bottom:1px solid rgba(63,75,59,.42)}
@@ -49,13 +49,13 @@ body{font-family:Oxanium,sans-serif;color:#F4F1E6}
 .bunker-distance-pair>div{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
 .distance-label{font:600 clamp(10px,2.7vw,14px)/1 Oxanium,sans-serif;color:#3F4B3B;letter-spacing:.05em}
 .bunker-distance-pair strong{font:600 clamp(22px,6vw,35px)/1 Oxanium,sans-serif;color:#101110;font-variant-numeric:tabular-nums}
-.wind-entry{position:absolute;right:5%;bottom:5%;width:14%;max-width:56px;min-width:40px;aspect-ratio:1;border:1.5px solid rgba(233,201,40,.9);border-radius:50%;background:#F4F1E6;padding:0;display:grid;place-items:center;z-index:5;cursor:pointer;touch-action:manipulation}
+.wind-entry{position:absolute;right:7%;bottom:7%;width:13%;max-width:54px;min-width:40px;aspect-ratio:1;border:1.5px solid rgba(233,201,40,.9);border-radius:50%;background:#F4F1E6;padding:0;display:grid;place-items:center;z-index:9;cursor:pointer;touch-action:manipulation}
 .wind-entry img{width:100%;height:100%;object-fit:contain;display:block}
 .wind-entry:active{transform:scale(.95)}
-.wind-view{position:absolute;inset:0;z-index:8;background:var(--uido-ivory);display:grid;place-items:center}
+.wind-view{position:absolute;inset:0;z-index:10;background:var(--uido-ivory);display:grid;place-items:center}
 .wind-view[hidden]{display:none}
 .wind-view iframe{width:100%;height:100%;border:0;display:block}
-@media(max-width:420px){.bunker-distance-pair strong{font-size:clamp(21px,5.9vw,29px)}.bunker-half{left:7%;right:7%}.wind-entry{right:5%;bottom:5%;width:13%;min-width:38px}}
+@media(max-width:420px){.bunker-distance-pair strong{font-size:clamp(21px,5.9vw,29px)}.bunker-half{left:7%;right:7%}.wind-entry{right:7%;bottom:7%;width:13%;min-width:38px}}
 
 .yardage-photo{display:none!important}
 .yardage-shade{display:none!important}
@@ -108,8 +108,9 @@ button,.btn,.option-button,.choice,.action{font-family:inherit}
       <div class="bunker-distance-pair"><div><span class="distance-label">FR</span><strong id="fairwayFront">—</strong></div><div><span class="distance-label">CR</span><strong id="fairwayCarry">—</strong></div></div>
       <div class="bunker-distance-pair"><div><span class="distance-label">FR</span><strong id="fairwayRightFront">—</strong></div><div><span class="distance-label">CR</span><strong id="fairwayRightCarry">—</strong></div></div>
     </div>
-    <button class="wind-entry" id="windEntry" type="button" aria-label="Open wind tile and continue to shot flow"><img src="assets/uido-golf-ball.svg" alt=""></button>
+    
   </div>
+  <button class="wind-entry" id="windEntry" type="button" aria-label="Open wind tile and continue to shot flow"><img src="assets/uido-golf-ball.svg" alt=""></button>
   <div class="wind-view" id="windView" aria-label="Wind tile" hidden><iframe title="Wind direction and strength" src="wind-tile.html?embedded=1" loading="lazy"></iframe></div>
 </section></main>
 <script>
