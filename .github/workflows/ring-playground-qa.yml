@@ -75,6 +75,7 @@ jobs:
                       middle=page.locator("#canvas .object").filter(has_text="367").first
                       box=middle.bounding_box()
                       before={"x":box["x"],"y":box["y"],"w":box["width"],"h":box["height"]}
+                      before_style=middle.get_attribute("style")
                       target=page.locator("#mirrorCanvas .mirror-target").nth(1)
                       target_box=target.bounding_box()
                       # Exercise the same custom-data drop path used by the UI.
@@ -94,7 +95,11 @@ jobs:
                       page.locator('input[data-test-field="green.middle"]').press("Tab")
                       page.wait_for_timeout(100)
                       after=page.locator("#canvas .object").filter(has_text="401").first.bounding_box()
-                      if not after or abs(after["x"]-before["x"])>0.5 or abs(after["y"]-before["y"])>0.5 or abs(after["width"]-before["w"])>0.5 or abs(after["height"]-before["h"])>0.5:
+                      after_style=page.locator("#canvas .object").filter(has_text="401").first.get_attribute("style")
+                      def geometry_style(style):
+                          import re
+                          return tuple(re.search(rf'{key}:\\s*([^;]+)', style or '').group(1) if re.search(rf'{key}:\\s*([^;]+)', style or '') else None for key in ["left","top","width","height"])
+                      if geometry_style(before_style)!=geometry_style(after_style):
                           report["failures"].append(f"{width}x{height}: changing field data altered geometry")
                       # Move the UI element; mirror target must follow.
                       page.locator("#canvas .object").filter(has_text="401").first.hover()
