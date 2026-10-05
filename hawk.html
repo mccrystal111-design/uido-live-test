@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#3f4b3b">
 <title>Hawk · Golf GPS</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--green:#3f4b3b;--green-dark:#263326;--paper:#f4f1e6;--ink:#20281f;--muted:#74796e;--line:#d9d8cb;--yellow:#f0c928;--white:#fffef8;--red:#a34a3c}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif}body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}button,input,select{font:inherit}button{cursor:pointer;touch-action:manipulation}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #d5ad00;outline-offset:2px}
@@ -19,11 +20,14 @@ header{display:flex;align-items:center;justify-content:space-between;gap:10px}.b
 footer{text-align:center;color:var(--muted);font-size:10px;line-height:1.5;padding:1px 10px}
 dialog{border:1px solid var(--line);border-radius:20px;padding:20px;width:calc(100% - 32px);max-width:420px;background:var(--paper);color:var(--ink);box-shadow:0 15px 60px #0004}dialog::backdrop{background:#111a12a6}.dialog-title{font-size:19px;font-weight:800;margin:0 0 7px}.dialog-sub{font-size:12px;color:var(--muted);line-height:1.5;margin:0 0 17px}.field{display:flex;flex-direction:column;gap:6px;margin:12px 0}.field label{font-size:11px;font-weight:800}.field input,.field select{width:100%;border:1px solid var(--line);border-radius:10px;background:var(--white);padding:12px;color:var(--ink)}.field-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.dialog-actions{display:flex;gap:8px;margin-top:18px}.dialog-actions button{flex:1}.round-list{display:flex;flex-direction:column;gap:8px;max-height:45vh;overflow:auto}.round-line{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:8px 0;font-size:12px}.empty{text-align:center;color:var(--muted);font-size:12px;padding:14px 0}
 @media(min-width:480px){.app{padding-top:22px}.distance-card{padding:23px}.flag-distance{font-size:108px}}
+
+.auth-gate{position:fixed;inset:0;z-index:50;background:var(--paper);display:grid;place-items:center;padding:20px}.auth-card{width:min(430px,100%);background:var(--white);border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:0 15px 60px #2633261c}.auth-brand{font-size:13px;font-weight:900;letter-spacing:.2em;color:var(--green)}.auth-title{font-size:26px;font-weight:800;margin:7px 0}.auth-copy{font-size:12px;color:var(--muted);line-height:1.5}.auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:18px 0 10px}.auth-tab{border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:10px;font-size:12px;font-weight:800;color:var(--green)}.auth-tab.active{background:var(--green);color:var(--paper)}.auth-error{color:var(--red);font-size:11px;line-height:1.4;margin-top:10px}.customer-bar{display:flex;align-items:center;gap:7px}.customer-name{font-size:10px;color:var(--muted);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.signout{border:0;background:none;color:var(--green);font-size:10px;font-weight:800;text-decoration:underline}
 </style>
 </head>
 <body>
-<main class="app">
-<header><div><div class="brand">HAWK</div><div class="brand-sub">Golf GPS · Keep playing</div></div><div class="status"><span class="dot" id="gpsDot"></span><span id="gpsStatus">GPS not started</span></div></header>
+<div class="auth-gate" id="authGate"><div class="auth-card"><div class="auth-brand">HAWK</div><div class="auth-title">Your golf account</div><p class="auth-copy">Create your Hawk customer profile or sign in. Your password is handled by Supabase Auth; Hawk never stores it in the app database.</p><div class="auth-tabs"><button class="auth-tab active" id="signupTab">Create account</button><button class="auth-tab" id="loginTab">Log in</button></div><form id="authForm"><div class="field" id="nameField"><label for="authName">Name</label><input id="authName" autocomplete="name" maxlength="80" required></div><div class="field"><label for="authEmail">Email</label><input id="authEmail" type="email" autocomplete="email" required></div><div class="field"><label for="authPassword">Password</label><input id="authPassword" type="password" autocomplete="new-password" minlength="8" required></div><button class="action yellow" id="authSubmit" type="submit">Create Hawk account</button><div class="auth-error" id="authError" hidden></div></form></div></div>
+<main class="app" id="hawkApp" hidden>
+<header><div><div class="brand">HAWK</div><div class="brand-sub">Golf GPS · Keep playing</div></div><div class="status"><div class="customer-bar"><span class="customer-name" id="customerName"></span><button class="signout" id="signOut">Sign out</button></div><span class="dot" id="gpsDot"></span><span id="gpsStatus">GPS not started</span></div></header>
 <section class="holebar"><div><div class="hole-name" id="courseName">Practice Round</div><div class="hole-meta" id="holeMeta">Hole 1 · Par 4 · Yardages editable</div></div><div class="hole-controls"><button class="round-btn" id="prevHole" aria-label="Previous hole">‹</button><div class="hole-number" id="holeNumber">1</div><button class="round-btn" id="nextHole" aria-label="Next hole">›</button></div></section>
 <section class="distance-card">
 <div class="distance-label">DISTANCE TO FLAG</div><div class="flag-distance" id="flagDistance">— <span class="unit">yd</span></div>
@@ -46,6 +50,53 @@ dialog{border:1px solid var(--line);border-radius:20px;padding:20px;width:calc(1
 (function(){
 'use strict';
 const KEY='hawk-field-test-v1';
+const SUPABASE_URL='https://itmlfcaukkngcoxaxcgm.supabase.co';
+const SUPABASE_KEY='sb_publishable_SFVmpTo4ewSizGjkLEyiRA_9tatAJPY';
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let authMode='signup';
+const authGate=()=>el('authGate'), hawkApp=()=>el('hawkApp');
+function authMessage(msg){el('authError').hidden=!msg;el('authError').textContent=msg||''}
+function setAuthMode(mode){
+ authMode=mode; const signup=mode==='signup';
+ el('signupTab').classList.toggle('active',signup);el('loginTab').classList.toggle('active',!signup);
+ el('nameField').style.display=signup?'flex':'none';el('authName').required=signup;
+ el('authPassword').autocomplete=signup?'new-password':'current-password';
+ el('authSubmit').textContent=signup?'Create Hawk account':'Log in';authMessage('');
+}
+async function ensureProfile(user,name){
+ const {data,error}=await supabaseClient.from('uido_profiles').select('id,display_name').eq('id',user.id).maybeSingle();
+ if(error) throw error;
+ if(!data){const {error:e}=await supabaseClient.from('uido_profiles').insert({id:user.id,display_name:name||user.email?.split('@')[0]||'Hawk customer'});if(e)throw e}
+ else if(name&&data.display_name!==name){const {error:e}=await supabaseClient.from('uido_profiles').update({display_name:name}).eq('id',user.id);if(e)throw e}
+}
+async function showCustomer(user){
+ try{
+  const {data,error}=await supabaseClient.from('uido_profiles').select('display_name').eq('id',user.id).maybeSingle();
+  if(error)throw error;
+  el('customerName').textContent=data?.display_name||user.email||'Hawk customer';
+  authGate().style.display='none';hawkApp().hidden=false;
+ }catch(e){authMessage(e.message||'Could not load your Hawk profile.')}
+}
+el('signupTab').onclick=()=>setAuthMode('signup');el('loginTab').onclick=()=>setAuthMode('login');
+el('authForm').onsubmit=async ev=>{
+ ev.preventDefault();authMessage('');el('authSubmit').disabled=true;
+ try{
+  const email=el('authEmail').value.trim(),password=el('authPassword').value,name=el('authName').value.trim();
+  if(authMode==='signup'){
+   const {data,error}=await supabaseClient.auth.signUp({email,password});
+   if(error)throw error;
+   if(data.user){if(data.session){await ensureProfile(data.user,name);await showCustomer(data.user)}else{authMessage('Account created. Check your email to confirm the account, then log in to Hawk.');}}
+  }else{
+   const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+   if(error)throw error;
+   await ensureProfile(data.user,'');await showCustomer(data.user);
+  }
+ }catch(e){authMessage(e.message||'Authentication failed.')}finally{el('authSubmit').disabled=false}
+};
+el('signOut').onclick=async()=>{await supabaseClient.auth.signOut();hawkApp().hidden=true;authGate().style.display='grid';setAuthMode('login')};
+supabaseClient.auth.onAuthStateChange(async(_event,session)=>{if(session?.user){try{await ensureProfile(session.user,'');await showCustomer(session.user)}catch(e){authMessage(e.message||'Could not load your Hawk profile.')}}});
+(async()=>{const {data}=await supabaseClient.auth.getSession();if(data.session)await showCustomer(data.session.user);else{hawkApp().hidden=true;authGate().style.display='grid'}})();
+
 const blankHole=()=>({par:4,flag:'',front:'',middle:'',back:'',bunker:'',water:'',strokes:0,shots:[]});
 let saved={};try{saved=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
 const state={course:saved.course||'Practice Round',hole:saved.hole||1,holes:saved.holes||{},gps:null,watchId:null,trail:saved.trail||[],lastShot:saved.lastShot||null};
