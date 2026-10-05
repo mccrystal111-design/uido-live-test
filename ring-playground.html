@@ -36,7 +36,7 @@ header{padding:14px 18px;background:var(--ivory);border-bottom:1px solid var(--l
 </style>
 </head>
 <body>
-<header><div><strong>UiDo / RING PLAYGROUND</strong><br><span>Fixed canvas · layout experiments only</span></div><div class="row"><button class="btn" id="reset">Reset layout</button><button class="btn primary" id="export">Export layout JSON</button></div></header>
+<header><div><strong>UiDo / RING PLAYGROUND</strong><br><span>Fixed canvas · layout experiments only</span></div><div class="row"><button class="btn" id="reset">Reset layout</button><button class="btn" id="loadYardage">Load existing yardage</button><button class="btn" id="capture">Capture layout</button><button class="btn primary" id="export">Export layout JSON</button></div></header>
 <main class="app">
  <div class="phone-wrap"><div class="phone"><div class="canvas" id="canvas">
   <div class="status"><span>UiDo TEST</span><span>GPS ···</span></div>
@@ -51,6 +51,7 @@ header{padding:14px 18px;background:var(--ivory);border-bottom:1px solid var(--l
   <section class="panel"><h2>LAYOUT DATA</h2><p id="summary">No objects selected.</p><div class="row"><button class="btn" id="copy" >Copy JSON</button><button class="btn" id="download">Download JSON</button></div><div class="statusline" id="status" aria-live="polite"></div></section>
  </aside>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
 (function(){
 const $=id=>document.getElementById(id);
@@ -116,12 +117,31 @@ document.addEventListener('pointerup',()=>{if(drag){drag=null;updateSummary()}})
 $('assets').innerHTML=assets.map((a,i)=>'<button class="asset" data-asset="'+i+'">'+esc(a.label)+'</button>').join('');
 $('assets').addEventListener('click',e=>{const b=e.target.closest('[data-asset]');if(!b)return;const a=assets[Number(b.dataset.asset)];const pos={yardage:[50,42],meta:[50,17],quad:[30,32],distance:[30,50],line:[50,50],label:[50,50]};const p=pos[a.type]||[50,50];addItem(a,target,p[0],p[1])});
 document.querySelectorAll('[data-target]').forEach(b=>b.addEventListener('click',()=>{target=b.dataset.target;document.querySelectorAll('[data-target]').forEach(x=>x.classList.toggle('active',x===b))}));
-function seed(){items=[];counter=0;const seedTop=[{...assets[3],ring:'top',x:50,y:14},{...assets[0],ring:'top',x:50,y:34},{...assets[1],ring:'top',x:50,y:50},{...assets[2],ring:'top',x:50,y:66},
- {...assets[4],label:'VERTICAL DIVIDER',type:'line',ring:'top',x:31,y:50,w:1,h:58,size:1,style:'muted'},
- {...assets[4],label:'VERTICAL DIVIDER',type:'line',ring:'top',x:69,y:50,w:1,h:58,size:1,style:'muted'},
- {...assets[5],label:'FMB DIVIDER',type:'line',ring:'top',x:50,y:42,w:30,h:1,size:1,style:'muted'},
- {...assets[5],label:'FMB DIVIDER',type:'line',ring:'top',x:50,y:58,w:30,h:1,size:1,style:'muted'}];seedTop.forEach(a=>addItem(a,a.ring,a.x,a.y));items.forEach(i=>{if(i.ring==='top'&&i.type==='yardage')i.w=34});items.forEach(i=>{if(i.type==='yardage'&&i.label.startsWith('MIDDLE'))i.size=27});renderAll();select(null)}
-function applyStage(s){
+function loadExistingYardage(){
+ items=[];counter=0;stage='yardage';target='top';
+ const existing=[
+  {type:'yardage',label:'FRONT 352',size:42,w:34,h:15,style:'',ring:'top',x:50,y:70},
+  {type:'yardage',label:'MIDDLE 367',size:45,w:34,h:17,style:'yellow',ring:'top',x:50,y:50},
+  {type:'yardage',label:'BACK 382',size:42,w:34,h:15,style:'',ring:'top',x:50,y:30},
+  {type:'label',label:'GSB LEFT',size:12,w:22,h:10,style:'sage',ring:'top',x:20,y:20},
+  {type:'distance',label:'355\\n344',size:18,w:22,h:12,style:'sage',ring:'top',x:20,y:35},
+  {type:'label',label:'GSB RIGHT',size:11,w:22,h:10,style:'sage',ring:'top',x:80,y:20},
+  {type:'distance',label:'355\\n344',size:18,w:22,h:12,style:'sage',ring:'top',x:80,y:35},
+  {type:'label',label:'FWB LEFT',size:12,w:22,h:10,style:'sage',ring:'top',x:20,y:58.8107},
+  {type:'distance',label:'215\\n198',size:18,w:22,h:12,style:'sage',ring:'top',x:20,y:74.0599},
+  {type:'label',label:'FWB RIGHT',size:12,w:22,h:10,style:'sage',ring:'top',x:80,y:58.8107},
+  {type:'distance',label:'231\\n209',size:18,w:22,h:12,style:'sage',ring:'top',x:80,y:73.7476},
+  {type:'line',label:'LEFT VERTICAL SEPARATOR',size:1,w:1,h:58,style:'muted',ring:'top',x:35,y:50},
+  {type:'line',label:'RIGHT VERTICAL SEPARATOR',size:1,w:1,h:58,style:'muted',ring:'top',x:65,y:50},
+  {type:'line',label:'FRONT / MIDDLE SEPARATOR',size:1,w:30,h:1,style:'muted',ring:'top',x:50,y:60},
+  {type:'line',label:'MIDDLE / BACK SEPARATOR',size:1,w:30,h:1,style:'muted',ring:'top',x:50,y:40},
+  {type:'label',label:'WIND',size:13,w:24,h:12,style:'outline',ring:'bottom',x:50,y:50},
+  {type:'label',label:'BALL ICON',size:11,w:18,h:12,style:'yellow',ring:'bottom',x:50,y:89.974}
+ ];
+ existing.forEach(a=>addItem(a,a.ring,a.x,a.y));
+ renderAll();select(null);updateStatus('Existing yardage layout loaded from the current UiDo layout specification.');
+}
+function seed(){function applyStage(s){
  stage=s;document.querySelectorAll('[data-stage]').forEach(b=>b.classList.toggle('active',b.dataset.stage===s));
  if(s==='yardage'){target='top';seed();return}
  items=[];counter=0;
@@ -135,6 +155,15 @@ function applyStage(s){
  }
  renderAll();select(null);target='top';document.querySelectorAll('[data-target]').forEach(b=>b.classList.toggle('active',b.dataset.target==='top'));
 }
+function updateStatus(msg){$('status').textContent=msg;}
+$('loadYardage').onclick=loadExistingYardage;
+$('capture').onclick=async()=>{
+ const data=output();
+ data.capture={capturedAt:new Date().toISOString(),viewport:{width:window.innerWidth,height:window.innerHeight,devicePixelRatio:window.devicePixelRatio||1},canvas:{width:$('canvas').getBoundingClientRect().width,height:$('canvas').getBoundingClientRect().height}};
+ data.computedStyles=items.map(it=>{const el=document.querySelector('[data-id="'+it.id+'"]');if(!el)return null;const s=getComputedStyle(el);return {id:it.id,text:el.innerText,fontFamily:s.fontFamily,fontSize:s.fontSize,fontWeight:s.fontWeight,lineHeight:s.lineHeight,letterSpacing:s.letterSpacing,width:s.width,height:s.height,left:s.left,top:s.top,color:s.color,background:s.backgroundColor,border:s.border};}).filter(Boolean);
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='uido-layout-capture.json';a.click();URL.revokeObjectURL(url);
+ if(window.html2canvas){const shot=await html2canvas($('canvas'),{backgroundColor:null,scale:window.devicePixelRatio||1,useCORS:true});const png=await new Promise(r=>shot.toBlob(r,'image/png'));const purl=URL.createObjectURL(png);const p=document.createElement('a');p.href=purl;p.download='uido-layout-capture.png';p.click();URL.revokeObjectURL(purl);updateStatus('Layout JSON + exact rendered canvas screenshot captured.');}else updateStatus('Layout JSON captured; screenshot library unavailable.');
+};
 $('stages').addEventListener('click',e=>{const b=e.target.closest('[data-stage]');if(b)applyStage(b.dataset.stage)});
 $('gridToggle').onclick=()=>{$('canvas').classList.toggle('show-grid',grid=!grid);$('gridToggle').classList.toggle('active',grid);$('gridToggle').textContent=grid?'Hide coordinate grid':'Show coordinate grid'};
 $('snapToggle').onclick=()=>{snap=!snap;$('snapToggle').classList.toggle('active',snap);$('snapToggle').textContent=snap?'Snap: on (2%)':'Snap 2%'};
