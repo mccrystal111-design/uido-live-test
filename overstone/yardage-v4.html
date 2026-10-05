@@ -80,7 +80,7 @@ function metres(a,b){if(!a||!b)return NaN;const R=6371008.8,p1=a[0]*rad,p2=b[0]*
 function yards(m){return Number.isFinite(m)&&m>=0?String(Math.round(m*1.093613298)):'—'}
 function source(){try{return frame.contentWindow.UIDO_OVERSTONE_SOURCE_HOLES[String(activeHole)]||null}catch(e){return null}}
 function coursePosition(d){const p=d&&d.line_of_play&&d.line_of_play[0];return p?[p[1],p[0]]:null}
-function playerPosition(d){const tee=coursePosition(d);return position&&tee&&metres(position,tee)<2500?position:tee}
+function playerPosition(d){return position||null}
 function setPair(id,a,b){const el=$(id);el.children[0].textContent=a;el.children[1].textContent=b}
 function classifyBunker(b,green){return metres(b.anchor_gps||b.front_gps,green)<=60*0.9144?'greenside':'fairway'}
 function rebuildPages(d,pos){
