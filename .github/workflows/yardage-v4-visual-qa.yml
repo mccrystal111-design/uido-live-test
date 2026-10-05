@@ -18,7 +18,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm init -y >/dev/null 2>&1 && npm install playwright@1.55.0 >/dev/null 2>&1
+      - run: npm init -y >/dev/null 2>&1 && npm install playwright@1.55.0 pngjs@7.0.0 >/dev/null 2>&1
       - run: npx playwright install --with-deps chromium >/dev/null 2>&1
       - name: Start server
         run: |
@@ -34,6 +34,22 @@ jobs:
             await page.goto('http://127.0.0.1:4173/overstone/yardage-v4.html?visual=1',{waitUntil:'networkidle'});
             await page.evaluate(async()=>{if(document.fonts) await document.fonts.ready});
             await page.screenshot({path:'yardage-v4.png',fullPage:false});
+            const fs=require('fs'); const {PNG}=require('pngjs');
+            const png=PNG.sync.read(fs.readFileSync('yardage-v4.png'));
+            const px=(x,y)=>{const i=(png.width*y+x)*4;return [png.data[i],png.data[i+1],png.data[i+2],png.data[i+3]]};
+            const probes={
+              background:[0,0,[244,241,230]],
+              topRingTop:[180,44,[16,17,16]],
+              bottomRingTop:[180,426,[16,17,16]],
+              leftVertical:[128,200,[63,75,59]],
+              rightVertical:[231,200,[63,75,59]],
+              frontMiddle:[180,174,[63,75,59]],
+              middleBack:[180,233,[63,75,59]],
+              windLeft:[146,580,[63,75,59]],
+              windRight:[213,580,[63,75,59]]
+            };
+            for(const [name,[x,y,expected]] of Object.entries(probes)){const actual=px(x,y);const ok=expected.every((v,i)=>Math.abs(actual[i]-v)<=2);console.log(name,{x,y,expected,actual,ok});if(!ok)throw new Error('Pixel probe failed: '+name+' expected '+expected+' got '+actual)}
+            console.log('PIXEL_PROBES_PASS');
             const boxes=await page.evaluate(()=>{
               const ids=['.top-ring','.bottom-ring','.top-inner','.bottom-inner','.left-separator','.right-separator','.front-middle','.middle-back','.wind-control','.wind-label','.ball-label'];
               return Object.fromEntries(ids.map(sel=>{const r=document.querySelector(sel).getBoundingClientRect();return [sel,{x:r.x,y:r.y,width:r.width,height:r.height}]}));
