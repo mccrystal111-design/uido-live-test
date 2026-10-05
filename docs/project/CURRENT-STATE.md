@@ -1,6 +1,6 @@
 # UiDo — Current State
 
-Updated: 2026-10-02. Tool/access register is linked from the session-start instructions; dashboard deployment and Playwright verification are complete.
+Updated: 2026-10-05. Tool/access register is linked from the session-start instructions; dashboard deployment and Playwright verification are complete.
 
 ## Project control
 - Mandatory tool map: [TOOL-AND-ACCESS-REGISTER.md](TOOL-AND-ACCESS-REGISTER.md). It records confirmed routes and current access gaps; verify needed tools at the start of each session.
@@ -35,11 +35,20 @@ Updated: 2026-10-02. Tool/access register is linked from the session-start instr
 - Latest dashboard-copy Pages deploy [run #36982434145](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982434145) passed at commit `84140b87432507706ad159e3f2a936d93ef72053`. Dashboard Playwright QA [run #36982461137](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982461137) passed at commit `9bc63015d319a79b0dc7f946137081d54cde5415`.
 - Documentation commits caused several push-event workflow runs to fail with zero jobs (e.g. [#36982036792](https://github.com/mccrystal111-design/uido-live-test/actions/runs/36982036792)); GitHub's jobs endpoint returns an empty list, so the failure cause is not yet established. No reruns were started. Avoid claiming these are course-build failures until the trigger/check-suite explanation is confirmed.
 
+## Yardage field-mirror playground — 2026-10-05
+- `ring-playground.html` is now a two-sided yardage authoring surface: finished UI on the left, same-position semantic field targets on the right, and a separate Field Library for drag/drop binding.
+- The mirror is geometry-linked to the finished UI. Semantic fields are deliberately unbound at load; test values are separate from layout geometry.
+- Export is now semantic field/layout JSON plus a screenshot of the finished UI canvas only.
+- Live renderer `overstone/yardage-lie-prototype.html` remains untouched.
+- Implementation commits: [02e22e6](https://github.com/mccrystal111-design/uido-live-test/commit/02e22e65b8db03cd03268675bc0faaa111840614) and QA workflow [917eea9](https://github.com/mccrystal111-design/uido-live-test/commit/917eea938cdaec1aac06e81b2e230468ba24c7a1).
+- QA status: **needs verification**. The prior run on the pre-mirror version failed because its selector expected the old `#loadYardage` control; the later run was cancelled after the source was updated. No manual rerun was started.
+
 ## Next actions
 - **OPS-002** remains open for separate reconciliation; this session has deliberately moved to another workstream.
 - **DATA-001** is now in progress: draft the provider-neutral [Course Packet Specification](../architecture/COURSE-PACKET-SPEC.md) was committed at [53144a8](https://github.com/mccrystal111-design/uido-live-test/commit/53144a8d5bdfb9a410f3142d85f822c2f70df046). Next: compare it with actual Overstone course-builder output and PR #3's proposed schemas, then agree the canonical geometry contract before implementing a builder/validator or choosing storage.
 
 ## Unverified
+- Final two-sided field-mirror playground behavior has not yet received a green Chromium workflow run; verify the new drag/drop, geometry mirroring and export behavior before treating it as stable.
 - The standalone base passed automated geometry QA, but the canonical hole-by-hole geometry contract still needs agreement before renderer extension.
 - The original concept PNG has not yet been placed unchanged on a dedicated Figma reference page.
 - No timeline dates have been agreed. Do not claim tests or visual QA passed without linked evidence.
