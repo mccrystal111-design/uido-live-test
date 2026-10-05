@@ -86,3 +86,11 @@ Updated: 2026-10-05. Tool/access register is linked from the session-start instr
 - The standalone base passed automated geometry QA, but the canonical hole-by-hole geometry contract still needs agreement before renderer extension.
 - The original concept PNG has not yet been placed unchanged on a dedicated Figma reference page.
 - No timeline dates have been agreed. Do not claim tests or visual QA passed without linked evidence.
+
+
+## Clean-build canonical database checkpoint — 2026-10-05
+- Supabase project uido-production is live in eu-west-2 and now contains the first UiDo-owned Overstone course revision: v1-osm-source.
+- Live import verified: 18 course holes, 159 physical source features, 159 feature-provenance links. Revision remains draft because satellite registration/refinement and hole-feature association are not yet verified.
+- GitHub canonical evidence is persisted at course-models/source-normalized/overstone-source-normalized-v0.1.json and course-models/canonical/overstone-park-v1.json; the live import record is database/seeds/20261005_overstone_canonical_v1.sql.
+- The canonical database preserves OSM source geometry and the existing Overstone F/M/B green anchors. No satellite transform has been invented.
+- Supabase security review still reports two public tables without RLS and five RLS-enabled tables without policies. These are foundation/security work, not a reason to alter the course import.
