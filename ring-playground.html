@@ -18,7 +18,7 @@ header{padding:14px 18px;background:var(--ivory);border-bottom:1px solid var(--l
 .ring-frame.top{top:5.7%}.ring-frame.bottom{bottom:5.7%}
 .ring-tag{position:absolute;z-index:2;left:7%;top:4%;font-size:8px;letter-spacing:.12em;color:#6b7166;pointer-events:none}
 .ring-content{position:absolute;inset:5%;border-radius:50%;overflow:hidden}
-.grid-overlay{position:absolute;inset:8%;display:none;pointer-events:none;z-index:4;background-image:linear-gradient(to right,rgba(63,75,59,.15) 1px,transparent 1px),linear-gradient(to bottom,rgba(63,75,59,.15) 1px,transparent 1px);background-size:10% 10%;border:1px dashed rgba(63,75,59,.35);border-radius:50%}
+.grid-overlay{position:absolute;inset:0;display:none;pointer-events:none;z-index:4;background-image:linear-gradient(to right,rgba(63,75,59,.13) 1px,transparent 1px),linear-gradient(to bottom,rgba(63,75,59,.13) 1px,transparent 1px);background-size:10% 10%;border:1px dashed rgba(63,75,59,.32);border-radius:50%}
 .show-grid .grid-overlay{display:block}
 .canvas-footer{position:absolute;bottom:1.8%;left:0;right:0;text-align:center;font-size:8px;letter-spacing:.1em;color:#77796f}
 .object{position:absolute;z-index:5;min-width:24px;min-height:18px;display:flex;align-items:center;justify-content:center;text-align:center;touch-action:none;user-select:none;cursor:grab;white-space:pre-line;line-height:1.05;border:1px solid transparent;border-radius:5px;padding:2px;transform:translate(-50%,-50%);font-variant-numeric:tabular-nums}
@@ -39,8 +39,8 @@ header{padding:14px 18px;background:var(--ivory);border-bottom:1px solid var(--l
 <main class="app">
  <div class="phone-wrap"><div class="phone"><div class="canvas" id="canvas">
   <div class="status"><span>UiDo TEST</span><span>GPS ···</span></div>
-  <section class="ring-frame top" id="topRing"><span class="ring-tag">TOP RING</span><div class="ring-content" id="topContent"></div></section>
-  <section class="ring-frame bottom" id="bottomRing"><span class="ring-tag">BOTTOM RING</span><div class="ring-content" id="bottomContent"></div></section>
+  <section class="ring-frame top" id="topRing"><span class="ring-tag">TOP RING</span><div class="ring-content" id="topContent"><div class="grid-overlay" aria-hidden="true"></div></div></section>
+  <section class="ring-frame bottom" id="bottomRing"><span class="ring-tag">BOTTOM RING</span><div class="ring-content" id="bottomContent"><div class="grid-overlay" aria-hidden="true"></div></div></section>
   <div class="canvas-footer">PROTOTYPE · NOT LIVE COURSE DATA</div>
  </div></div></div>
  <aside class="tools">
