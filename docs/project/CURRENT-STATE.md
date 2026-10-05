@@ -60,6 +60,14 @@ Updated: 2026-10-05. Tool/access register is linked from the session-start instr
 - Do not modify v4 as part of Hawk/V5 development unless explicitly requested. Treat it as a reference/test baseline.
 - Latest v4 live-position change: commit a0e015018b0f16161b3e022b927d99ddfa1873db; player position no longer falls back to the tee when live GPS is unavailable. Post-change deployment/render verification was not established, so do not claim that specific revision has been visually verified.
 
+### Hawk / V5 customer/auth baseline — 2026-10-05
+- `hawk.html` now has a real Supabase Auth customer gate: email/password signup, login, session restoration and sign-out.
+- Customer profile data is stored in `public.uido_profiles`, keyed to the Supabase Auth user UUID and protected by owner-only RLS policies.
+- Passwords are handled by Supabase Auth and are not stored in the UiDo profile table.
+- Signup creates the profile only for the authenticated user's own UUID; login restores/creates the corresponding profile as needed.
+- The browser uses the Supabase publishable key, not a service-role/secret key.
+- GitHub commit: `8be1b9622681ea69e4420465d59406ecadf832c7`.
+
 ### Hawk / V5 discovery — Q&A only so far
 - Hawk is a new app/product experience being defined separately from v4.
 - Discovery is currently in Q&A mode. No Hawk build should begin until the Q&A is complete and the accumulated decisions are agreed.
@@ -93,4 +101,4 @@ Updated: 2026-10-05. Tool/access register is linked from the session-start instr
 - Live import verified: 18 course holes, 159 physical source features, 159 feature-provenance links. Revision remains draft because satellite registration/refinement and hole-feature association are not yet verified.
 - GitHub canonical evidence is persisted at course-models/source-normalized/overstone-source-normalized-v0.1.json and course-models/canonical/overstone-park-v1.json; the live import record is database/seeds/20261005_overstone_canonical_v1.sql.
 - The canonical database preserves OSM source geometry and the existing Overstone F/M/B green anchors. No satellite transform has been invented.
-- Supabase security review still reports two public tables without RLS and five RLS-enabled tables without policies. These are foundation/security work, not a reason to alter the course import.
+- Supabase security hardening: `uido_profiles` is now RLS-protected with owner-only policies; `handle_new_user()` is no longer intentionally exposed as a public RPC. Remaining advisor findings are PostGIS-managed infrastructure warnings plus intentionally locked course/provenance tables without public policies.
