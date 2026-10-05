@@ -58,5 +58,13 @@ Updated: 2026-10-05
 - Real-Golfer Trigger Principle applies to all live-product workflows.
 - Workflow triggers may run normally when configured; use manual dispatch/reruns only when needed. Preserve human approval for product and visual decisions.
 
+## Latest work — Figma, Yardage v4 and Hawk/V5 — 2026-10-05
+
+- **Figma:** Approved yardage source is UiDo Yardage — Source Recreation, node 8:24, 360×780, on 02 — Product UI in the UiDo — Brand & Product Design System file.
+- **Yardage v4:** overstone/yardage-v4.html is the fresh Figma-derived visual baseline. Kieron confirmed the visual result is correct. Keep v4 as a test/reference baseline; do not alter it for Hawk/V5 unless explicitly requested.
+- **Hawk/V5:** this is a separate new product experience currently in Q&A discovery only. Do not start implementation until discovery is complete and the cumulative decisions are agreed.
+- Current Hawk decisions: Start Round / Scores / Stats on the start screen; equal-sized controls with Start Round distinguished by colour; brief setup with Course + Tees + scoring format; GPS starts at app load; Start Round opens Hole 1 yardage; Score + Putts advances the hole; tapping the hole header opens a 6×3 selector containing only 1–18; selecting a hole closes the selector and opens that hole; GPS updates continuously, holds a stopped position when accuracy is better than 4m, and resumes live updates when movement restarts.
+- Q&A discovery uses the new project-agnostic cumulative-memory protocol in NEW-CHAT-STARTER.md. Keep one cumulative copyable memory line after every answer and ask one question at a time.
+
 ## End-of-session protocol
 Update action status and evidence, CURRENT-STATE with one next action, decisions and verified changes, and this handover. State blockers and any required human action. Do not claim tests passed without evidence. Update the tool/access register whenever a tool, access route, permission or procedure changes.
