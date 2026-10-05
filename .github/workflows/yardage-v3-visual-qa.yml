@@ -1,0 +1,62 @@
+name: Yardage v3 visual QA
+on:
+  push:
+    paths:
+      - 'overstone/yardage-v3.html'
+      - 'overstone/index.html'
+      - 'overstone/course-source-model.js'
+  workflow_dispatch:
+jobs:
+  visual:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Playwright
+        run: |
+          npm init -y
+          npm install playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start local server
+        run: |
+          python3 -m http.server 4173 >/tmp/uido-http.log 2>&1 &
+          echo $! > /tmp/uido-http.pid
+      - name: Render and capture
+        run: |
+          node <<'NODE'
+          const { chromium } = require('playwright');
+          (async()=>{
+            const browser=await chromium.launch({headless:true});
+            const page=await browser.newPage({viewport:{width:360,height:780},deviceScaleFactor:1});
+            const errors=[];
+            page.on('console',m=>{if(m.type()==='error') errors.push('console: '+m.text())});
+            page.on('pageerror',e=>errors.push('pageerror: '+e.message));
+            await page.goto('http://127.0.0.1:4173/overstone/yardage-v3.html?visual=1',{waitUntil:'networkidle'});
+            await page.screenshot({path:'yardage-v3.png',fullPage:false});
+            const metrics=await page.evaluate(()=>({
+              width:document.querySelector('#yardage').getBoundingClientRect().width,
+              height:document.querySelector('#yardage').getBoundingClientRect().height,
+              scrollWidth:document.documentElement.scrollWidth,
+              scrollHeight:document.documentElement.scrollHeight,
+              meta:document.querySelector('#holeMeta').getBoundingClientRect().toJSON(),
+              back:document.querySelector('.yardage.back').getBoundingClientRect().toJSON(),
+              middle:document.querySelector('.yardage.middle').getBoundingClientRect().toJSON(),
+              front:document.querySelector('.yardage.front').getBoundingClientRect().toJSON(),
+              leftSep:document.querySelector('.left-separator').getBoundingClientRect().toJSON(),
+              rightSep:document.querySelector('.right-separator').getBoundingClientRect().toJSON()
+            }));
+            console.log('VISUAL_QA_METRICS '+JSON.stringify(metrics));
+            if(errors.length){console.error('VISUAL_QA_ERRORS '+JSON.stringify(errors));process.exitCode=1}
+            await browser.close();
+          })();
+          NODE
+      - name: Print screenshot as base64 for visual inspection
+        run: |
+          base64 -w 0 yardage-v3.png | sed 's/^/SCREENSHOT_BASE64=/'
+      - name: Upload screenshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: yardage-v3-screenshot
+          path: yardage-v3.png
