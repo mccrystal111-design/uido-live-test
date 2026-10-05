@@ -149,4 +149,20 @@ If actual rendered pixels are unavailable, say so plainly and do not claim visua
 11. Do not ask Kieron to repeat information already documented and still verified. Ask only for missing owner decisions or access that genuinely requires him.
 12. At the end, update relevant project records and leave a concise handover with what changed, what was verified, what remains uncertain and the next action. Update the tool/access register whenever a tool, access route, permission or process changes.
 
+
+## Voice conversation handoff — “Crack on”
+
+UiDo work may be discussed through Voice mode. Treat voice as a normal project conversation, but use the following explicit handoff convention:
+
+- Kieron may talk through decisions, questions, ideas and context conversationally.
+- When Kieron says **“crack on”**, treat that as the explicit end-of-conversation handoff.
+- **“Crack on” means: stop conversationally responding and begin the agreed work.**
+- Do not ask another question, offer another suggestion, or add a conversational closing after “crack on” unless genuinely blocked by missing information or access that cannot be resolved independently.
+- Do not interpret the absence of further speech as permission to keep the conversation going. The explicit phrase is the handoff signal.
+- Once handed off, use the available tools and continue the task until reaching a meaningful checkpoint or genuine blocker.
+- If no user action is required, do not interrupt Kieron just to say that work has started.
+- If Kieron says **“stop”**, immediately stop the current work/line of action and wait for further instruction.
+
+This convention exists specifically for Voice mode so project conversations can feel natural without the assistant continually trying to have the last word.
+
 Now inspect the current source of truth and continue with the highest-priority unblocked action. Do not ask Kieron to repeat information already documented.
