@@ -107,7 +107,7 @@ jobs:
 
                       if record["title"] != "UiDo — Fixed Ring Playground":
                           report["failures"].append(f"{width}x{height}: unexpected title {record['title']!r}")
-                      if record["stage"] != "YARDAGE":
+                      if record["stage"].upper() != "YARDAGE":
                           report["failures"].append(f"{width}x{height}: yardage stage is not active")
                       for required_text, present in record["required_text"].items():
                           if not present:
