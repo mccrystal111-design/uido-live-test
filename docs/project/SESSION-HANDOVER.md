@@ -1,6 +1,6 @@
 # UiDo Session Handover
 
-Updated: 2026-10-02
+Updated: 2026-10-05
 
 ## First read
 1. [Project control pack](README.md)
@@ -11,6 +11,14 @@ Updated: 2026-10-02
 6. DECISION-LOG.md
 
 ## Immediate next action
+
+**Verify the new yardage field-mirror playground.** Open `ring-playground.html`. The left side is the finished UI; the right side contains same-position drop targets. Drag fields such as `green.front`, `green.middle` and `green.back` from the Field Library onto their mirror targets. Move a left-side element and confirm the target follows. Change a bound test value and confirm the geometry does not move. Then use **Export fields + screenshot** and confirm the JSON contains semantic bindings/layout rather than literal dynamic values, while the PNG contains only the finished UI.
+
+- Implementation: [02e22e6](https://github.com/mccrystal111-design/uido-live-test/commit/02e22e65b8db03cd03268675bc0faaa111840614).
+- QA workflow: [917eea9](https://github.com/mccrystal111-design/uido-live-test/commit/917eea938cdaec1aac06e81b2e230468ba24c7a1).
+- **QA is not yet verified for the final revision.** The prior run was for the old playground and failed on the removed `#loadYardage` selector; the next run was cancelled when the source changed again. Do not call the new mirror implementation green until a fresh successful run exists.
+
+## Previous immediate next action
 
 **Kieron's requested field test: radial tile + GPS capture at the ball.** Open the standalone [Shot Capture + GPS test](../../overstone/shot-capture-gps-test.html) or intended published URL https://mccrystal111-design.github.io/uido-live-test/overstone/shot-capture-gps-test.html on the phone. Allow location access, wait for a fix, tap a radial tile, select its value, and tap **HIT SHOT** to save that shot's decision snapshot. Use **Score** and **Putts** for hole-level values, then **Export JSON**. Compare captured phone coordinates/timestamps/accuracy with the Garmin watch and review the plotted points against the Overstone wireframe. The page is additive and does not alter the existing hole renderer. It stores events in browser local storage until export or clear. **No on-course/device test has yet been performed, and live Pages publication could not be verified from this session.** If the URL is not live yet, check the normal Pages deployment; do not manually rerun Actions without a reason.
 
