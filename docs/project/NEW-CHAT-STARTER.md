@@ -27,6 +27,80 @@ Rules:
 
 This rule exists because the development problem is not simply code generation; it is the lack of a closed visual feedback loop. **The rendered product must be observable before visual work is considered verified.**
 
+
+## Visual error-capture rules — mandatory
+
+The detailed visual error capture is also recorded in **[chat.md](./chat.md)**. Read it before doing visually precise work.
+
+### Coordinate systems must never be mixed
+
+Figma `get_design_context` positions are normally **absolute within the full design frame**. CSS children inside a positioned ring/container are **relative to that parent**.
+
+Before writing CSS, explicitly convert every positioned child:
+
+```
+html_left = figma_x - parent_x
+html_top  = figma_y - parent_y
+```
+
+Do not copy Figma frame coordinates directly into child CSS.
+
+The Yardage v3 failure is the reference example:
+
+- Figma top ring origin = `25,44`
+- Horizontal separator Figma position = `146,174`
+- Correct child position = `121,130`
+- Vertical separator Figma position = `128,140`
+- Correct child position = `103,96`
+
+The original implementation copied some absolute values into the relative container, creating systematic 25px/44px errors.
+
+### Visual QA must capture the actual pixels
+
+A page passing Playwright/DOM/geometry tests is **not sufficient** to call a visual build correct.
+
+For visually sensitive work:
+
+1. Render the actual HTML at the exact target viewport.
+2. Capture the rendered screenshot/artifact.
+3. Inspect the screenshot itself.
+4. Compare it with the Figma reference at the same dimensions.
+5. Check source coordinates against rendered coordinates for critical geometry.
+6. If possible, use an overlay/pixel-diff or equivalent measured comparison rather than eyeballing alone.
+7. Diagnose the coordinate/reference-origin error before changing CSS.
+8. Re-render and inspect again after the correction.
+9. Only then provide the live URL.
+
+**Green automation ≠ visually correct UI.**
+
+### Do not invent requirements during visual translation
+
+Experimental playground fields are not automatically product requirements.
+
+Do not infer extra behaviour or controls (for example wind heading, wind speed/mph, GPS controls or replacement graphics) unless the current approved source explicitly defines them.
+
+The approved Figma design is the visual source of truth. The screenshot is a QA reference, not an implementation asset.
+
+### Preserve approved visual decisions
+
+Do not casually alter an element because it is convenient to implement.
+
+In particular, preserve user-approved geometry, spacing, separators, ring sizes, hierarchy, colours, dots and controls unless the user explicitly requests a change.
+
+If a visual mismatch is found, make the smallest change justified by the measured source geometry. Do not enter a blind “nudge until it looks right” patch cycle.
+
+### Before sending a visually sensitive result
+
+The assistant must be able to say, truthfully:
+
+- the page rendered at the target viewport;
+- the actual rendered screenshot was inspected;
+- important geometry was compared against the source;
+- known visual mismatches were resolved;
+- the live link is being supplied only after that verification.
+
+If actual rendered pixels are unavailable, say so plainly and do not claim visual verification.
+
 **Start here**
 - Project control pack: https://github.com/mccrystal111-design/uido-live-test/blob/main/docs/project/README.md
 - Project brief: https://github.com/mccrystal111-design/uido-live-test/blob/main/docs/project/PROJECT-BRIEF.md
