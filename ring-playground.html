@@ -8,9 +8,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600&display=swap');
 :root{--ivory:#F4F1E6;--ink:#101110;--yellow:#E9C928;--sage:#3F4B3B;--ring:rgba(63,75,59,.42);--line:rgba(16,17,16,.18);--blue:#4c6570}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#e8e6de;color:var(--ink);font-family:Oxanium,system-ui,sans-serif}button,input,select{font:inherit}button{cursor:pointer;touch-action:manipulation}
-header{padding:14px 18px;background:var(--ivory);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;min-width:0}header>div{min-width:0}header .row{min-width:0;max-width:100%}header strong{letter-spacing:.1em;font-size:16px}header span{font:12px/1.4 Arial,sans-serif;color:#5d6258}
-.app{display:grid;grid-template-columns:minmax(0,390px) minmax(0,1fr);gap:18px;padding:18px;max-width:1100px;margin:0 auto;align-items:start}
-.phone-wrap{display:flex;justify-content:center;min-width:0}.phone{width:min(100%,360px);min-width:0;padding:12px;border:1px solid #c8c6bd;border-radius:28px;background:#d8d7cf;box-shadow:0 3px 12px rgba(16,17,16,.07)}
+header{padding:14px 18px;overflow-x:hidden;background:var(--ivory);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;min-width:0}header>div{min-width:0}header .row{min-width:0;max-width:100%;overflow:hidden}header strong{letter-spacing:.1em;font-size:16px}header span{font:12px/1.4 Arial,sans-serif;color:#5d6258}
+.app{display:grid;overflow:hidden;grid-template-columns:minmax(0,390px) minmax(0,1fr);gap:18px;padding:18px;max-width:1100px;margin:0 auto;align-items:start}
+.phone-wrap{display:flex;justify-content:center;min-width:0;max-width:100%;overflow:hidden}.phone-title{font-size:10px;letter-spacing:.1em;margin:0 4px 8px;overflow-wrap:anywhere}.phone{width:min(100%,360px);min-width:0;padding:12px;border:1px solid #c8c6bd;border-radius:28px;background:#d8d7cf;box-shadow:0 3px 12px rgba(16,17,16,.07)}
 .canvas{position:relative;width:100%;aspect-ratio:9/19.5;background:var(--ivory);border:1px solid #c6c3b8;border-radius:20px;overflow:hidden}
 .status{position:absolute;left:7%;right:7%;top:2%;display:flex;justify-content:space-between;font-size:9px;letter-spacing:.08em;color:#77796f;pointer-events:none}
 .ring-frame{position:absolute;left:7%;width:86%;aspect-ratio:1;border:1px solid rgba(16,17,16,.24);border-radius:20px;background:var(--ivory);overflow:hidden}
