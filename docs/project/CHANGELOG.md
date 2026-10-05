@@ -65,3 +65,8 @@
 - Added a Putts radial tile, touch-friendly value picker, shot/hole phases, per-shot decision snapshots on HIT SHOT, retained hole-level score/putts, GPS attached to each event, and an export with ordered raw events and shot summaries.
 - Values are a practical test vocabulary for today's field trial, not yet an approved canonical UiDo data contract. No device test has been run and live Pages publication remains unverified.
 - Commit: [9b54d56](https://github.com/mccrystal111-design/uido-live-test/commit/9b54d56bb9fa200771887f87b1af30986ecd9764).
+
+
+## 2026-10-05
+- Canonical database build: established the first live Overstone course revision in Supabase uido-production from preserved GitHub source evidence. Added Git-backed source-normalized and canonical model records plus the live-import seed record.
+- Evidence: 18 holes, 159 source physical features and 159 feature-provenance links verified in the live database. Revision is intentionally draft pending measured registration/refinement.
