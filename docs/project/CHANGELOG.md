@@ -1,5 +1,16 @@
 # UiDo Project Control Change Log
 
+## 2026-10-05 — Yardage field-mirror playground foundation
+- Reworked `ring-playground.html` into a two-sided yardage playground: the left canvas is the finished golfer-facing UI; the right canvas is an automatically mirrored field-target surface.
+- UI elements retain one source of truth for position/size. Moving or resizing the finished UI updates the corresponding mirror target automatically.
+- Added a semantic Field Library with drag/drop binding. A field is deliberately **not** pre-bound: the user drags the semantic field onto the matching-position mirror target.
+- Added separate test data so changing a bound field value does not alter layout geometry.
+- Export now produces semantic field bindings + layout geometry as JSON and a screenshot of the finished UI canvas only; playground tooling is outside the captured production canvas.
+- Existing live renderer `overstone/yardage-lie-prototype.html` was not changed.
+- Added/updated `.github/workflows/ring-playground-qa.yml` for Chromium checks covering mirror counts, semantic field drag/drop, test-data/geometry separation and mirror tracking.
+- Current QA evidence is **not yet green for this final revision**: the previous run tested the pre-mirror implementation and failed on an obsolete `#loadYardage` selector; the subsequent workflow run was cancelled by concurrency after the next source update. No manual rerun was started.
+- Commits: playground [02e22e6](https://github.com/mccrystal111-design/uido-live-test/commit/02e22e65b8db03cd03268675bc0faaa111840614); QA workflow [917eea9](https://github.com/mccrystal111-design/uido-live-test/commit/917eea938cdaec1aac06e81b2e230468ba24c7a1).
+
 ## 2026-10-02 — Live dashboard foundation
 - Added `project-dashboard.html`, a responsive, read-only dashboard that fetches public repository issues, open pull requests and recent workflow runs directly from the GitHub REST API.
 - Dashboard refreshes on demand and every five minutes. It does not trigger or rerun workflows.
