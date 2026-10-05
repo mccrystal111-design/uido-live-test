@@ -122,7 +122,7 @@ function ringEl(r){return $(r==='top'?'topContent':'bottomContent')}
 function mirrorEl(r){return $(r==='top'?'mirrorTop':'mirrorBottom')}
 function fieldValue(id){return fieldMap[id]?.value??'—'}
 function displayText(it){
- if(!it.binding)return it.label;
+ if(!it.binding)return it.sampleValue??it.label;
  const v=fieldValue(it.binding);
  if(it.binding==='hole.number'||it.binding==='hole.par'||it.binding==='hole.nettPar')return v;
  return v;
@@ -134,11 +134,11 @@ function renderItem(it){
  el.style.left=it.x+'%';el.style.top=it.y+'%';el.style.width=it.w+'%';el.style.height=it.h+'%';el.style.fontSize=it.size+'px';
  if(it.type==='yardage'){el.textContent=displayText(it);el.title=it.binding||it.label}
  else if(it.type==='distance'){
-   const val=it.binding?fieldValue(it.binding):it.label.replace(/\\n/g,'<br>');
-   el.innerHTML=it.binding?esc(val):esc(it.label).replace(/\\n/g,'<br>');
+   const val=it.binding?fieldValue(it.binding):(it.sampleValue??it.label).replace(/\\n/g,'<br>');
+   el.innerHTML=it.binding?esc(val):esc(val);
  } else if(it.type==='line'){el.textContent='';el.setAttribute('aria-label','separator')}
  else if(it.binding){el.textContent=displayText(it)}
- else el.textContent=it.label;
+ else el.textContent=it.sampleValue??it.label;
 }
 function renderMirror(it){
  let el=document.querySelector('#mirrorCanvas [data-id="'+it.id+'"]');
@@ -205,18 +205,18 @@ document.addEventListener('pointerup',()=>{if(drag){drag=null;updateSummary()}})
 function loadYardage(){
  items=[];counter=0;selected=null;
  const existing=[
-  {type:'yardage',label:'FRONT',size:42,w:34,h:15,style:'',ring:'top',x:50,y:70,binding:'green.front'},
-  {type:'yardage',label:'MIDDLE',size:45,w:34,h:17,style:'yellow',ring:'top',x:50,y:50,binding:'green.middle'},
-  {type:'yardage',label:'BACK',size:42,w:34,h:15,style:'',ring:'top',x:50,y:30,binding:'green.back'},
-  {type:'meta',label:'HOLE · PAR · NETT',size:12,w:72,h:9,style:'sage',ring:'top',x:50,y:17,binding:null},
+  {type:'yardage',label:'FRONT',sampleValue:'352',size:42,w:34,h:15,style:'',ring:'top',x:50,y:70},
+  {type:'yardage',label:'MIDDLE',sampleValue:'367',size:45,w:34,h:17,style:'yellow',ring:'top',x:50,y:50},
+  {type:'yardage',label:'BACK',sampleValue:'382',size:42,w:34,h:15,style:'',ring:'top',x:50,y:30},
+  {type:'meta',label:'HOLE · PAR · NETT',sampleValue:'HOLE 1 · PAR 4 (4)',size:12,w:72,h:9,style:'sage',ring:'top',x:50,y:17},
   {type:'label',label:'GSB LEFT',size:12,w:22,h:10,style:'sage',ring:'top',x:20,y:20},
-  {type:'distance',label:'355\\n344',size:18,w:22,h:12,style:'sage',ring:'top',x:20,y:35,binding:null},
+  {type:'distance',label:'GSB LEFT DISTANCES',sampleValue:'355\\n344',size:18,w:22,h:12,style:'sage',ring:'top',x:20,y:35},
   {type:'label',label:'GSB RIGHT',size:11,w:22,h:10,style:'sage',ring:'top',x:80,y:20},
-  {type:'distance',label:'355\\n344',size:18,w:22,h:12,style:'sage',ring:'top',x:80,y:35,binding:null},
+  {type:'distance',label:'GSB RIGHT DISTANCES',sampleValue:'355\\n344',size:18,w:22,h:12,style:'sage',ring:'top',x:80,y:35},
   {type:'label',label:'FWB LEFT',size:12,w:22,h:10,style:'sage',ring:'top',x:20,y:58.8107},
-  {type:'distance',label:'215\\n198',size:18,w:22,h:12,style:'sage',ring:'top',x:20,y:74.0599,binding:null},
+  {type:'distance',label:'FWB LEFT DISTANCES',sampleValue:'215\\n198',size:18,w:22,h:12,style:'sage',ring:'top',x:20,y:74.0599},
   {type:'label',label:'FWB RIGHT',size:12,w:22,h:10,style:'sage',ring:'top',x:80,y:58.8107},
-  {type:'distance',label:'231\\n209',size:18,w:22,h:12,style:'sage',ring:'top',x:80,y:73.7476,binding:null},
+  {type:'distance',label:'FWB RIGHT DISTANCES',sampleValue:'231\\n209',size:18,w:22,h:12,style:'sage',ring:'top',x:80,y:73.7476},
   {type:'line',label:'LEFT VERTICAL SEPARATOR',size:1,w:1,h:58,style:'muted',ring:'top',x:35,y:50},
   {type:'line',label:'RIGHT VERTICAL SEPARATOR',size:1,w:1,h:58,style:'muted',ring:'top',x:65,y:50},
   {type:'line',label:'FRONT / MIDDLE SEPARATOR',size:1,w:30,h:1,style:'muted',ring:'top',x:50,y:60},
