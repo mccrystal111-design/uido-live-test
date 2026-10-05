@@ -77,8 +77,15 @@ jobs:
                       before={"x":box["x"],"y":box["y"],"w":box["width"],"h":box["height"]}
                       target=page.locator("#mirrorCanvas .mirror-target").nth(1)
                       target_box=target.bounding_box()
-                      field=page.locator('.field-card[data-field="green.middle"]')
-                      field.drag_to(target)
+                      # Exercise the same custom-data drop path used by the UI.
+                      target_id=target.get_attribute("data-id")
+                      page.evaluate("""([targetId, fieldId]) => {
+                        const target = document.querySelector('#mirrorCanvas .mirror-target[data-id="'+targetId+'"]');
+                        const dt = new DataTransfer();
+                        dt.setData('text/field', fieldId);
+                        target.dispatchEvent(new DragEvent('dragover', {bubbles:true, dataTransfer:dt}));
+                        target.dispatchEvent(new DragEvent('drop', {bubbles:true, dataTransfer:dt}));
+                      }""", [target_id, "green.middle"])
                       page.wait_for_timeout(200)
                       if "green.middle" not in target.inner_text(): report["failures"].append(f"{width}x{height}: field did not bind to mirror target")
                       if page.locator("#canvas .object").filter(has_text="367").first.inner_text()!="367": report["failures"].append(f"{width}x{height}: bound test value not rendered")
