@@ -141,9 +141,9 @@ function loadExistingYardage(){
  existing.forEach(a=>addItem(a,a.ring,a.x,a.y));
  renderAll();select(null);updateStatus('Existing yardage layout loaded from the current UiDo layout specification.');
 }
-function seed(){function applyStage(s){
+function applyStage(s){
  stage=s;document.querySelectorAll('[data-stage]').forEach(b=>b.classList.toggle('active',b.dataset.stage===s));
- if(s==='yardage'){target='top';seed();return}
+ if(s==='yardage'){loadExistingYardage();return}
  items=[];counter=0;
  if(s==='shot'){
   addItem({...assets[3],label:'HOLE 1 · PAR 4'},'top',50,13);
