@@ -43,6 +43,40 @@ Updated: 2026-10-05. Tool/access register is linked from the session-start instr
 - Implementation commits: [02e22e6](https://github.com/mccrystal111-design/uido-live-test/commit/02e22e65b8db03cd03268675bc0faaa111840614) and QA workflow [917eea9](https://github.com/mccrystal111-design/uido-live-test/commit/917eea938cdaec1aac06e81b2e230468ba24c7a1).
 - QA status: **needs verification**. The prior run on the pre-mirror version failed because its selector expected the old `#loadYardage` control; the later run was cancelled after the source was updated. No manual rerun was started.
 
+## Figma + Yardage v4 + Hawk/V5 work — 2026-10-05
+
+### Figma source recreation
+- Figma file: https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI
+- Approved source frame: UiDo Yardage — Source Recreation, node 8:24, 360×780, on 02 — Product UI.
+- This frame is the visual source of truth for the yardage UI. The approved design was recreated as a fresh HTML baseline rather than patched from the earlier v3 layout.
+- Use Figma design context/geometry as authoritative and verify the actual rendered page at 360×780 before visual approval.
+- Do not redesign the approved yardage composition unless explicitly requested.
+
+### Yardage v4 — retained as test baseline
+- File: overstone/yardage-v4.html
+- v4 is the fresh Figma-derived yardage build and is now the visual test baseline.
+- The user has confirmed that v4 is visually correct.
+- v4 uses the live yardage/GPS engine derived from earlier work, but it is not the new Hawk product build.
+- Do not modify v4 as part of Hawk/V5 development unless explicitly requested. Treat it as a reference/test baseline.
+- Latest v4 live-position change: commit a0e015018b0f16161b3e022b927d99ddfa1873db; player position no longer falls back to the tee when live GPS is unavailable. Post-change deployment/render verification was not established, so do not claim that specific revision has been visually verified.
+
+### Hawk / V5 discovery — Q&A only so far
+- Hawk is a new app/product experience being defined separately from v4.
+- Discovery is currently in Q&A mode. No Hawk build should begin until the Q&A is complete and the accumulated decisions are agreed.
+- Current agreed behaviour includes:
+  - Start screen: Start Round, Scores, Stats; equal-sized controls, with Start Round distinguished by colour.
+  - Start Round opens a brief setup: Course, Tees, scoring format.
+  - GPS acquisition begins when the app/page loads.
+  - Start Round opens the yardage page on Hole 1.
+  - Hole progression occurs after Score + Putts are completed, not automatically from GPS.
+  - The current hole remains active unless the player manually uses Jump to Hole.
+  - Tapping the hole header (for example HOLE 1 · PAR 4 (4)) opens an 18-hole selector.
+  - Hole selector is a 6×3 grid with buttons labelled only 1–18.
+  - Selecting a hole closes the selector and opens that hole.
+  - GPS continues updating while playing; when the player has stopped and GPS accuracy is better than 4m, hold the position. Resume live updates when movement starts again.
+- The Q&A memory is maintained as one cumulative, copyable plain-text line after each answer. This is a project-agnostic discovery protocol, now documented in NEW-CHAT-STARTER.md.
+- The eventual final Q&A memory must be persisted in the appropriate project source-of-truth document before Hawk/V5 implementation begins.
+
 ## Next actions
 - **OPS-002** remains open for separate reconciliation; this session has deliberately moved to another workstream.
 - **DATA-001** is now in progress: draft the provider-neutral [Course Packet Specification](../architecture/COURSE-PACKET-SPEC.md) was committed at [53144a8](https://github.com/mccrystal111-design/uido-live-test/commit/53144a8d5bdfb9a410f3142d85f822c2f70df046). Next: compare it with actual Overstone course-builder output and PR #3's proposed schemas, then agree the canonical geometry contract before implementing a builder/validator or choosing storage.
