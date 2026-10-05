@@ -68,3 +68,11 @@ Updated: 2026-10-05
 
 ## End-of-session protocol
 Update action status and evidence, CURRENT-STATE with one next action, decisions and verified changes, and this handover. State blockers and any required human action. Do not claim tests passed without evidence. Update the tool/access register whenever a tool, access route, permission or procedure changes.
+
+
+## 2026-10-05 clean-build checkpoint
+- Continued directly from the canonical-build handoff; no prototype or renderer patching was used.
+- Verified GitHub repo access and Supabase uido-production access.
+- Persisted Overstone source-normalized evidence and canonical v1 model in GitHub.
+- Imported Overstone v1 source evidence into Supabase as a draft canonical revision: 18 holes, 159 physical features, 159 provenance links.
+- Next unblocked build action: reconcile the canonical geometry contract against the real Overstone model, then complete measured satellite registration/refinement rather than publishing the draft.
