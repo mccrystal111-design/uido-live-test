@@ -109,14 +109,17 @@ body{
 }
 .bunker{
   position:absolute;
-  transform:translate(-50%,-50%);
   width:61.301px;
+  height:33.437px;
   text-align:center;
 }
-.bunker.left{left:96.5px}
-.bunker.right{left:263.65px}
-.bunker.gs{top:115px}
-.bunker.fw{top:236px}
+.bunker.left{left:66px}
+.bunker.right{left:233px}
+.bunker.gs,.bunker.fw{top:14px}
+.bunker.gs .bunker-label{position:absolute;left:0;top:87px;width:100%;height:28px}
+.bunker.gs .bunker-values{position:absolute;left:0;top:129.003px;width:100%;height:33.437px}
+.bunker.fw .bunker-label{position:absolute;left:0;top:208px;width:100%;height:28px}
+.bunker.fw .bunker-values{position:absolute;left:0;top:250.003px;width:100%;height:33.437px}
 .bunker.right .bunker-label{font-size:11px}
 .bunker-values span{display:block}
 
@@ -187,6 +190,7 @@ body{
   cursor:pointer;
 }
 .status{
+  display:none;
   position:fixed;
   left:8px;
   bottom:8px;
@@ -259,7 +263,7 @@ body{
   </section>
 </main>
 
-<div class="status" id="status">Waiting for GPS…</div>
+<div class="status" id="status" aria-hidden="true"></div>
 
 <script>
 (function(){
