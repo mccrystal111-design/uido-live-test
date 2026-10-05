@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>UiDo — Fixed Ring Playground</title>
+<title>UiDo — Yardage Field Playground</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600&display=swap');
 :root{--ivory:#F4F1E6;--ink:#101110;--yellow:#E9C928;--sage:#3F4B3B;--ring:rgba(63,75,59,.42);--line:rgba(16,17,16,.18);--blue:#4c6570}
@@ -36,102 +36,187 @@ header{padding:14px 18px;background:var(--ivory);border-bottom:1px solid var(--l
 </style>
 </head>
 <body>
-<header><div><strong>UiDo / RING PLAYGROUND</strong><br><span>Fixed canvas · layout experiments only</span></div><div class="row"><button class="btn" id="reset">Reset layout</button><button class="btn" id="loadYardage">Load existing yardage</button><button class="btn" id="capture">Capture layout</button><button class="btn primary" id="export">Export layout JSON</button></div></header>
+<header>
+  <div><strong>UiDo / RING PLAYGROUND</strong><br><span>Finished UI on the left · semantic field binding on the mirror</span></div>
+  <div class="row"><button class="btn" id="reset">Reset yardage</button><button class="btn" id="gridToggle">Show grid</button><button class="btn" id="capture">Export fields + screenshot</button></div>
+</header>
 <main class="app">
- <div class="phone-wrap"><div class="phone"><div class="canvas" id="canvas">
-  <div class="status"><span>UiDo TEST</span><span>GPS ···</span></div>
-  <section class="ring-frame top" id="topRing"><span class="ring-tag">TOP RING</span><div class="ring-content" id="topContent"><div class="grid-overlay" aria-hidden="true"></div></div></section>
-  <section class="ring-frame bottom" id="bottomRing"><span class="ring-tag">BOTTOM RING</span><div class="ring-content" id="bottomContent"><div class="grid-overlay" aria-hidden="true"></div></div></section>
-  <div class="canvas-footer">PROTOTYPE · NOT LIVE COURSE DATA</div>
- </div></div></div>
- <aside class="tools">
-  <section class="panel"><h2>VIEW / STAGE</h2><p>Both ring frames are fixed. Change the stage to preview different contents without moving the rings.</p><div class="row" id="stages"><button class="btn active" data-stage="yardage">Yardage</button><button class="btn" data-stage="shot">Shot review</button><button class="btn" data-stage="score">Score</button></div><div style="height:9px"></div><div class="row"><button class="btn" id="gridToggle">Show coordinate grid</button><button class="btn" id="snapToggle">Snap 2%</button></div></section>
-  <section class="panel"><h2>ADD PLACEHOLDER</h2><p>Tap an item to add it to the selected ring, then drag it into position. These are editable placeholders, not final art.</p><div class="row" style="margin-bottom:8px"><button class="btn active" data-target="top">Target: top</button><button class="btn" data-target="bottom">Target: bottom</button></div><div class="asset-list" id="assets"></div></section>
-  <section class="panel"><h2>SELECTED OBJECT</h2><p id="selectionHelp">Select an object on the canvas to inspect and edit its position and size.</p><div class="fields"><label class="field">Label<input id="fLabel" type="text" disabled></label><label class="field">Font size (px)<input id="fSize" type="number" min="6" max="90" disabled></label><label class="field">X position (%)<input id="fX" type="number" min="0" max="100" step="0.5" disabled></label><label class="field">Y position (%)<input id="fY" type="number" min="0" max="100" step="0.5" disabled></label><label class="field">Width (%)<input id="fW" type="number" min="4" max="100" step="1" disabled></label><label class="field">Height (%)<input id="fH" type="number" min="3" max="100" step="1" disabled></label><label class="field">Style<select id="fStyle" disabled><option value="">Plain</option><option value="yellow">Yellow</option><option value="sage">Sage</option><option value="muted">Muted</option><option value="outline">Outlined circle</option></select></label><label class="field">Ring<select id="fRing" disabled><option value="top">Top ring</option><option value="bottom">Bottom ring</option></select></label></div><div class="row" style="margin-top:10px"><button class="btn" id="delete" disabled>Remove selected</button><button class="btn" id="duplicate" disabled>Duplicate</button></div></section>
-  <section class="panel"><h2>LAYOUT DATA</h2><p id="summary">No objects selected.</p><div class="row"><button class="btn" id="copy" >Copy JSON</button><button class="btn" id="download">Download JSON</button></div><div class="statusline" id="status" aria-live="polite"></div></section>
- </aside>
+  <section class="phone-wrap"><div class="phone">
+    <div class="phone-title">FINISHED UI</div>
+    <div class="canvas" id="canvas">
+      <section class="ring-frame top"><div class="ring-content" id="topContent"><div class="grid-overlay"></div></div></section>
+      <section class="ring-frame bottom"><div class="ring-content" id="bottomContent"><div class="grid-overlay"></div></div></section>
+    </div>
+  </div></section>
+
+  <section class="phone-wrap"><div class="phone">
+    <div class="phone-title">FIELD MIRROR · DROP FIELDS HERE</div>
+    <div class="canvas mirror-canvas" id="mirrorCanvas">
+      <section class="ring-frame top"><div class="ring-content" id="mirrorTop"></div></section>
+      <section class="ring-frame bottom"><div class="ring-content" id="mirrorBottom"></div></section>
+    </div>
+  </div></section>
+
+  <aside class="tools">
+    <section class="panel">
+      <h2>SEMANTIC FIELD LIBRARY</h2>
+      <p>Drag a field onto the matching-position target on the mirror. The target position and size come automatically from the finished UI.</p>
+      <div class="fields" id="fieldLibrary"></div>
+    </section>
+    <section class="panel">
+      <h2>SELECTED UI ELEMENT</h2>
+      <p id="selectionHelp">Select an element on the finished UI to edit its position or size.</p>
+      <div class="fields">
+        <label class="field">Font size<input id="fSize" type="number" min="6" max="90" disabled></label>
+        <label class="field">X %<input id="fX" type="number" min="0" max="100" step=".5" disabled></label>
+        <label class="field">Y %<input id="fY" type="number" min="0" max="100" step=".5" disabled></label>
+        <label class="field">Width %<input id="fW" type="number" min="1" max="100" step="1" disabled></label>
+        <label class="field">Height %<input id="fH" type="number" min="1" max="100" step="1" disabled></label>
+      </div>
+      <div class="row" style="margin-top:10px"><button class="btn" id="delete" disabled>Remove</button><button class="btn" id="duplicate" disabled>Duplicate</button></div>
+    </section>
+    <section class="panel">
+      <h2>FIELD TEST DATA</h2>
+      <p>These values are deliberately separate from the layout. Change them to prove the UI position stays unchanged.</p>
+      <div class="fields" id="testData"></div>
+    </section>
+    <section class="panel">
+      <h2>EXPORT</h2>
+      <div class="legend"><span><i class="dot"></i> unbound target</span><span><i class="dot bound"></i> bound field</span></div>
+      <p id="summary">Loading yardage layout…</p>
+      <div class="statusline" id="status" aria-live="polite"></div>
+    </section>
+  </aside>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
 (function(){
 const $=id=>document.getElementById(id);
-const assets=[
- {type:'yardage',label:'FRONT 352',size:22,w:36,h:15,style:''},
- {type:'yardage',label:'MIDDLE 367',size:27,w:42,h:17,style:'yellow'},
- {type:'yardage',label:'BACK 382',size:22,w:36,h:15,style:''},
- {type:'line',label:'VERTICAL DIVIDER',size:1,w:1,h:58,style:'muted'},
- {type:'line',label:'YARDAGE DIVIDER',size:1,w:30,h:1,style:'muted'},
- {type:'meta',label:'HOLE 1 · PAR 4 (4)',size:12,w:72,h:9,style:'sage'},
- {type:'quad',label:'STRIKE',size:13,w:42,h:38,style:'outline'},
- {type:'quad',label:'TRAJ',size:13,w:42,h:38,style:'outline'},
- {type:'quad',label:'START',size:13,w:42,h:38,style:'outline'},
- {type:'quad',label:'SHAPE',size:13,w:42,h:38,style:'outline'},
- {type:'distance',label:'FR 28',size:18,w:22,h:12,style:'sage'},
- {type:'distance',label:'CR 41',size:18,w:22,h:12,style:''},
- {type:'label',label:'GREENSIDE',size:12,w:54,h:10,style:'sage'},
- {type:'label',label:'FAIRWAY',size:12,w:44,h:10,style:'sage'},
- {type:'label',label:'WIND',size:13,w:24,h:12,style:'outline'},
- {type:'label',label:'LIE',size:13,w:24,h:12,style:'outline'},
- {type:'label',label:'CLUB',size:13,w:24,h:12,style:'outline'},
- {type:'label',label:'SCORE',size:15,w:35,h:13,style:''},
- {type:'label',label:'PUTTS',size:11,w:28,h:10,style:'sage'},
- {type:'label',label:'TOTAL +2',size:17,w:48,h:13,style:''},
- {type:'label',label:'NET -1',size:17,w:42,h:13,style:'yellow'},
- {type:'label',label:'NEXT SHOT',size:13,w:45,h:13,style:'outline'},
- {type:'label',label:'BALL ICON',size:11,w:18,h:12,style:'yellow'}
+const fieldDefs=[
+ {id:'hole.number',label:'Hole number',value:'1'},
+ {id:'hole.par',label:'Par',value:'4'},
+ {id:'hole.nettPar',label:'Nett Par',value:'4'},
+ {id:'green.front',label:'Green front',value:'352'},
+ {id:'green.middle',label:'Green middle',value:'367'},
+ {id:'green.back',label:'Green back',value:'382'},
+ {id:'bunkers.greenside.left.front',label:'GSB left front',value:'355'},
+ {id:'bunkers.greenside.left.carry',label:'GSB left carry',value:'344'},
+ {id:'bunkers.greenside.right.front',label:'GSB right front',value:'355'},
+ {id:'bunkers.greenside.right.carry',label:'GSB right carry',value:'344'},
+ {id:'bunkers.fairway.left.front',label:'FWB left front',value:'215'},
+ {id:'bunkers.fairway.left.carry',label:'FWB left carry',value:'198'},
+ {id:'bunkers.fairway.right.front',label:'FWB right front',value:'231'},
+ {id:'bunkers.fairway.right.carry',label:'FWB right carry',value:'209'},
+ {id:'wind.direction',label:'Wind direction',value:'NW'},
+ {id:'wind.speed',label:'Wind speed',value:'14 mph'}
 ];
-let items=[],selected=null,target='top',stage='yardage',counter=0,grid=false,snap=false,drag=null;
-function addItem(a,ring=target,x=50,y=50){
- const it={id:'obj-'+(++counter),type:a.type,label:a.label,size:a.size,w:a.w,h:a.h,style:a.style||'',ring,x,y};
- items.push(it);renderItem(it);select(it.id);return it;
+const fieldMap=Object.fromEntries(fieldDefs.map(f=>[f.id,f]));
+let items=[],selected=null,counter=0,grid=false,drag=null,dragField=null;
+
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function addItem(a){
+ const it={id:'ui-'+(++counter),type:a.type,label:a.label,size:a.size,w:a.w,h:a.h,style:a.style||'',ring:a.ring,x:a.x,y:a.y,binding:a.binding||null};
+ items.push(it);return it;
 }
 function ringEl(r){return $(r==='top'?'topContent':'bottomContent')}
+function mirrorEl(r){return $(r==='top'?'mirrorTop':'mirrorBottom')}
+function fieldValue(id){return fieldMap[id]?.value??'—'}
+function displayText(it){
+ if(!it.binding)return it.label;
+ const v=fieldValue(it.binding);
+ if(it.binding==='hole.number'||it.binding==='hole.par'||it.binding==='hole.nettPar')return v;
+ return v;
+}
 function renderItem(it){
- let el=document.querySelector('[data-id="'+it.id+'"]');
- if(!el){el=document.createElement('div');el.className='object';el.dataset.id=it.id;el.addEventListener('pointerdown',down);el.addEventListener('click',e=>{e.stopPropagation();select(it.id)});ringEl(it.ring).appendChild(el)}
- else if(el.parentElement!==ringEl(it.ring))ringEl(it.ring).appendChild(el);
- el.className='object'+(it.id===selected?' selected':'')+(it.style?' '+it.style:'');
+ let el=document.querySelector('#canvas [data-id="'+it.id+'"]');
+ if(!el){el=document.createElement('div');el.dataset.id=it.id;el.addEventListener('pointerdown',down);el.addEventListener('click',e=>{e.stopPropagation();select(it.id)});ringEl(it.ring).appendChild(el)}
+ el.className='object'+(it.id===selected?' selected':'')+(it.style?' '+it.style:'')+(it.binding?' bound':'');
  el.style.left=it.x+'%';el.style.top=it.y+'%';el.style.width=it.w+'%';el.style.height=it.h+'%';el.style.fontSize=it.size+'px';
- if(it.type==='quad'){el.classList.add('quad');el.innerHTML='<strong>'+esc(it.label)+'</strong><span>SELECTED</span>'}
- else if(it.type==='yardage'){const p=it.label.split(' ');el.textContent=p.slice(-1)[0];el.title=it.label}
- else if(it.type==='distance'){el.innerHTML=esc(it.label).replace(' ','<br>')}
- else if(it.type==='line'){el.textContent='';el.setAttribute('aria-label',it.label)}
+ if(it.type==='yardage'){el.textContent=displayText(it);el.title=it.binding||it.label}
+ else if(it.type==='distance'){
+   const val=it.binding?fieldValue(it.binding):it.label.replace(/\\n/g,'<br>');
+   el.innerHTML=it.binding?esc(val):esc(it.label).replace(/\\n/g,'<br>');
+ } else if(it.type==='line'){el.textContent='';el.setAttribute('aria-label','separator')}
+ else if(it.binding){el.textContent=displayText(it)}
  else el.textContent=it.label;
 }
-function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-function renderAll(){document.querySelectorAll('.object').forEach(e=>e.remove());items.forEach(renderItem);updateInspector();updateSummary()}
-function select(id){selected=id;document.querySelectorAll('.object').forEach(e=>e.classList.toggle('selected',e.dataset.id===id));updateInspector()}
-function updateInspector(){
- const it=items.find(o=>o.id===selected),ids=['fLabel','fSize','fX','fY','fW','fH','fStyle','fRing','delete','duplicate'];
- ids.forEach(id=>$(id).disabled=!it);
- $('selectionHelp').textContent=it?'Selected: '+it.id+' · drag on canvas or edit values below.':'Select an object on the canvas to inspect and edit its position and size.';
- if(!it)return;
- $('fLabel').value=it.label;$('fSize').value=it.size;$('fX').value=it.x;$('fY').value=it.y;$('fW').value=it.w;$('fH').value=it.h;$('fStyle').value=it.style;$('fRing').value=it.ring;
+function renderMirror(it){
+ let el=document.querySelector('#mirrorCanvas [data-id="'+it.id+'"]');
+ if(!el){el=document.createElement('div');el.dataset.id=it.id;el.className='mirror-target';el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('drop-ready')});el.addEventListener('dragleave',()=>el.classList.remove('drop-ready'));el.addEventListener('drop',e=>{e.preventDefault();el.classList.remove('drop-ready');const id=e.dataTransfer.getData('text/field');if(id)bindField(it.id,id)});mirrorEl(it.ring).appendChild(el)}
+ el.className='mirror-target '+(it.binding?'bound':'empty')+(it.type==='line'?' line':'');
+ el.style.left=it.x+'%';el.style.top=it.y+'%';el.style.width=it.w+'%';el.style.height=it.h+'%';
+ if(it.binding){const f=fieldMap[it.binding];el.innerHTML='<span><span class="field-name">'+esc(f.id)+'</span><br><span class="field-value">'+esc(String(f.value))+'</span></span>'}
+ else el.innerHTML='<span class="drop-hint">DROP FIELD</span>';
 }
-function updateSummary(){$('summary').textContent=items.length+' objects · '+items.filter(i=>i.ring==='top').length+' top ring · '+items.filter(i=>i.ring==='bottom').length+' bottom ring. Layout is a local draft until exported.'}
-function updateSelected(key,val){const it=items.find(o=>o.id===selected);if(!it)return;if(['size','x','y','w','h'].includes(key)){val=Number(val);if(!Number.isFinite(val))return;val=Math.max(key==='x'||key==='y'?0:key==='size'?6:4,Math.min(key==='x'||key==='y'?100:key==='size'?90:100,val))}it[key]=val;renderItem(it);updateInspector();updateSummary()}
-['fLabel','fSize','fX','fY','fW','fH','fStyle','fRing'].forEach(id=>$(id).addEventListener('change',()=>{const map={fLabel:'label',fSize:'size',fX:'x',fY:'y',fW:'w',fH:'h',fStyle:'style',fRing:'ring'};updateSelected(map[id],$(id).value)}));
-function down(e){if(e.button!==undefined&&e.button!==0)return;e.preventDefault();const id=e.currentTarget.dataset.id;select(id);const it=items.find(o=>o.id===id);drag={id,startX:e.clientX,startY:e.clientY,x:it.x,y:it.y,el:e.currentTarget};e.currentTarget.setPointerCapture(e.pointerId)}
-document.addEventListener('pointermove',e=>{if(!drag)return;const box=ringEl(items.find(o=>o.id===drag.id).ring).getBoundingClientRect();let x=drag.x+(e.clientX-drag.startX)/box.width*100,y=drag.y+(e.clientY-drag.startY)/box.height*100;if(snap){x=Math.round(x/2)*2;y=Math.round(y/2)*2}const it=items.find(o=>o.id===drag.id);it.x=Math.max(0,Math.min(100,x));it.y=Math.max(0,Math.min(100,y));drag.el.style.left=it.x+'%';drag.el.style.top=it.y+'%';updateInspector()});
+function renderAll(){document.querySelectorAll('#canvas .object').forEach(e=>e.remove());document.querySelectorAll('#mirrorCanvas .mirror-target').forEach(e=>e.remove());items.forEach(it=>{renderItem(it);renderMirror(it)});updateInspector();updateFieldCards();updateSummary()}
+function select(id){selected=id;document.querySelectorAll('#canvas .object').forEach(e=>e.classList.toggle('selected',e.dataset.id===id));updateInspector()}
+function updateInspector(){
+ const it=items.find(o=>o.id===selected);
+ ['fSize','fX','fY','fW','fH','delete','duplicate'].forEach(id=>$(id).disabled=!it);
+ $('selectionHelp').textContent=it?'Selected '+it.id+(it.binding?' · '+it.binding:' · no semantic field yet'):'Select an element on the finished UI to edit its position or size.';
+ if(!it)return;
+ $('fSize').value=it.size;$('fX').value=it.x;$('fY').value=it.y;$('fW').value=it.w;$('fH').value=it.h;
+}
+function updateSummary(){
+ const bound=items.filter(i=>i.binding).length;
+ $('summary').textContent=items.length+' UI elements · '+bound+' semantic fields bound · mirror positions follow the finished UI automatically.';
+}
+function updateFieldCards(){
+ document.querySelectorAll('.field-card').forEach(c=>c.dataset.bound=items.some(i=>i.binding===c.dataset.field));
+}
+function bindField(itemId,fieldId){
+ const it=items.find(i=>i.id===itemId);if(!it||!fieldMap[fieldId])return;
+ it.binding=fieldId;renderItem(it);renderMirror(it);updateFieldCards();updateInspector();updateSummary();
+ $('status').textContent=fieldId+' bound to '+it.id+'.';
+}
+function renderFieldLibrary(){
+ $('fieldLibrary').innerHTML=fieldDefs.map(f=>'<div class="field-card" draggable="true" data-field="'+esc(f.id)+'"><strong>'+esc(f.label)+'</strong><span>'+esc(f.id)+' · '+esc(String(f.value))+'</span></div>').join('');
+ document.querySelectorAll('.field-card').forEach(c=>{
+   c.addEventListener('dragstart',e=>{dragField=c.dataset.field;c.classList.add('dragging');e.dataTransfer.setData('text/field',dragField);e.dataTransfer.effectAllowed='copy'});
+   c.addEventListener('dragend',()=>{dragField=null;c.classList.remove('dragging')});
+ });
+}
+function renderTestData(){
+ $('testData').innerHTML=fieldDefs.map(f=>'<label class="field">'+esc(f.id)+'<input data-test-field="'+esc(f.id)+'" value="'+esc(String(f.value))+'"></label>').join('');
+ $('testData').querySelectorAll('input').forEach(i=>i.addEventListener('change',()=>{const f=fieldMap[i.dataset.testField];if(!f)return;f.value=i.value;renderAll()}));
+}
+function updateSelected(key,val){
+ const it=items.find(o=>o.id===selected);if(!it)return;
+ val=Number(val);if(!Number.isFinite(val))return;
+ const mins={size:6,x:0,y:0,w:1,h:1},maxs={size:90,x:100,y:100,w:100,h:100};
+ it[key]=Math.max(mins[key],Math.min(maxs[key],val));renderItem(it);renderMirror(it);updateInspector();updateSummary();
+}
+['fSize','fX','fY','fW','fH'].forEach(id=>$(id).addEventListener('change',()=>updateSelected({fSize:'size',fX:'x',fY:'y',fW:'w',fH:'h'}[id],$(id).value)));
+function down(e){
+ if(e.button!==undefined&&e.button!==0)return;e.preventDefault();
+ const id=e.currentTarget.dataset.id;select(id);const it=items.find(o=>o.id===id);
+ drag={id,startX:e.clientX,startY:e.clientY,x:it.x,y:it.y,el:e.currentTarget};e.currentTarget.setPointerCapture(e.pointerId);
+}
+document.addEventListener('pointermove',e=>{
+ if(!drag)return;
+ const it=items.find(o=>o.id===drag.id);const box=ringEl(it.ring).getBoundingClientRect();
+ it.x=Math.max(0,Math.min(100,drag.x+(e.clientX-drag.startX)/box.width*100));
+ it.y=Math.max(0,Math.min(100,drag.y+(e.clientY-drag.startY)/box.height*100));
+ if(grid){it.x=Math.round(it.x/2)*2;it.y=Math.round(it.y/2)*2}
+ drag.el.style.left=it.x+'%';drag.el.style.top=it.y+'%';renderMirror(it);updateInspector();
+});
 document.addEventListener('pointerup',()=>{if(drag){drag=null;updateSummary()}});
-$('assets').innerHTML=assets.map((a,i)=>'<button class="asset" data-asset="'+i+'">'+esc(a.label)+'</button>').join('');
-$('assets').addEventListener('click',e=>{const b=e.target.closest('[data-asset]');if(!b)return;const a=assets[Number(b.dataset.asset)];const pos={yardage:[50,42],meta:[50,17],quad:[30,32],distance:[30,50],line:[50,50],label:[50,50]};const p=pos[a.type]||[50,50];addItem(a,target,p[0],p[1])});
-document.querySelectorAll('[data-target]').forEach(b=>b.addEventListener('click',()=>{target=b.dataset.target;document.querySelectorAll('[data-target]').forEach(x=>x.classList.toggle('active',x===b))}));
-function loadExistingYardage(){
- items=[];counter=0;stage='yardage';target='top';
+
+function loadYardage(){
+ items=[];counter=0;selected=null;
  const existing=[
-  {type:'yardage',label:'FRONT 352',size:42,w:34,h:15,style:'',ring:'top',x:50,y:70},
-  {type:'yardage',label:'MIDDLE 367',size:45,w:34,h:17,style:'yellow',ring:'top',x:50,y:50},
-  {type:'yardage',label:'BACK 382',size:42,w:34,h:15,style:'',ring:'top',x:50,y:30},
-  {type:'meta',label:'HOLE 1 · PAR 4 (4)',size:12,w:72,h:9,style:'sage',ring:'top',x:50,y:17},
+  {type:'yardage',label:'FRONT',size:42,w:34,h:15,style:'',ring:'top',x:50,y:70,binding:'green.front'},
+  {type:'yardage',label:'MIDDLE',size:45,w:34,h:17,style:'yellow',ring:'top',x:50,y:50,binding:'green.middle'},
+  {type:'yardage',label:'BACK',size:42,w:34,h:15,style:'',ring:'top',x:50,y:30,binding:'green.back'},
+  {type:'meta',label:'HOLE · PAR · NETT',size:12,w:72,h:9,style:'sage',ring:'top',x:50,y:17,binding:null},
   {type:'label',label:'GSB LEFT',size:12,w:22,h:10,style:'sage',ring:'top',x:20,y:20},
-  {type:'distance',label:'355\\n344',size:18,w:22,h:12,style:'sage',ring:'top',x:20,y:35},
+  {type:'distance',label:'355\\n344',size:18,w:22,h:12,style:'sage',ring:'top',x:20,y:35,binding:null},
   {type:'label',label:'GSB RIGHT',size:11,w:22,h:10,style:'sage',ring:'top',x:80,y:20},
-  {type:'distance',label:'355\\n344',size:18,w:22,h:12,style:'sage',ring:'top',x:80,y:35},
+  {type:'distance',label:'355\\n344',size:18,w:22,h:12,style:'sage',ring:'top',x:80,y:35,binding:null},
   {type:'label',label:'FWB LEFT',size:12,w:22,h:10,style:'sage',ring:'top',x:20,y:58.8107},
-  {type:'distance',label:'215\\n198',size:18,w:22,h:12,style:'sage',ring:'top',x:20,y:74.0599},
+  {type:'distance',label:'215\\n198',size:18,w:22,h:12,style:'sage',ring:'top',x:20,y:74.0599,binding:null},
   {type:'label',label:'FWB RIGHT',size:12,w:22,h:10,style:'sage',ring:'top',x:80,y:58.8107},
-  {type:'distance',label:'231\\n209',size:18,w:22,h:12,style:'sage',ring:'top',x:80,y:73.7476},
+  {type:'distance',label:'231\\n209',size:18,w:22,h:12,style:'sage',ring:'top',x:80,y:73.7476,binding:null},
   {type:'line',label:'LEFT VERTICAL SEPARATOR',size:1,w:1,h:58,style:'muted',ring:'top',x:35,y:50},
   {type:'line',label:'RIGHT VERTICAL SEPARATOR',size:1,w:1,h:58,style:'muted',ring:'top',x:65,y:50},
   {type:'line',label:'FRONT / MIDDLE SEPARATOR',size:1,w:30,h:1,style:'muted',ring:'top',x:50,y:60},
@@ -139,45 +224,36 @@ function loadExistingYardage(){
   {type:'label',label:'WIND',size:13,w:24,h:12,style:'outline',ring:'bottom',x:50,y:50},
   {type:'label',label:'BALL ICON',size:11,w:18,h:12,style:'yellow',ring:'bottom',x:50,y:89.974}
  ];
- existing.forEach(a=>addItem(a,a.ring,a.x,a.y));
- renderAll();select(null);updateStatus('Existing yardage layout loaded from the current UiDo layout specification.');
+ existing.forEach(addItem);renderAll();$('status').textContent='Yardage layout loaded. Drag semantic fields onto the mirror targets.';
 }
-function applyStage(s){
- stage=s;document.querySelectorAll('[data-stage]').forEach(b=>b.classList.toggle('active',b.dataset.stage===s));
- if(s==='yardage'){loadExistingYardage();return}
- items=[];counter=0;
- if(s==='shot'){
-  addItem({...assets[3],label:'HOLE 1 · PAR 4'},'top',50,13);
-  [['STRIKE',30,31],['TRAJ',70,31],['START',30,69],['SHAPE',70,69]].forEach(([label,x,y])=>addItem({...assets[4],label},'top',x,y));
-  addItem({...assets[12],label:'WIND'},'bottom',30,29);addItem({...assets[13],label:'LIE'},'bottom',70,29);addItem({...assets[14],label:'CLUB'},'bottom',50,52);addItem({...assets[19],label:'HIT SHOT'},'bottom',50,77);
- }else{
-  addItem({...assets[17],label:'TOTAL +2'},'top',50,38);addItem({...assets[18],label:'NET -1'},'top',50,59);
-  addItem({...assets[15],label:'SCORE 5'},'bottom',50,36);addItem({...assets[16],label:'PUTTS 2'},'bottom',50,55);addItem({...assets[19],label:'NEXT SHOT'},'bottom',50,77);
- }
- renderAll();select(null);target='top';document.querySelectorAll('[data-target]').forEach(b=>b.classList.toggle('active',b.dataset.target==='top'));
+function output(){
+ return {
+  schema:'uido-yardage-field-layout-v1',
+  canvas:{aspectRatio:'9/19.5',rings:[
+   {id:'top',position:'fixed',x:7,y:5.7,width:86,aspectRatio:1},
+   {id:'bottom',position:'fixed',x:7,bottom:5.7,width:86,aspectRatio:1}
+  ]},
+  fields:items.filter(i=>i.binding).map(i=>({uiId:i.id,field:i.binding})),
+  layout:items.map(({id,type,label,size,w,h,style,ring,x,y,binding})=>({id,type,label:binding?undefined:label,size,w,h,style,ring,x,y,binding:binding||null})),
+  testData:Object.fromEntries(fieldDefs.map(f=>[f.id,f.value]))
+ };
 }
-function updateStatus(msg){$('status').textContent=msg;}
-$('loadYardage').onclick=loadExistingYardage;
-$('capture').onclick=async()=>{
+async function exportPackage(){
  const data=output();
- data.capture={capturedAt:new Date().toISOString(),viewport:{width:window.innerWidth,height:window.innerHeight,devicePixelRatio:window.devicePixelRatio||1},canvas:{width:$('canvas').getBoundingClientRect().width,height:$('canvas').getBoundingClientRect().height}};
- data.computedStyles=items.map(it=>{const el=document.querySelector('[data-id="'+it.id+'"]');if(!el)return null;const s=getComputedStyle(el);return {id:it.id,text:el.innerText,fontFamily:s.fontFamily,fontSize:s.fontSize,fontWeight:s.fontWeight,lineHeight:s.lineHeight,letterSpacing:s.letterSpacing,width:s.width,height:s.height,left:s.left,top:s.top,color:s.color,background:s.backgroundColor,border:s.border};}).filter(Boolean);
- const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='uido-layout-capture.json';a.click();URL.revokeObjectURL(url);
- if(window.html2canvas){const shot=await html2canvas($('canvas'),{backgroundColor:null,scale:window.devicePixelRatio||1,useCORS:true});const png=await new Promise(r=>shot.toBlob(r,'image/png'));const purl=URL.createObjectURL(png);const p=document.createElement('a');p.href=purl;p.download='uido-layout-capture.png';p.click();URL.revokeObjectURL(purl);updateStatus('Layout JSON + exact rendered canvas screenshot captured.');}else updateStatus('Layout JSON captured; screenshot library unavailable.');
-};
-$('stages').addEventListener('click',e=>{const b=e.target.closest('[data-stage]');if(b)applyStage(b.dataset.stage)});
-$('gridToggle').onclick=()=>{$('canvas').classList.toggle('show-grid',grid=!grid);$('gridToggle').classList.toggle('active',grid);$('gridToggle').textContent=grid?'Hide coordinate grid':'Show coordinate grid'};
-$('snapToggle').onclick=()=>{snap=!snap;$('snapToggle').classList.toggle('active',snap);$('snapToggle').textContent=snap?'Snap: on (2%)':'Snap 2%'};
-$('delete').onclick=()=>{items=items.filter(o=>o.id!==selected);selected=null;renderAll()};
-$('duplicate').onclick=()=>{const it=items.find(o=>o.id===selected);if(it){const copy={...it,id:undefined,x:Math.min(92,it.x+5),y:Math.min(92,it.y+5)};addItem(copy,copy.ring,copy.x,copy.y)}};
-function output(){return {schema:'uido-ring-layout-v1',canvas:{aspectRatio:'9:19.5',rings:[{id:'top',position:'fixed',x:7,y:5.7,width:86,aspectRatio:1},{id:'bottom',position:'fixed',x:7,bottom:5.7,width:86,aspectRatio:1}]},stage,objects:items.map(({id,...o})=>({...o,id}))}}
-function download(){const blob=new Blob([JSON.stringify(output(),null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='uido-ring-layout.json';a.click();URL.revokeObjectURL(url);$('status').textContent='Layout JSON downloaded.'}
-$('export').onclick=download;$('download').onclick=download;
-$('copy').onclick=async()=>{const data=JSON.stringify(output(),null,2);try{await navigator.clipboard.writeText(data);$('status').textContent='Layout JSON copied.'}catch(e){const ta=document.createElement('textarea');ta.value=data;document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();$('status').textContent=ok?'Layout JSON copied.':'Clipboard unavailable — use Download JSON.'}};
-$('reset').onclick=()=>applyStage(stage);
-$('topContent').addEventListener('click',e=>{if(e.target.id==='topContent')select(null)});
-$('bottomContent').addEventListener('click',e=>{if(e.target.id==='bottomContent')select(null)});
-loadExistingYardage();
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='uido-yardage-field-layout.json';a.click();URL.revokeObjectURL(url);
+ if(window.html2canvas){
+  const shot=await html2canvas($('canvas'),{backgroundColor:null,scale:window.devicePixelRatio||1,useCORS:true});
+  const png=await new Promise(r=>shot.toBlob(r,'image/png'));const purl=URL.createObjectURL(png);const p=document.createElement('a');p.href=purl;p.download='uido-yardage-field-layout.png';p.click();URL.revokeObjectURL(purl);
+  $('status').textContent='Field JSON + finished UI screenshot exported.';
+ }else $('status').textContent='Field JSON exported; screenshot library unavailable.';
+}
+$('capture').onclick=exportPackage;
+$('gridToggle').onclick=()=>{$('canvas').classList.toggle('show-grid',grid=!grid);$('gridToggle').textContent=grid?'Hide grid':'Show grid'};
+$('reset').onclick=loadYardage;
+$('delete').onclick=()=>{if(!selected)return;items=items.filter(i=>i.id!==selected);selected=null;renderAll()};
+$('duplicate').onclick=()=>{const it=items.find(i=>i.id===selected);if(!it)return;const copy={...it,id:'ui-'+(++counter),x:Math.min(92,it.x+5),y:Math.min(92,it.y+5),binding:null};items.push(copy);renderAll();select(copy.id)};
+$('canvas').addEventListener('click',e=>{if(e.target===e.currentTarget||e.target.closest('.ring-content')===e.target)select(null)});
+renderFieldLibrary();renderTestData();loadYardage();
 })();
 </script>
 </body>
