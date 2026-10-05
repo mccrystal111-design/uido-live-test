@@ -1,0 +1,3 @@
+-- UiDo production database foundation
+-- Canonical course model + user profile foundation.
+-- Applied to Supabase project uido-production only after schema review.
