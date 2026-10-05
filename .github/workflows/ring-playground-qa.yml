@@ -1,0 +1,150 @@
+name: Ring Playground Browser QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ring-playground.html'
+      - '.github/workflows/ring-playground-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ring-playground-browser-qa
+  cancel-in-progress: false
+
+jobs:
+  browser-qa:
+    name: Check yardage ring playground in Chromium
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.52.0-noble
+    timeout-minutes: 10
+    steps:
+      - name: Install Playwright Python package
+        run: python -m pip install --disable-pip-version-check playwright==1.52.0
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Serve repository
+        shell: bash
+        run: |
+          python -m http.server 8000 --bind 0.0.0.0 >/tmp/ring-http.log 2>&1 &
+          echo $! >/tmp/ring-http.pid
+          sleep 2
+          curl --fail --silent --show-error http://127.0.0.1:8000/ring-playground.html >/dev/null
+
+      - name: Verify yardage playground in Chromium
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+
+          url = "http://127.0.0.1:8000/ring-playground.html"
+          report = {
+              "url": url,
+              "checks": [],
+              "viewports": [],
+              "console_errors": [],
+              "page_errors": [],
+              "http_failures": [],
+              "failures": [],
+          }
+
+          with sync_playwright() as p:
+              browser = p.chromium.launch()
+              for width, height in [(390, 844), (1440, 900)]:
+                  page = browser.new_page(viewport={"width": width, "height": height})
+                  page.on("console", lambda msg: report["console_errors"].append(msg.text[:1000]) if msg.type == "error" else None)
+                  page.on("pageerror", lambda exc: report["page_errors"].append(str(exc)))
+                  page.on("response", lambda response: report["http_failures"].append({"status": response.status, "url": response.url}) if response.status >= 400 and "favicon" not in response.url else None)
+
+                  response = page.goto(url, wait_until="networkidle", timeout=30000)
+                  record = {
+                      "viewport": f"{width}x{height}",
+                      "http_status": response.status if response else None,
+                  }
+
+                  if not response or response.status != 200:
+                      report["failures"].append(f"{width}x{height}: page did not return HTTP 200")
+                      report["viewports"].append(record)
+                      page.close()
+                      continue
+
+                  try:
+                      page.locator("#loadYardage").wait_for(timeout=5000)
+                      page.wait_for_timeout(500)
+
+                      record["title"] = page.title()
+                      record["stage"] = page.locator("[data-stage].active").inner_text()
+                      record["summary"] = page.locator("#summary").inner_text()
+                      record["canvas_width"] = page.locator("#canvas").bounding_box()["width"]
+                      record["canvas_height"] = page.locator("#canvas").bounding_box()["height"]
+                      record["document_width"] = page.evaluate("document.documentElement.scrollWidth")
+                      record["horizontal_overflow"] = record["document_width"] > width + 1
+
+                      visible_text = page.locator("#canvas").inner_text()
+                      required = [
+                          "HOLE 1 · PAR 4 (4)",
+                          "355",
+                          "344",
+                          "215",
+                          "198",
+                          "231",
+                          "209",
+                          "352",
+                          "367",
+                          "382",
+                          "WIND",
+                          "BALL ICON",
+                      ]
+                      record["required_text"] = {text: text in visible_text for text in required}
+
+                      if record["title"] != "UiDo — Fixed Ring Playground":
+                          report["failures"].append(f"{width}x{height}: unexpected title {record['title']!r}")
+                      if record["stage"] != "YARDAGE":
+                          report["failures"].append(f"{width}x{height}: yardage stage is not active")
+                      for required_text, present in record["required_text"].items():
+                          if not present:
+                              report["failures"].append(f"{width}x{height}: missing required canvas text {required_text!r}")
+                      if record["horizontal_overflow"]:
+                          report["failures"].append(f"{width}x{height}: horizontal overflow")
+                      if record["canvas_width"] <= 0 or record["canvas_height"] <= 0:
+                          report["failures"].append(f"{width}x{height}: canvas has invalid dimensions")
+
+                      page.screenshot(path=f"/tmp/ring-playground-{width}x{height}.png", full_page=True)
+                  except Exception as exc:
+                      report["failures"].append(f"{width}x{height}: browser check failed: {exc!r}")
+
+                  report["viewports"].append(record)
+                  page.close()
+
+              browser.close()
+
+          if report["console_errors"]:
+              report["failures"].append("Browser console errors were reported")
+          if report["page_errors"]:
+              report["failures"].append("Browser page errors were reported")
+          if report["http_failures"]:
+              report["failures"].append("HTTP responses >= 400 were reported")
+
+          Path("/tmp/ring-playground-browser-qa.json").write_text(json.dumps(report, indent=2))
+          print(json.dumps(report, indent=2))
+
+          if report["failures"]:
+              raise SystemExit(1)
+          PY
+
+      - name: Upload ring playground screenshots and report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ring-playground-browser-qa
+          path: /tmp/ring-playground-*
+          if-no-files-found: warn
+          retention-days: 21
