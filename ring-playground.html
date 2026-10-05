@@ -61,7 +61,7 @@ const assets=[
  {type:'yardage',label:'BACK 382',size:22,w:36,h:15,style:''},
  {type:'line',label:'VERTICAL DIVIDER',size:1,w:1,h:58,style:'muted'},
  {type:'line',label:'YARDAGE DIVIDER',size:1,w:30,h:1,style:'muted'},
- {type:'meta',label:'HOLE 1 · PAR 4',size:12,w:72,h:9,style:'sage'},
+ {type:'meta',label:'HOLE 1 · PAR 4 (4)',size:12,w:72,h:9,style:'sage'},
  {type:'quad',label:'STRIKE',size:13,w:42,h:38,style:'outline'},
  {type:'quad',label:'TRAJ',size:13,w:42,h:38,style:'outline'},
  {type:'quad',label:'START',size:13,w:42,h:38,style:'outline'},
@@ -176,7 +176,7 @@ $('copy').onclick=async()=>{const data=JSON.stringify(output(),null,2);try{await
 $('reset').onclick=()=>applyStage(stage);
 $('topContent').addEventListener('click',e=>{if(e.target.id==='topContent')select(null)});
 $('bottomContent').addEventListener('click',e=>{if(e.target.id==='bottomContent')select(null)});
-seed();
+loadExistingYardage();
 })();
 </script>
 </body>
