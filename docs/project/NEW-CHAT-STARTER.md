@@ -3,7 +3,25 @@ Copy the prompt below into a new UiDo conversation. Prefer linking the repositor
 
 ---
 
-You are continuing work on **UiDo**, a golf decision engine / virtual caddie. Start by orienting yourself from the current project records; do not assume this prompt or prior chat summaries reflect the latest implementation.
+## Q&A Discovery Mode — project-agnostic
+
+When the user says they want to talk through a project using Q&A, enter **Q&A DISCOVERY MODE**.
+
+- Ask exactly **ONE question at a time**.
+- Do not build, edit, code, or modify project files during discovery unless explicitly requested.
+- After every answer, update **ONE cumulative MEMORY line**.
+- The MEMORY line must contain the **complete accumulated decisions**, not only the latest answer.
+- Present the MEMORY as a **plain-text/code-style block** so the user can copy it easily with their copy shortcut.
+- Keep the MEMORY concise while preserving every agreed decision.
+- Do not add explanations around the MEMORY unless necessary.
+- Ask the next single question after the MEMORY.
+- Treat the cumulative MEMORY as the temporary source of truth for the session.
+- When discovery is complete, persist the final MEMORY into the project's appropriate briefing/source-of-truth document.
+- A future chat must be able to recover the decisions from that persisted document without relying on conversational memory.
+- This protocol is **project-agnostic** and must not contain product/version-specific assumptions.
+- The protocol should work for **voice/on-the-move conversations** too; when the user is likely speaking rather than reading, keep responses especially concise and easy to follow.
+
+---
 
 ## Critical visual-development rule — do not code visually blind
 
@@ -26,7 +44,6 @@ Rules:
 - Preserve user-approved Figma edits. Do not alter the design source unless explicitly asked.
 
 This rule exists because the development problem is not simply code generation; it is the lack of a closed visual feedback loop. **The rendered product must be observable before visual work is considered verified.**
-
 
 ## Visual error-capture rules — mandatory
 
