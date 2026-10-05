@@ -1,0 +1,48 @@
+name: Yardage v4 Visual QA
+
+on:
+  push:
+    paths:
+      - 'overstone/yardage-v4.html'
+      - '.github/workflows/yardage-v4-visual-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  visual-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm init -y >/dev/null 2>&1 && npm install playwright@1.55.0 >/dev/null 2>&1
+      - run: npx playwright install --with-deps chromium >/dev/null 2>&1
+      - name: Start server
+        run: |
+          python3 -m http.server 4173 --directory . >/tmp/uido-server.log 2>&1 &
+          echo $! > /tmp/uido-server.pid
+      - name: Render at exact Figma viewport
+        run: |
+          node <<'NODE'
+          const { chromium } = require('playwright');
+          (async()=>{
+            const browser=await chromium.launch({headless:true});
+            const page=await browser.newPage({viewport:{width:360,height:780},deviceScaleFactor:1});
+            await page.goto('http://127.0.0.1:4173/overstone/yardage-v4.html?visual=1',{waitUntil:'networkidle'});
+            await page.evaluate(async()=>{if(document.fonts) await document.fonts.ready});
+            await page.screenshot({path:'yardage-v4.png',fullPage:false});
+            const boxes=await page.evaluate(()=>{
+              const ids=['.top-ring','.bottom-ring','.top-inner','.bottom-inner','.left-separator','.right-separator','.front-middle','.middle-back','.wind-control','.wind-label','.ball-label'];
+              return Object.fromEntries(ids.map(sel=>{const r=document.querySelector(sel).getBoundingClientRect();return [sel,{x:r.x,y:r.y,width:r.width,height:r.height}]}));
+            });
+            console.log(JSON.stringify(boxes,null,2));
+            await browser.close();
+          })();
+          NODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yardage-v4-screenshot
+          path: yardage-v4.png
