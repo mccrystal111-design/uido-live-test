@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>UiDo — Live Yardage</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600&display=swap');
+:root{--ivory:#F4F1E6;--ink:#101110;--yellow:#E9C928;--sage:#3F4B3B;--ring:rgba(63,75,59,.42);--line:rgba(16,17,16,.18)}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;min-height:100%;background:var(--ivory);color:var(--ink);font-family:Oxanium,system-ui,sans-serif}
+body{overflow:hidden}
+.screen{position:relative;width:min(100vw,360px);height:100dvh;min-height:600px;max-height:780px;margin:0 auto;background:var(--ivory);overflow:hidden}
+.ring{position:absolute;left:7%;width:86%;aspect-ratio:1;border:1px solid rgba(16,17,16,.24);border-radius:20px;background:var(--ivory);overflow:hidden}
+.ring:before{content:"";position:absolute;inset:2%;border:1.5px solid var(--ring);border-radius:50%;pointer-events:none}
+.top{top:5.7%}.bottom{bottom:5.7%}
+.content{position:absolute;inset:5%;border-radius:50%;overflow:hidden}
+.meta{position:absolute;left:14%;right:14%;top:17%;text-align:center;color:var(--sage);font-size:12px;line-height:1;letter-spacing:.06em;white-space:nowrap}
+.yardages{position:absolute;left:34%;width:32%;top:28%;height:45%;display:flex;flex-direction:column;align-items:center;justify-content:space-between;text-align:center;font-variant-numeric:tabular-nums}
+.yardage{font-size:42px;line-height:.95;font-weight:500;min-height:15%;display:flex;align-items:center;justify-content:center}
+.yardage.middle{font-size:45px;color:var(--yellow)}
+.rule{height:1px;width:30%;background:var(--line);flex:0 0 auto}
+.bunker{position:absolute;color:var(--sage);text-align:center;font-variant-numeric:tabular-nums}
+.bunker.left{left:8%;width:24%}.bunker.right{right:8%;width:24%}
+.bunker.gs{top:20%}.bunker.fw{top:59%}
+.bunker-label{font-size:11px;line-height:1;letter-spacing:.06em;margin-bottom:10px}
+.bunker-values{font-size:18px;line-height:1.25;white-space:pre-line}
+.divider-v{position:absolute;top:34%;height:30%;width:1px;background:var(--line)}
+.divider-v.left{left:35.5%}.divider-v.right{left:64.5%}
+.divider-h{position:absolute;left:35%;width:30%;height:1px;background:var(--line)}
+.divider-h.one{top:40%}.divider-h.two{top:60%}
+.page-dots{position:absolute;left:0;right:0;bottom:5%;display:flex;justify-content:center;gap:7px;z-index:4}
+.page-dot{width:5px;height:5px;border-radius:50%;background:rgba(16,17,16,.22)}
+.page-dot.active{background:var(--sage)}
+.bottom-control{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);display:flex;justify-content:center}
+.control{width:24%;aspect-ratio:1;border:1px solid var(--ring);border-radius:50%;background:transparent;color:var(--sage);display:grid;place-items:center;font-size:13px;letter-spacing:.08em}
+.ball{position:absolute;right:8%;bottom:7%;width:18%;aspect-ratio:1;border:0;background:transparent;color:var(--yellow);display:grid;place-items:center;font-size:18px}
+.gps{position:absolute;left:8%;bottom:7%;border:0;background:transparent;color:var(--sage);font-size:11px;letter-spacing:.06em}
+.hidden{display:none!important}
+.status{position:fixed;left:8px;top:8px;z-index:20;padding:4px 6px;border-radius:5px;background:rgba(244,241,230,.9);font:10px Arial,sans-serif;color:var(--sage);pointer-events:none}
+.course-data{position:fixed;left:-12000px;top:0;width:390px;height:844px;opacity:0;pointer-events:none;border:0}
+@media(min-width:700px){.screen{border-left:1px solid #e1ded4;border-right:1px solid #e1ded4}}
+</style>
+</head>
+<body>
+<iframe id="courseData" class="course-data" src="index.html" title="UiDo course data" aria-hidden="true" tabindex="-1"></iframe>
+<div class="screen" id="screen">
+  <section class="ring top" aria-label="Live yardages and bunker distances">
+    <div class="content" id="topContent">
+      <div class="meta" id="holeMeta">HOLE 1 · PAR 4 (4)</div>
+      <div class="yardages" aria-label="Front middle back yardages">
+        <div class="yardage" id="yardageBack">—</div>
+        <div class="rule"></div>
+        <div class="yardage middle" id="yardageMiddle">—</div>
+        <div class="rule"></div>
+        <div class="yardage" id="yardageFront">—</div>
+      </div>
+      <div class="bunker gs left"><div class="bunker-label">GSB LEFT</div><div class="bunker-values" id="gsLeft">—\n—</div></div>
+      <div class="bunker gs right"><div class="bunker-label">GSB RIGHT</div><div class="bunker-values" id="gsRight">—\n—</div></div>
+      <div class="bunker fw left"><div class="bunker-label">FWB LEFT</div><div class="bunker-values" id="fwLeft">—\n—</div></div>
+      <div class="bunker fw right"><div class="bunker-label">FWB RIGHT</div><div class="bunker-values" id="fwRight">—\n—</div></div>
+      <div class="divider-v left"></div><div class="divider-v right"></div>
+      <div class="divider-h one"></div><div class="divider-h two"></div>
+      <div class="page-dots" id="pageDots" aria-label="Bunker pages"></div>
+    </div>
+  </section>
+  <section class="ring bottom" aria-label="Wind and GPS controls">
+    <div class="content">
+      <div class="bottom-control"><button class="control" id="windButton" type="button">WIND</button></div>
+      <button class="gps" id="gpsButton" type="button">GPS</button>
+      <button class="ball" id="ballButton" type="button" aria-label="Ball">●</button>
+    </div>
+  </section>
+</div>
+<div class="status" id="status">Waiting for GPS…</div>
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const frame=$('courseData');
+  let position=null,watchId=null,activeHole=1,page=0,pages=[];
+  const rad=Math.PI/180;
+  function metres(a,b){if(!a||!b)return NaN;const R=6371008.8,p1=a[0]*rad,p2=b[0]*rad,dp=(b[0]-a[0])*rad,dl=(b[1]-a[1])*rad;const h=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;return 2*R*Math.asin(Math.min(1,Math.sqrt(h)))}
+  function yards(m){return Number.isFinite(m)&&m>=0?String(Math.round(m*1.093613298)):'—'}
+  function source(){try{return frame.contentWindow.UIDO_OVERSTONE_SOURCE_HOLES[String(activeHole)]||null}catch(e){return null}}
+  function coursePosition(d){const p=d&&d.line_of_play&&d.line_of_play[0];return p?[p[1],p[0]]:null}
+  function playerPosition(d){const tee=coursePosition(d);if(position&&tee&&metres(position,tee)<2500)return position;return tee}
+  function setText(id,a,b){$(id).textContent=(a||'—')+'\\n'+(b||'—')}
+  function classifyBunker(b,green){return metres(b.anchor_gps||b.front_gps,green)<=60*0.9144?'greenside':'fairway'}
+  function rebuildPages(d,pos){
+    const green=d&&d.green_fmb&&d.green_fmb.middle;if(!d||!green||!pos){pages=[];renderDots();return}
+    const all=(d.bunkers||[]).filter(b=>b.front_gps&&b.back_gps).map(b=>({...b,zone:classifyBunker(b,green)}));
+    const gsL=all.filter(b=>b.zone==='greenside'&&b.side==='left').sort((a,b)=>metres(pos,a.front_gps)-metres(pos,b.front_gps));
+    const gsR=all.filter(b=>b.zone==='greenside'&&b.side==='right').sort((a,b)=>metres(pos,a.front_gps)-metres(pos,b.front_gps));
+    const fwL=all.filter(b=>b.zone==='fairway'&&b.side==='left').sort((a,b)=>metres(pos,a.front_gps)-metres(pos,b.front_gps));
+    const fwR=all.filter(b=>b.zone==='fairway'&&b.side==='right').sort((a,b)=>metres(pos,a.front_gps)-metres(pos,b.front_gps));
+    const count=Math.max(gsL.length,gsR.length,fwL.length,fwR.length,1);
+    pages=Array.from({length:count},(_,i)=>({gsL:gsL[i]||null,gsR:gsR[i]||null,fwL:fwL[i]||null,fwR:fwR[i]||null}));
+    page=Math.min(page,pages.length-1);renderDots();
+  }
+  function renderDots(){
+    $('pageDots').innerHTML=pages.map((_,i)=>'<span class="page-dot'+(i===page?' active':'')+'"></span>').join('');
+  }
+  function render(){
+    const d=source(),pos=playerPosition(d);if(!d||!pos)return;
+    $('holeMeta').textContent='HOLE '+activeHole+' · PAR '+d.par+' ('+(d.nettPar??d.par)+')';
+    $('yardageFront').textContent=yards(metres(pos,d.green_fmb.front));
+    $('yardageMiddle').textContent=yards(metres(pos,d.green_fmb.middle));
+    $('yardageBack').textContent=yards(metres(pos,d.green_fmb.back));
+    rebuildPages(d,pos);
+    const p=pages[page]||{};
+    setText('gsLeft',p.gsL?yards(metres(pos,p.gsL.front_gps)):'—',p.gsL?yards(metres(pos,p.gsL.back_gps)):'—');
+    setText('gsRight',p.gsR?yards(metres(pos,p.gsR.front_gps)):'—',p.gsR?yards(metres(pos,p.gsR.back_gps)):'—');
+    setText('fwLeft',p.fwL?yards(metres(pos,p.fwL.front_gps)):'—',p.fwL?yards(metres(pos,p.fwL.back_gps)):'—');
+    setText('fwRight',p.fwR?yards(metres(pos,p.fwR.front_gps)):'—',p.fwR?yards(metres(pos,p.fwR.back_gps)):'—');
+    $('status').textContent=position?'GPS live':'Course position preview';
+  }
+  function changePage(delta){if(pages.length<2)return;page=(page+delta+pages.length)%pages.length;render()}
+  let startX=0,startY=0;
+  $('topContent').addEventListener('touchstart',e=>{const t=e.touches[0];startX=t.clientX;startY=t.clientY},{passive:true});
+  $('topContent').addEventListener('touchend',e=>{const t=e.changedTouches[0],dx=t.clientX-startX,dy=t.clientY-startY;if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy))changePage(dx<0?1:-1)},{passive:true});
+  $('gpsButton').addEventListener('click',()=>{if(navigator.geolocation&&watchId===null)startGPS()});
+  function startGPS(){watchId=navigator.geolocation.watchPosition(p=>{position=[p.coords.latitude,p.coords.longitude];render()},e=>{$('status').textContent='GPS unavailable';},{enableHighAccuracy:true,maximumAge:3000,timeout:12000});}
+  $('windButton').addEventListener('click',()=>{$('status').textContent='Wind control ready'});
+  $('ballButton').addEventListener('click',()=>{$('status').textContent='Shot/ball control ready'});
+  frame.addEventListener('load',()=>{
+    try{
+      const doc=frame.contentDocument,header=doc.getElementById('holeHeaderMeta');
+      if(header)new MutationObserver(()=>{const m=header.textContent.match(/Hole\\s+(\\d+)/i);if(m&&Number(m[1])!==activeHole){activeHole=Number(m[1]);page=0;render()}}).observe(header,{childList:true,subtree:true,characterData:true});
+    }catch(e){}
+    render();
+    startGPS();
+  });
+  setInterval(render,2000);
+})();
+</script>
+</body>
+</html>
