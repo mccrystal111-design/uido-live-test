@@ -66,15 +66,77 @@ We should not constrain the Core database around Hawk's reduced feature set.
 
 We do not need to finalize subscription/entitlement schema while defining the Core customer database. First define the complete Core model; then determine how Hawk maps onto it and add access/entitlement controls where necessary.
 
-## Questions not yet answered
+### Q11 — Multiple rounds on the same day
+**Decision:** YES.
 
-### Q11 — Core data-model versioning
-**Status:** OPEN.
+A customer can play multiple rounds or sessions on the same day. Each completed round/session is captured separately with its own start/end boundaries and unique Round ID.
 
-Question asked: should the Core data model/schema itself be versioned so schema changes are traceable, migrations are safer, and the evolution of Core is auditable?
+### Q12 — Course and course-version linkage
+**Decision:** YES.
 
-### Other open database questions
-Only genuine gaps should be added here. Previously settled UiDo product/UI/statistics decisions should be retrieved from the existing project documentation rather than re-asked during this Q&A.
+Each round gets a unique, permanent **Round ID** and stores the **canonical Course ID** and the **Course Version ID** used for that round. New rounds can use the current course version; historical rounds retain the version used when they were played.
+
+### Q13 — Practice rounds and practice sessions
+**Decision:** YES.
+
+Core should distinguish practice activity from rounds intended as scored/official golf. Practice sessions can be fully logged, including shots and results, without being treated as official handicap rounds.
+
+This also supports practice such as playing only three holes or repeatedly hitting shots from a particular position. The customer should be able to review those practice shots and their results.
+
+WHS/GHIN treatment of official rounds remains governed by the relevant external rules/integration and should not be hard-coded into the basic Core data model.
+
+### Q14 — Course-independent sessions
+**Decision:** DEFERRED.
+
+The normal round flow is course-linked because the course is needed for yardages and decision support. A course-independent practice/session mode may be useful later, particularly for offline or specialized practice, but no final database requirement was set.
+
+### Q15 — Round start GPS
+**Decision:** YES / implicit.
+
+When a round is started and the app has GPS, the round should capture the start location as part of the round record.
+
+### Q16 — Manual course selection / GPS fallback / offline mode
+**Decision:** YES for manual selection; offline mode remains a product requirement to investigate.
+
+When GPS is working, the nearest appropriate course can be presented for confirmation. The customer must also be able to manually select a course if GPS is unavailable or incorrect.
+
+The round/session should retain how the course was selected.
+
+A paid/offline-capable product may later allow course data to be stored locally so the app can operate without a live data connection. This is primarily a product/storage decision rather than a blocker for the Core customer schema.
+
+### Q17 — Tee selection and round conditions
+**Decision:** YES — log the customer's selections.
+
+Core must store the tee selected for each round because tee selection affects handicap calculations and course rating/slope. Relevant course/tee rating information should remain associated with the round so the historical context is preserved.
+
+### Q18 — Device information
+**Decision:** YES.
+
+Core should record the device/context used to capture a round or session. This can support product improvement, understanding transitions between phone/watch/other devices, customer research, and future device/integration opportunities.
+
+Device information should be treated as useful customer/product telemetry and retained appropriately.
+
+### Q19 — Customer preferences/settings
+**Decision:** YES — keep preferences/settings conceptually separate from historical player data.
+
+Customer preferences may change independently of historical golf records. Examples include units, notifications, preferred/default tees and other app settings.
+
+A default tee preference can be stored, but the customer's actual tee choice for each round must be recorded independently. UiDo should not dictate which tee a customer plays based solely on history; conditions, season, course availability, competitions and personal practice goals can change the appropriate choice.
+
+### Q20 — Equipment history
+**Decision:** YES — retain history, not just the current bag.
+
+Core should store equipment changes over time so UiDo can eventually help customers understand whether improvement is associated with equipment changes, practice, or player development.
+
+### Q21 — Club inventory and carry distances
+**Decision:** YES.
+
+Core should store the customer's club inventory and typical/known carry distances. This is part of the data available to UiDo's decision engine.
+
+### Q22 — Core data-model versioning
+**Status:** OPEN / not yet decided.
+
+Question: should the Core data model/schema itself be versioned so schema changes are traceable, migrations are safer, and the evolution of Core is auditable?
 
 ## Working rules for future Q&A
 
@@ -83,3 +145,4 @@ Only genuine gaps should be added here. Previously settled UiDo product/UI/stati
 3. If a question depends on an existing UiDo decision, retrieve/check the project source of truth first.
 4. Record each confirmed answer in this log.
 5. Keep Core comprehensive; define Hawk as a subset/variant after the Core model is established.
+6. Where the user has made a product decision rather than a database decision, record the database implication without unnecessarily forcing a schema decision.
