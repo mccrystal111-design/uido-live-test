@@ -57,6 +57,24 @@ Figma/design source -> implementation -> actual rendered page -> screenshot at t
 
 Do not claim visual QA is green without inspecting actual rendered pixels. Preserve approved Figma decisions and do not invent requirements from experimental playgrounds.
 
+## Product-to-APK development path — 2026-10-06
+
+The intended long-term Hawk product is an Android APK. The agreed development path is to **design in Figma first, build/test the UI in HTML, then package the same application into Android when ready**, rather than building a throwaway website and rebuilding the product natively.
+
+This is an additive architecture decision:
+- Figma is the visual source of truth.
+- HTML is the initial development/testing/rendering layer.
+- The application/data/decision logic should be structured so it can be reused when packaged for Android.
+- Separate HTML screens/pages are preferred for patch safety and version control, with shared application logic/styles where appropriate rather than duplicated standalone applications.
+- The existing approved Yardage page remains a protected/proven starting point; do not rebuild it merely to establish the architecture.
+- Future Android-specific capabilities (for example deeper sensors, background GPS, Bluetooth/ANT+, Garmin/launch-monitor integrations, native permissions or lifecycle behavior) may require an Android bridge/plugin layer. Do not assume every browser capability will transfer unchanged.
+- Candidate Android packaging approach is a web-to-Android bridge such as Capacitor; this is an implementation direction, not a final locked technology decision.
+- The intended workflow is: **Figma -> approved visual -> HTML implementation -> rendered screenshot/pixel check -> refine -> approved screen -> Android packaging/integration**.
+- Do not build the Hawk front page directly in HTML before its Figma design has been agreed.
+- Do not delete, replace or reinterpret the approved Yardage work in order to follow this architecture.
+
+The goal is to avoid a rebuild while still allowing fast visual iteration and real-device testing before APK packaging.
+
 ## Mandatory first-session checklist
 
 1. Read PROJECT-BRIEF, TOOL-AND-ACCESS-REGISTER, CURRENT-STATE, ACTION-REGISTER, DEPENDENCIES, DECISION-LOG and latest SESSION-HANDOVER.
