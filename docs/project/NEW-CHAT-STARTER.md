@@ -2,6 +2,27 @@
 
 Use this file as the orientation point for new UiDo chats. Prefer the repository source of truth over conversational memory.
 
+## Product brand — 2026-10-06
+
+**Kite is now the single base product brand.** The previous separate Kite/Hawk brand concept is superseded.
+
+Kite is one golf app for adult and junior players, with multiple player profiles within the same family/account. A parent should be able to switch between players and track a child's shots/rounds easily; the child can also use the same app independently.
+
+Kite is deliberately not golf-specific or explicitly child-branded. The brand can support a wider visual/product language around:
+- aerial perspective / looking down from a kite, naturally connecting to GPS and course mapping;
+- movement and direction;
+- play, freedom and curiosity;
+- the kite's tether as a metaphor for parent/child connection and shared activity.
+
+**Product principle:** do not create a separate "kids mode" as a separate product identity. Players are first-class objects and the UI adapts to the active player.
+
+Conceptual product relationship:
+**Family/account -> Players -> Rounds -> Shots**
+
+The canonical course database remains independent of the brand/UI and is consumed by Kite. Course data, player identity, round/session data and presentation remain separate building blocks.
+
+Do not reintroduce Hawk as a separate customer-facing brand unless a later decision explicitly reverses DEC-014 in the Decision Log.
+
 ## UiDo Core User Database — current baseline
 
 UiDo Core is the complete customer/data model. Hawk is a simplified product variant of Core, not a separate customer identity/database.
@@ -57,9 +78,9 @@ Figma/design source -> implementation -> actual rendered page -> screenshot at t
 
 Do not claim visual QA is green without inspecting actual rendered pixels. Preserve approved Figma decisions and do not invent requirements from experimental playgrounds.
 
-## Product-to-APK development path — 2026-10-06
+## Product-to-APK development path - 2026-10-06
 
-The intended long-term Hawk product is an Android APK. The agreed development path is to **design in Figma first, build/test the UI in HTML, then package the same application into Android when ready**, rather than building a throwaway website and rebuilding the product natively.
+The intended long-term product is an Android APK. The agreed development path is to **design in Figma first, build/test the UI in HTML, then package the same application into Android when ready**, rather than building a throwaway website and rebuilding the product natively.
 
 This is an additive architecture decision:
 - Figma is the visual source of truth.
@@ -70,7 +91,7 @@ This is an additive architecture decision:
 - Future Android-specific capabilities (for example deeper sensors, background GPS, Bluetooth/ANT+, Garmin/launch-monitor integrations, native permissions or lifecycle behavior) may require an Android bridge/plugin layer. Do not assume every browser capability will transfer unchanged.
 - Candidate Android packaging approach is a web-to-Android bridge such as Capacitor; this is an implementation direction, not a final locked technology decision.
 - The intended workflow is: **Figma -> approved visual -> HTML implementation -> rendered screenshot/pixel check -> refine -> approved screen -> Android packaging/integration**.
-- Do not build the Hawk front page directly in HTML before its Figma design has been agreed.
+- Do not build the front page directly in HTML before its Figma design has been agreed.
 - Do not delete, replace or reinterpret the approved Yardage work in order to follow this architecture.
 
 The goal is to avoid a rebuild while still allowing fast visual iteration and real-device testing before APK packaging.
