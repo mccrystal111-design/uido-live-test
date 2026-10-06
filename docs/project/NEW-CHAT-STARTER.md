@@ -122,3 +122,31 @@ When Kieron says “crack on”, that is the explicit handoff from conversation 
 Read docs/project/chat.md before visually precise work. Never mix Figma absolute coordinates with CSS child-relative coordinates. Green automation is not equivalent to visual approval.
 
 Now inspect the current source of truth and continue with the highest-priority unblocked action.
+
+## Kite front screen — 2026-10-06
+
+The Kite front/home screen is now moving from the orange concept into the approved **navy + white** brand colourway.
+
+### Brand treatment
+- Primary identity: deep navy background with white logo/icon treatment.
+- Approved logo direction: the thin white hex golf icon based on the exact Google strategy SVG path, paired with the Sora ExtraLight lowercase `kite` wordmark with the i-dot removed.
+- The hex icon sits immediately to the left of `kite`, with its visible height matched to the lowercase `k`.
+- Orange remains a possible secondary/accent colour; it is not the default front-screen background.
+
+### Front-screen content
+Remove the temporary positioning tags/descriptors from the orange concept:
+- `GOLF GPS`
+- `PLAY WITH CLARITY`
+- `EST. 2026`
+
+These are deliberately omitted so the brand does not become dated or unnecessarily restrictive.
+
+The front-screen actions are exactly:
+- **Start Round** — primary action
+- **Scores** — scoring/history
+- **Stats** — player performance
+
+### Golf-course graphic
+The orange concept's golf-course image is visual reference only. Rebuild the front screen in Figma as editable layers rather than placing the supplied screenshot as a flattened UI. Explore a striking **navy/white golf-course treatment**; the course graphic is a major visual element of the screen and should be treated as designed artwork, not just a recoloured photograph.
+
+Do not begin HTML implementation of the front page until the Figma design is agreed.
