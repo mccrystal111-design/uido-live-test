@@ -50,4 +50,16 @@ No GitHub Actions were manually rerun for this database build.
 ## Project control
 
 Use docs/project/NEW-CHAT-STARTER.md as the new-chat orientation point and read the Core database baseline/Q&A before further Core database work.
+## Hawk → Core integration — 2026-10-06
 
+Hawk is now connected to the UiDo Core customer-data foundation at the first round/shot persistence layer.
+
+- Starting a Hawk round creates a permanent `uido_rounds` record.
+- The round stores the authenticated customer, course/course-version/tee IDs when supplied, round type, course-selection method, start time, start GPS when available, and device/app context.
+- Entering a hole creates the corresponding `uido_round_holes` record on demand.
+- Score changes sync to the Core round-hole record.
+- Record Shot syncs the shot to `uido_shots`, including GPS when available, timestamp, Hawk source identity, raw local shot data and device/app context.
+- LocalStorage remains as a local cache; it is not the Core source of truth once a Core round is active.
+- No GitHub Actions were manually rerun.
+
+Next implementation checkpoint: validate the live Hawk → Supabase round/shot path, then build the Hawk front page on top of the real Core-backed customer/session model.
