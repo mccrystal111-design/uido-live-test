@@ -1,168 +1,85 @@
 # UiDo — New Chat Starter
-Copy the prompt below into a new UiDo conversation. Prefer linking the repository and reading the current source-of-truth files rather than relying on old chat memory.
 
----
+Use this file as the orientation point for new UiDo chats. Prefer the repository source of truth over conversational memory.
 
-## Q&A Discovery Mode — project-agnostic
+## UiDo Core User Database — current baseline
 
-When the user says they want to talk through a project using Q&A, enter **Q&A DISCOVERY MODE**.
+UiDo Core is the complete customer/data model. Hawk is a simplified product variant of Core, not a separate customer identity/database.
 
-- Ask exactly **ONE question at a time**.
-- Do not build, edit, code, or modify project files during discovery unless explicitly requested.
-- After every answer, update **ONE cumulative MEMORY line**.
-- The MEMORY line must contain the **complete accumulated decisions**, not only the latest answer.
-- Present the MEMORY as a **plain-text/code-style block** so the user can copy it easily with their copy shortcut.
-- Keep the MEMORY concise while preserving every agreed decision.
-- Do not add explanations around the MEMORY unless necessary.
-- Ask the next single question after the MEMORY.
-- Treat the cumulative MEMORY as the temporary source of truth for the session.
-- When discovery is complete, persist the final MEMORY into the project's appropriate briefing/source-of-truth document.
-- A future chat must be able to recover the decisions from that persisted document without relying on conversational memory.
-- This protocol is **project-agnostic** and must not contain product/version-specific assumptions.
-- The protocol should work for **voice/on-the-move conversations** too; when the user is likely speaking rather than reading, keep responses especially concise and easy to follow.
+The live Core customer-data foundation is now in Supabase:
 
----
+- uido_profiles — permanent Auth-linked customer identity/profile, home course and lifecycle/retention state.
+- uido_user_preferences — mutable customer preferences/settings.
+- uido_handicap_records — historical handicap records for UiDo Practice Handicap and future WHS/GHIN/other providers.
+- uido_equipment — equipment history.
+- uido_clubs — club inventory and carry-distance history.
+- uido_rounds — permanent Round IDs, course + course-version linkage, tee selection, round/session type, timestamps, start GPS, course-selection method and device context.
+- uido_round_holes — hole-by-hole scores/putts.
+- uido_shots — available UiDo shot flow: GPS, club, lie, wind, trajectory, shape, outcome, Free Aim/decision data, source data and UiDo interpretation.
+- uido_external_records — provider-neutral external records for future Garmin, TrackMan, WHS, GHIN and other integrations, retaining original payloads separately from UiDo interpretation.
 
-## Critical visual-development rule — do not code visually blind
+Core principles already agreed:
+- One permanent UiDo identity follows the customer through Hawk to UiDo.
+- Core should capture as much useful player data as reasonably available; products decide what to display.
+- Historical data should be retained rather than overwritten when relevant.
+- Practice sessions are first-class records and may include partial-hole or repeated-position practice.
+- Each round has a permanent Round ID and retains the course version used.
+- Tee selection and relevant rating/slope context belong to the round.
+- Device context is useful for product improvement and future device integrations.
+- Preferences are separate from historical player activity; defaults do not dictate actual round choices.
+- Equipment and club/carry history should be retained.
+- External source records should preserve source identity and original payload; UiDo interpretation is separate.
+- Approximately five-year recoverability after account retirement, followed by anonymization, is the current direction and remains subject to final legal/privacy implementation.
+- Entitlement/subscription schema is deferred until the Core model is established.
+- Exact Core schema-versioning strategy remains open.
 
-UiDo has repeatedly suffered from visual translation problems when the assistant interprets a design, writes HTML/CSS, then relies on the user to discover visual errors. **Do not repeat that workflow.**
+Source-of-truth files:
+- docs/project/UIDO-CORE-DATABASE-BASELINE.md
+- docs/project/Q&A-UIDO-USER-DATABASE-CORE.md
+- database/schema/uido-core-user-data-v1.sql
 
-For any visually precise UI work:
+Do not re-ask settled Core decisions. If a database question depends on an existing UiDo product/UI/statistics decision, retrieve the project source of truth first.
 
-**Figma/design source → implementation → actual rendered page → screenshot at the target viewport → assistant inspects the rendered screenshot → correct implementation → render/screenshot again → only then present the live link.**
+## Q&A Discovery Mode
 
-Rules:
-- The approved Figma/design is the **visual source of truth**.
-- Existing code/data/behaviour is the functional source of truth unless the task explicitly changes it.
-- Do not blindly patch visual problems based only on assumptions about CSS geometry.
-- Do not claim visual QA is green unless the actual rendered output has been captured and inspected.
-- Use Playwright/browser rendering to capture the real page at the required viewport where available.
-- Automated tests (DOM assertions, geometry checks, console checks, etc.) are useful but **are complementary to visual inspection, not a substitute for it**.
-- If actual rendered pixels cannot be accessed, say so plainly and do not claim visual verification.
-- Do not send a live link for a visually sensitive change as though it has been visually approved when the rendered result has not actually been inspected.
-- Avoid repeated cycles of “interpret → patch → user discovers another visual error”. If the rendered result is wrong, fix the source rather than layering patches onto an already-misaligned implementation.
-- Preserve user-approved Figma edits. Do not alter the design source unless explicitly asked.
+When Kieron explicitly starts a Q&A:
+- Ask exactly one genuine unresolved question at a time.
+- Do not re-ask settled decisions.
+- For voice, keep questions concise.
+- Record confirmed decisions in the appropriate Q&A source-of-truth file.
+- When the Q&A is complete, persist the final decisions to the project docs.
 
-This rule exists because the development problem is not simply code generation; it is the lack of a closed visual feedback loop. **The rendered product must be observable before visual work is considered verified.**
+## Visual-development rule
 
-## Visual error-capture rules — mandatory
+For visually precise UI work:
 
-The detailed visual error capture is also recorded in **[chat.md](./chat.md)**. Read it before doing visually precise work.
+Figma/design source -> implementation -> actual rendered page -> screenshot at target viewport -> inspect screenshot -> correct -> render again -> inspect again -> only then present the live link.
 
-### Coordinate systems must never be mixed
+Do not claim visual QA is green without inspecting actual rendered pixels. Preserve approved Figma decisions and do not invent requirements from experimental playgrounds.
 
-Figma `get_design_context` positions are normally **absolute within the full design frame**. CSS children inside a positioned ring/container are **relative to that parent**.
+## Mandatory first-session checklist
 
-Before writing CSS, explicitly convert every positioned child:
+1. Read PROJECT-BRIEF, TOOL-AND-ACCESS-REGISTER, CURRENT-STATE, ACTION-REGISTER, DEPENDENCIES, DECISION-LOG and latest SESSION-HANDOVER.
+2. For Core/database work, read the Core database baseline and Q&A log first.
+3. Verify actual tool/access availability; docs are not proof of current access.
+4. Inspect relevant current code, recent commits, open PRs and workflow runs.
+5. State the verified baseline and highest-priority unblocked action.
+6. Continue existing implementation; do not rebuild proven work without evidence.
+7. Do not manually rerun/dispatch GitHub Actions unless needed. Normal triggers may run.
+8. Do not ask Kieron to repeat information that is documented and still verified.
+9. Update relevant project records at meaningful checkpoints.
 
-```
-html_left = figma_x - parent_x
-html_top  = figma_y - parent_y
-```
+## Voice handoff — “Crack on”
 
-Do not copy Figma frame coordinates directly into child CSS.
+When Kieron says “crack on”, that is the explicit handoff from conversation to execution.
 
-The Yardage v3 failure is the reference example:
+- Stop conversationally responding and begin the agreed work.
+- Do not ask another question unless genuinely blocked by missing information/access.
+- Use available tools and continue until a meaningful checkpoint or genuine blocker.
+- If Kieron says “stop”, stop the current line of work immediately.
 
-- Figma top ring origin = `25,44`
-- Horizontal separator Figma position = `146,174`
-- Correct child position = `121,130`
-- Vertical separator Figma position = `128,140`
-- Correct child position = `103,96`
+## Visual error capture
 
-The original implementation copied some absolute values into the relative container, creating systematic 25px/44px errors.
+Read docs/project/chat.md before visually precise work. Never mix Figma absolute coordinates with CSS child-relative coordinates. Green automation is not equivalent to visual approval.
 
-### Visual QA must capture the actual pixels
-
-A page passing Playwright/DOM/geometry tests is **not sufficient** to call a visual build correct.
-
-For visually sensitive work:
-
-1. Render the actual HTML at the exact target viewport.
-2. Capture the rendered screenshot/artifact.
-3. Inspect the screenshot itself.
-4. Compare it with the Figma reference at the same dimensions.
-5. Check source coordinates against rendered coordinates for critical geometry.
-6. If possible, use an overlay/pixel-diff or equivalent measured comparison rather than eyeballing alone.
-7. Diagnose the coordinate/reference-origin error before changing CSS.
-8. Re-render and inspect again after the correction.
-9. Only then provide the live URL.
-
-**Green automation ≠ visually correct UI.**
-
-### Do not invent requirements during visual translation
-
-Experimental playground fields are not automatically product requirements.
-
-Do not infer extra behaviour or controls (for example wind heading, wind speed/mph, GPS controls or replacement graphics) unless the current approved source explicitly defines them.
-
-The approved Figma design is the visual source of truth. The screenshot is a QA reference, not an implementation asset.
-
-### Preserve approved visual decisions
-
-Do not casually alter an element because it is convenient to implement.
-
-In particular, preserve user-approved geometry, spacing, separators, ring sizes, hierarchy, colours, dots and controls unless the user explicitly requests a change.
-
-If a visual mismatch is found, make the smallest change justified by the measured source geometry. Do not enter a blind “nudge until it looks right” patch cycle.
-
-### Before sending a visually sensitive result
-
-The assistant must be able to say, truthfully:
-
-- the page rendered at the target viewport;
-- the actual rendered screenshot was inspected;
-- important geometry was compared against the source;
-- known visual mismatches were resolved;
-- the live link is being supplied only after that verification.
-
-If actual rendered pixels are unavailable, say so plainly and do not claim visual verification.
-
-**Start here**
-- Project control pack: https://github.com/mccrystal111-design/uido-live-test/blob/main/docs/project/README.md
-- Project brief: https://github.com/mccrystal111-design/uido-live-test/blob/main/docs/project/PROJECT-BRIEF.md
-- Tool & access register (mandatory): https://github.com/mccrystal111-design/uido-live-test/blob/main/docs/project/TOOL-AND-ACCESS-REGISTER.md
-- Current state: https://github.com/mccrystal111-design/uido-live-test/blob/main/docs/project/CURRENT-STATE.md
-- Action register: https://github.com/mccrystal111-design/uido-live-test/blob/main/docs/project/ACTION-REGISTER.md
-- Dependencies: https://github.com/mccrystal111-design/uido-live-test/blob/main/docs/project/DEPENDENCIES.md
-- Decisions: https://github.com/mccrystal111-design/uido-live-test/blob/main/docs/project/DECISION-LOG.md
-- Handover: https://github.com/mccrystal111-design/uido-live-test/blob/main/docs/project/SESSION-HANDOVER.md
-- Live dashboard: https://mccrystal111-design.github.io/uido-live-test/project-dashboard.html
-- Repository: https://github.com/mccrystal111-design/uido-live-test
-- Figma: https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI
-
-**Mandatory first-session checklist**
-1. Read the project brief, tool/access register, current state, action register, dependencies, decision log and latest handover.
-2. Inspect the actual tools available in this session. Verify repository access, the needed connected services, and any required browser/runtime access. Treat the register as a guide, not proof that access still works.
-3. If a tool is unavailable or a permission is missing, record the exact gap and use a clearly labelled alternative only when suitable. Never claim Playwright/browser QA or a successful test without actual execution evidence.
-4. Inspect the relevant current code, recent commits, open PRs and workflow runs. Treat project docs as summaries, not proof that code currently behaves as described.
-5. State the verified baseline, next unblocked action, dependencies and acceptance criteria.
-6. Continue from the existing implementation; don't rebuild proven work without evidence.
-7. Preserve the Real-Golfer Trigger Principle: live-product workflows must map to real golfer actions/events or justified support processes, and QA/development must not leak into live-user behaviour.
-8. Configured GitHub Actions may run normally on their triggers. Use manual dispatch/reruns when useful, not by habit.
-9. Kieron owns product scope, visual approval and product trade-offs. Make focused implementation decisions within approved constraints and report evidence honestly.
-10. Task checklist
-     1. Understand - Kieron will explain what you want to achieve. You’ll ask focused questions about the intended behaviour, existing components, constraints and anything that’s ambiguous.
-      2. Confirm - summarise my understanding of the task, what I intend to change, what must stay untouched and how we’ll verify the result.
-      3. Wait for your approval - I won't start implementing until you confirm that I've understood and you're happy for me to proceed.
-      4. Execute and verify - Once approved, I’ll get on with it, preserve proven work, avoid unapproved scope changes and report clearly what I actually changed and tested.
-11. Do not ask Kieron to repeat information already documented and still verified. Ask only for missing owner decisions or access that genuinely requires him.
-12. At the end, update relevant project records and leave a concise handover with what changed, what was verified, what remains uncertain and the next action. Update the tool/access register whenever a tool, access route, permission or process changes.
-
-
-## Voice conversation handoff — “Crack on”
-
-UiDo work may be discussed through Voice mode. Treat voice as a normal project conversation, but use the following explicit handoff convention:
-
-- Kieron may talk through decisions, questions, ideas and context conversationally.
-- When Kieron says **“crack on”**, treat that as the explicit end-of-conversation handoff.
-- **“Crack on” means: stop conversationally responding and begin the agreed work.**
-- Do not ask another question, offer another suggestion, or add a conversational closing after “crack on” unless genuinely blocked by missing information or access that cannot be resolved independently.
-- Do not interpret the absence of further speech as permission to keep the conversation going. The explicit phrase is the handoff signal.
-- Once handed off, use the available tools and continue the task until reaching a meaningful checkpoint or genuine blocker.
-- If no user action is required, do not interrupt Kieron just to say that work has started.
-- If Kieron says **“stop”**, immediately stop the current work/line of action and wait for further instruction.
-
-This convention exists specifically for Voice mode so project conversations can feel natural without the assistant continually trying to have the last word.
-
-Now inspect the current source of truth and continue with the highest-priority unblocked action. Do not ask Kieron to repeat information already documented.
+Now inspect the current source of truth and continue with the highest-priority unblocked action.
