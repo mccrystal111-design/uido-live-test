@@ -83,6 +83,12 @@ When Kieron explicitly starts a Q&A:
 - Treat this as a mandatory gate for every visual change, including small icons, colours, spacing, z-order/layering, typography, overlays and controls.
 - Preserve the approved Figma source of truth; do not use an HTML screenshot as a substitute for the Figma design check.
 
+## Visual QA shorthand
+
+**QA: Figma + browser pixel-check.**
+
+Use this as the standing shorthand for the mandatory visual QA rule: render and inspect the actual pixels in Figma, and in the browser/HTML system when one exists. Never claim a visual check without actually inspecting the rendered result.
+
 ## Visual-development rule
 
 For visually precise UI work:
