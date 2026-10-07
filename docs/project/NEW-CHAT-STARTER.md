@@ -70,6 +70,19 @@ When Kieron explicitly starts a Q&A:
 - Record confirmed decisions in the appropriate Q&A source-of-truth file.
 - When the Q&A is complete, persist the final decisions to the project docs.
 
+## Mandatory visual QA rule
+
+**Every visual change must be pixel checked in the actual system where it will be used before it is presented as approved.**
+
+- **Figma:** render the changed frame/component at the intended viewport/scale and inspect the actual rendered pixels, not just the layer tree, coordinates or properties.
+- **Browser HTML:** render the actual page in the target browser/viewport and inspect the screenshot/pixels.
+- If a visual change exists in both Figma and HTML, **both must be checked**.
+- A structural check, green automation run, successful build, or matching coordinates is **not** visual approval.
+- Do not say a change is “pixel checked”, “visually checked”, “QA green” or equivalent unless the rendered result has actually been inspected.
+- If the rendered result is wrong, correct it and render/check again before presenting it.
+- Treat this as a mandatory gate for every visual change, including small icons, colours, spacing, z-order/layering, typography, overlays and controls.
+- Preserve the approved Figma source of truth; do not use an HTML screenshot as a substitute for the Figma design check.
+
 ## Visual-development rule
 
 For visually precise UI work:
