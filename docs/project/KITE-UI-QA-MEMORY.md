@@ -152,3 +152,10 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 - The mobile Kite Scores screen stays limited to the 20 most recent ended and retained rounds.
 - Older rounds remain stored and could potentially be accessed through a Kite website rather than adding archive controls to the mobile screen.
 - Website-based archive access is an idea to explore, not a confirmed website scope or implementation decision. Keep older round data retained and associated with the player's account/profile so a future web experience can retrieve it.
+
+
+### Saved scorecard review behaviour — 2026-10-09
+
+- Tapping a saved round opens its scorecard in **Review mode**, showing the recorded hole-by-hole scores and relevant statistics for that specific round.
+- The saved data is not editable by default. Changes are possible only after the player explicitly selects **Edit Scorecard**.
+- Preserve the round's own persistent ID so review or edits always target the correct round.
