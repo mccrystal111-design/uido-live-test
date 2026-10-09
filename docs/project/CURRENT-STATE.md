@@ -50,16 +50,44 @@ No GitHub Actions were manually rerun for this database build.
 ## Project control
 
 Use docs/project/NEW-CHAT-STARTER.md as the new-chat orientation point and read the Core database baseline/Q&A before further Core database work.
-## Hawk → Core integration — 2026-10-06
+## Execution checkpoint — 2026-10-09
 
-Hawk is now connected to the UiDo Core customer-data foundation at the first round/shot persistence layer.
+### Yardage field-mirror playground — browser QA passed
 
-- Starting a Hawk round creates a permanent `uido_rounds` record.
-- The round stores the authenticated customer, course/course-version/tee IDs when supplied, round type, course-selection method, start time, start GPS when available, and device/app context.
-- Entering a hole creates the corresponding `uido_round_holes` record on demand.
-- Score changes sync to the Core round-hole record.
-- Record Shot syncs the shot to `uido_shots`, including GPS when available, timestamp, Hawk source identity, raw local shot data and device/app context.
-- LocalStorage remains as a local cache; it is not the Core source of truth once a Core round is active.
-- No GitHub Actions were manually rerun.
+The existing `ring-playground.html` has been tested in Chromium at **390×844** and **1440×900**. The successful run verified:
+- 18 finished-UI objects and 18 mirror targets at both viewports.
+- Semantic binding for `green.middle`.
+- Changing the test value from 367 to 401 leaves layout geometry unchanged.
+- Moving the bound UI element updates the mirror target to matching layout percentages.
+- JSON field/layout export and finished-UI PNG export both download; the JSON uses the `uido-yardage-field-layout-v1` schema.
+- No browser console errors, page errors or HTTP failures; no horizontal overflow.
 
-Next implementation checkpoint: validate the live Hawk → Supabase round/shot path, then build the Hawk front page on top of the real Core-backed customer/session model.
+Evidence: [Ring Playground Browser QA run](https://github.com/mccrystal111-design/uido-live-test/actions/runs/37912037681). This is functional browser QA, not a visual-design approval or pixel-level Figma review.
+
+The playground code also fixes the font-size inspector mapping. The QA test now measures the target after scrolling it into view, avoiding the earlier false drag failure caused by stale viewport coordinates.
+
+### Core persistence prototype — syntax fixed, end-to-end path not yet proven
+
+`hawk.html` is a **legacy prototype filename**, not a decision to restore Hawk as a separate customer-facing brand. Kite remains the current product brand.
+
+- The inline script previously contained literal backslash-n sequences in JavaScript code, which broke parsing of the auth and persistence logic. The line breaks and CSV export newline escape have been corrected.
+- A dedicated static workflow now extracts the inline JavaScript and runs `node --check`. It passed: [Core Prototype Static QA](https://github.com/mccrystal111-design/uido-live-test/actions/runs/37911801415).
+- The code contains Supabase Auth/profile, round, round-hole and shot persistence operations, but the live database path has **not** been demonstrated end to end.
+
+Verified production state:
+- Only the `uido-production` Supabase project is visible through the current connection; no separate QA project is available in the current access.
+- `uido_profiles`, `uido_rounds`, `uido_round_holes` and `uido_shots` each currently contain zero rows.
+- The Overstone revision `v1-osm-source` is still `draft`; public read policies expose course versions/holes/features/tees only when the version is `published`.
+- `uido_rounds.course_id` and `course_version_id` are required UUID foreign keys, while the prototype presents these fields as optional free text. This UI/schema contract must be reconciled before a reliable round can be created.
+
+Do not insert synthetic customer/round/shot records into production. Track the blocked end-to-end test in [CORE-001, issue #9](https://github.com/mccrystal111-design/uido-live-test/issues/9).
+
+### Overstone course packet — real fixture inspected, draft retained
+
+The committed source-normalized and canonical files and live Supabase revision were compared. The canonical file contains 159 physical features and 18 hole routes, but course-level validation remains incomplete due to satellite registration and hole-feature association. The committed canonical file's type/provenance conventions do not fully match the current canonical builder's output conventions. The course-packet spec now records these gaps and the acceptance tests required before publishing.
+
+See [Course Packet Specification, real fixture review](../architecture/COURSE-PACKET-SPEC.md#11-real-overstone-fixture-review--2026-10-09). Do not publish or regenerate over the existing draft until the producer/input/contract mismatch is resolved.
+
+### Next action
+
+**DATA-001 / CRS-002:** reconcile the committed canonical Overstone model with its pinned input and current builder, then implement the fixture acceptance checks. Preserve the existing Yardage and AGNOSTIC45 baselines. Core end-to-end validation remains blocked until an isolated QA environment and a published course fixture are available.
