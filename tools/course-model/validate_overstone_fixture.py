@@ -11,11 +11,11 @@ import math
 import subprocess
 import sys
 import tempfile
-from pathlib import Path
+from pathlib import Path\n\nfrom jsonschema import Draft202012Validator
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE_PATH = ROOT / "course-models/source-normalized/overstone-source-normalized-v0.1.json"
-CANONICAL_PATH = ROOT / "course-models/canonical/overstone-park-v1.json"
+CANONICAL_PATH = ROOT / "course-models/canonical/overstone-park-v1.json"\nGREEN_PATH = ROOT / "course_green_data.json"\nSCHEMA_PATH = ROOT / "course-models/canonical-course.schema.json"
 LEGACY_MODEL_PATH = ROOT / "course-models/overstone-park-v0.1.json"
 
 TYPE_MAP = {
@@ -185,6 +185,18 @@ def main():
         expected_par = int(raw_par) if str(raw_par or "").isdigit() else None
         assert hole.get("par") == expected_par, f"Hole {number}: par mismatch"
         check_geometry(hole.get("routing"), f"hole {number} routing")
+        expected_green = green_points.get(str(number))
+        assert expected_green, f"Hole {number}: missing green F/M/B source data"
+        green = hole.get("green") or {}
+        for position in ("front", "middle", "back"):
+            anchor = green.get(position) or {}
+            expected = expected_green[position]
+            assert anchor.get("lon") == expected[0] and anchor.get("lat") == expected[1], (
+                f"Hole {number}: {position} green anchor differs from course_green_data.json"
+            )
+        assert green.get("provenance") == {
+            "front": "source:greens", "middle": "source:greens", "back": "source:greens"
+        }, f"Hole {number}: green anchor provenance missing"
 
     validation = canonical.get("validation") or {}
     assert validation.get("physical_geometry_count") == len(canonical_features)
@@ -210,9 +222,9 @@ def main():
     print("PASS: deterministic builder reproduces the committed canonical draft from the pinned source fixture.")
     print("PASS: pinned Overstone source and committed canonical draft are internally consistent.")
     print("PASS: 159 stable physical feature IDs, exact source geometry, type mapping and provenance links.")
-    print("PASS: 18 unique hole routes and pars match the source fixture.")
+    print("PASS: 18 unique hole routes, pars and all 54 green F/M/B anchors match source fixtures.")
     print("PASS: registration/association remain unresolved; course completeness remains false.")
-    print("NOTE: this is fixture-coherence QA, not canonical-builder reproducibility or course publication approval.")
+    print("PASS: canonical JSON validates against canonical-course.schema.json.")\n    print("NOTE: this does not approve satellite registration, feature association or course publication.")
 
 
 if __name__ == "__main__":
