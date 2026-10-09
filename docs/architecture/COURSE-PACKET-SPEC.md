@@ -209,3 +209,44 @@ These are observed schema gaps, not a rejection of PR #3. Before approval, use r
 - [ ] Decide how canonical `course_version_id` maps to packet `course_revision` and how revisions remain immutable.
 - [ ] Define a validator report format and decide which conditions are fatal versus warnings.
 - [ ] Only after fixture and loader tests pass, decide package archive/container and storage/delivery topology.
+
+## 11. Real Overstone fixture review — 2026-10-09
+
+**Status: fixture inspected; contract and packet are not approved.** This section records observations from the committed files and live Supabase data. It does not certify the geometry as ready for golfers.
+
+### Evidence inspected
+
+- Source-normalized fixture: `course-models/source-normalized/overstone-source-normalized-v0.1.json`
+  - 177 source features: 124 Polygon, 35 LineString and 18 Point.
+  - Types: 31 BUNKER, 1 DRIVING_RANGE, 17 FAIRWAY, 20 GREEN, 18 HOLE, 18 PIN, 30 TEE, 23 ROUGH, 17 PATH and 2 WATER.
+- Committed canonical model: `course-models/canonical/overstone-park-v1.json`
+  - 159 course-scoped physical features: 124 Polygon, 17 LineString and 18 Point.
+  - The 18 hole routes are stored separately on the hole records; the 18 PIN source features are represented as `target` physical features.
+  - All 18 hole records have routing and are marked `CONFIRMED`, while course-level validation correctly remains incomplete with unresolved `satellite_registration` and `hole_feature_association`.
+- Live Supabase `uido-production`:
+  - Revision `v1-osm-source` remains `draft`.
+  - 18 hole rows, 159 feature rows and 159 feature-provenance rows exist for the revision.
+  - Public read policies expose course versions, holes, features and tees only when the version is `published`. The draft revision is therefore not a valid public runtime fixture.
+
+### Contract gaps to resolve before publishing
+
+1. **Builder/output drift:** the committed canonical JSON uses lower-case feature types and fields such as `provenance`, `verification_status` and `quality_status`. The current `tools/course-model/build_canonical_course.py` normalizes feature types to upper case and emits `status`, `source_refs` and `association_evidence`. Reconcile the intended producer, input fixture and regeneration command before regenerating or replacing the committed canonical model.
+2. **Feature type vocabulary:** define and test the intentional mapping from source types (`TEE`, `PIN`, `HOLE`, etc.) to canonical types (`teeing_area`, `target`, hole-level `routing`, etc.). Do not let case changes or aliases arise implicitly.
+3. **Provenance contract:** the canonical model carries source identifiers inside a `provenance` object, while the current builder also emits `source_refs` and `association_evidence`. Choose one required, validated representation and preserve feature-level source links.
+4. **Validation semantics:** distinguish a hole route being present/confirmed from the association of physical features to that hole being confirmed. Course completeness must remain false while registration and feature association are unresolved.
+5. **Package artefact:** `course-packages/schema/uido-course-package-v0.1.json` is currently a sample-shaped JSON document with null build timestamp/checksum, not a validated generated package or a JSON Schema. Do not treat it as a publishable packet.
+6. **Geometry schema:** `course-models/canonical-course.schema.json` accepts any object for geometry and free-form feature type strings. It does not yet enforce valid GeoJSON structure, geometry/type compatibility, coordinate ranges or required feature-level provenance.
+
+### Fixture acceptance tests to implement
+
+- Build from a pinned, committed source fixture and record the exact producer commit.
+- Assert 18 unique hole numbers, 18 route geometries, explicit par/unknown states and course-level completeness status.
+- Assert stable physical feature IDs and the expected 159-feature count for this exact Overstone fixture; do not hard-code this count as a universal course rule.
+- Assert the documented source-to-canonical type mapping and geometry types, including the separation of hole routing from physical features.
+- Validate finite WGS84 coordinates in longitude/latitude order, non-empty valid geometry and plausible course bounds.
+- Assert every physical feature has a resolvable source/provenance link or an explicit manually-authored reason.
+- Assert unresolved registration/association prevents publication; only publish after a machine-readable validation report passes or records an explicitly approved exception.
+- Round-trip the validated model through the intended course-packet builder and verify manifest file hashes, revision identity and offline-required assets.
+- Test Supabase visibility with an anonymous/authenticated read: draft revisions must remain hidden; only published revisions and their intended public data should be readable.
+
+**Next DATA-001 action:** reconcile the committed canonical JSON with the current builder and pinned input fixture, then implement the acceptance checks above. Do not change the live revision to `published` or modify the renderer until this gate passes.
