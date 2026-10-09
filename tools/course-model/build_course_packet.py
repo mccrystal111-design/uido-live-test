@@ -94,6 +94,22 @@ def verified_feature_refs(canonical: dict, hole_number: int) -> list[str]:
     return sorted(set(refs))
 
 
+def is_publishable(canonical: dict, expected_holes: int) -> bool:
+    validation = canonical.get("validation") or {}
+    holes = canonical.get("holes", [])
+    included_numbers = sorted(int(h["hole_number"]) for h in holes)
+    return (
+        canonical.get("provenance", {}).get("stage") == "enriched_candidate"
+        and validation.get("course_complete") is True
+        and not validation.get("unresolved_features")
+        and not validation.get("conflicts")
+        and len(included_numbers) == expected_holes
+        and included_numbers == list(range(1, expected_holes + 1))
+        and bool(canonical.get("geometry", {}).get("features"))
+        and all(h.get("routing") and h.get("routing_provenance") and h.get("green") for h in holes)
+    )
+
+
 def packet_files(canonical: dict, registry: dict) -> dict[str, dict]:
     course = canonical.get("course") or {}
     course_id = str(course["id"])
@@ -109,15 +125,7 @@ def packet_files(canonical: dict, registry: dict) -> dict[str, dict]:
 
     hole_records = sorted(canonical.get("holes", []), key=lambda h: int(h["hole_number"]))
     included_numbers = [int(h["hole_number"]) for h in hole_records]
-    publishable = (
-        stage == "enriched_candidate"
-        and validation.get("course_complete") is True
-        and not validation.get("unresolved_features")
-        and not validation.get("conflicts")
-        and len(included_numbers) == expected_holes
-        and set(included_numbers) == set(range(1, expected_holes + 1))
-        and all(h.get("routing") and h.get("routing_provenance") and h.get("green") for h in hole_records)
-    )
+    publishable = is_publishable(canonical, expected_holes)
 
     course_json = {
         "course_id": course_id,
@@ -230,7 +238,7 @@ def packet_files(canonical: dict, registry: dict) -> dict[str, dict]:
     files["validation/report.json"] = {
         "canonical_validation": validation,
         "packet_validation": {
-            "schema_valid": True,
+            "canonical_schema_valid": True,\n            "packet_structure_checked": True,
             "publishable": publishable,
             "canonical_stage": stage,
             "expected_holes": expected_holes,
@@ -263,12 +271,8 @@ def build_packet(
 
     files = packet_files(canonical, registry)
     validation = canonical.get("validation") or {}
-    publishable = (
-        stage == "enriched_candidate"
-        and validation.get("course_complete") is True
-        and not validation.get("unresolved_features")
-        and not validation.get("conflicts")
-    )
+    expected_holes_for_course = int(registry.get("courses", {}).get(canonical["course"]["id"], {}).get("holes") or 0)
+    publishable = is_publishable(canonical, expected_holes_for_course)
     if not publishable and not allow_draft:
         raise ValueError("Course is not publishable; pass --draft to build a QA-only packet")
 
