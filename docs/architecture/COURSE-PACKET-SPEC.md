@@ -228,6 +228,18 @@ These are observed schema gaps, not a rejection of PR #3. Before approval, use r
   - 18 hole rows, 159 feature rows and 159 feature-provenance rows exist for the revision.
   - Public read policies expose course versions, holes, features and tees only when the version is `published`. The draft revision is therefore not a valid public runtime fixture.
 
+### Additional reproducibility finding — 2026-10-09
+
+A deterministic comparison of the committed files now confirms that the canonical draft's 159 physical features match the pinned source-normalized fixture exactly by stable ID, geometry and the explicit type map. The 18 canonical hole routes also match the 18 source `HOLE` geometries and pars. The draft's unresolved registration/association gates remain intact.
+
+However, **fixture coherence is not builder reproducibility**:
+
+- `course-models/overstone-park-v0.1.json` contains 18 green-anchor-only hole records; its physical feature buckets and unassigned-feature list are empty. It is not a geometry-bearing input for reproducing the 159-feature canonical draft.
+- `tools/course-model/build_canonical_course.py` expects the generated `uido.course.v0.2` model. `.github/workflows/validate-canonical-v2.yml` currently acquires fresh Overpass data and builds that intermediate model at runtime; it does not rebuild from the committed source-normalized fixture.
+- The committed canonical file uses lower-case canonical type labels and its own provenance/quality fields, while the current builder normalizes types to upper case and emits a different feature-field shape. These may be valid separate stages, but the contract and adapter boundary are not explicit.
+
+A deterministic fixture-acceptance script now checks the pinned source-normalized file against the committed canonical draft, including IDs, exact geometry, type mapping, source provenance, coordinate ranges, 18 hole routes/par values and the requirement to keep course completeness false. It runs in `tools/course-model/validate_overstone_fixture.py` via `.github/workflows/overstone-fixture-qa.yml`. **That workflow does not run the canonical builder, call external providers, write Supabase data or publish a course.**
+
 ### Contract gaps to resolve before publishing
 
 1. **Builder/output drift:** the committed canonical JSON uses lower-case feature types and fields such as `provenance`, `verification_status` and `quality_status`. The current `tools/course-model/build_canonical_course.py` normalizes feature types to upper case and emits `status`, `source_refs` and `association_evidence`. Reconcile the intended producer, input fixture and regeneration command before regenerating or replacing the committed canonical model.
@@ -249,4 +261,4 @@ These are observed schema gaps, not a rejection of PR #3. Before approval, use r
 - Round-trip the validated model through the intended course-packet builder and verify manifest file hashes, revision identity and offline-required assets.
 - Test Supabase visibility with an anonymous/authenticated read: draft revisions must remain hidden; only published revisions and their intended public data should be readable.
 
-**Next DATA-001 action:** reconcile the committed canonical JSON with the current builder and pinned input fixture, then implement the acceptance checks above. Do not change the live revision to `published` or modify the renderer until this gate passes.
+**Next DATA-001 action:** make the canonical producer reproducible from a pinned committed source artifact and explicitly document the source-normalized → canonical adapter/type map. The new fixture-coherence QA is a first guardrail, not proof that the builder reproduces the artifact. Do not change the live revision to `published` or modify the renderer until reproducibility, geometry validity, registration and association gates pass.
