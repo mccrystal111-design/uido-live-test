@@ -11,7 +11,7 @@ from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import TimeoutError as PlaywrightTimeoutError, sync_playwright
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -106,6 +106,8 @@ MOCK_SUPABASE = r"""
 
 def main() -> None:
     errors = []
+    console_errors = []
+    failed_requests = []
     dialogs = []
     handler = partial(SimpleHTTPRequestHandler, directory=str(ROOT))
     server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
@@ -118,15 +120,33 @@ def main() -> None:
             browser = playwright.chromium.launch()
             page = browser.new_page(viewport={"width": 390, "height": 844})
             page.on("pageerror", lambda error: errors.append(str(error)))
+            page.on("console", lambda message: console_errors.append(message.text) if message.type == "error" else None)
+            page.on("requestfailed", lambda request: failed_requests.append({"url": request.url, "failure": request.failure}))
             page.on("dialog", lambda dialog: (dialogs.append(dialog.message), dialog.accept()))
             page.route(
-                "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
+                "**/npm/@supabase/supabase-js@2*",
                 lambda route: route.fulfill(status=200, content_type="application/javascript", body=MOCK_SUPABASE),
             )
             page.goto(url, wait_until="load")
-            page.wait_for_function(
-                "document.getElementById('hawkApp') && !document.getElementById('hawkApp').hidden"
-            )
+            try:
+                page.wait_for_function(
+                    "document.getElementById('hawkApp') && !document.getElementById('hawkApp').hidden"
+                )
+            except PlaywrightTimeoutError as exc:
+                diagnostic = page.evaluate("""() => ({
+                    supabasePresent: !!window.supabase,
+                    mockPresent: !!window.__coreMock,
+                    appHidden: document.getElementById('hawkApp')?.hidden,
+                    authMessage: document.getElementById('authMessage')?.textContent,
+                    authGateDisplay: document.getElementById('authGate')?.style.display
+                })""")
+                raise AssertionError(json.dumps({
+                    "reason": "mock authentication did not reveal the app",
+                    "diagnostic": diagnostic,
+                    "page_errors": errors,
+                    "console_errors": console_errors,
+                    "failed_requests": failed_requests
+                }, indent=2)) from exc
 
             # A slug/blank value must fail locally; no round insert may be attempted.
             page.locator("#startRoundButton").click()
