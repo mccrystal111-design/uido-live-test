@@ -21,7 +21,8 @@
         "provider": "UiDo existing green F/M/B dataset",
         "source": "course_green_data.json"
       }
-    ]
+    ],
+    "stage": "source_only_draft"
   },
   "geometry": {
     "scope": "course",
