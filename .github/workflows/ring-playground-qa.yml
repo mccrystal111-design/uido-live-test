@@ -158,7 +158,7 @@ jobs:
                               out="/tmp/ring-playground-export.png"
                               download.save_as(out)
                               data=Path(out).read_bytes()
-                              if not data.startswith(b"\\x89PNG\\r\\n\\x1a\\n"):
+                              if not data.startswith(b"\x89PNG\r\n\x1a\n"):
                                   report["failures"].append(f"{width}x{height}: exported screenshot is not a PNG")
                               elif len(data)<1000:
                                   report["failures"].append(f"{width}x{height}: exported screenshot is unexpectedly small")
