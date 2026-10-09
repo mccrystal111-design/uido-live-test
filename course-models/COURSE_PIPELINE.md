@@ -95,3 +95,15 @@ Both stages use `uido.course.canonical.v2`, but they have distinct provenance la
 `.github/workflows/validate-canonical-v2.yml` is a **manual live-acquisition candidate workflow**: it fetches fresh Overpass data to exercise the candidate path. It is not a downstream consumer of the pinned source fixture and must not overwrite the source-only draft or publish a course. Deterministic acceptance tests use committed fixtures and do not call external providers.
 
 Promotion to a publishable course revision is a separate, explicit step after geometry validation, measured satellite registration, association review, packet generation and RLS/package QA all pass.
+
+
+## Packet generation and promotion
+
+`tools/course-model/build_course_packet.py` converts a canonical model into a local packet directory containing:
+- `manifest.json` with producer commit/version, coverage, coordinate reference, units and per-file SHA-256/byte sizes.
+- `course.json`, course-scoped `features.geojson`, one `holes/NN.geojson` file per included hole, `provenance/sources.json` and `validation/report.json`.
+- Input artifact hashes for the canonical model, course registry and (for the source-only draft) the pinned normalized fixture and green F/M/B source.
+
+An incomplete model cannot be packaged without the explicit `--draft` flag. That flag only permits a QA artefact; it does not publish, update Supabase or mark the course complete. A packet is publishable only from the `enriched_candidate` stage after the canonical completeness gates, full hole coverage, route provenance and green anchors all pass. Promotion to a published immutable revision is still a separate, not-yet-implemented step.
+
+The deterministic `overstone-fixture-qa.yml` workflow tests fixture/schema agreement, completeness gates, packet manifest hashes and the explicit draft-only rule. It does not fetch live sources or write to Supabase.
