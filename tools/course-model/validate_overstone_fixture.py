@@ -11,11 +11,15 @@ import math
 import subprocess
 import sys
 import tempfile
-from pathlib import Path\n\nfrom jsonschema import Draft202012Validator
+from pathlib import Path
+
+from jsonschema import Draft202012Validator
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE_PATH = ROOT / "course-models/source-normalized/overstone-source-normalized-v0.1.json"
-CANONICAL_PATH = ROOT / "course-models/canonical/overstone-park-v1.json"\nGREEN_PATH = ROOT / "course_green_data.json"\nSCHEMA_PATH = ROOT / "course-models/canonical-course.schema.json"
+CANONICAL_PATH = ROOT / "course-models/canonical/overstone-park-v1.json"
+GREEN_PATH = ROOT / "course_green_data.json"
+SCHEMA_PATH = ROOT / "course-models/canonical-course.schema.json"
 LEGACY_MODEL_PATH = ROOT / "course-models/overstone-park-v0.1.json"
 
 TYPE_MAP = {
@@ -224,7 +228,8 @@ def main():
     print("PASS: 159 stable physical feature IDs, exact source geometry, type mapping and provenance links.")
     print("PASS: 18 unique hole routes, pars and all 54 green F/M/B anchors match source fixtures.")
     print("PASS: registration/association remain unresolved; course completeness remains false.")
-    print("PASS: canonical JSON validates against canonical-course.schema.json.")\n    print("NOTE: this does not approve satellite registration, feature association or course publication.")
+    print("PASS: canonical JSON validates against canonical-course.schema.json.")
+    print("NOTE: this does not approve satellite registration, feature association or course publication.")
 
 
 if __name__ == "__main__":
