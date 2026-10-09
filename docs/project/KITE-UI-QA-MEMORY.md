@@ -361,3 +361,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - Fairways-hit percentage and greens-in-regulation (GIR) percentage should follow the shared **Front 9 / Back 9 / Both** filter, consistent with the other Performance breakdowns.
 - Calculate each percentage from the eligible holes for the selected nine(s) where the relevant data is recorded; do not count missing data as misses or zeros.
+
+
+### Putting stats use the nine filter — 2026-10-09
+
+- Average putts per hole and average putts per round should follow the shared **Front 9 / Back 9 / Both** filter. When Front 9 or Back 9 is selected, calculate the putting figures from the relevant played holes/round segments only.
+- Keep putting statistics contextual rather than treating low putt counts alone as proof of good putting. Missing putting data remains missing and is not treated as zero.
