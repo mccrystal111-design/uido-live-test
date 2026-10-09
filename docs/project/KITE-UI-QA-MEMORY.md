@@ -285,3 +285,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - Remember the player's last selected round-length filter (9 holes / 18 holes / Both) where persistence is available, rather than resetting to a fixed default each time.
 - If no saved preference exists yet, choose a sensible initial default; this preference must not affect stored round data or the calculation rules.
+
+
+### Scoring breakdown by hole par — 2026-10-09
+
+- In the Stats Scoring section, show the **average gross score** separately for par 3s, par 4s and par 5s.
+- Do not use average score relative to par for this particular breakdown; the user wants average gross strokes for each hole-par category.
