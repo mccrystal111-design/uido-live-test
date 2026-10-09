@@ -387,3 +387,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - Where practical, let the Overview summary metrics (average score, best round and most recent round) respect the same **9 holes / 18 holes / Both** filter used by the scoring-trend chart.
 - This is a preference for consistent filtering, not a reason to complicate the layout. Ensure the summary compares like with like and does not combine 9-hole and 18-hole gross totals as if they were equivalent.
+
+
+### Remember Stats chart round-count preference — 2026-10-09
+
+- Remember the player's last selected **5 / 10 / 20 rounds** chart range where preference persistence is available, just as with the 9 holes / 18 holes / Both filter.
+- If no saved range exists, default to **10 rounds**. This preference changes only the displayed range, not stored round data.
