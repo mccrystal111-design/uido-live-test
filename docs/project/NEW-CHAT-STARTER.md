@@ -25,7 +25,7 @@ Do not reintroduce Hawk as a separate customer-facing brand unless a later decis
 
 ## UiDo Core User Database — current baseline
 
-UiDo Core is the complete customer/data model. Hawk is a simplified product variant of Core, not a separate customer identity/database.
+UiDo Core is the complete customer/data model. Kite is the current customer-facing product brand. The legacy `hawk.html` file is a prototype harness for Core persistence work, not a separate customer-facing brand.
 
 The live Core customer-data foundation is now in Supabase:
 
@@ -40,7 +40,7 @@ The live Core customer-data foundation is now in Supabase:
 - uido_external_records — provider-neutral external records for future Garmin, TrackMan, WHS, GHIN and other integrations, retaining original payloads separately from UiDo interpretation.
 
 Core principles already agreed:
-- One permanent UiDo identity follows the customer through Hawk to UiDo.
+- One permanent UiDo identity follows the customer across Kite experiences and future product surfaces.
 - Core should capture as much useful player data as reasonably available; products decide what to display.
 - Historical data should be retained rather than overwritten when relevant.
 - Practice sessions are first-class records and may include partial-hole or repeated-position practice.
