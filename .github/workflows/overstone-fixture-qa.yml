@@ -6,6 +6,9 @@ on:
     paths:
       - 'course-models/source-normalized/overstone-source-normalized-v0.1.json'
       - 'course-models/canonical/overstone-park-v1.json'
+      - 'course-models/canonical-course.schema.json'
+      - 'course_green_data.json'
+      - 'tools/course-model/build_overstone_canonical_from_normalized.py'
       - 'course-models/overstone-park-v0.1.json'
       - 'tools/course-model/validate_overstone_fixture.py'
       - 'tools/course-model/build_canonical_course.py'
@@ -23,6 +26,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Install schema validator
+        run: python3 -m pip install --disable-pip-version-check jsonschema==4.23.0
       - name: Run deterministic fixture acceptance checks
         run: python3 tools/course-model/validate_overstone_fixture.py
       - name: Test canonical publication gates
