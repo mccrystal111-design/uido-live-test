@@ -16,6 +16,9 @@ def sample_model(registration=None, association=None, missing_route=None, missin
     feature = {
         "id": "way/test-tee",
         "type": "TEE",
+        "provenance": "source:osm",
+        "source_refs": ["way/test-tee"],
+        "confidence": "source",
         "geometry": {
             "type": "Polygon",
             "coordinates": [[
