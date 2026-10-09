@@ -102,7 +102,7 @@ validation/report.json
 
 - `tools/course-model/build_course_packet.py` builds the packet directory and writes a manifest containing producer commit/version, source/input artifact hashes, output file sizes and SHA-256 checksums.
 - `course-packages/schema/uido-course-packet-manifest-v0.1.schema.json` defines the manifest contract.
-- `tools/course-model/load_course_packet.py` is a reference offline loader/validator. It verifies the manifest, every declared file's size/hash, hole/route/green-anchor structure and physical-feature references. The actual app/browser/native offline loader is not yet integrated.
+- `tools/course-model/load_course_packet.py` is a reference offline loader/validator. It verifies the manifest, every declared file's size/hash, hole/route/green-anchor structure and physical-feature references. The actual app/browser/native offline loader is not yet integrated. The reference loader's hash/path/route/green-anchor checks pass in [fixture QA run 37914350725](https://github.com/mccrystal111-design/uido-live-test/actions/runs/37914350725).
 - An incomplete model requires the explicit `--draft` flag. That produces a QA artefact only; it does not publish a revision or write to Supabase.
 
 The current packet is **not publishable**: measured satellite registration and explicit physical-feature/hole associations remain unresolved. The canonical draft preserves the existing F/M/B points from `course_green_data.json`; a read-only comparison found all 54 points match the live Supabase coordinates within 5 cm. That confirms database parity, not independent validation of the derivation method for every hole.
