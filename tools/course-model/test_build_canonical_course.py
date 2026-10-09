@@ -2,12 +2,13 @@
 """Unit tests for canonical course completeness gates; no network or database access."""
 from __future__ import annotations
 
+import json
 import sys
 import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from build_canonical_course import build_canonical  # noqa: E402
+from build_canonical_course import build_canonical  # noqa: E402\nfrom jsonschema import Draft202012Validator  # noqa: E402
 
 
 def sample_model(registration=None, association=None, missing_route=None, missing_green=None):
@@ -52,7 +53,7 @@ def sample_model(registration=None, association=None, missing_route=None, missin
         })
     return {
         "schema_version": "uido.course.v0.2",
-        "course": {"id": "test-course"},
+        "course": {"id": "test-course", "name": "Test Course"},
         "sources": [{"id": "osm", "status": "available"}],
         "registration": registration or {
             "status": "verified",
@@ -102,6 +103,12 @@ class CanonicalCompletenessGateTests(unittest.TestCase):
         self.assertFalse(result["validation"]["course_complete"])
         self.assertIn({"hole": 4, "feature": "green_anchors"}, result["validation"]["unresolved_features"])
         self.assertIn("green_anchors", result["validation"]["unresolved_features"])
+
+    def test_output_matches_canonical_json_schema(self):
+        root = Path(__file__).resolve().parents[2]
+        schema = json.loads((root / "course-models/canonical-course.schema.json").read_text(encoding="utf-8"))
+        Draft202012Validator.check_schema(schema)
+        Draft202012Validator(schema).validate(build_canonical(sample_model()))
 
 
 if __name__ == "__main__":
