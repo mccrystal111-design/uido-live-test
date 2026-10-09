@@ -83,3 +83,15 @@ If acquisition changes:
 - anything that must not be rebuilt.
 
 The repository, packet manifests and workflow outputs are the technical memory. Chat history is context, not the source of truth.
+
+
+## Canonical model stages — 2026-10-09
+
+Both stages use `uido.course.canonical.v2`, but they have distinct provenance labels and must not overwrite one another silently:
+
+- **`source_only_draft`** — reproducible output from a pinned source-normalized fixture. Physical features retain stable source IDs and provenance at course scope; hole records contain routing plus green F/M/B anchors. Physical-feature/hole association and satellite registration may remain unresolved. This is the current committed Overstone draft.
+- **`enriched_candidate`** — output from the acquisition/intermediate-model path. It may carry per-feature association evidence from nearest-hole/nearest-green heuristics. That evidence is useful for review but is not verified association. The canonical builder must keep `validation.course_complete=false` until registration and associations are explicitly verified and green anchors/routes are complete.
+
+`.github/workflows/validate-canonical-v2.yml` is a **manual live-acquisition candidate workflow**: it fetches fresh Overpass data to exercise the candidate path. It is not a downstream consumer of the pinned source fixture and must not overwrite the source-only draft or publish a course. Deterministic acceptance tests use committed fixtures and do not call external providers.
+
+Promotion to a publishable course revision is a separate, explicit step after geometry validation, measured satellite registration, association review, packet generation and RLS/package QA all pass.
