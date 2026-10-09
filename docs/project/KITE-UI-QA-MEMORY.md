@@ -310,3 +310,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - Include a familiar golf scoring breakdown in Stats Performance: birdies, pars, bogeys, and double bogeys or worse, shown as the percentage of holes in each category.
 - This is a conventional, easy-to-understand scoring summary. Calculate from recorded hole scores relative to each hole's par; do not treat missing hole scores as a scoring category.
+
+
+### Course-specific stats scope — 2026-10-09
+
+- Do not include average score by hole number (holes 1–18) in the general Stats Performance section. It is too dependent on the particular course.
+- Avoid splitting general player stats into separate course-specific views for now. Keep Stats focused on the player's overall game across rounds and courses.
