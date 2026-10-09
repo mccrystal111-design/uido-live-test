@@ -5,7 +5,8 @@
 -- Guarantees:
 --   * a new round can reference only an active course + published course version;
 --   * a tee set, when supplied, belongs to that exact version;
---   * a round hole belongs to the user's round and, when hole_id is supplied,
+--   * round course/version/tee context is immutable after round creation;
+--   * round-hole inserts and updates belong to the user's round and, when hole_id is supplied,
 --     to the same course version and hole number;
 --   * a shot cannot attach another user's round/hole or mix round and hole IDs.
 
