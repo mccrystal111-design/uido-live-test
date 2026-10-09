@@ -8,6 +8,9 @@ from __future__ import annotations
 
 import json
 import math
+import subprocess
+import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -75,9 +78,48 @@ def check_geometry(geometry, label):
     return geometry_type
 
 
+def first_difference(left, right, path="$"):
+    if type(left) is not type(right):
+        return path
+    if isinstance(left, dict):
+        if set(left) != set(right):
+            return f"{path} keys: {sorted(set(left) ^ set(right))}"
+        for key in left:
+            difference = first_difference(left[key], right[key], f"{path}.{key}")
+            if difference:
+                return difference
+    elif isinstance(left, list):
+        if len(left) != len(right):
+            return f"{path} length: {len(left)} != {len(right)}"
+        for index, (a, b) in enumerate(zip(left, right)):
+            difference = first_difference(a, b, f"{path}[{index}]")
+            if difference:
+                return difference
+    elif left != right:
+        return f"{path}: {left!r} != {right!r}"
+    return None
+
+
 def main():
     source = load(SOURCE_PATH)
     canonical = load(CANONICAL_PATH)
+
+    # Rebuild from the pinned fixture, not live Overpass or the legacy green-anchor model.
+    with tempfile.TemporaryDirectory() as directory:
+        rebuilt_path = Path(directory) / "overstone-canonical.json"
+        subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "tools/course-model/build_overstone_canonical_from_normalized.py"),
+                "--source", str(SOURCE_PATH),
+                "--registry", str(ROOT / "course-models/COURSE_REGISTRY.json"),
+                "--out", str(rebuilt_path),
+            ],
+            check=True,
+        )
+        rebuilt = load(rebuilt_path)
+        difference = first_difference(rebuilt, canonical)
+        assert difference is None, f"Deterministic builder differs from committed canonical draft at {difference}"
 
     assert source.get("schema") == "uido.course.source-normalized.v0.1"
     assert canonical.get("schema") == "uido.course.canonical.v2"
@@ -165,7 +207,7 @@ def main():
     if legacy_geometry_count == 0:
         print("NOTE: legacy v0.1 model is green-anchor-only; do not use it as the physical-geometry fixture.")
 
-    print("PASS: pinned Overstone source and committed canonical draft are internally consistent.")
+    print("PASS: deterministic builder reproduces the committed canonical draft from the pinned source fixture.")\n    print("PASS: pinned Overstone source and committed canonical draft are internally consistent.")
     print("PASS: 159 stable physical feature IDs, exact source geometry, type mapping and provenance links.")
     print("PASS: 18 unique hole routes and pars match the source fixture.")
     print("PASS: registration/association remain unresolved; course completeness remains false.")
