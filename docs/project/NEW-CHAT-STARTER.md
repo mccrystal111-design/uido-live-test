@@ -57,6 +57,7 @@ Core principles already agreed:
 Source-of-truth files:
 - docs/project/UIDO-CORE-DATABASE-BASELINE.md
 - docs/project/Q&A-UIDO-USER-DATABASE-CORE.md
+- docs/project/KITE-UI-QA-MEMORY.md — cumulative Kite UI Q&A decisions (Stats, saved rounds, end-of-round flow).
 - database/schema/uido-core-user-data-v1.sql
 
 Do not re-ask settled Core decisions. If a database question depends on an existing UiDo product/UI/statistics decision, retrieve the project source of truth first.
