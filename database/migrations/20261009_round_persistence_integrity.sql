@@ -88,9 +88,9 @@ with check (
         and r.user_id = (select auth.uid())
     )
   )
+  and (round_hole_id is null or round_id is not null)
   and (
-    round_id is null
-    or round_hole_id is null
+    round_hole_id is null
     or exists (
       select 1
       from public.uido_round_holes rh
@@ -127,9 +127,9 @@ with check (
         and r.user_id = (select auth.uid())
     )
   )
+  and (round_hole_id is null or round_id is not null)
   and (
-    round_id is null
-    or round_hole_id is null
+    round_hole_id is null
     or exists (
       select 1
       from public.uido_round_holes rh
