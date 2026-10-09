@@ -259,7 +259,7 @@ def packet_files(canonical: dict, registry: dict) -> dict[str, dict]:
         "canonical_validation": validation,
         "packet_validation": {
             "canonical_schema_valid": True,
-            "packet_structure_checked": True,
+            "packet_structure_generated": True,
             "publishable": publishable,
             "canonical_stage": stage,
             "expected_holes": expected_holes,
