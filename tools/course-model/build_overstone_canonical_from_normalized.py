@@ -29,7 +29,7 @@ def load(path: str | Path) -> dict:
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
-def build(source: dict, registry: dict) -> dict:
+def build(source: dict, registry: dict, greens: dict) -> dict:
     if source.get("schema") != "uido.course.source-normalized.v0.1":
         raise ValueError(f"Unsupported source schema: {source.get('schema')!r}")
     if source.get("course_id") != "overstone-park":
@@ -38,6 +38,10 @@ def build(source: dict, registry: dict) -> dict:
     registry_course = registry.get("courses", {}).get("overstone-park", {})
     if not registry_course.get("name"):
         raise ValueError("Overstone course name is missing from COURSE_REGISTRY.json")
+
+    green_points = greens.get("greenPoints", {})
+    if set(green_points) != {str(number) for number in range(1, 19)}:
+        raise ValueError("Green F/M/B dataset must cover holes 1–18 exactly")
 
     source_features = source.get("features", [])
     route_features = [f for f in source_features if f.get("canonical_type") == "HOLE"]
@@ -89,10 +93,21 @@ def build(source: dict, registry: dict) -> dict:
         properties = feature.get("properties") or {}
         raw_par = properties.get("par")
         par = int(raw_par) if str(raw_par or "").isdigit() else None
+        green = green_points[str(number)]
         holes.append({
             "hole_number": number,
             "par": par,
             "routing": feature["geometry"],
+            "green": {
+                "front": {"lon": green["front"][0], "lat": green["front"][1]},
+                "middle": {"lon": green["middle"][0], "lat": green["middle"][1]},
+                "back": {"lon": green["back"][0], "lat": green["back"][1]},
+                "provenance": {
+                    "front": "source:greens",
+                    "middle": "source:greens",
+                    "back": "source:greens",
+                },
+            },
             "truth": "CONFIRMED",
         })
 
@@ -144,10 +159,11 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--source", required=True, help="Pinned source-normalized JSON fixture")
     parser.add_argument("--registry", required=True, help="UiDo course registry JSON")
+    parser.add_argument("--greens", required=True, help="Green front/middle/back source data")
     parser.add_argument("--out", required=True, help="Output canonical v2 JSON path")
     args = parser.parse_args()
 
-    canonical = build(load(args.source), load(args.registry))
+    canonical = build(load(args.source), load(args.registry), load(args.greens))
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(canonical, indent=2) + "\n", encoding="utf-8")
