@@ -37,12 +37,66 @@ with check (
     )
   )
 );
+ 
+create or replace function public.prevent_round_course_context_change()
+returns trigger
+language plpgsql
+as $
+begin
+  if new.course_id is distinct from old.course_id
+     or new.course_version_id is distinct from old.course_version_id
+     or new.tee_set_id is distinct from old.tee_set_id then
+    raise exception using
+      errcode = 'check_violation',
+      message = 'Round course context is immutable after creation';
+  end if;
+  return new;
+end;
+$;
+
+drop trigger if exists uido_round_course_context_immutable on public.uido_rounds;
+create trigger uido_round_course_context_immutable
+before update of course_id, course_version_id, tee_set_id
+on public.uido_rounds
+for each row execute function public.prevent_round_course_context_change();
 
 drop policy if exists "Users can insert their own round holes" on public.uido_round_holes;
 create policy "Users can insert their own round holes"
 on public.uido_round_holes
 for insert
 to authenticated
+with check (
+  exists (
+    select 1
+    from public.uido_rounds r
+    where r.id = uido_round_holes.round_id
+      and r.user_id = (select auth.uid())
+      and (
+        uido_round_holes.hole_id is null
+        or exists (
+          select 1
+          from public.course_holes ch
+          where ch.id = uido_round_holes.hole_id
+            and ch.course_version_id = r.course_version_id
+            and ch.hole_number = uido_round_holes.hole_number
+        )
+      )
+  )
+);
+
+drop policy if exists "Users can update their own round holes" on public.uido_round_holes;
+create policy "Users can update their own round holes"
+on public.uido_round_holes
+for update
+to authenticated
+using (
+  exists (
+    select 1
+    from public.uido_rounds r
+    where r.id = uido_round_holes.round_id
+      and r.user_id = (select auth.uid())
+  )
+)
 with check (
   exists (
     select 1
