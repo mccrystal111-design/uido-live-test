@@ -98,6 +98,10 @@ def build(source: dict, registry: dict, greens: dict) -> dict:
             "hole_number": number,
             "par": par,
             "routing": feature["geometry"],
+            "routing_provenance": {
+                "source_id": "osm",
+                "source_feature_id": str(feature["source_id"]),
+            },
             "green": {
                 "front": {"lon": green["front"][0], "lat": green["front"][1]},
                 "middle": {"lon": green["middle"][0], "lat": green["middle"][1]},
