@@ -18,6 +18,22 @@ END;
 $$;
 GRANT EXECUTE ON FUNCTION public.qa_expect_rls_rejection(text, text) TO authenticated;
 
+CREATE OR REPLACE FUNCTION public.qa_expect_check_violation(statement text, label text)
+RETURNS void
+LANGUAGE plpgsql
+AS $
+BEGIN
+  BEGIN
+    EXECUTE statement;
+    RAISE EXCEPTION 'FAIL: expected immutable-context rejection for %', label;
+  EXCEPTION
+    WHEN check_violation THEN
+      RAISE NOTICE 'PASS: rejected immutable context change for %', label;
+  END;
+END;
+$;
+GRANT EXECUTE ON FUNCTION public.qa_expect_check_violation(text, text) TO authenticated;
+
 SET ROLE authenticated;
 SET request.jwt.claim.sub = '00000000-0000-4000-8000-000000000001';
 
@@ -104,6 +120,20 @@ SELECT public.qa_expect_rls_rejection(
        '50000000-0000-4000-8000-000000000002',
        '40000000-0000-4000-8000-000000000001',1)$sql$,
   'another users round'
+);
+
+SELECT public.qa_expect_rls_rejection(
+  $sql$UPDATE public.uido_round_holes
+       SET hole_id='40000000-0000-4000-8000-000000000002', hole_number=2
+       WHERE id='60000000-0000-4000-8000-000000000001'$sql$,
+  'round-hole update to another course version'
+);
+
+SELECT public.qa_expect_check_violation(
+  $sql$UPDATE public.uido_rounds
+       SET course_version_id='20000000-0000-4000-8000-000000000002'
+       WHERE id='50000000-0000-4000-8000-000000000001'$sql$,
+  'round course version after creation'
 );
 
 -- A shot must reference only the current user's round and its matching hole row.
