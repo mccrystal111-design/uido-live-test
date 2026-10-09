@@ -203,3 +203,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 - Save Changes persists the edits and only reports success after saving succeeds.
 - Discard Changes abandons the unsaved edits and preserves the previously saved round.
 - Continue Editing closes the pop-up and returns to the edit state without losing the player's current changes.
+
+
+### Save failure during saved-scorecard editing — 2026-10-09
+
+- If saving fails because of a connection or technical error, keep the player's current edits on screen and allow them to retry.
+- Do not show a success confirmation or discard the edits unless the save has actually succeeded. Show a clear error/retry path.
