@@ -442,3 +442,12 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - Preferred order: (1) fairways hit % and GIR % cards, (2) putting figures, and (3) the horizontal scoring-outcome bar chart.
 - This order is agreed as the content sequence; sizing and final spacing remain subject to visual review in Figma.
+
+
+### Stats additional short-game and penalty statistics — 2026-10-09
+
+- Include **penalties per round**, **up-and-down percentage**, and **sand-save percentage** in Stats Performance, provided the required data has been recorded.
+- Up-and-down percentage is successful up-and-downs divided by eligible attempts: the player misses the green and holes out in two strokes or fewer.
+- Sand-save percentage is successful sand saves divided by eligible greenside-bunker attempts, where the player gets the ball into the hole in two strokes or fewer.
+- Penalties per round is calculated only from rounds with recorded penalty data. Missing attempts or penalty data must not be treated as zero; leave the statistic blank when there is insufficient recorded data.
+- These are additional statistics beyond the initial fairways/GIR cards, putting figures and scoring-outcome bar chart. Keep the layout provisional until reviewed in Figma; do not make Figma changes during Q&A.
