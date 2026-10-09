@@ -298,3 +298,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 - Include average putts per hole and average putts per round in the Scoring section when putting data is available, consistent with familiar golf-statistics conventions.
 - Treat putting counts as context, not a standalone verdict on putting performance. Low putt totals can result from missed greens and good chipping/up-and-down play; interpret putting alongside other recorded context such as greens in regulation and scoring rather than implying fewer putts always means better putting.
 - If the required data is not recorded, leave the statistic blank rather than displaying zero or a dash.
+
+
+### Fairways and greens statistics — 2026-10-09
+
+- Include **fairways hit percentage** and **greens in regulation (GIR) percentage** in the Stats Scoring section when the player has recorded the required data.
+- Keep these statistics optional; if data is missing, leave the display blank and do not interpret missing data as zero.
