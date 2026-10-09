@@ -424,3 +424,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 - Use a **horizontal bar chart** for the percentages of holes scored as birdie or better, par, bogey, and double bogey or worse.
 - Reuse the familiar visual language already used for Round Statistics on the existing Scorecard where practical, so the Stats page feels consistent with the rest of Kite.
 - This confirms the chart type; review the final sizing and visual treatment in the Figma example before treating those details as final. Do not make Figma changes during Q&A.
+
+
+### Stats Performance numerical layout — 2026-10-09
+
+- Preferred provisional direction: use cards for **fairways hit %** and **greens in regulation (GIR) %**, followed by the putting figures and horizontal scoring-outcome bar chart.
+- The user needs to see the rendered layout before approving the cards. Avoid making them so small that labels or values feel cramped; adjust sizing and grouping during the Figma review. Do not change Figma during Q&A.
