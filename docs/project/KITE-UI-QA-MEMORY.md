@@ -183,3 +183,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - When editing a saved scorecard, the player may enter round statistics that were not recorded at the time, such as fairways hit or greens in regulation.
 - Treat these as optional data: do not assume an unentered statistic was zero or infer a value. Recalculate the relevant statistics once the player enters or changes the data.
+
+
+### Display of unentered statistics — 2026-10-09
+
+- If a round statistic has not been entered, leave its display field blank rather than showing a dash or treating it as zero.
+- Preserve the distinction between missing data and an actual recorded zero in storage and calculations.
