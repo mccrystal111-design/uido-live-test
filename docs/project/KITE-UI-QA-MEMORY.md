@@ -86,3 +86,17 @@ The shared engine should support calculation independently of whether Kite expos
 - Treat these as product/design decisions, not proof that Figma has already been edited or that implementation exists.
 - Before implementation, inspect the existing Figma screens and code and preserve user edits. Record implementation status separately from product decisions.
 - Do not manually run or dispatch GitHub Actions unless explicitly requested or genuinely needed.
+
+
+## Figma baseline inspected — 2026-10-09
+
+Reviewed the current rendered frames on Figma page **02 — Product UI**. Preserve existing work and reconcile agreed behaviours against these screens before adding new UI.
+
+- **Home — `93:2`, “Kite — Front Screen — Navy White — Construction V1”**: already has Start Round, Scores and Stats actions, plus the player/handicap display and profile icon. Do not ask whether Scores and Stats should be added to Home; they already exist.
+- **Start Round — `124:25`**: existing course, player selection/add-player, Stroke Play/Stableford and tee-selection layout. Earlier decision remains: Add Player offers a saved player or a round-only guest; a guest must not silently become a permanent profile.
+- **Scorecard — `261:30`**: existing long scorecard with player/score summary, front/back hole tables, totals and round statistics. Reuse this as the scorecard template for live rounds and stored rounds; do not create a duplicate saved-round scorecard design.
+- **End Round — `261:125`**: current frame is headed “Round complete”, includes View/Edit Scorecard, End Round and Discard Round, and has footer copy saying “Your round is saved to your player profile.” This needs reconciliation with the agreed flow: the End Round screen is the review/confirmation step; normal Finish saves only after the player chooses to finish; Discard requires the shared “Are you sure?” pop-up; successful finish shows the transient Round Saved pop-up with Home, Scores and Stats. Do not assume the current footer or button labels already implement the agreed behaviour.
+- **Player Profile — `295:5`**: current profile frame shows player name/switcher, handicap summary, Home course & tees, Playing preferences, and Clubs & carry distances. Preserve user-added changes and existing Google icon assets. Two developer guidance text layers are still inside the phone frame in the current render; they should ultimately live outside the player-facing frame in developer notes, but do not remove or move user content without reconciling with the canvas.
+- **Stats page**: no separate top-level Kite Stats screen was identified on the inspected Product UI page. The scorecard contains a Round Statistics section, but that is not the agreed player Stats screen. A dedicated Stats frame will need to be designed later using the confirmed one-page scroll layout and sticky Overview / Scoring / Performance tabs.
+
+This was a baseline review, not a design edit. No Figma layers were changed and no GitHub Actions were run.
