@@ -350,3 +350,8 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - Reuse the **Front 9 / Back 9 / Both** filter for the birdie/par/bogey scoring-outcome breakdown, provided it can be shared without unnecessary implementation complexity.
 - Prefer one consistent filter state across related Performance scoring components rather than separate controls that can disagree. If the UI/implementation requires independent filters, keep the behaviour clear and simple.
+
+
+### Grouped scoring outcome categories — 2026-10-09
+
+- Keep the Performance scoring-outcome categories grouped for a clean mobile display: **birdie or better**, **par**, **bogey**, and **double bogey or worse**. Do not split eagles or triple bogeys into separate categories at this stage.
