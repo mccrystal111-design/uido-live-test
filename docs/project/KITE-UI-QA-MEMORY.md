@@ -327,3 +327,10 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 ### Recent-form summary — 2026-10-09
 
 - Do not add a separate recent-form count/summary of birdies, pars and bogeys over the last 5 or 10 rounds. The scoring trend chart is sufficient and avoids duplicating information in Performance.
+
+
+### Front-nine / back-nine scoring breakdown — 2026-10-09
+
+- Include scoring averages split by **Front 9 / Back 9 / Both** across rounds, without creating separate course-specific stats views.
+- Provide a filter with **Front 9**, **Back 9** and **Both** options so players can compare starts, finishes or the full round.
+- Apply the selected split consistently to the displayed scoring average and use only the holes/rounds available for that selection; do not treat missing scores as zero.
