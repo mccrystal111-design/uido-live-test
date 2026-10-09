@@ -297,6 +297,7 @@ def build_canonical(model: dict) -> dict:
         "schema": "uido.course.canonical.v2",
         "course": model.get("course", {}),
         "provenance": {
+            "stage": "enriched_candidate",
             "policy": (
                 "Physical geometry is course-scoped and source-preserved. Holes "
                 "contain routing, green F/M/B anchors and relationships only. "
