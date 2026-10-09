@@ -405,3 +405,15 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - Provisional layout: place the scoring-trend chart immediately beneath the three compact summary cards, with the 5 / 10 / 20 round-count and 9 holes / 18 holes / Both filters directly above the graph.
 - This layout is not yet approved. The user wants to see an example and try it in Figma later before confirming the arrangement. Do not change Figma during Q&A.
+
+
+### Stats Scoring layout — 2026-10-09
+
+- Preferred provisional layout: use three compact cards for average gross score on **par 3s**, **par 4s** and **par 5s**, mirroring the three-card pattern proposed for Overview.
+- Confirm the visual treatment when the user can try the rendered Stats page in Figma; do not make Figma changes during Q&A.
+
+
+### Putting figures in Stats — 2026-10-09
+
+- Show both **average putts per hole** and **average putts per round** in the Stats Scoring section.
+- Both figures follow the shared **Front 9 / Back 9 / Both** filter where relevant. If putting data is missing, leave the figure blank rather than treating it as zero.
