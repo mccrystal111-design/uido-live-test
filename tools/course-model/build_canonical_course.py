@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """Build the provider-agnostic UiDo canonical course model.
 
-Physical geometry is course-scoped. Hole records own routing and relationships,
-not cloned copies of physical features. Completeness is gated on measured
-registration and verified feature associations, not merely on data presence.
+Physical geometry is course-scoped. Hole records own routing, green F/M/B
+anchors and relationships, not cloned copies of physical features. Completeness
+is gated on measured registration and verified feature associations.
 """
 from __future__ import annotations
 
 import argparse
 import json
+import math
 from pathlib import Path
 
 
@@ -19,6 +20,23 @@ BUCKET_TYPES = {
     "green_source_features": "GREEN",
     "paths": "PATH",
     "context": None,
+}
+CANONICAL_TYPE_MAP = {
+    "WATER": "water",
+    "WATER_HAZARD": "water",
+    "TEE": "teeing_area",
+    "FAIRWAY": "fairway",
+    "ROUGH": "rough",
+    "GREEN": "green",
+    "BUNKER": "bunker",
+    "DRIVING_RANGE": "driving_range",
+    "PATH": "path",
+    "WOOD": "woodland",
+    "WOODLAND": "woodland",
+    "OOB": "out_of_bounds",
+    "STRUCTURE": "structure",
+    "TARGET": "target",
+    "UNKNOWN": "unknown",
 }
 
 
@@ -75,6 +93,39 @@ def associations_are_verified(model: dict) -> bool:
     return True
 
 
+def normalize_green(green: dict | None) -> dict | None:
+    if not green:
+        return None
+    result = {}
+    provenance = green.get("provenance") or {}
+    for position in ("front", "middle", "back"):
+        point = green.get(position)
+        if not isinstance(point, dict):
+            return None
+        lon, lat = point.get("lon"), point.get("lat")
+        if (
+            not isinstance(lon, (int, float))
+            or isinstance(lon, bool)
+            or not isinstance(lat, (int, float))
+            or isinstance(lat, bool)
+            or not math.isfinite(lon)
+            or not math.isfinite(lat)
+            or not -180 <= lon <= 180
+            or not -90 <= lat <= 90
+        ):
+            return None
+        result[position] = {"lon": lon, "lat": lat}
+    result["provenance"] = {
+        position: str(provenance.get(position) or "source:unknown")
+        for position in ("front", "middle", "back")
+    }
+    return result
+
+
+def green_anchors_are_complete(model: dict) -> bool:
+    return all(normalize_green(hole.get("green")) is not None for hole in model.get("holes", []))
+
+
 def normalize_feature(feature: dict, default_type: str | None, associations: list[dict]) -> dict | None:
     geometry = feature.get("geometry")
     if not geometry:
@@ -85,22 +136,54 @@ def normalize_feature(feature: dict, default_type: str | None, associations: lis
         feature_id = feature.get("source_id")
     if feature_id is None:
         return None
+    feature_id = str(feature_id)
 
-    result = dict(feature)
-    result["id"] = str(feature_id)
-    result["type"] = str(feature.get("type") or default_type or "UNKNOWN").upper()
-    result["geometry"] = geometry
+    raw_type = str(feature.get("type") or default_type or "UNKNOWN").upper()
+    canonical_type = CANONICAL_TYPE_MAP.get(raw_type, raw_type.lower())
+    raw_provenance = feature.get("provenance")
+    source_refs = feature.get("source_refs") or []
+    if isinstance(raw_provenance, dict):
+        provenance = dict(raw_provenance)
+        provenance.setdefault("source_feature_id", str(source_refs[0] if source_refs else feature_id))
+    elif isinstance(raw_provenance, str) and raw_provenance.startswith("source:"):
+        provenance = {
+            "source_id": raw_provenance.split(":", 1)[1],
+            "source_feature_id": str(source_refs[0] if source_refs else feature_id),
+        }
+    else:
+        provenance = {
+            "source_id": str(feature.get("source_id") or "unknown"),
+            "source_feature_id": str(source_refs[0] if source_refs else feature_id),
+        }
 
-    result.setdefault("provenance", "source:osm")
-    result.setdefault("confidence", "source")
-    result.setdefault("status", "source")
+    raw_status = str(feature.get("verification_status") or feature.get("status") or "source").lower()
+    if raw_status in {"verified", "confirmed"}:
+        verification_status = "verified"
+    elif raw_status == "conflict":
+        verification_status = "conflict"
+    elif raw_status in {"unknown", "unresolved"}:
+        verification_status = raw_status
+    else:
+        verification_status = "supported"
 
-    existing = result.get("associations")
-    if existing is not None:
-        result["association_evidence"] = existing
-        result.pop("associations", None)
+    raw_quality = feature.get("quality_status")
+    if raw_quality:
+        quality_status = str(raw_quality)
+    elif str(feature.get("confidence") or "source").lower() in {"source", "source_only"}:
+        quality_status = "source_only"
+    else:
+        quality_status = "unknown"
 
-    result["association_evidence"] = associations
+    result = {
+        "id": feature_id,
+        "type": canonical_type,
+        "geometry": geometry,
+        "provenance": provenance,
+        "verification_status": verification_status,
+        "quality_status": quality_status,
+    }
+    if associations:
+        result["association_evidence"] = associations
     return result
 
 
@@ -108,18 +191,14 @@ def build_route(hole: dict) -> dict | None:
     routing = hole.get("routing")
     if not routing:
         return None
-
-    # Routing geometry is hole-specific relationship data, not physical course
-    # geometry. Preserve it exactly and make the role explicit.
-    route = dict(routing)
-    route["role"] = "hole_route"
-    route["hole_number"] = int(hole["hole_number"])
-
-    green = hole.get("green")
-    if green:
-        route["destination"] = green.get("middle")
-
-    return route
+    # Accept either a direct GeoJSON geometry or an upstream feature wrapper,
+    # but always emit the canonical direct-geometry form.
+    if isinstance(routing, dict) and routing.get("type") in {
+        "Point", "LineString", "Polygon", "MultiPoint", "MultiLineString", "MultiPolygon"
+    } and "coordinates" in routing:
+        return routing
+    geometry = routing.get("geometry") if isinstance(routing, dict) else None
+    return geometry if isinstance(geometry, dict) else None
 
 
 def build_canonical(model: dict) -> dict:
@@ -138,6 +217,10 @@ def build_canonical(model: dict) -> dict:
         if route is None:
             truth = "INCOMPLETE"
             unresolved.append({"hole": number, "feature": "routing"})
+
+        green = normalize_green(raw_hole.get("green"))
+        if green is None:
+            unresolved.append({"hole": number, "feature": "green_anchors"})
 
         for feature, default_type in iter_hole_features(raw_hole):
             normalized = normalize_feature(
@@ -169,12 +252,15 @@ def build_canonical(model: dict) -> dict:
                 {"hole": number, "conflict": item} for item in raw_hole["conflicts"]
             )
 
-        holes.append({
+        hole_record = {
             "hole_number": number,
             "par": raw_hole.get("par"),
             "routing": route,
             "truth": truth,
-        })
+        }
+        if green is not None:
+            hole_record["green"] = green
+        holes.append(hole_record)
 
     # Preserve source geometry that has not been associated to a hole.
     for feature in model.get("unassigned_features", []) or []:
@@ -191,13 +277,13 @@ def build_canonical(model: dict) -> dict:
 
     features = sorted(physical.values(), key=lambda feature: feature["id"])
 
-    # These gates are deliberately separate from hole-route truth. Having 18
-    # routes does not prove that OSM geometry has been registered to imagery or
-    # that physical features have been correctly assigned to holes.
+    # Route presence does not prove physical-feature association or registration.
     if not registration_is_verified(model.get("registration")):
         unresolved.append("satellite_registration")
     if not associations_are_verified(model):
         unresolved.append("hole_feature_association")
+    if not green_anchors_are_complete(model):
+        unresolved.append("green_anchors")
 
     complete = (
         len(holes) == 18
@@ -213,8 +299,9 @@ def build_canonical(model: dict) -> dict:
         "provenance": {
             "policy": (
                 "Physical geometry is course-scoped and source-preserved. Holes "
-                "contain routing and relationships only. Shared physical features "
-                "retain one stable identity and may be referenced by multiple holes."
+                "contain routing, green F/M/B anchors and relationships only. "
+                "Shared physical features retain one stable identity and may be "
+                "referenced by multiple holes."
             ),
             "sources": model.get("sources", []),
             "upstream_model_schema": model.get("schema_version"),
@@ -231,6 +318,7 @@ def build_canonical(model: dict) -> dict:
             "unique_physical_ids": len({feature["id"] for feature in features}),
             "unresolved_features": unresolved,
             "conflicts": conflicts,
+            "status": "complete" if complete else "draft_source_import",
         },
     }
 
