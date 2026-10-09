@@ -39,6 +39,7 @@ The physical archive format is intentionally not fixed in v0.1. A directory, ZIP
 course-packet/
   manifest.json                 # required: identity, versions, files, checksums
   course.json                   # required: course-level metadata
+  features.geojson              # required: course-scoped physical features
   holes/
     01.geojson                  # required for each included hole
     02.geojson
@@ -97,7 +98,7 @@ Each hole record must have a stable `hole_id`, display hole number, par where ve
 
 A feature needs a stable ID, a controlled feature type, valid geometry, provenance references and a quality/status value. Geometry type must be constrained by feature type in the canonical schema (for example, an area feature must not silently accept a Point). The exact allowed geometry cardinality and multipart rules must be agreed in the canonical geometry contract before being enforced in production.
 
-Direction of play is hole-specific and must be explicit. Do not infer direction solely from feature ordering or share it across holes. Shared course features may be referenced by ID only if the packet also guarantees they resolve offline.
+Direction of play is hole-specific and must be explicit. Do not infer direction solely from feature ordering or share it across holes. Shared course features may be referenced by ID only if the packet also guarantees they resolve offline. Green F/M/B anchors are point coordinates in WGS 84 and are separate from the green polygon; if a packet advertises front/middle/back yardages, all three anchors and their provenance are required.
 
 ### Coordinate handling
 
@@ -130,7 +131,7 @@ A packet is publishable only when these gates pass or an explicitly allowed warn
 3. **Geometry validity:** coordinates are finite and in range; rings are closed where required; geometry is non-empty and structurally valid; no accidental lat/lon inversion detected by plausibility checks.
 4. **Course coverage:** hole IDs/numbers are unique; declared complete coverage matches expected hole count; every required feature class has either geometry or an explicit missing/unknown status.
 5. **Spatial consistency:** hole features lie within plausible course bounds; direction of play is present; transform is stable and not mirrored/scaled incorrectly.
-6. **Provenance:** canonical features link to sources or are explicitly marked as manually authored with author/time/change reason.
+6. **Provenance:** canonical physical features and hole routes link to sources; green F/M/B anchors have per-point provenance; manually authored geometry records author/time/change reason.
 7. **Renderer smoke test:** loader can load the packet offline and render selected holes with expected SVG/geometry roots and positive dimensions, without uncaught errors.
 8. **Diagnostics:** report machine-readable errors/warnings with file, feature/hole ID and actionable reason.
 
