@@ -3,31 +3,73 @@
   "$id": "https://uido.golf/schemas/canonical-course.v2.json",
   "title": "UiDo Canonical Course Source of Truth v2",
   "type": "object",
-  "required": ["schema", "course", "provenance", "geometry", "holes", "validation"],
+  "required": [
+    "schema",
+    "course",
+    "provenance",
+    "geometry",
+    "holes",
+    "validation"
+  ],
   "properties": {
-    "schema": {"const": "uido.course.canonical.v2"},
+    "schema": {
+      "const": "uido.course.canonical.v2"
+    },
     "course": {
       "type": "object",
-      "required": ["id", "name"],
-      "properties": {"id": {"type": "string"}, "name": {"type": "string"}, "location": {"type": "object"}}
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "location": {
+          "type": "object"
+        }
+      }
     },
     "provenance": {
       "type": "object",
-      "required": ["policy", "sources", "upstream_model_schema"],
+      "required": [
+        "policy",
+        "sources",
+        "upstream_model_schema"
+      ],
       "properties": {
-        "policy": {"type": "string"},
-        "upstream_model_schema": {"type": "string"},
-        "sources": {"type": "array", "items": {"type": "object"}}
+        "policy": {
+          "type": "string"
+        },
+        "upstream_model_schema": {
+          "type": "string"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
       }
     },
     "geometry": {
       "type": "object",
-      "required": ["scope", "features"],
+      "required": [
+        "scope",
+        "features"
+      ],
       "properties": {
-        "scope": {"const": "course"},
+        "scope": {
+          "const": "course"
+        },
         "features": {
           "type": "array",
-          "items": {"$ref": "#/$defs/physicalFeature"}
+          "items": {
+            "$ref": "#/$defs/physicalFeature"
+          }
         }
       }
     },
@@ -37,44 +79,249 @@
       "maxItems": 18,
       "items": {
         "type": "object",
-        "required": ["hole_number", "routing", "truth"],
+        "required": [
+          "hole_number",
+          "routing",
+          "truth"
+        ],
         "properties": {
-          "hole_number": {"type": "integer", "minimum": 1, "maximum": 18},
-          "par": {"type": ["integer", "null"]},
-          "routing": {"type": ["object", "null"]},
-          "truth": {"type": "string", "enum": ["CONFIRMED", "INCOMPLETE", "CONFLICT"]}
+          "hole_number": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 18
+          },
+          "par": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "routing": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/geoJsonGeometry"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "truth": {
+            "type": "string",
+            "enum": [
+              "CONFIRMED",
+              "INCOMPLETE",
+              "CONFLICT"
+            ]
+          },
+          "green": {
+            "$ref": "#/$defs/greenAnchors"
+          }
         },
         "additionalProperties": false
       }
     },
     "validation": {
       "type": "object",
-      "required": ["course_complete", "holes_complete", "physical_geometry_count", "unique_physical_ids", "unresolved_features", "conflicts"],
+      "required": [
+        "course_complete",
+        "holes_complete",
+        "physical_geometry_count",
+        "unique_physical_ids",
+        "unresolved_features",
+        "conflicts"
+      ],
       "properties": {
-        "course_complete": {"type": "boolean"},
-        "holes_complete": {"type": "integer"},
-        "physical_geometry_count": {"type": "integer"},
-        "unique_physical_ids": {"type": "integer"},
-        "unresolved_features": {"type": "array"},
-        "conflicts": {"type": "array"}
+        "course_complete": {
+          "type": "boolean"
+        },
+        "holes_complete": {
+          "type": "integer"
+        },
+        "physical_geometry_count": {
+          "type": "integer"
+        },
+        "unique_physical_ids": {
+          "type": "integer"
+        },
+        "unresolved_features": {
+          "type": "array"
+        },
+        "conflicts": {
+          "type": "array"
+        }
       }
     }
   },
   "$defs": {
     "physicalFeature": {
       "type": "object",
-      "required": ["id", "type", "geometry"],
+      "required": [
+        "id",
+        "type",
+        "geometry",
+        "provenance",
+        "verification_status",
+        "quality_status"
+      ],
       "properties": {
-        "id": {"type": "string"},
-        "type": {"type": "string"},
-        "geometry": {"type": "object"},
-        "provenance": {},
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "water",
+            "teeing_area",
+            "green",
+            "bunker",
+            "fairway",
+            "driving_range",
+            "rough",
+            "path",
+            "target",
+            "woodland",
+            "out_of_bounds",
+            "structure",
+            "unknown"
+          ]
+        },
+        "geometry": {
+          "$ref": "#/$defs/geoJsonGeometry"
+        },
+        "provenance": {
+          "type": "object",
+          "required": [
+            "source_id",
+            "source_feature_id"
+          ],
+          "properties": {
+            "source_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_feature_id": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": true
+        },
         "confidence": {},
         "status": {},
-        "source_refs": {"type": "array"},
-        "association_evidence": {"type": "array"}
+        "source_refs": {
+          "type": "array"
+        },
+        "association_evidence": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "verification_status": {
+          "type": "string",
+          "enum": [
+            "supported",
+            "verified",
+            "conflict",
+            "unknown",
+            "unresolved"
+          ]
+        },
+        "quality_status": {
+          "type": "string",
+          "minLength": 1
+        }
       },
       "additionalProperties": true
+    },
+    "geoJsonGeometry": {
+      "type": "object",
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Point",
+            "LineString",
+            "Polygon",
+            "MultiPoint",
+            "MultiLineString",
+            "MultiPolygon"
+          ]
+        },
+        "coordinates": {
+          "type": "array"
+        }
+      },
+      "additionalProperties": false
+    },
+    "greenAnchor": {
+      "type": "object",
+      "required": [
+        "lon",
+        "lat"
+      ],
+      "properties": {
+        "lon": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        },
+        "lat": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        }
+      },
+      "additionalProperties": false
+    },
+    "greenAnchors": {
+      "type": "object",
+      "required": [
+        "front",
+        "middle",
+        "back",
+        "provenance"
+      ],
+      "properties": {
+        "front": {
+          "$ref": "#/$defs/greenAnchor"
+        },
+        "middle": {
+          "$ref": "#/$defs/greenAnchor"
+        },
+        "back": {
+          "$ref": "#/$defs/greenAnchor"
+        },
+        "provenance": {
+          "type": "object",
+          "required": [
+            "front",
+            "middle",
+            "back"
+          ],
+          "properties": {
+            "front": {
+              "type": "string",
+              "minLength": 1
+            },
+            "middle": {
+              "type": "string",
+              "minLength": 1
+            },
+            "back": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
     }
   }
 }
