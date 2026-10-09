@@ -98,24 +98,70 @@ jobs:
                       after_style=page.locator("#canvas .object").filter(has_text="401").first.get_attribute("style")
                       def geometry_style(style):
                           import re
-                          return tuple(re.search(rf'{key}:\\s*([^;]+)', style or '').group(1) if re.search(rf'{key}:\\s*([^;]+)', style or '') else None for key in ["left","top","width","height"])
+                          values=[]
+                          for key in ["left","top","width","height"]:
+                              match=re.search(rf'{key}:\s*([^;]+)', style or '')
+                              values.append(match.group(1).strip() if match else None)
+                          return tuple(values)
                       if geometry_style(before_style)!=geometry_style(after_style):
                           report["failures"].append(f"{width}x{height}: changing field data altered geometry")
-                      # Move the UI element; mirror target must follow.
-                      page.locator("#canvas .object").filter(has_text="401").first.hover()
+                      if after is None:
+                          report["failures"].append(f"{width}x{height}: bound field value did not render after data change")
+                      # Move the UI element; the mirrored target must move to exactly the same layout percentages.
+                      ui=page.locator("#canvas .object").filter(has_text="401").first
+                      ui_box=ui.bounding_box()
+                      ui_style_before=ui.get_attribute("style")
+                      if not ui_box:
+                          raise AssertionError("Bound middle-yardage object has no bounding box")
+                      start_x=ui_box["x"]+ui_box["width"]/2
+                      start_y=ui_box["y"]+ui_box["height"]/2
+                      page.mouse.move(start_x,start_y)
                       page.mouse.down()
-                      page.mouse.move(before["x"]+20,before["y"]+10)
+                      page.mouse.move(start_x+24,start_y+18,steps=4)
                       page.mouse.up()
                       page.wait_for_timeout(100)
-                      moved=page.locator("#canvas .object").filter(has_text="401").first.bounding_box()
-                      mirror_moved=page.locator("#mirrorCanvas .mirror-target").nth(1).bounding_box()
-                      if not moved or not mirror_moved or abs((mirror_moved["x"]-moved["x"])-(target_box["x"]-before["x"]))>2:
-                          # Position equality is better checked via percentages, so use DOM values below.
-                          pass
+                      ui_style=ui.get_attribute("style")
                       mirror_style=page.locator("#mirrorCanvas .mirror-target").nth(1).get_attribute("style")
-                      ui_style=page.locator("#canvas .object").filter(has_text="401").first.get_attribute("style")
-                      if not mirror_style or not ui_style:
-                          report["failures"].append(f"{width}x{height}: missing mirrored geometry styles after move")
+                      if geometry_style(ui_style)==geometry_style(ui_style_before):
+                          report["failures"].append(f"{width}x{height}: drag did not move the UI element")
+                      if geometry_style(ui_style)!=geometry_style(mirror_style):
+                          report["failures"].append(f"{width}x{height}: mirror geometry does not match moved UI geometry")
+                      # Validate the downloadable field/layout package and the finished-UI PNG.
+                      downloads=[]
+                      page.on("download",lambda download: downloads.append(download))
+                      page.locator("#capture").click()
+                      page.wait_for_function("document.querySelector('#status').textContent.includes('exported')",timeout=15000)
+                      page.wait_for_timeout(300)
+                      names=[d.suggested_filename for d in downloads]
+                      record["downloads"]=names
+                      if "uido-yardage-field-layout.json" not in names:
+                          report["failures"].append(f"{width}x{height}: semantic field JSON was not downloaded")
+                      if "uido-yardage-field-layout.png" not in names:
+                          report["failures"].append(f"{width}x{height}: finished UI PNG was not downloaded")
+                      for download in downloads:
+                          if download.suggested_filename.endswith(".json"):
+                              out="/tmp/ring-playground-export.json"
+                              download.save_as(out)
+                              package=json.loads(Path(out).read_text())
+                              record["export_schema"]=package.get("schema")
+                              record["export_field_count"]=len(package.get("fields",[]))
+                              bound=[item for item in package.get("layout",[]) if item.get("binding")=="green.middle"]
+                              if package.get("schema")!="uido-yardage-field-layout-v1":
+                                  report["failures"].append(f"{width}x{height}: unexpected export schema")
+                              if not any(f.get("field")=="green.middle" for f in package.get("fields",[])):
+                                  report["failures"].append(f"{width}x{height}: export missing green.middle semantic binding")
+                              if not bound:
+                                  report["failures"].append(f"{width}x{height}: layout export missing bound green.middle element")
+                              if bound and any(k in bound[0] for k in ["sampleValue","literalValue","value"]):
+                                  report["failures"].append(f"{width}x{height}: bound layout stores a literal dynamic value")
+                          elif download.suggested_filename.endswith(".png"):
+                              out="/tmp/ring-playground-export.png"
+                              download.save_as(out)
+                              data=Path(out).read_bytes()
+                              if not data.startswith(b"\\x89PNG\\r\\n\\x1a\\n"):
+                                  report["failures"].append(f"{width}x{height}: exported screenshot is not a PNG")
+                              elif len(data)<1000:
+                                  report["failures"].append(f"{width}x{height}: exported screenshot is unexpectedly small")
                       page.screenshot(path=f"/tmp/ring-playground-{width}x{height}.png",full_page=True)
                   except Exception as exc:
                       report["failures"].append(f"{width}x{height}: browser check failed: {exc!r}")
