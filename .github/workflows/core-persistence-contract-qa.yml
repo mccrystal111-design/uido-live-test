@@ -1,0 +1,25 @@
+name: Core Persistence Contract QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'hawk.html'
+      - 'tools/qa/test_kite_core_round_contract.py'
+      - '.github/workflows/core-persistence-contract-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-contract:
+    name: Verify round/shot persistence contract with mocked Supabase
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.52.0-noble
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Verify round and shot write contract
+        run: python3 tools/qa/test_kite_core_round_contract.py
