@@ -84,10 +84,10 @@ Do not insert synthetic customer/round/shot records into production. Track the b
 
 ### Overstone course packet — real fixture inspected, draft retained
 
-The committed source-normalized and canonical files and live Supabase revision were compared. The canonical file contains 159 physical features and 18 hole routes, but course-level validation remains incomplete due to satellite registration and hole-feature association. The committed canonical file's type/provenance conventions do not fully match the current canonical builder's output conventions. The course-packet spec now records these gaps and the acceptance tests required before publishing.
+The committed source-normalized and canonical files and live Supabase revision were compared. A new deterministic adapter reproduces the 159-feature / 18-route canonical draft from the pinned fixture, and [fixture acceptance QA passed](https://github.com/mccrystal111-design/uido-live-test/actions/runs/37912622803). Course-level validation remains incomplete due to satellite registration and hole-feature association. The separate live-acquisition / generic builder path still emits a different output shape, and the runtime package's green F/M/B anchor boundary must be reconciled. The course-packet spec records the evidence and gates.
 
 See [Course Packet Specification, real fixture review](../architecture/COURSE-PACKET-SPEC.md#11-real-overstone-fixture-review--2026-10-09). Do not publish or regenerate over the existing draft until the producer/input/contract mismatch is resolved.
 
 ### Next action
 
-**DATA-001 / CRS-002:** reconcile the committed canonical Overstone model with its pinned input and current builder, then implement the fixture acceptance checks. Preserve the existing Yardage and AGNOSTIC45 baselines. Core end-to-end validation remains blocked until an isolated QA environment and a published course fixture are available.
+**DATA-001 / CRS-002:** reconcile the pinned-fixture adapter with the live-acquisition / generic builder path and settle the runtime package boundary for green F/M/B anchors ([issue #10](https://github.com/mccrystal111-design/uido-live-test/issues/10)). Preserve the existing Yardage and AGNOSTIC45 baselines. Core end-to-end validation remains blocked until an isolated QA environment and a published course fixture are available.
