@@ -1,0 +1,52 @@
+name: Round Persistence RLS Contract QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'database/migrations/20261009_round_persistence_integrity.sql'
+      - 'database/tests/round_persistence_rls_setup.sql'
+      - 'database/tests/round_persistence_rls_assertions.sql'
+      - '.github/workflows/round-persistence-rls-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rls-contract:
+    name: Test draft RLS migration in ephemeral PostgreSQL
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: uido_qa
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d uido_qa"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: uido_qa
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+      - name: Create isolated RLS fixture
+        run: psql -v ON_ERROR_STOP=1 -f database/tests/round_persistence_rls_setup.sql
+      - name: Apply draft migration to ephemeral database only
+        run: psql -v ON_ERROR_STOP=1 -f database/migrations/20261009_round_persistence_integrity.sql
+      - name: Verify owner, course-version and round-hole checks
+        run: psql -v ON_ERROR_STOP=1 -f database/tests/round_persistence_rls_assertions.sql
