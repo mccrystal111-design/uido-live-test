@@ -1,7 +1,7 @@
 # Kite UI Q&A Memory — Stats, Round History & End-of-Round
 
 **Updated:** 2026-10-09  
-**Status:** In progress — confirmed decisions below; one question remains open.  
+**Status:** In progress — confirmed decisions recorded; Q&A continues.  
 **Purpose:** Durable, cumulative record of Kite UI decisions from the Stats and saved-round Q&A. Use this before continuing the design conversation or implementation.
 
 ## Product and architecture principles
@@ -73,7 +73,7 @@ The shared engine should support calculation independently of whether Kite expos
 - The Round Saved pop-up appears only after saving has actually succeeded. Similarly, a discard success/result must only be shown after the discard operation has completed.
 - Tapping Home, Scores or Stats dismisses the Round Saved pop-up and opens the selected destination.
 
-## Open question — edits to a saved scorecard
+## Saved-scorecard edit confirmation
 
 **Not yet answered:** After a player edits a previously saved scorecard and taps Save, should Kite save immediately and then show a brief “Changes Saved” pop-up using the shared component, or show a confirmation before saving?
 
