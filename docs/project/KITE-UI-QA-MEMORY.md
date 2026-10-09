@@ -165,3 +165,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - Editing a saved round preserves its original date and time.
 - Update only that round's score data and recalculate the affected statistics; do not change the round timestamp as a side effect of editing.
+
+
+### Saved round course/player association — 2026-10-09
+
+- Editing a saved scorecard is for correcting that round's score data, not changing who played or which course the round was played at.
+- Keep the original player and course association fixed during scorecard editing. If either was recorded incorrectly, treat that as a separate correction workflow rather than a normal scorecard edit; the details of that workflow are not yet specified.
