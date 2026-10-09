@@ -135,7 +135,7 @@ class CoursePacketBuilderTests(unittest.TestCase):
             )
             target = output / "features.geojson"
             target.write_bytes(target.read_bytes() + b" ")
-            with self.assertRaisesRegex(ValueError, "SHA-256 mismatch"):
+            with self.assertRaisesRegex(ValueError, "Byte-size mismatch|SHA-256 mismatch"):
                 load_packet(output)
 
 
