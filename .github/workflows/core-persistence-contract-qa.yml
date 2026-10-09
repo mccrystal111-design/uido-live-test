@@ -21,5 +21,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Install Playwright Python package
+        run: python3 -m pip install --disable-pip-version-check playwright==1.52.0
       - name: Verify round and shot write contract
         run: python3 tools/qa/test_kite_core_round_contract.py
