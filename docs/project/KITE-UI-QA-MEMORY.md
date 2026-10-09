@@ -470,3 +470,11 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - The user confirms putts are also captured. Consider **sand-shot/greenside-bunker information, GIR, putts and hole score** together when deriving sand-save and up-and-down attempts and conversions.
 - These may be sufficient for many cases, so do not introduce extra manual inputs by default. Before implementation, validate the exact existing shot/lie data and calculation rules; only mark cases unknown where the captured data cannot distinguish an attempt or outcome reliably.
+
+
+### User-defined up-and-down and sand-save rules — 2026-10-09
+
+- **Up-and-down:** classify a hole as an up-and-down when the player missed the green and then took **one putt** to finish the hole.
+- **Sand save:** classify a hole as a sand save when the player missed the green into a bunker, played a recorded sand shot, and then took **one putt** to finish the hole.
+- Use the existing missed-green/GIR, sand-shot and putt records to derive these outcomes rather than adding separate manual entry by default.
+- Validate how bunker location and the number/order of shots are represented in the current data model before implementation. Do not count ambiguous cases as successes or failures; keep insufficient data unknown.
