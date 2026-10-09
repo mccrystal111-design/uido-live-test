@@ -1,7 +1,7 @@
 # UiDo Course Packet Specification — Draft v0.1
 
 Status: **Draft for implementation review — not an approved geometry contract**  
-Last updated: 2026-10-02  
+Last updated: 2026-10-09  
 Scope: the versioned, provider-neutral course data package consumed by the UiDo renderer/course loader, with a delivery boundary that can support offline play. This is not a Supabase schema decision and does not define player, round, or shot data.
 
 ## 1. Purpose and boundary
@@ -243,14 +243,16 @@ A separate read-only comparison of the 54 green F/M/B coordinates in `course_gre
 
 The generic builder `tools/course-model/build_canonical_course.py` has also been aligned to the same canonical vocabulary and core field structure: lower-case canonical feature types, structured provenance, direct GeoJSON routing, and green F/M/B anchors. It now refuses to mark a course complete unless registration has a measured transform and metrics, feature associations are explicitly verified, green anchors are present, all 18 routes exist, and there are no unresolved conflicts. Six unit tests passed in the same run.
 
-### Remaining pipeline discrepancy
+### Two-stage producer contract — explicit, not yet publishable
 
-The pinned-fixture adapter and the generic live-acquisition path are now much closer in output contract, but they do not yet share one authoritative input/build path:
+The two producers now have an explicit `provenance.stage` field required by the canonical schema:
 
-- `course-models/overstone-park-v0.1.json` remains an older green-anchor-only model with empty physical feature buckets. It must not be used as the source for the 159 physical features.
-- `.github/workflows/validate-canonical-v2.yml` acquires fresh Overpass data and builds a `uido.course.v0.2` intermediate model at runtime. That path does not use the pinned `source-normalized` fixture, and its nearest-hole/nearest-green associations remain heuristic evidence rather than verified assignments.
-- The generic builder preserves association evidence, but the course-level publication gate now correctly remains false for this input because registration and association verification are unresolved.
-- The runtime course package must preserve all green F/M/B anchors from the canonical hole records. The package-shaped JSON under `course-packages/schema/` is still a sample, not a generated offline package with a manifest and checksums.
+- **`source_only_draft`** is built deterministically from the pinned normalized source fixture. It preserves source IDs/geometry, routes and green F/M/B anchors, while keeping hole-feature association unresolved.
+- **`enriched_candidate`** is produced by the live-acquisition/intermediate-model path. It can carry nearest-hole/nearest-green association evidence for review, but that evidence is not verified association. The generic builder now prevents this stage from claiming completeness until registration, associations, routes and green anchors pass.
+
+`.github/workflows/validate-canonical-v2.yml` is explicitly named as a **manual live-acquisition candidate workflow**. It fetches fresh Overpass data to exercise that path; it is not a downstream consumer of the pinned source fixture and must not overwrite the source-only draft. Deterministic acceptance tests use committed fixtures and do not call external providers.
+
+This removes the ambiguity about which stage an artifact belongs to. The remaining work is to define and implement the **promotion contract** from an enriched candidate to an immutable published revision, with a build manifest and package-level QA.
 
 ### Contract gaps to resolve before publishing
 
@@ -280,4 +282,4 @@ The pinned-fixture adapter and the generic live-acquisition path are now much cl
 - Automate RLS visibility testing in isolated QA.
 - Complete measured satellite registration and explicit physical-feature/hole association.
 
-**Next DATA-001 action:** reconcile the pinned-fixture build path with the live-acquisition path and define the generated package manifest. Do not publish the live Supabase revision or modify the renderer until registration and association gates pass.
+**Next DATA-001 action:** implement the promotion gate and generated package manifest for the two explicit producer stages, then validate the offline package. Do not publish the live Supabase revision or modify the renderer until registration and association gates pass.
