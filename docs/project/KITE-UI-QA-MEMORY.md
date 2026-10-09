@@ -75,9 +75,9 @@ The shared engine should support calculation independently of whether Kite expos
 
 ## Saved-scorecard edit confirmation
 
-**Not yet answered:** After a player edits a previously saved scorecard and taps Save, should Kite save immediately and then show a brief “Changes Saved” pop-up using the shared component, or show a confirmation before saving?
-
-**Suggested default, awaiting user confirmation:** Save immediately, then show a brief “Changes Saved” pop-up. Editing already requires an explicit Edit Scorecard action, so another pre-save confirmation may add unnecessary friction.
+- After a player edits a saved scorecard and taps Save, save immediately, then show a brief “Changes Saved” pop-up using the shared component.
+- The pop-up auto-dismisses after around 1.5–2 seconds and has no dismissal button.
+- Show success only after the save succeeds. If saving fails, show a clear error and retry path.
 
 ## Working protocol
 
@@ -159,3 +159,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 - Tapping a saved round opens its scorecard in **Review mode**, showing the recorded hole-by-hole scores and relevant statistics for that specific round.
 - The saved data is not editable by default. Changes are possible only after the player explicitly selects **Edit Scorecard**.
 - Preserve the round's own persistent ID so review or edits always target the correct round.
+
+
+### Saved round timestamp after editing — 2026-10-09
+
+- Editing a saved round preserves its original date and time.
+- Update only that round's score data and recalculate the affected statistics; do not change the round timestamp as a side effect of editing.
