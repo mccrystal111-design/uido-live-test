@@ -226,3 +226,12 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - Prefer a brief **Undo** opportunity for **3 seconds** after the player chooses Discard Changes in the unsaved-changes pop-up, rather than adding a second confirmation step.
 - The discard action must remain reversible during that window: Undo restores the unsaved edits and returns the player to editing. After the 3-second window expires, abandon the edits and return to Review mode. The previously saved round is never altered by discarding unsaved edits.
+
+
+## Stats screen Q&A — continued 2026-10-09
+
+### Overview section content
+
+- Immediately beneath the prominent, editable handicap, show a compact summary of **average score, best round and most recent round**.
+- Follow this summary with the player's scoring trend.
+- Keep the opening view informative but uncluttered; detailed breakdowns belong in the Scoring and Performance sections.
