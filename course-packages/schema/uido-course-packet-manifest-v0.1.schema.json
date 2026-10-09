@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uido.example/schemas/course-packet-manifest-v0.1.json",
+  "title": "UiDo Course Packet Manifest v0.1",
+  "type": "object",
+  "required": [
+    "packet_format",
+    "course_id",
+    "course_revision",
+    "created_at",
+    "producer",
+    "coverage",
+    "coordinate_reference",
+    "units",
+    "files",
+    "minimum_loader_version",
+    "extensions"
+  ],
+  "properties": {
+    "packet_format": {
+      "const": "uido.course-packet/0.1"
+    },
+    "course_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "course_revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "producer": {
+      "type": "object",
+      "required": ["name", "version", "commit"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^(?:[a-fA-F0-9]{40}|working-tree|test-commit)$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "coverage": {
+      "type": "object",
+      "required": ["expected_holes", "included_hole_numbers", "complete", "status"],
+      "properties": {
+        "expected_holes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "included_hole_numbers": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 99
+          }
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["draft", "partial", "complete"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "coordinate_reference": {
+      "type": "object",
+      "required": ["id", "axis_order"],
+      "properties": {
+        "id": {
+          "const": "EPSG:4326"
+        },
+        "axis_order": {
+          "const": ["longitude", "latitude"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "units": {
+      "type": "object",
+      "required": ["linear", "elevation"],
+      "properties": {
+        "linear": {
+          "const": "metre"
+        },
+        "elevation": {
+          "const": "metre"
+        }
+      },
+      "additionalProperties": false
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "media_type", "byte_size", "sha256"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\)[^\\u0000]+$"
+          },
+          "media_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "byte_size": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{64}$"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "minimum_loader_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "extensions": {
+      "type": "object",
+      "required": ["canonical_stage", "validation_status", "publishable"],
+      "properties": {
+        "canonical_stage": {
+          "type": "string",
+          "enum": ["source_only_draft", "enriched_candidate"]
+        },
+        "validation_status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "publishable": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}
