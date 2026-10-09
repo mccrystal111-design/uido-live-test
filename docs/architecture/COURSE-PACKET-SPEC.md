@@ -232,7 +232,7 @@ These are observed schema gaps, not a rejection of PR #3. Before approval, use r
 
 The pinned source-normalized fixture and committed canonical draft now have a deterministic build path. `tools/course-model/build_overstone_canonical_from_normalized.py` rebuilds the canonical draft from the committed normalized OSM fixture, course registry and `course_green_data.json`. The acceptance workflow validates the output against `canonical-course.schema.json` and compares the rebuilt JSON with the committed artifact.
 
-[Overstone Fixture Acceptance QA run 37913378894](https://github.com/mccrystal111-design/uido-live-test/actions/runs/37913378894) passed:
+[Overstone Fixture Acceptance QA run 37913598055](https://github.com/mccrystal111-design/uido-live-test/actions/runs/37913598055) passed:
 - 159 stable physical feature IDs, exact source geometry, explicit type mapping and provenance.
 - 18 unique hole routes and pars.
 - All 54 green front/middle/back anchors match the pinned green source.
