@@ -122,6 +122,7 @@ def build(source: dict, registry: dict, greens: dict) -> dict:
             "current_revision": CANONICAL_REVISION,
         },
         "provenance": {
+            "stage": "source_only_draft",
             "policy": PROVENANCE_POLICY,
             "upstream_model_schema": source["schema"],
             "sources": [
