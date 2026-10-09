@@ -30,6 +30,42 @@ def source_available(model: dict, source_id: str) -> bool:
     )
 
 
+def registration_is_verified(registration: dict | None) -> bool:
+    """Only a measured registration solution can satisfy the publication gate."""
+    registration = registration or {}
+    return (
+        registration.get("status") in {"registered", "verified", "complete"}
+        and bool(registration.get("transform"))
+        and bool(registration.get("metrics"))
+    )
+
+
+def association_is_verified(feature: dict) -> bool:
+    """Distance-based association evidence is not equivalent to verification."""
+    association = feature.get("association") or {}
+    status = str(association.get("status") or feature.get("association_status") or "").lower()
+    return status in {"verified", "confirmed"} or association.get("verified") is True
+
+
+def associations_are_verified(model: dict) -> bool:
+    for hole in model.get("holes", []):
+        for feature, _default_type in iter_hole_features(hole):
+            if not association_is_verified(feature):
+                return False
+
+    for feature in model.get("unassigned_features", []) or []:
+        association = feature.get("association") or {}
+        method = association.get("method")
+        feature_type = str(feature.get("type") or "").upper()
+        if method == "non-hole-course-feature" and feature_type in {
+            "DRIVING_RANGE", "WOODLAND", "STRUCTURE", "OOB"
+        }:
+            continue
+        if not association_is_verified(feature):
+            return False
+    return True
+
+
 def iter_hole_features(hole: dict):
     for bucket, default_type in BUCKET_TYPES.items():
         for feature in hole.get(bucket, []) or []:
@@ -158,6 +194,13 @@ def main() -> None:
             physical.setdefault(normalized["id"], normalized)
 
     features = sorted(physical.values(), key=lambda f: f["id"])
+    # Presence of a route is not proof of physical-feature association, and
+    # an acquired OSM source is not proof of measured satellite registration.
+    if not registration_is_verified(model.get("registration")):
+        unresolved.append("satellite_registration")
+    if not associations_are_verified(model):
+        unresolved.append("hole_feature_association")
+
     complete = (
         len(holes) == 18
         and not unresolved
