@@ -106,4 +106,4 @@ Promotion to a publishable course revision is a separate, explicit step after ge
 
 An incomplete model cannot be packaged without the explicit `--draft` flag. That flag only permits a QA artefact; it does not publish, update Supabase or mark the course complete. A packet is publishable only from the `enriched_candidate` stage after the canonical completeness gates, full hole coverage, route provenance and green anchors all pass. Promotion to a published immutable revision is still a separate, not-yet-implemented step.
 
-The deterministic `overstone-fixture-qa.yml` workflow tests fixture/schema agreement, completeness gates, packet manifest hashes and the explicit draft-only rule. It does not fetch live sources or write to Supabase.
+The deterministic `overstone-fixture-qa.yml` workflow tests fixture/schema agreement, completeness gates, packet manifest hashes and the explicit draft-only rule. [Run 37914106427](https://github.com/mccrystal111-design/uido-live-test/actions/runs/37914106427) passed all steps. It does not fetch live sources or write to Supabase. The next step is integration with the actual offline loader, followed by an explicit promotion gate.
