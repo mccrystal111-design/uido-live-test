@@ -291,3 +291,10 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - In the Stats Scoring section, show the **average gross score** separately for par 3s, par 4s and par 5s.
 - Do not use average score relative to par for this particular breakdown; the user wants average gross strokes for each hole-par category.
+
+
+### Putting statistics in Stats — 2026-10-09
+
+- Include average putts per hole and average putts per round in the Scoring section when putting data is available, consistent with familiar golf-statistics conventions.
+- Treat putting counts as context, not a standalone verdict on putting performance. Low putt totals can result from missed greens and good chipping/up-and-down play; interpret putting alongside other recorded context such as greens in regulation and scoring rather than implying fewer putts always means better putting.
+- If the required data is not recorded, leave the statistic blank rather than displaying zero or a dash.
