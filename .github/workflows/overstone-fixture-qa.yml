@@ -13,6 +13,9 @@ on:
       - 'tools/course-model/validate_overstone_fixture.py'
       - 'tools/course-model/build_canonical_course.py'
       - 'tools/course-model/test_build_canonical_course.py'
+      - 'tools/course-model/build_course_packet.py'
+      - 'tools/course-model/test_course_packet_builder.py'
+      - 'course-packages/schema/uido-course-packet-manifest-v0.1.schema.json'
       - '.github/workflows/overstone-fixture-qa.yml'
   workflow_dispatch:
 
@@ -32,3 +35,5 @@ jobs:
         run: python3 tools/course-model/validate_overstone_fixture.py
       - name: Test canonical publication gates
         run: python3 tools/course-model/test_build_canonical_course.py
+      - name: Test course packet manifest and draft gate
+        run: python3 tools/course-model/test_course_packet_builder.py
