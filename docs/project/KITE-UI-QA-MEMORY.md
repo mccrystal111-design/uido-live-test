@@ -131,3 +131,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 - Scores lists only rounds that have been **ended and retained**.
 - Discarded rounds are excluded.
 - A round that is still in progress or was abandoned without being ended is not shown in Scores.
+
+
+### Same-day rounds — 2026-10-09
+
+- Multiple rounds played at the same course on the same date appear as **separate cards**.
+- Store a date-and-time timestamp for each round and use it to distinguish rounds and support newest-first ordering. Show the time on the card when needed to disambiguate same-day rounds.
