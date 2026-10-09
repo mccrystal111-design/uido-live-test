@@ -109,8 +109,8 @@ function updateSyncStatus(){el('syncStatus')&&(el('syncStatus').textContent=core
 function yd(v){return v!==''&&v!=null&&Number.isFinite(Number(v))?Math.round(Number(v)):'—'}
 async function startCoreRound(){
  if(!currentUser)return;
- const courseId=el('roundCourseId').value.trim();
- const courseVersionId=el('roundVersionId').value.trim();
+ const courseId=el('roundCourseId').value.trim().toLowerCase();
+ const courseVersionId=el('roundVersionId').value.trim().toLowerCase();
  const uuidPattern=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
  if(!uuidPattern.test(courseId)||!uuidPattern.test(courseVersionId)){
   throw new Error('Choose an active course and a published course version. Both IDs must be valid UUIDs; a course slug is not an ID.');
@@ -125,7 +125,7 @@ async function startCoreRound(){
  if(!course||course.status!=='active'){
   throw new Error('That course is not active.');
  }
- const teeSetId=el('roundTeeId').value.trim();
+ const teeSetId=el('roundTeeId').value.trim().toLowerCase();
  if(teeSetId){
   if(!uuidPattern.test(teeSetId))throw new Error('Tee set ID must be a valid UUID.');
   const {data:teeSet,error:teeError}=await supabaseClient.from('tee_sets').select('id,course_version_id').eq('id',teeSetId).eq('course_version_id',courseVersionId).maybeSingle();
