@@ -40,6 +40,9 @@ def sample_model(registration=None, association=None, missing_route=None, missin
                 "type": "LineString",
                 "coordinates": [[-0.1, 52.0], [-0.099, 52.001]],
             } if number != missing_route else None,
+            "routing_provenance": {
+                "source_id": "osm", "source_feature_id": f"way/test-route-{number}"
+            } if number != missing_route else None,
             "green": None if number == missing_green else {
                 "front": {"lon": -0.1001, "lat": 52.0001},
                 "middle": {"lon": -0.1000, "lat": 52.0002},
@@ -97,6 +100,7 @@ class CanonicalCompletenessGateTests(unittest.TestCase):
         self.assertEqual(result["geometry"]["features"][0]["provenance"]["source_id"], "osm")
         self.assertEqual(result["holes"][0]["routing"]["type"], "LineString")
         self.assertIn("front", result["holes"][0]["green"])
+        self.assertEqual(result["holes"][0]["routing_provenance"]["source_id"], "osm")
 
     def test_missing_route_blocks_completeness_even_with_verified_gates(self):
         result = build_canonical(sample_model(missing_route=7))
