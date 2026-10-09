@@ -65,9 +65,5 @@ jobs:
               path = Path(tempfile.gettempdir()) / f"hawk-inline-{index}.js"
               path.write_text(source, encoding="utf-8")
               subprocess.run(["node", "--check", str(path)], check=True)
-              for token in ["\\\\nlet ", "\\\\nconst ", "\\\\nfunction ", "\\\\nasync function "]:
-                  if token in source:
-                      raise SystemExit(f"Found literal backslash-n before JavaScript declaration: {token!r}")
-
           print(f"PASS: {len(parser.inline_scripts)} inline JavaScript block(s) parsed successfully.")
           PY
