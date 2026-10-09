@@ -201,6 +201,29 @@ def build_route(hole: dict) -> dict | None:
     return geometry if isinstance(geometry, dict) else None
 
 
+def route_provenance(hole: dict) -> dict | None:
+    explicit = hole.get("routing_provenance")
+    if isinstance(explicit, dict) and explicit.get("source_id") and explicit.get("source_feature_id"):
+        return explicit
+    routing = hole.get("routing")
+    if not isinstance(routing, dict):
+        return None
+    raw_provenance = routing.get("provenance")
+    source_refs = routing.get("source_refs") or []
+    if isinstance(raw_provenance, dict):
+        source_id = raw_provenance.get("source_id") or "unknown"
+        source_feature_id = raw_provenance.get("source_feature_id") or (source_refs[0] if source_refs else routing.get("id"))
+    elif isinstance(raw_provenance, str) and raw_provenance.startswith("source:"):
+        source_id = raw_provenance.split(":", 1)[1]
+        source_feature_id = source_refs[0] if source_refs else routing.get("id")
+    else:
+        source_id = str(routing.get("source_id") or "unknown")
+        source_feature_id = source_refs[0] if source_refs else routing.get("id")
+    if source_feature_id is None:
+        source_feature_id = f"hole:{int(hole['hole_number'])}:routing"
+    return {"source_id": str(source_id), "source_feature_id": str(source_feature_id)}
+
+
 def build_canonical(model: dict) -> dict:
     osm_available = source_available(model, "osm")
 
@@ -256,6 +279,7 @@ def build_canonical(model: dict) -> dict:
             "hole_number": number,
             "par": raw_hole.get("par"),
             "routing": route,
+            "routing_provenance": route_provenance(raw_hole),
             "truth": truth,
         }
         if green is not None:
