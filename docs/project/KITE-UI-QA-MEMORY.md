@@ -374,3 +374,10 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 - Place the shared **Front 9 / Back 9 / Both** selector once at the top of the Stats Performance section.
 - Keep the selector/header row sticky while the player scrolls through Performance so it remains visible and continues to control all relevant statistics below it.
 - Ensure the sticky row does not obscure content and behaves sensibly on a mobile viewport.
+
+
+### Sticky Stats navigation and Performance filter — 2026-10-09
+
+- Keep the main **Overview / Scoring / Performance** tabs sticky at the top of the Stats page during scrolling.
+- Keep the **Front 9 / Back 9 / Both** filter row sticky beneath the main tabs while the player is in the Performance section.
+- Both rows remain visible together when relevant, with careful mobile spacing so neither overlaps nor obscures page content. The filter controls the relevant Performance statistics below it.
