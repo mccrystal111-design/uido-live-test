@@ -367,3 +367,10 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - Average putts per hole and average putts per round should follow the shared **Front 9 / Back 9 / Both** filter. When Front 9 or Back 9 is selected, calculate the putting figures from the relevant played holes/round segments only.
 - Keep putting statistics contextual rather than treating low putt counts alone as proof of good putting. Missing putting data remains missing and is not treated as zero.
+
+
+### Sticky Performance filter header — 2026-10-09
+
+- Place the shared **Front 9 / Back 9 / Both** selector once at the top of the Stats Performance section.
+- Keep the selector/header row sticky while the player scrolls through Performance so it remains visible and continues to control all relevant statistics below it.
+- Ensure the sticky row does not obscure content and behaves sensibly on a mobile viewport.
