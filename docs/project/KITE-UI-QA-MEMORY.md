@@ -171,3 +171,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - Editing a saved scorecard is for correcting that round's score data, not changing who played or which course the round was played at.
 - Keep the original player and course association fixed during scorecard editing. If either was recorded incorrectly, treat that as a separate correction workflow rather than a normal scorecard edit; the details of that workflow are not yet specified.
+
+
+### Saved scorecard editable data — 2026-10-09
+
+- In Edit Scorecard mode, all recorded round stats should be editable, not just hole-by-hole gross scores. This includes putts and other statistics captured for the round.
+- Keep the original player and course association fixed, and preserve the original round date/time. Saving updates that round's entered data and recalculates affected statistics; other rounds remain unchanged.
