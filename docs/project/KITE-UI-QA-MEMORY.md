@@ -316,3 +316,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - Do not include average score by hole number (holes 1–18) in the general Stats Performance section. It is too dependent on the particular course.
 - Avoid splitting general player stats into separate course-specific views for now. Keep Stats focused on the player's overall game across rounds and courses.
+
+
+### Handicap trend in Stats — 2026-10-09
+
+- Do not add a handicap-over-time graph to the general Stats Performance section at this stage. Handicap can move sharply after a cluster of good rounds and then remain unchanged through many mediocre rounds, depending on the handicap system's calculation and how often the player plays; a simple trend could be misleading or duplicate the prominent current handicap in Overview.
+- Keep the current handicap prominent in Overview. Any future handicap history view should explain the system and its update behaviour rather than presenting the line as a simple measure of current form.
