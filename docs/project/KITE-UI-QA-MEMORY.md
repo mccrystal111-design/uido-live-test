@@ -430,3 +430,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - Preferred provisional direction: use cards for **fairways hit %** and **greens in regulation (GIR) %**, followed by the putting figures and horizontal scoring-outcome bar chart.
 - The user needs to see the rendered layout before approving the cards. Avoid making them so small that labels or values feel cramped; adjust sizing and grouping during the Figma review. Do not change Figma during Q&A.
+
+
+### Stats Scoring card consistency — 2026-10-09
+
+- Use **three cards in a single row** for the average gross scores on par 3s, par 4s and par 5s, following the same three-card pattern used elsewhere in Stats for visual consistency.
+- Treat the single-row layout as the preferred direction, then validate readability and spacing in the Figma example; do not change Figma during Q&A.
