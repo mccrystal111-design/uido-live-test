@@ -249,16 +249,24 @@ The deterministic adapter is `tools/course-model/build_overstone_canonical_from_
 5. **Package artefact:** `course-packages/schema/uido-course-package-v0.1.json` is currently a sample-shaped JSON document with null build timestamp/checksum, not a validated generated package or a JSON Schema. Do not treat it as a publishable packet.
 6. **Geometry schema:** `course-models/canonical-course.schema.json` accepts any object for geometry and free-form feature type strings. It does not yet enforce valid GeoJSON structure, geometry/type compatibility, coordinate ranges or required feature-level provenance.
 
-### Fixture acceptance tests to implement
+### Acceptance checks — implemented and remaining
 
-- Build from a pinned, committed source fixture and record the exact producer commit.
-- Assert 18 unique hole numbers, 18 route geometries, explicit par/unknown states and course-level completeness status.
-- Assert stable physical feature IDs and the expected 159-feature count for this exact Overstone fixture; do not hard-code this count as a universal course rule.
-- Assert the documented source-to-canonical type mapping and geometry types, including the separation of hole routing from physical features.
-- Validate finite WGS84 coordinates in longitude/latitude order, non-empty valid geometry and plausible course bounds.
-- Assert every physical feature has a resolvable source/provenance link or an explicit manually-authored reason.
-- Assert unresolved registration/association prevents publication; only publish after a machine-readable validation report passes or records an explicitly approved exception.
-- Round-trip the validated model through the intended course-packet builder and verify manifest file hashes, revision identity and offline-required assets.
-- Test Supabase visibility with an anonymous/authenticated read: draft revisions must remain hidden; only published revisions and their intended public data should be readable.
+**Implemented and green**
+- Deterministic build from the pinned source-normalized fixture via `tools/course-model/build_overstone_canonical_from_normalized.py`; the generated JSON is compared with the committed canonical draft.
+- Assert 18 unique hole numbers, 18 route geometries, pars, stable physical feature IDs and the explicit source-to-canonical type map.
+- Compare exact source geometry and provenance links for all 159 physical features.
+- Validate GeoJSON geometry types and finite WGS84 longitude/latitude ranges.
+- Keep `course_complete=false` while satellite registration and hole-feature association remain unresolved.
+- Generic-builder unit tests verify that pending registration, nearest-path heuristic association and missing routes block completeness; a synthetic fixture with both gates explicitly verified can complete. [Run 37912849298](https://github.com/mccrystal111-design/uido-live-test/actions/runs/37912849298) passed.
+- Supabase public-read policies were inspected manually and currently expose course versions, holes, features and tees only for published versions. Automated RLS visibility testing remains open.
+
+**Remaining before publishing**
+- Reconcile the pinned-fixture adapter with the separate live-acquisition / `build_overstone_model.py` / `build_canonical_course.py` path and declare one authoritative producer or explicitly version both contracts.
+- Include or explicitly reference green front/middle/back anchors in the runtime package; the canonical draft currently lists their source in provenance but does not carry the anchors in its hole records.
+- Record the exact producer commit, source hashes and build manifest for every generated packet.
+- Strengthen geometry checks with plausible course bounds, polygon ring closure/topology and other geometry validity rules.
+- Generate a real offline-ready course package with manifest, asset list and checksums; the current package-shaped JSON remains a sample, not a validated package.
+- Automate Supabase visibility checks against an isolated QA environment.
+- Complete measured satellite registration and explicit physical-feature/hole association; do not publish before these gates pass.
 
 **Next DATA-001 action:** reconcile the pinned-fixture adapter with the separate live-acquisition / `build_overstone_model.py` / `build_canonical_course.py` path, then declare one authoritative producer or explicitly version both contracts. Include or explicitly reference green front/middle/back anchors in the runtime package. Do not change the live revision to `published` or modify the renderer until builder reconciliation, geometry validity, registration and association gates pass.
