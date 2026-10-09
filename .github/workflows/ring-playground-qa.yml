@@ -109,6 +109,7 @@ jobs:
                           report["failures"].append(f"{width}x{height}: bound field value did not render after data change")
                       # Move the UI element; the mirrored target must move to exactly the same layout percentages.
                       ui=page.locator("#canvas .object").filter(has_text="401").first
+                      ui.hover()
                       ui_box=ui.bounding_box()
                       ui_style_before=ui.get_attribute("style")
                       if not ui_box:
@@ -134,7 +135,6 @@ jobs:
                         const expected=document.querySelector('#canvas .object[data-id="'+id+'"]');
                         return {isExpected:hit===expected,hitTag:hit?.tagName,hitId:hit?.dataset?.id||null,hitText:(hit?.textContent||'').trim().slice(0,40),expectedId:expected?.dataset?.id||null};
                       }""",[start_x,start_y,ui.get_attribute("data-id")])
-                      ui.hover()
                       page.mouse.move(start_x,start_y)
                       page.mouse.down()
                       page.mouse.move(start_x+24,start_y+18,steps=4)
