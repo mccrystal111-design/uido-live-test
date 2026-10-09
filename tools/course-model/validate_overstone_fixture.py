@@ -192,6 +192,9 @@ def main():
         source_hole = source_holes_by_number[number]
         hole = canonical_holes_by_number[number]
         assert hole.get("routing") == source_hole.get("geometry"), f"Hole {number}: routing geometry mismatch"
+        assert hole.get("routing_provenance") == {
+            "source_id": "osm", "source_feature_id": str(source_hole["source_id"])
+        }, f"Hole {number}: route provenance mismatch"
         raw_par = (source_hole.get("properties") or {}).get("par")
         expected_par = int(raw_par) if str(raw_par or "").isdigit() else None
         assert hole.get("par") == expected_par, f"Hole {number}: par mismatch"
