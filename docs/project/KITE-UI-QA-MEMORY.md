@@ -124,3 +124,10 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 ### Scores list ordering — 2026-10-09
 
 - Show saved rounds in **reverse chronological order**, with the most recently played round first.
+
+
+### Scores inclusion rule — 2026-10-09
+
+- Scores lists only rounds that have been **ended and retained**.
+- Discarded rounds are excluded.
+- A round that is still in progress or was abandoned without being ended is not shown in Scores.
