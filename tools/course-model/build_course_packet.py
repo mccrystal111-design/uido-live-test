@@ -43,6 +43,26 @@ def sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def input_artifact_record(path: Path) -> dict:
+    resolved = path.resolve()
+    try:
+        relative = resolved.relative_to(ROOT).as_posix()
+    except ValueError as exc:
+        raise ValueError(f"Input artifact must be inside the repository: {path}") from exc
+    return {"path": relative, "sha256": sha256(path.read_bytes())}
+
+
+def collect_input_artifacts(canonical_path: Path, registry_path: Path, stage: str) -> list[dict]:
+    paths = [canonical_path, registry_path]
+    if stage == "source_only_draft":
+        paths.extend([
+            ROOT / "course-models/source-normalized/overstone-source-normalized-v0.1.json",
+            ROOT / "course_green_data.json",
+        ])
+    records = [input_artifact_record(path) for path in paths]
+    return sorted(records, key=lambda item: item["path"])
+
+
 def safe_relative_path(path: str) -> bool:
     pure = PurePosixPath(path)
     return (
@@ -259,6 +279,7 @@ def build_packet(
     producer_version: str,
     created_at: str,
     allow_draft: bool,
+    input_artifacts: list[dict] | None = None,
 ) -> dict:
     try:
         from jsonschema import Draft202012Validator, FormatChecker
@@ -271,6 +292,16 @@ def build_packet(
         raise ValueError(f"Unsupported canonical stage: {stage!r}")
 
     files = packet_files(canonical, registry)
+    provenance_record = files["provenance/sources.json"]
+    provenance_record["input_artifacts"] = sorted(input_artifacts or [], key=lambda item: item["path"])
+    green_artifact = next(
+        (item for item in provenance_record["input_artifacts"] if item["path"] == "course_green_data.json"),
+        None,
+    )
+    if green_artifact:
+        for source in provenance_record.get("sources", []):
+            if source.get("id") == "greens":
+                source["source_sha256"] = green_artifact["sha256"]
     validation = canonical.get("validation") or {}
     expected_holes_for_course = int(registry.get("courses", {}).get(canonical["course"]["id"], {}).get("holes") or 0)
     publishable = is_publishable(canonical, expected_holes_for_course)
@@ -354,14 +385,22 @@ def main() -> None:
     parser.add_argument("--draft", action="store_true", help="Allow QA-only output when publication gates are unresolved")
     args = parser.parse_args()
 
+    canonical_path = Path(args.canonical)
+    registry_path = Path(args.registry)
+    canonical = load(canonical_path)
+    registry = load(registry_path)
+    input_artifacts = collect_input_artifacts(
+        canonical_path, registry_path, canonical.get("provenance", {}).get("stage", "")
+    )
     manifest = build_packet(
-        load(Path(args.canonical)),
-        load(Path(args.registry)),
+        canonical,
+        registry,
         Path(args.out),
         args.producer_commit,
         args.producer_version,
         args.created_at,
         args.draft,
+        input_artifacts,
     )
     print(json.dumps({
         "packet_dir": str(Path(args.out)),
