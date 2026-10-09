@@ -10,7 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from build_canonical_course import build_canonical  # noqa: E402
 
 
-def sample_model(registration=None, association=None, missing_route=None):
+def sample_model(registration=None, association=None, missing_route=None, missing_green=None):
     feature = {
         "id": "way/test-tee",
         "type": "TEE",
@@ -35,7 +35,12 @@ def sample_model(registration=None, association=None, missing_route=None):
                 "type": "LineString",
                 "coordinates": [[-0.1, 52.0], [-0.099, 52.001]],
             } if number != missing_route else None,
-            "green": None,
+            "green": None if number == missing_green else {
+                "front": {"lon": -0.1001, "lat": 52.0001},
+                "middle": {"lon": -0.1000, "lat": 52.0002},
+                "back": {"lon": -0.0999, "lat": 52.0003},
+                "provenance": {"front": "source:greens", "middle": "source:greens", "back": "source:greens"},
+            },
             "tees": [feature] if number == 1 else [],
             "fairways": [],
             "rough": [],
@@ -82,11 +87,21 @@ class CanonicalCompletenessGateTests(unittest.TestCase):
         self.assertEqual(result["validation"]["holes_complete"], 18)
         self.assertEqual(result["validation"]["physical_geometry_count"], 1)
         self.assertEqual(result["validation"]["unresolved_features"], [])
+        self.assertEqual(result["geometry"]["features"][0]["type"], "teeing_area")
+        self.assertEqual(result["geometry"]["features"][0]["provenance"]["source_id"], "osm")
+        self.assertEqual(result["holes"][0]["routing"]["type"], "LineString")
+        self.assertIn("front", result["holes"][0]["green"])
 
     def test_missing_route_blocks_completeness_even_with_verified_gates(self):
         result = build_canonical(sample_model(missing_route=7))
         self.assertFalse(result["validation"]["course_complete"])
         self.assertIn({"hole": 7, "feature": "routing"}, result["validation"]["unresolved_features"])
+
+    def test_missing_green_anchors_blocks_completeness(self):
+        result = build_canonical(sample_model(missing_green=4))
+        self.assertFalse(result["validation"]["course_complete"])
+        self.assertIn({"hole": 4, "feature": "green_anchors"}, result["validation"]["unresolved_features"])
+        self.assertIn("green_anchors", result["validation"]["unresolved_features"])
 
 
 if __name__ == "__main__":
