@@ -339,3 +339,8 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 ### Nine-hole rounds in front/back averages — 2026-10-09
 
 - A 9-hole round contributes only to the front-nine or back-nine average corresponding to the nine actually played. Never count one 9-hole round as both sides or infer data for the unplayed nine.
+
+
+### Front/back-nine average measure — 2026-10-09
+
+- Use **average score relative to par** for the Front 9 / Back 9 / Both breakdown, consistent with the 18-hole scoring averages and the main scoring-trend chart. Do not switch to gross strokes for the nine-hole comparison.
