@@ -8,7 +8,8 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from build_canonical_course import build_canonical  # noqa: E402\nfrom jsonschema import Draft202012Validator  # noqa: E402
+from build_canonical_course import build_canonical  # noqa: E402
+from jsonschema import Draft202012Validator  # noqa: E402
 
 
 def sample_model(registration=None, association=None, missing_route=None, missing_green=None):
