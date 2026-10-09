@@ -90,7 +90,8 @@
         "required": [
           "hole_number",
           "routing",
-          "truth"
+          "truth",
+          "routing_provenance"
         ],
         "properties": {
           "hole_number": {
@@ -124,6 +125,31 @@
           },
           "green": {
             "$ref": "#/$defs/greenAnchors"
+          },
+          "routing_provenance": {
+            "anyOf": [
+              {
+                "type": "object",
+                "required": [
+                  "source_id",
+                  "source_feature_id"
+                ],
+                "properties": {
+                  "source_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "source_feature_id": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": true
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false
