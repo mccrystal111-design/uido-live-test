@@ -381,3 +381,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 - Keep the main **Overview / Scoring / Performance** tabs sticky at the top of the Stats page during scrolling.
 - Keep the **Front 9 / Back 9 / Both** filter row sticky beneath the main tabs while the player is in the Performance section.
 - Both rows remain visible together when relevant, with careful mobile spacing so neither overlaps nor obscures page content. The filter controls the relevant Performance statistics below it.
+
+
+### Overview summary and round-length filter — 2026-10-09
+
+- Where practical, let the Overview summary metrics (average score, best round and most recent round) respect the same **9 holes / 18 holes / Both** filter used by the scoring-trend chart.
+- This is a preference for consistent filtering, not a reason to complicate the layout. Ensure the summary compares like with like and does not combine 9-hole and 18-hole gross totals as if they were equivalent.
