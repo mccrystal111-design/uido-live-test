@@ -399,3 +399,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - Preferred initial design direction: compact cards for **average score**, **best round** and **most recent round**.
 - This is provisional until the user sees an example. Present a rendered visual example for review before treating the layout as approved; do not make Figma changes during Q&A.
+
+
+### Stats Overview chart placement — 2026-10-09
+
+- Provisional layout: place the scoring-trend chart immediately beneath the three compact summary cards, with the 5 / 10 / 20 round-count and 9 holes / 18 holes / Both filters directly above the graph.
+- This layout is not yet approved. The user wants to see an example and try it in Figma later before confirming the arrangement. Do not change Figma during Q&A.
