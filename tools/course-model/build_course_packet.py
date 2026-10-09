@@ -238,7 +238,8 @@ def packet_files(canonical: dict, registry: dict) -> dict[str, dict]:
     files["validation/report.json"] = {
         "canonical_validation": validation,
         "packet_validation": {
-            "canonical_schema_valid": True,\n            "packet_structure_checked": True,
+            "canonical_schema_valid": True,
+            "packet_structure_checked": True,
             "publishable": publishable,
             "canonical_stage": stage,
             "expected_holes": expected_holes,
