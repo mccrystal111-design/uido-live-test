@@ -334,3 +334,8 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 - Include scoring averages split by **Front 9 / Back 9 / Both** across rounds, without creating separate course-specific stats views.
 - Provide a filter with **Front 9**, **Back 9** and **Both** options so players can compare starts, finishes or the full round.
 - Apply the selected split consistently to the displayed scoring average and use only the holes/rounds available for that selection; do not treat missing scores as zero.
+
+
+### Nine-hole rounds in front/back averages — 2026-10-09
+
+- A 9-hole round contributes only to the front-nine or back-nine average corresponding to the nine actually played. Never count one 9-hole round as both sides or infer data for the unplayed nine.
