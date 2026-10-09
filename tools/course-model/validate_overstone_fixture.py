@@ -134,6 +134,7 @@ def main():
     assert source.get("schema") == "uido.course.source-normalized.v0.1"
     assert canonical.get("schema") == "uido.course.canonical.v2"
     assert source.get("course_id") == canonical.get("course", {}).get("id") == "overstone-park"
+    assert (canonical.get("provenance") or {}).get("stage") == "source_only_draft"
 
     source_features = source.get("features", [])
     source_holes = [f for f in source_features if f.get("canonical_type") == "HOLE"]
