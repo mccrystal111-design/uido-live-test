@@ -195,3 +195,11 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - The user has no strong preference about whether the Stats page refreshes immediately after a saved round is edited or on next opening.
 - Implementation default: update/recalculate the underlying stats as soon as the saved edit succeeds, so any subsequent view of Stats reflects the latest data. No extra screen or confirmation is needed for the recalculation.
+
+
+### Leaving saved-scorecard edit mode with unsaved changes — 2026-10-09
+
+- If a player attempts to leave Edit Scorecard mode with unsaved changes, show a confirmation pop-up with three actions: **Save Changes**, **Discard Changes**, and **Continue Editing**.
+- Save Changes persists the edits and only reports success after saving succeeds.
+- Discard Changes abandons the unsaved edits and preserves the previously saved round.
+- Continue Editing closes the pop-up and returns to the edit state without losing the player's current changes.
