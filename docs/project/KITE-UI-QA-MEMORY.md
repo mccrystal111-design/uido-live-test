@@ -100,3 +100,15 @@ Reviewed the current rendered frames on Figma page **02 — Product UI**. Preser
 - **Stats page**: no separate top-level Kite Stats screen was identified on the inspected Product UI page. The scorecard contains a Round Statistics section, but that is not the agreed player Stats screen. A dedicated Stats frame will need to be designed later using the confirmed one-page scroll layout and sticky Overview / Scoring / Performance tabs.
 
 This was a baseline review, not a design edit. No Figma layers were changed and no GitHub Actions were run.
+
+
+## Scores screen — confirmed direction (2026-10-09)
+
+- Create a dedicated **Scores** screen; no existing top-level Scores frame was found in the inspected Product UI page.
+- Keep it deliberately simple: a vertically scrollable list of saved-round cards, with each card showing **date played, total/gross score, net score, and course name**.
+- Tapping a card opens the existing Scorecard screen in Review mode, populated with that specific saved round. Do not design a second scorecard.
+- Avoid graphs, extra performance metrics, filters, and dashboard decoration on Scores; those belong on Stats or can be considered later only if a real need emerges.
+- Use the existing Kite navy-and-white styling and established typography/icon assets.
+- Any example rounds in the design must be marked as illustrative data, not real saved-round records.
+- Each card must be bound to its own persistent round ID in implementation so the correct round opens.
+- Design attempt on 2026-10-09 did not complete successfully; no new Scores frame was verified as created. Do not assume the screen exists in Figma yet.
