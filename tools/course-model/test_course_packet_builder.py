@@ -10,7 +10,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from build_course_packet import build_packet  # noqa: E402
+from build_course_packet import build_packet, collect_input_artifacts  # noqa: E402
 from jsonschema import Draft202012Validator, FormatChecker  # noqa: E402
 
 
@@ -30,6 +30,9 @@ class CoursePacketBuilderTests(unittest.TestCase):
         self.registry = load(REGISTRY_PATH)
         self.producer_commit = "0" * 40
         self.created_at = "2026-10-09T00:00:00Z"
+        self.input_artifacts = collect_input_artifacts(
+            CANONICAL_PATH, REGISTRY_PATH, self.canonical["provenance"]["stage"]
+        )
 
     def test_incomplete_canonical_requires_explicit_draft_flag(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -37,7 +40,7 @@ class CoursePacketBuilderTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "pass --draft"):
                 build_packet(
                     self.canonical, self.registry, output, self.producer_commit,
-                    "0.1.0", self.created_at, False,
+                    "0.1.0", self.created_at, False, self.input_artifacts,
                 )
             self.assertFalse(output.exists())
 
@@ -46,7 +49,7 @@ class CoursePacketBuilderTests(unittest.TestCase):
             output = Path(tmp) / "packet"
             manifest = build_packet(
                 self.canonical, self.registry, output, self.producer_commit,
-                "0.1.0", self.created_at, True,
+                "0.1.0", self.created_at, True, self.input_artifacts,
             )
 
             schema = load(MANIFEST_SCHEMA_PATH)
@@ -101,6 +104,15 @@ class CoursePacketBuilderTests(unittest.TestCase):
             self.assertIn("satellite_registration", report["packet_validation"]["blocking_gates"])
             self.assertIn("hole_feature_association", report["packet_validation"]["blocking_gates"])
             self.assertTrue((output / "provenance/sources.json").is_file())
+            provenance = load(output / "provenance/sources.json")
+            input_paths = [item["path"] for item in provenance["input_artifacts"]]
+            self.assertEqual(input_paths, sorted(input_paths))
+            self.assertIn("course-models/source-normalized/overstone-source-normalized-v0.1.json", input_paths)
+            self.assertIn("course_green_data.json", input_paths)
+            green_source = next(source for source in provenance["sources"] if source["id"] == "greens")
+            self.assertRegex(green_source["source_sha256"], r"^[a-f0-9]{64}$")
+            for item in provenance["input_artifacts"]:
+                self.assertRegex(item["sha256"], r"^[a-f0-9]{64}$")
 
 
 if __name__ == "__main__":
