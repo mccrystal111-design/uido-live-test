@@ -209,3 +209,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - If saving fails because of a connection or technical error, keep the player's current edits on screen and allow them to retry.
 - Do not show a success confirmation or discard the edits unless the save has actually succeeded. Show a clear error/retry path.
+
+
+### Successful saved-scorecard edit feedback — 2026-10-09
+
+- After a saved scorecard edit saves successfully, show a brief **“Changes Saved”** pop-down/toast for **1 second**, then dismiss it automatically.
+- Return to Review mode after the successful save; the toast is brief feedback, not a separate confirmation step. Never show it before the save succeeds.
