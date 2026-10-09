@@ -304,3 +304,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - Include **fairways hit percentage** and **greens in regulation (GIR) percentage** in the Stats Scoring section when the player has recorded the required data.
 - Keep these statistics optional; if data is missing, leave the display blank and do not interpret missing data as zero.
+
+
+### Scoring outcome distribution — 2026-10-09
+
+- Include a familiar golf scoring breakdown in Stats Performance: birdies, pars, bogeys, and double bogeys or worse, shown as the percentage of holes in each category.
+- This is a conventional, easy-to-understand scoring summary. Calculate from recorded hole scores relative to each hole's par; do not treat missing hole scores as a scoring category.
