@@ -38,7 +38,8 @@
       "required": [
         "policy",
         "sources",
-        "upstream_model_schema"
+        "upstream_model_schema",
+        "stage"
       ],
       "properties": {
         "policy": {
@@ -52,6 +53,13 @@
           "items": {
             "type": "object"
           }
+        },
+        "stage": {
+          "type": "string",
+          "enum": [
+            "source_only_draft",
+            "enriched_candidate"
+          ]
         }
       }
     },
