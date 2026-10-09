@@ -265,3 +265,10 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 ### Lowest-round star criterion — 2026-10-09
 
 - The star on the Stats trend chart marks the round with the **best score relative to par**, not simply the fewest gross strokes. Use the round's score-to-par result so performances across different course pars are compared meaningfully.
+
+
+### Stats chart score measure — 2026-10-09
+
+- Plot each round's result **relative to par** (for example, +4 or −2), not gross strokes.
+- Calculate and display the 3-round rolling average using the same relative-to-par measure so the plotted series and trend line are directly comparable across courses.
+- The star marks the best round relative to par.
