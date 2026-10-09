@@ -260,3 +260,8 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - Calculate the rolling average using the **last 3 rounds at each point** in the Stats chart, making it responsive to recent form.
 - For the first one or two points where fewer than three rounds are available, use the available rounds rather than inventing data; keep missing data distinct from zero.
+
+
+### Lowest-round star criterion — 2026-10-09
+
+- The star on the Stats trend chart marks the round with the **best score relative to par**, not simply the fewest gross strokes. Use the round's score-to-par result so performances across different course pars are compared meaningfully.
