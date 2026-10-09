@@ -113,6 +113,12 @@ jobs:
                       ui_style_before=ui.get_attribute("style")
                       if not ui_box:
                           raise AssertionError("Bound middle-yardage object has no bounding box")
+                      page.evaluate("""() => {
+                        window.__qaPointerEvents={down:0,move:0,up:0};
+                        document.addEventListener('pointerdown',()=>window.__qaPointerEvents.down++,true);
+                        document.addEventListener('pointermove',()=>window.__qaPointerEvents.move++,true);
+                        document.addEventListener('pointerup',()=>window.__qaPointerEvents.up++,true);
+                      }""")
                       start_x=ui_box["x"]+ui_box["width"]/2
                       start_y=ui_box["y"]+ui_box["height"]/2
                       page.mouse.move(start_x,start_y)
@@ -122,8 +128,16 @@ jobs:
                       page.wait_for_timeout(100)
                       ui_style=ui.get_attribute("style")
                       mirror_style=page.locator("#mirrorCanvas .mirror-target").nth(1).get_attribute("style")
+                      record["drag_diagnostics"]={
+                          "pointer_events":page.evaluate("window.__qaPointerEvents"),
+                          "before":geometry_style(ui_style_before),
+                          "after":geometry_style(ui_style),
+                          "selected":ui.evaluate("(el)=>el.classList.contains('selected')")
+                      }
+                      if not record["drag_diagnostics"]["pointer_events"]["down"]:
+                          report["failures"].append(f"{width}x{height}: pointerdown did not reach the yardage object; diagnostics={record['drag_diagnostics']}")
                       if geometry_style(ui_style)==geometry_style(ui_style_before):
-                          report["failures"].append(f"{width}x{height}: drag did not move the UI element")
+                          report["failures"].append(f"{width}x{height}: drag did not move the UI element; diagnostics={record['drag_diagnostics']}")
                       if geometry_style(ui_style)!=geometry_style(mirror_style):
                           report["failures"].append(f"{width}x{height}: mirror geometry does not match moved UI geometry")
                       # Validate the downloadable field/layout package and the finished-UI PNG.
