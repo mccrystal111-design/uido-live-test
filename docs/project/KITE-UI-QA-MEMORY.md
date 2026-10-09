@@ -457,3 +457,10 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - Group **penalties per round**, **up-and-down percentage**, and **sand-save percentage** in a separate **Short Game & Penalties** subsection beneath the main Performance statistics, rather than adding more cards to the primary layout.
 - Keep the exact presentation provisional until the Stats page is reviewed in Figma; do not make Figma changes during Q&A.
+
+
+### Derive short-game statistics from captured round data — 2026-10-09
+
+- Do not add a separate manual entry step for up-and-downs or sand saves if they can be calculated reliably from the existing hole-by-hole data.
+- The current scorecard/live-round capture includes sand-shot information and GIR, alongside hole scores and putting data. Use these recorded inputs to derive sand-save and up-and-down attempts/conversions where the data supports an unambiguous calculation.
+- Avoid guessing when the available data is insufficient to determine an attempt or outcome; preserve missing/unknown data rather than fabricating a result. Revisit any genuinely missing capture fields only if the calculation cannot be made from the existing record.
