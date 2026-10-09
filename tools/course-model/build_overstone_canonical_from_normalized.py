@@ -124,7 +124,7 @@ def build(source: dict, registry: dict) -> dict:
         },
         "geometry": {
             "scope": "course",
-            "features": [physical[key] for key in sorted(physical)],
+            "features": list(physical.values()),
         },
         "holes": holes,
         "validation": {
