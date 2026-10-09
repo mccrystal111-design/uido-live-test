@@ -451,3 +451,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 - Sand-save percentage is successful sand saves divided by eligible greenside-bunker attempts, where the player gets the ball into the hole in two strokes or fewer.
 - Penalties per round is calculated only from rounds with recorded penalty data. Missing attempts or penalty data must not be treated as zero; leave the statistic blank when there is insufficient recorded data.
 - These are additional statistics beyond the initial fairways/GIR cards, putting figures and scoring-outcome bar chart. Keep the layout provisional until reviewed in Figma; do not make Figma changes during Q&A.
+
+
+### Stats Short Game & Penalties subsection — 2026-10-09
+
+- Group **penalties per round**, **up-and-down percentage**, and **sand-save percentage** in a separate **Short Game & Penalties** subsection beneath the main Performance statistics, rather than adding more cards to the primary layout.
+- Keep the exact presentation provisional until the Stats page is reviewed in Figma; do not make Figma changes during Q&A.
