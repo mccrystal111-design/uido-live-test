@@ -85,3 +85,24 @@ This is a validated derivation for Overstone hole 1, not yet a claim that the ex
 The detailed derivation record is in `course-models/FMB_DERIVATION.md`.
 
 **Next validation:** run the derivation across all 18 Overstone holes, then test the same deterministic method against Poult Wood before promoting it to the standard acquisition pipeline.
+
+
+## Current Overstone QA packet — not a runtime release
+
+The source-only Overstone draft now has a deterministic packet generator. Its QA directory layout is:
+
+```text
+manifest.json
+course.json
+features.geojson
+holes/01.geojson ... holes/18.geojson
+provenance/sources.json
+validation/report.json
+```
+
+- `tools/course-model/build_course_packet.py` builds the packet directory and writes a manifest containing producer commit/version, source/input artifact hashes, output file sizes and SHA-256 checksums.
+- `course-packages/schema/uido-course-packet-manifest-v0.1.schema.json` defines the manifest contract.
+- `tools/course-model/load_course_packet.py` is a reference offline loader/validator. It verifies the manifest, every declared file's size/hash, hole/route/green-anchor structure and physical-feature references. The actual app/browser/native offline loader is not yet integrated.
+- An incomplete model requires the explicit `--draft` flag. That produces a QA artefact only; it does not publish a revision or write to Supabase.
+
+The current packet is **not publishable**: measured satellite registration and explicit physical-feature/hole associations remain unresolved. The canonical draft preserves the existing F/M/B points from `course_green_data.json`; a read-only comparison found all 54 points match the live Supabase coordinates within 5 cm. That confirms database parity, not independent validation of the derivation method for every hole.
