@@ -501,3 +501,10 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 - In the Stats Overview **Best Round** card, make score relative to par the primary, prominent figure.
 - Beneath it, show the best gross score and the course par for that round in smaller text (for example, **Best score +2** with **Best gross 75 / Par 72** underneath).
 - Preserve the round/course context so the par displayed is the par that applied to that recorded round, not an assumed standard par. Keep the exact visual hierarchy provisional until reviewed in Figma; do not make Figma changes during Q&A.
+
+
+### Most Recent Round card details — 2026-10-09
+
+- Keep the Stats Overview **Most Recent Round** card consistent with **Best Round**: show score relative to par as the primary, prominent figure.
+- Beneath it, show the gross score and the course par for that specific round in smaller text. Use the par recorded for that round/course rather than assuming a standard par.
+- Keep the exact visual hierarchy provisional until reviewed in Figma; do not make Figma changes during Q&A.
