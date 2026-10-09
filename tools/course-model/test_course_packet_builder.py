@@ -11,6 +11,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from build_course_packet import build_packet, collect_input_artifacts  # noqa: E402
+from load_course_packet import load_packet  # noqa: E402
 from jsonschema import Draft202012Validator, FormatChecker  # noqa: E402
 
 
@@ -99,6 +100,16 @@ class CoursePacketBuilderTests(unittest.TestCase):
                 )
                 self.assertTrue(hole["properties"]["routing_provenance"]["source_feature_id"])
 
+            packet = load_packet(output)
+            self.assertEqual(len(packet["features"]), 159)
+            self.assertEqual(len(packet["holes"]), 18)
+            loaded_anchor_count = sum(
+                1 for hole in packet["holes"].values()
+                for feature in hole["features"]
+                if feature["properties"].get("feature_type") == "green_anchor"
+            )
+            self.assertEqual(loaded_anchor_count, 54)
+
             report = load(output / "validation/report.json")
             self.assertFalse(report["packet_validation"]["publishable"])
             self.assertIn("satellite_registration", report["packet_validation"]["blocking_gates"])
@@ -113,6 +124,19 @@ class CoursePacketBuilderTests(unittest.TestCase):
             self.assertRegex(green_source["source_sha256"], r"^[a-f0-9]{64}$")
             for item in provenance["input_artifacts"]:
                 self.assertRegex(item["sha256"], r"^[a-f0-9]{64}$")
+
+
+    def test_reference_loader_rejects_corrupt_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / "packet"
+            build_packet(
+                self.canonical, self.registry, output, self.producer_commit,
+                "0.1.0", self.created_at, True, self.input_artifacts,
+            )
+            target = output / "features.geojson"
+            target.write_bytes(target.read_bytes() + b" ")
+            with self.assertRaisesRegex(ValueError, "SHA-256 mismatch"):
+                load_packet(output)
 
 
 if __name__ == "__main__":
