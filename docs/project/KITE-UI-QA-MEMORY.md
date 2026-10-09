@@ -508,3 +508,12 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 - Keep the Stats Overview **Most Recent Round** card consistent with **Best Round**: show score relative to par as the primary, prominent figure.
 - Beneath it, show the gross score and the course par for that specific round in smaller text. Use the par recorded for that round/course rather than assuming a standard par.
 - Keep the exact visual hierarchy provisional until reviewed in Figma; do not make Figma changes during Q&A.
+
+### Q&A closed — Kite Figma implementation handoff — 2026-10-09
+
+- Q&A is closed. Editable Figma frames created on `02 — Product UI`: `Kite — Stats — V1` (302:5), `Kite — Scores — V1` (302:121), and `Kite — Developer Notes — Q&A Handoff` (302:162). Existing screens were preserved; new screens were placed alongside them.
+- Stats visual prototype includes handicap, Overview/Scoring/Performance navigation, Average/Best/Most Recent cards, relative-to-par trend chart, 9/18/Both and 5/10/20 controls, Par 3/4/5 averages, fairways/GIR, putting, grouped outcome bars and Short Game & Penalties.
+- Average, Best and Most Recent cards share relative-to-par prominence; average gross and average course par support decimal values. Per-round course par must be used for relative-to-par calculations.
+- Scores prototype is a simple newest-first retained-round list, intended to open each existing Scorecard in Review mode. Sample scores/dates are visual placeholders only.
+- Developer notes frame contains the Q&A decisions and implementation constraints. Navigation, sticky behaviour, round data, calculations and interactions are not yet wired; End Round save messaging still needs reconciliation.
+- No GitHub Actions were run. Screens remain subject to visual QA and iteration.
