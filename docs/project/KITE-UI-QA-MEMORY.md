@@ -393,3 +393,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - Remember the player's last selected **5 / 10 / 20 rounds** chart range where preference persistence is available, just as with the 9 holes / 18 holes / Both filter.
 - If no saved range exists, default to **10 rounds**. This preference changes only the displayed range, not stored round data.
+
+
+### Stats Overview summary-card layout — 2026-10-09
+
+- Preferred initial design direction: compact cards for **average score**, **best round** and **most recent round**.
+- This is provisional until the user sees an example. Present a rendered visual example for review before treating the layout as approved; do not make Figma changes during Q&A.
