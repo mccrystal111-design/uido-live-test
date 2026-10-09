@@ -436,3 +436,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - Use **three cards in a single row** for the average gross scores on par 3s, par 4s and par 5s, following the same three-card pattern used elsewhere in Stats for visual consistency.
 - Treat the single-row layout as the preferred direction, then validate readability and spacing in the Figma example; do not change Figma during Q&A.
+
+
+### Stats Performance section order — 2026-10-09
+
+- Preferred order: (1) fairways hit % and GIR % cards, (2) putting figures, and (3) the horizontal scoring-outcome bar chart.
+- This order is agreed as the content sequence; sizing and final spacing remain subject to visual review in Figma.
