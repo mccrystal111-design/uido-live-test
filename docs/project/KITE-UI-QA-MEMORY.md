@@ -215,3 +215,8 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - After a saved scorecard edit saves successfully, show a brief **“Changes Saved”** pop-down/toast for **1 second**, then dismiss it automatically.
 - Return to Review mode after the successful save; the toast is brief feedback, not a separate confirmation step. Never show it before the save succeeds.
+
+
+### Review mode metadata — 2026-10-09
+
+- Keep the saved scorecard Review mode clean. Show the original round date and relevant playing details; do not add a “last edited” timestamp to the player-facing screen.
