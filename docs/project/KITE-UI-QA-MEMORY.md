@@ -137,3 +137,11 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - Multiple rounds played at the same course on the same date appear as **separate cards**.
 - Store a date-and-time timestamp for each round and use it to distinguish rounds and support newest-first ordering. Show the time on the card when needed to disambiguate same-day rounds.
+
+
+### Scores list limit and archive — 2026-10-09
+
+- The Scores screen displays only the **20 most recent ended and retained rounds**, ordered newest first.
+- Older rounds remain stored/archived; they are not deleted when they fall outside the visible top 20.
+- Keep the visible Scores screen simple; do not add month/year grouping or infinite scrolling as part of this requirement.
+- Whether users need a separate archive/history access point is not yet specified.
