@@ -272,3 +272,10 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 - Plot each round's result **relative to par** (for example, +4 or −2), not gross strokes.
 - Calculate and display the 3-round rolling average using the same relative-to-par measure so the plotted series and trend line are directly comparable across courses.
 - The star marks the best round relative to par.
+
+
+### Stats chart round-length filter — 2026-10-09
+
+- Provide a filter for **9 holes / 18 holes / Both** on the Stats scoring-trend chart.
+- When Both is selected, plot each round's score relative to par so 9-hole and 18-hole results can be compared on the same measure; do not convert a 9-hole score into a projected 18-hole gross score.
+- The 5 / 10 / 20 selector controls the number of most recent rounds in the selected round-length set. The chart continues to show round score relative to par, a 3-round rolling average on that same measure, and a star for the best relative-to-par round.
