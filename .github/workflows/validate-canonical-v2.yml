@@ -81,7 +81,7 @@ PY
           assert ids, "Canonical course contains no physical geometry"
           assert len(ids) == len(set(ids)), "Duplicate physical geometry identity detected"
           for hole in c["holes"]:
-              assert set(hole) == {"hole_number", "par", "routing", "truth"}
+              assert set(hole) == {"hole_number", "par", "routing", "green", "truth"}
               assert "features" not in hole
           for feature in c["geometry"]["features"]:
               assert "geometry" in feature
