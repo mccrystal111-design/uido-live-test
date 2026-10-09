@@ -235,3 +235,10 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 - Immediately beneath the prominent, editable handicap, show a compact summary of **average score, best round and most recent round**.
 - Follow this summary with the player's scoring trend.
 - Keep the opening view informative but uncluttered; detailed breakdowns belong in the Scoring and Performance sections.
+
+
+### Stats scoring trend chart — 2026-10-09
+
+- In the Stats Overview section, use a line graph showing the score for each round and the average score over time.
+- Mark the player's lowest round score with a star beside that data point.
+- Keep the chart easy to read on mobile and avoid unnecessary decoration. The round-by-round detail remains available on Scores.
