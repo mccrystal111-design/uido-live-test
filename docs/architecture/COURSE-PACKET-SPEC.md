@@ -274,7 +274,7 @@ This removes the ambiguity about which stage an artifact belongs to. The remaini
 - Canonical schema validation.
 - Publication-gate unit tests: pending registration, heuristic association, missing route and missing green anchors all block completeness; a synthetic fixture with all gates verified can complete.
 - Manual read-only comparison of live Supabase F/M/B coordinates against the pinned green source (all within 5 cm).
-- Draft packet manifest QA: input hashes, output file hashes/sizes, 18 hole files, 159 course-wide features, all 54 green anchors, and the no-publish-without-`--draft` rule. [Run 37914106427](https://github.com/mccrystal111-design/uido-live-test/actions/runs/37914106427) passed.
+- Draft packet manifest and reference-loader QA: input hashes, output file hashes/sizes, path safety, 18 hole files, 159 course-wide features, all 54 green anchors, route provenance/reference resolution, corruption detection and the no-publish-without-`--draft` rule. [Run 37914350725](https://github.com/mccrystal111-design/uido-live-test/actions/runs/37914350725) passed.
 
 **Remaining before publishing**
 - Unify or explicitly version the pinned adapter and live-acquisition/generic-builder paths.
