@@ -1,14 +1,14 @@
 # UiDo — Current State
 
-Updated: 2026-10-06.
+Updated: 2026-10-09.
 
-## UiDo Core User Database — 2026-10-06
+## UiDo Core User Database — 2026-10-09
 
 The first UiDo Core customer-data foundation is now live in Supabase project uido-production.
 
 Core architecture:
-- One permanent Supabase Auth identity follows a customer through Hawk and full UiDo.
-- Core stores the complete customer/data model; Hawk is a simplified product variant.
+- One permanent Supabase Auth identity follows a customer across Kite experiences and future product surfaces.
+- Core stores the complete customer/data model; Kite is the current customer-facing brand. The legacy `hawk.html` file is a prototype harness, not a separate product brand.
 - Customer-owned data is protected with RLS policies based on auth.uid().
 
 Live customer tables:
