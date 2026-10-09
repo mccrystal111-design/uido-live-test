@@ -190,7 +190,7 @@ function updateSelected(key,val){
 function down(e){
  if(e.button!==undefined&&e.button!==0)return;e.preventDefault();
  const id=e.currentTarget.dataset.id;select(id);const it=items.find(o=>o.id===id);
- drag={id,startX:e.clientX,startY:e.clientY,x:it.x,y:it.y,el:e.currentTarget};e.currentTarget.setPointerCapture(e.pointerId);
+ drag={id,startX:e.clientX,startY:e.clientY,x:it.x,y:it.y,el:e.currentTarget};
 }
 document.addEventListener('pointermove',e=>{
  if(!drag)return;
