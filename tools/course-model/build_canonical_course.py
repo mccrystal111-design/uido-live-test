@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Build the provider-agnostic UiDo canonical course model.
 
-The canonical model owns physical geometry at COURSE scope. Holes own only
-routing/relationship data. A physical feature may therefore be referenced by
-more than one hole without being cloned.
+Physical geometry is course-scoped. Hole records own routing and relationships,
+not cloned copies of physical features. Completeness is gated on measured
+registration and verified feature associations, not merely on data presence.
 """
 from __future__ import annotations
 
@@ -28,6 +28,15 @@ def source_available(model: dict, source_id: str) -> bool:
         and source.get("status") in {"available", "acquired_for_build", "captured"}
         for source in model.get("sources", [])
     )
+
+
+def iter_hole_features(hole: dict):
+    for bucket, default_type in BUCKET_TYPES.items():
+        for feature in hole.get(bucket, []) or []:
+            yield feature, default_type
+
+    for feature in hole.get("hazards", []) or []:
+        yield feature, str(feature.get("type", "UNKNOWN")).upper()
 
 
 def registration_is_verified(registration: dict | None) -> bool:
@@ -64,15 +73,6 @@ def associations_are_verified(model: dict) -> bool:
         if not association_is_verified(feature):
             return False
     return True
-
-
-def iter_hole_features(hole: dict):
-    for bucket, default_type in BUCKET_TYPES.items():
-        for feature in hole.get(bucket, []) or []:
-            yield feature, default_type
-
-    for feature in hole.get("hazards", []) or []:
-        yield feature, str(feature.get("type", "UNKNOWN")).upper()
 
 
 def normalize_feature(feature: dict, default_type: str | None, associations: list[dict]) -> dict | None:
@@ -122,13 +122,7 @@ def build_route(hole: dict) -> dict | None:
     return route
 
 
-def main() -> None:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--model", required=True)
-    ap.add_argument("--out", required=True)
-    args = ap.parse_args()
-
-    model = json.loads(Path(args.model).read_text())
+def build_canonical(model: dict) -> dict:
     osm_available = source_available(model, "osm")
 
     holes = []
@@ -160,18 +154,20 @@ def main() -> None:
                 truth = "INCOMPLETE"
                 continue
 
-            fid = normalized["id"]
-            if fid in physical:
-                prior = physical[fid]
+            feature_id = normalized["id"]
+            if feature_id in physical:
+                prior = physical[feature_id]
                 prior.setdefault("association_evidence", []).extend(
                     normalized.get("association_evidence", [])
                 )
             else:
-                physical[fid] = normalized
+                physical[feature_id] = normalized
 
         if raw_hole.get("conflicts"):
             truth = "CONFLICT"
-            conflicts.extend({"hole": number, "conflict": item} for item in raw_hole["conflicts"])
+            conflicts.extend(
+                {"hole": number, "conflict": item} for item in raw_hole["conflicts"]
+            )
 
         holes.append({
             "hole_number": number,
@@ -193,9 +189,11 @@ def main() -> None:
         if normalized is not None:
             physical.setdefault(normalized["id"], normalized)
 
-    features = sorted(physical.values(), key=lambda f: f["id"])
-    # Presence of a route is not proof of physical-feature association, and
-    # an acquired OSM source is not proof of measured satellite registration.
+    features = sorted(physical.values(), key=lambda feature: feature["id"])
+
+    # These gates are deliberately separate from hole-route truth. Having 18
+    # routes does not prove that OSM geometry has been registered to imagery or
+    # that physical features have been correctly assigned to holes.
     if not registration_is_verified(model.get("registration")):
         unresolved.append("satellite_registration")
     if not associations_are_verified(model):
@@ -209,7 +207,7 @@ def main() -> None:
         and osm_available
     )
 
-    canonical = {
+    return {
         "schema": "uido.course.canonical.v2",
         "course": model.get("course", {}),
         "provenance": {
@@ -228,7 +226,7 @@ def main() -> None:
         "holes": holes,
         "validation": {
             "course_complete": complete,
-            "holes_complete": sum(1 for h in holes if h["truth"] == "CONFIRMED"),
+            "holes_complete": sum(1 for hole in holes if hole["truth"] == "CONFIRMED"),
             "physical_geometry_count": len(features),
             "unique_physical_ids": len({feature["id"] for feature in features}),
             "unresolved_features": unresolved,
@@ -236,9 +234,18 @@ def main() -> None:
         },
     }
 
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model", required=True)
+    parser.add_argument("--out", required=True)
+    args = parser.parse_args()
+
+    model = json.loads(Path(args.model).read_text(encoding="utf-8"))
+    canonical = build_canonical(model)
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(canonical, indent=2) + "\n")
+    out.write_text(json.dumps(canonical, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(canonical["validation"], indent=2))
 
 
