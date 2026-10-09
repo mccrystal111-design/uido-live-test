@@ -248,3 +248,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - Provide chart range options for the **last 5, 10 or 20 rounds**.
 - This is a simple presentation/data-selection control: use the chosen count to select the most recent rounds for the chart and update the plotted round-score and average-over-time series. It should not require a separate statistics engine or a new screen.
+
+
+### Stats chart average line — 2026-10-09
+
+- Use a **rolling average** for the average-score line rather than one flat average across the selected rounds, because it better communicates form over time.
+- The chart range selector remains 5 / 10 / 20 rounds, with 10 as the default. Define and label the rolling-average calculation clearly during implementation so the line is understandable and consistent across selected ranges.
