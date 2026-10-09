@@ -220,3 +220,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 ### Review mode metadata — 2026-10-09
 
 - Keep the saved scorecard Review mode clean. Show the original round date and relevant playing details; do not add a “last edited” timestamp to the player-facing screen.
+
+
+### Undo after discarding unsaved scorecard edits — 2026-10-09
+
+- Prefer a brief **Undo** opportunity for **3 seconds** after the player chooses Discard Changes in the unsaved-changes pop-up, rather than adding a second confirmation step.
+- The discard action must remain reversible during that window: Undo restores the unsaved edits and returns the player to editing. After the 3-second window expires, abandon the edits and return to Review mode. The previously saved round is never altered by discarding unsaved edits.
