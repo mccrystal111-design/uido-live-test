@@ -145,3 +145,10 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 - Older rounds remain stored/archived; they are not deleted when they fall outside the visible top 20.
 - Keep the visible Scores screen simple; do not add month/year grouping or infinite scrolling as part of this requirement.
 - Whether users need a separate archive/history access point is not yet specified.
+
+
+### Archived rounds access — 2026-10-09
+
+- The mobile Kite Scores screen stays limited to the 20 most recent ended and retained rounds.
+- Older rounds remain stored and could potentially be accessed through a Kite website rather than adding archive controls to the mobile screen.
+- Website-based archive access is an idea to explore, not a confirmed website scope or implementation decision. Keep older round data retained and associated with the player's account/profile so a future web experience can retrieve it.
