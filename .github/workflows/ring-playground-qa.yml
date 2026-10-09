@@ -114,13 +114,27 @@ jobs:
                       if not ui_box:
                           raise AssertionError("Bound middle-yardage object has no bounding box")
                       page.evaluate("""() => {
-                        window.__qaPointerEvents={down:0,move:0,up:0};
-                        document.addEventListener('pointerdown',()=>window.__qaPointerEvents.down++,true);
+                        window.__qaPointerEvents={down:0,move:0,up:0,lastDownTarget:null};
+                        document.addEventListener('pointerdown',(event)=>{
+                          window.__qaPointerEvents.down++;
+                          window.__qaPointerEvents.lastDownTarget={
+                            tag:event.target.tagName,
+                            id:event.target.dataset?.id||null,
+                            text:(event.target.textContent||'').trim().slice(0,40),
+                            button:event.button
+                          };
+                        },true);
                         document.addEventListener('pointermove',()=>window.__qaPointerEvents.move++,true);
                         document.addEventListener('pointerup',()=>window.__qaPointerEvents.up++,true);
                       }""")
                       start_x=ui_box["x"]+ui_box["width"]/2
                       start_y=ui_box["y"]+ui_box["height"]/2
+                      record["hit_test"]=page.evaluate("""([x,y,id]) => {
+                        const hit=document.elementFromPoint(x,y);
+                        const expected=document.querySelector('#canvas .object[data-id="'+id+'"]');
+                        return {isExpected:hit===expected,hitTag:hit?.tagName,hitId:hit?.dataset?.id||null,hitText:(hit?.textContent||'').trim().slice(0,40),expectedId:expected?.dataset?.id||null};
+                      }""",[start_x,start_y,ui.get_attribute("data-id")])
+                      ui.hover()
                       page.mouse.move(start_x,start_y)
                       page.mouse.down()
                       page.mouse.move(start_x+24,start_y+18,steps=4)
