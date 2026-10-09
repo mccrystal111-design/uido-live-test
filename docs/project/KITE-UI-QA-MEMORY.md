@@ -355,3 +355,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 ### Grouped scoring outcome categories — 2026-10-09
 
 - Keep the Performance scoring-outcome categories grouped for a clean mobile display: **birdie or better**, **par**, **bogey**, and **double bogey or worse**. Do not split eagles or triple bogeys into separate categories at this stage.
+
+
+### Fairways and GIR use the nine filter — 2026-10-09
+
+- Fairways-hit percentage and greens-in-regulation (GIR) percentage should follow the shared **Front 9 / Back 9 / Both** filter, consistent with the other Performance breakdowns.
+- Calculate each percentage from the eligible holes for the selected nine(s) where the relevant data is recorded; do not count missing data as misses or zeros.
