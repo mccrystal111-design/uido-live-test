@@ -254,3 +254,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - Use a **rolling average** for the average-score line rather than one flat average across the selected rounds, because it better communicates form over time.
 - The chart range selector remains 5 / 10 / 20 rounds, with 10 as the default. Define and label the rolling-average calculation clearly during implementation so the line is understandable and consistent across selected ranges.
+
+
+### Rolling-average window — 2026-10-09
+
+- Calculate the rolling average using the **last 3 rounds at each point** in the Stats chart, making it responsive to recent form.
+- For the first one or two points where fewer than three rounds are available, use the available rounds rather than inventing data; keep missing data distinct from zero.
