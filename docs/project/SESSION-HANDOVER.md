@@ -1,6 +1,6 @@
 # UiDo Session Handover
 
-Updated: 2026-10-05
+Updated: 2026-10-09
 
 ## First read
 1. [Project control pack](README.md)
@@ -12,11 +12,9 @@ Updated: 2026-10-05
 
 ## Immediate next action
 
-**Verify the new yardage field-mirror playground.** Open `ring-playground.html`. The left side is the finished UI; the right side contains same-position drop targets. Drag fields such as `green.front`, `green.middle` and `green.back` from the Field Library onto their mirror targets. Move a left-side element and confirm the target follows. Change a bound test value and confirm the geometry does not move. Then use **Export fields + screenshot** and confirm the JSON contains semantic bindings/layout rather than literal dynamic values, while the PNG contains only the finished UI.
+**DATA-001 / CRS-002: reconcile the canonical Overstone model, its pinned input and the current builder.** Read section 11 of [COURSE-PACKET-SPEC.md](../architecture/COURSE-PACKET-SPEC.md#11-real-overstone-fixture-review--2026-10-09). Do not regenerate or publish the existing draft until the type/provenance/output mismatch is resolved and fixture acceptance tests exist.
 
-- Implementation: [02e22e6](https://github.com/mccrystal111-design/uido-live-test/commit/02e22e65b8db03cd03268675bc0faaa111840614).
-- QA workflow: [917eea9](https://github.com/mccrystal111-design/uido-live-test/commit/917eea938cdaec1aac06e81b2e230468ba24c7a1).
-- **QA is not yet verified for the final revision.** The prior run was for the old playground and failed on the removed `#loadYardage` selector; the next run was cancelled when the source changed again. Do not call the new mirror implementation green until a fresh successful run exists.
+Core persistence is not the immediate coding task: its syntax check is green, but end-to-end validation is blocked because only `uido-production` is available, the only course revision is draft, and the prototype UI/schema contract is inconsistent. See [CORE-001 / issue #9](https://github.com/mccrystal111-design/uido-live-test/issues/9). Do not insert synthetic test rows into production.
 
 ## Previous immediate next action
 
@@ -76,3 +74,14 @@ Update action status and evidence, CURRENT-STATE with one next action, decisions
 - Persisted Overstone source-normalized evidence and canonical v1 model in GitHub.
 - Imported Overstone v1 source evidence into Supabase as a draft canonical revision: 18 holes, 159 physical features, 159 provenance links.
 - Next unblocked build action: reconcile the canonical geometry contract against the real Overstone model, then complete measured satellite registration/refinement rather than publishing the draft.
+
+
+## 2026-10-09 execution checkpoint
+
+- **Ring Playground Browser QA passed** at 390×844 and 1440×900: semantic binding, layout stability when values change, UI movement mirrored to the same geometry, JSON export, PNG export, no console/page/HTTP errors and no horizontal overflow. Evidence: [run 37912037681](https://github.com/mccrystal111-design/uido-live-test/actions/runs/37912037681). This is functional browser QA, not Figma pixel-level visual approval.
+- Fixed the literal JavaScript line-break corruption in `hawk.html` and the CSV newline escape. **Core Prototype Static QA passed**: [run 37911801415](https://github.com/mccrystal111-design/uido-live-test/actions/runs/37911801415).
+- Core end-to-end persistence remains unverified. The only accessible Supabase project is `uido-production`; the profile/round/hole/shot tables are empty, and the only course revision is draft. The prototype allows optional free-text course/version IDs although the schema requires UUID foreign keys. Production was not written to.
+- Inspected the committed Overstone source-normalized and canonical fixtures against live Supabase. The 159-feature / 18-hole draft is retained, but course-level validation still flags satellite registration and hole-feature association; the current canonical file and builder have output-convention drift. Findings and acceptance tests are in section 11 of the course-packet spec.
+- A new P0 blocker is tracked as [CORE-001 / issue #9](https://github.com/mccrystal111-design/uido-live-test/issues/9). No GitHub Actions were manually rerun; the QA runs above were normal repository-triggered runs.
+
+Next after the course contract reconciliation: implement deterministic fixture acceptance tests, then resume measured satellite registration/refinement. Preserve the approved Yardage and AGNOSTIC45 baselines.
