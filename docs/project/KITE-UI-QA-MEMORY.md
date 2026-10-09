@@ -242,3 +242,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 - In the Stats Overview section, use a line graph showing the score for each round and the average score over time.
 - Mark the player's lowest round score with a star beside that data point.
 - Keep the chart easy to read on mobile and avoid unnecessary decoration. The round-by-round detail remains available on Scores.
+
+
+### Stats chart round-count options — 2026-10-09
+
+- Provide chart range options for the **last 5, 10 or 20 rounds**.
+- This is a simple presentation/data-selection control: use the chosen count to select the most recent rounds for the chart and update the plotted round-score and average-over-time series. It should not require a separate statistics engine or a new screen.
