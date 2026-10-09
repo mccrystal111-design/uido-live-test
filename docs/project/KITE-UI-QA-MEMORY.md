@@ -344,3 +344,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 ### Front/back-nine average measure — 2026-10-09
 
 - Use **average score relative to par** for the Front 9 / Back 9 / Both breakdown, consistent with the 18-hole scoring averages and the main scoring-trend chart. Do not switch to gross strokes for the nine-hole comparison.
+
+
+### Reuse front/back-nine filter in scoring breakdowns — 2026-10-09
+
+- Reuse the **Front 9 / Back 9 / Both** filter for the birdie/par/bogey scoring-outcome breakdown, provided it can be shared without unnecessary implementation complexity.
+- Prefer one consistent filter state across related Performance scoring components rather than separate controls that can disagree. If the UI/implementation requires independent filters, keep the behaviour clear and simple.
