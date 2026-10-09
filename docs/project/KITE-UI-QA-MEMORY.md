@@ -177,3 +177,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - In Edit Scorecard mode, all recorded round stats should be editable, not just hole-by-hole gross scores. This includes putts and other statistics captured for the round.
 - Keep the original player and course association fixed, and preserve the original round date/time. Saving updates that round's entered data and recalculates affected statistics; other rounds remain unchanged.
+
+
+### Adding previously unrecorded stats — 2026-10-09
+
+- When editing a saved scorecard, the player may enter round statistics that were not recorded at the time, such as fairways hit or greens in regulation.
+- Treat these as optional data: do not assume an unentered statistic was zero or infer a value. Recalculate the relevant statistics once the player enters or changes the data.
