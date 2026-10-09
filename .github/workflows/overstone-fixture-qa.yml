@@ -1,0 +1,25 @@
+name: Overstone Fixture Acceptance QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'course-models/source-normalized/overstone-source-normalized-v0.1.json'
+      - 'course-models/canonical/overstone-park-v1.json'
+      - 'course-models/overstone-park-v0.1.json'
+      - 'tools/course-model/validate_overstone_fixture.py'
+      - '.github/workflows/overstone-fixture-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fixture-acceptance:
+    name: Validate pinned Overstone source and canonical draft
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run deterministic fixture acceptance checks
+        run: python3 tools/course-model/validate_overstone_fixture.py
