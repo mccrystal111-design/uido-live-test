@@ -207,7 +207,8 @@ def main():
     if legacy_geometry_count == 0:
         print("NOTE: legacy v0.1 model is green-anchor-only; do not use it as the physical-geometry fixture.")
 
-    print("PASS: deterministic builder reproduces the committed canonical draft from the pinned source fixture.")\n    print("PASS: pinned Overstone source and committed canonical draft are internally consistent.")
+    print("PASS: deterministic builder reproduces the committed canonical draft from the pinned source fixture.")
+    print("PASS: pinned Overstone source and committed canonical draft are internally consistent.")
     print("PASS: 159 stable physical feature IDs, exact source geometry, type mapping and provenance links.")
     print("PASS: 18 unique hole routes and pars match the source fixture.")
     print("PASS: registration/association remain unresolved; course completeness remains false.")
