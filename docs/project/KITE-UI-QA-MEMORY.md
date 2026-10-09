@@ -486,3 +486,11 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
   - **Up-and-down:** missed the green, took one putt, and finished the hole in par.
   - **Sand save:** missed the green into a greenside bunker, played a recorded sand shot, took one putt, and finished the hole in par.
 - Use these as the user's requested success definitions for Kite. Keep attempt denominators based on eligible recorded opportunities, and do not classify incomplete/ambiguous data as a miss or a success.
+
+
+### Final terminology for recovery statistics — 2026-10-09
+
+- Use the labels **Scrambling %** and **Sand Saves %** in Stats Performance.
+- **Scrambling success:** missed the green in regulation and finished the hole in par or better.
+- **Sand-save success:** played from a greenside bunker and finished the hole in par or better.
+- Derive these from recorded GIR, shot/lie and hole-score data where possible. Count only eligible, known attempts in the denominator; do not treat missing or ambiguous data as a failure or success.
