@@ -464,3 +464,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 - Do not add a separate manual entry step for up-and-downs or sand saves if they can be calculated reliably from the existing hole-by-hole data.
 - The current scorecard/live-round capture includes sand-shot information and GIR, alongside hole scores and putting data. Use these recorded inputs to derive sand-save and up-and-down attempts/conversions where the data supports an unambiguous calculation.
 - Avoid guessing when the available data is insufficient to determine an attempt or outcome; preserve missing/unknown data rather than fabricating a result. Revisit any genuinely missing capture fields only if the calculation cannot be made from the existing record.
+
+
+### Putts as an input to short-game derivation — 2026-10-09
+
+- The user confirms putts are also captured. Consider **sand-shot/greenside-bunker information, GIR, putts and hole score** together when deriving sand-save and up-and-down attempts and conversions.
+- These may be sufficient for many cases, so do not introduce extra manual inputs by default. Before implementation, validate the exact existing shot/lie data and calculation rules; only mark cases unknown where the captured data cannot distinguish an attempt or outcome reliably.
