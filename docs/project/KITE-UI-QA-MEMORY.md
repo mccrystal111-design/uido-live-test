@@ -494,3 +494,10 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 - **Scrambling success:** missed the green in regulation and finished the hole in par or better.
 - **Sand-save success:** played from a greenside bunker and finished the hole in par or better.
 - Derive these from recorded GIR, shot/lie and hole-score data where possible. Count only eligible, known attempts in the denominator; do not treat missing or ambiguous data as a failure or success.
+
+
+### Best Round card details — 2026-10-09
+
+- In the Stats Overview **Best Round** card, make score relative to par the primary, prominent figure.
+- Beneath it, show the best gross score and the course par for that round in smaller text (for example, **Best score +2** with **Best gross 75 / Par 72** underneath).
+- Preserve the round/course context so the par displayed is the par that applied to that recorded round, not an assumed standard par. Keep the exact visual hierarchy provisional until reviewed in Figma; do not make Figma changes during Q&A.
