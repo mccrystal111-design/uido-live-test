@@ -119,3 +119,8 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 - **Total/gross score:** large and prominent, matching the large total-score treatment already used on the existing Kite Scorecard screen.
 - **Net score:** smaller than the total score and displayed in a neutral colour. Do not use the yellow accent to highlight net score.
 - Keep date and course name secondary to the total score.
+
+
+### Scores list ordering — 2026-10-09
+
+- Show saved rounds in **reverse chronological order**, with the most recently played round first.
