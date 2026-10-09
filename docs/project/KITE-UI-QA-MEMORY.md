@@ -478,3 +478,11 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 - **Sand save:** classify a hole as a sand save when the player missed the green into a bunker, played a recorded sand shot, and then took **one putt** to finish the hole.
 - Use the existing missed-green/GIR, sand-shot and putt records to derive these outcomes rather than adding separate manual entry by default.
 - Validate how bunker location and the number/order of shots are represented in the current data model before implementation. Do not count ambiguous cases as successes or failures; keep insufficient data unknown.
+
+
+### Up-and-down and sand-save par requirement — 2026-10-09
+
+- Refine both success rules to require the hole to be completed in **par** as well as the relevant recovery pattern:
+  - **Up-and-down:** missed the green, took one putt, and finished the hole in par.
+  - **Sand save:** missed the green into a greenside bunker, played a recorded sand shot, took one putt, and finished the hole in par.
+- Use these as the user's requested success definitions for Kite. Keep attempt denominators based on eligible recorded opportunities, and do not classify incomplete/ambiguous data as a miss or a success.
