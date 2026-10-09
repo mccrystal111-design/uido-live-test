@@ -26,21 +26,48 @@ jobs:
         shell: bash
         run: |
           python3 - <<'PY'
-          import re
           import subprocess
           import tempfile
+          from html.parser import HTMLParser
           from pathlib import Path
 
+          class InlineScriptParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.inline_scripts = []
+                  self.current = None
+                  self.external = False
+
+              def handle_starttag(self, tag, attrs):
+                  if tag.lower() == "script":
+                      self.external = any(name.lower() == "src" for name, _ in attrs)
+                      self.current = None if self.external else []
+
+              def handle_data(self, data):
+                  if self.current is not None:
+                      self.current.append(data)
+
+              def handle_endtag(self, tag):
+                  if tag.lower() == "script" and self.current is not None:
+                      source = "".join(self.current)
+                      if source.strip():
+                          self.inline_scripts.append(source)
+                      self.current = None
+                      self.external = False
+
           html = Path("hawk.html").read_text(encoding="utf-8")
-          blocks = re.findall(r"<script\\b([^>]*)>(.*?)</script\\s*>", html, flags=re.I | re.S)
-          inline = [body for attrs, body in blocks if not re.search(r"\\bsrc\\s*=", attrs, flags=re.I) and body.strip()]
-          if not inline:
+          parser = InlineScriptParser()
+          parser.feed(html)
+          if not parser.inline_scripts:
               raise SystemExit("No inline JavaScript found in hawk.html")
-          for index, source in enumerate(inline, 1):
+
+          for index, source in enumerate(parser.inline_scripts, 1):
               path = Path(tempfile.gettempdir()) / f"hawk-inline-{index}.js"
               path.write_text(source, encoding="utf-8")
               subprocess.run(["node", "--check", str(path)], check=True)
-          if re.search(r"\\\\n(?:let|const|function|async function)\\b", "\\n".join(inline)):
-              raise SystemExit("Found a literal backslash-n where a JavaScript line break is expected")
-          print(f"PASS: {len(inline)} inline JavaScript block(s) parsed successfully.")
+              for token in ["\\\\nlet ", "\\\\nconst ", "\\\\nfunction ", "\\\\nasync function "]:
+                  if token in source:
+                      raise SystemExit(f"Found literal backslash-n before JavaScript declaration: {token!r}")
+
+          print(f"PASS: {len(parser.inline_scripts)} inline JavaScript block(s) parsed successfully.")
           PY
