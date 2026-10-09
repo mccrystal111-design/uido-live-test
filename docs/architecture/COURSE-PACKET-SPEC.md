@@ -230,7 +230,7 @@ These are observed schema gaps, not a rejection of PR #3. Before approval, use r
 
 ### Additional reproducibility finding — 2026-10-09
 
-A deterministic comparison of the committed files now confirms that the canonical draft's 159 physical features match the pinned source-normalized fixture exactly by stable ID, geometry and the explicit type map. The 18 canonical hole routes also match the 18 source `HOLE` geometries and pars. The draft's unresolved registration/association gates remain intact.
+A deterministic adapter now rebuilds the committed canonical draft from the pinned source-normalized fixture. The resulting 159 physical features match by stable ID, geometry and explicit type map; all 18 canonical hole routes and pars match the source. The draft's unresolved registration/association gates remain intact. [Fixture acceptance run 37912622803](https://github.com/mccrystal111-design/uido-live-test/actions/runs/37912622803) passed.
 
 However, **fixture coherence is not builder reproducibility**:
 
@@ -238,7 +238,7 @@ However, **fixture coherence is not builder reproducibility**:
 - `tools/course-model/build_canonical_course.py` expects the generated `uido.course.v0.2` model. `.github/workflows/validate-canonical-v2.yml` currently acquires fresh Overpass data and builds that intermediate model at runtime; it does not rebuild from the committed source-normalized fixture.
 - The committed canonical file uses lower-case canonical type labels and its own provenance/quality fields, while the current builder normalizes types to upper case and emits a different feature-field shape. These may be valid separate stages, but the contract and adapter boundary are not explicit.
 
-A deterministic fixture-acceptance script now checks the pinned source-normalized file against the committed canonical draft, including IDs, exact geometry, type mapping, source provenance, coordinate ranges, 18 hole routes/par values and the requirement to keep course completeness false. It runs in `tools/course-model/validate_overstone_fixture.py` via `.github/workflows/overstone-fixture-qa.yml`. **That workflow does not run the canonical builder, call external providers, write Supabase data or publish a course.**
+The deterministic adapter is `tools/course-model/build_overstone_canonical_from_normalized.py`. `tools/course-model/validate_overstone_fixture.py` rebuilds to a temporary file and compares the result with the committed canonical draft, while checking IDs, exact geometry, type mapping, source provenance, coordinate ranges, 18 hole routes/par values and the requirement to keep course completeness false. It runs via `.github/workflows/overstone-fixture-qa.yml`. **That workflow does not fetch external data, write Supabase data or publish a course.**
 
 ### Contract gaps to resolve before publishing
 
@@ -261,4 +261,4 @@ A deterministic fixture-acceptance script now checks the pinned source-normalize
 - Round-trip the validated model through the intended course-packet builder and verify manifest file hashes, revision identity and offline-required assets.
 - Test Supabase visibility with an anonymous/authenticated read: draft revisions must remain hidden; only published revisions and their intended public data should be readable.
 
-**Next DATA-001 action:** make the canonical producer reproducible from a pinned committed source artifact and explicitly document the source-normalized → canonical adapter/type map. The new fixture-coherence QA is a first guardrail, not proof that the builder reproduces the artifact. Do not change the live revision to `published` or modify the renderer until reproducibility, geometry validity, registration and association gates pass.
+**Next DATA-001 action:** reconcile the pinned-fixture adapter with the separate live-acquisition / `build_overstone_model.py` / `build_canonical_course.py` path, then declare one authoritative producer or explicitly version both contracts. Include or explicitly reference green front/middle/back anchors in the runtime package. Do not change the live revision to `published` or modify the renderer until builder reconciliation, geometry validity, registration and association gates pass.
