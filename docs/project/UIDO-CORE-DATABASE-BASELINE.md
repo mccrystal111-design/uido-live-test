@@ -1,10 +1,10 @@
 # UiDo Core User Database — Baseline
 
-Updated: 2026-10-06
+Updated: 2026-10-09
 
 ## Architecture
 
-UiDo Core is the complete customer/data model. Hawk is a simplified product variant that reads a subset of Core. A customer has one permanent Supabase Auth identity across both products.
+UiDo Core is the complete customer/data model. Kite is the current customer-facing product brand. A customer has one permanent Supabase Auth identity; product/UI layers decide what to expose from Core. The legacy `hawk.html` file is a prototype harness, not a separate brand.
 
 ## Live Supabase customer-data model
 
@@ -29,7 +29,7 @@ All customer-owned tables have RLS enabled and owner policies based on `auth.uid
 5. Practice activity is first-class data, but is distinct from scored/official rounds.
 6. Keep mutable preferences separate from historical player activity.
 7. Design external integrations to be provider-neutral and extensible.
-8. Do not constrain Core around Hawk's reduced feature set.
+8. Do not constrain Core around one product screen or feature subset.
 
 ## Git-backed schema
 
