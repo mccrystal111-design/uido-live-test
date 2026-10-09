@@ -417,3 +417,10 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - Show both **average putts per hole** and **average putts per round** in the Stats Scoring section.
 - Both figures follow the shared **Front 9 / Back 9 / Both** filter where relevant. If putting data is missing, leave the figure blank rather than treating it as zero.
+
+
+### Stats Performance scoring outcome visualisation — 2026-10-09
+
+- Use a **horizontal bar chart** for the percentages of holes scored as birdie or better, par, bogey, and double bogey or worse.
+- Reuse the familiar visual language already used for Round Statistics on the existing Scorecard where practical, so the Stats page feels consistent with the rest of Kite.
+- This confirms the chart type; review the final sizing and visual treatment in the Figma example before treating those details as final. Do not make Figma changes during Q&A.
