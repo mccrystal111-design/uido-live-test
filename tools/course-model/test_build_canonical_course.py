@@ -92,6 +92,7 @@ class CanonicalCompletenessGateTests(unittest.TestCase):
         self.assertEqual(result["validation"]["holes_complete"], 18)
         self.assertEqual(result["validation"]["physical_geometry_count"], 1)
         self.assertEqual(result["validation"]["unresolved_features"], [])
+        self.assertEqual(result["provenance"]["stage"], "enriched_candidate")
         self.assertEqual(result["geometry"]["features"][0]["type"], "teeing_area")
         self.assertEqual(result["geometry"]["features"][0]["provenance"]["source_id"], "osm")
         self.assertEqual(result["holes"][0]["routing"]["type"], "LineString")
