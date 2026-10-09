@@ -189,3 +189,9 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 
 - If a round statistic has not been entered, leave its display field blank rather than showing a dash or treating it as zero.
 - Preserve the distinction between missing data and an actual recorded zero in storage and calculations.
+
+
+### Stats refresh after saved-round edits — 2026-10-09
+
+- The user has no strong preference about whether the Stats page refreshes immediately after a saved round is edited or on next opening.
+- Implementation default: update/recalculate the underlying stats as soon as the saved edit succeeds, so any subsequent view of Stats reflects the latest data. No extra screen or confirmation is needed for the recalculation.
