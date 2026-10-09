@@ -107,6 +107,10 @@ def first_difference(left, right, path="$"):
 def main():
     source = load(SOURCE_PATH)
     canonical = load(CANONICAL_PATH)
+    green_points = load(GREEN_PATH).get("greenPoints", {})
+    schema = load(SCHEMA_PATH)
+    Draft202012Validator.check_schema(schema)
+    Draft202012Validator(schema).validate(canonical)
 
     # Rebuild from the pinned fixture, not live Overpass or the legacy green-anchor model.
     with tempfile.TemporaryDirectory() as directory:
@@ -117,11 +121,13 @@ def main():
                 str(ROOT / "tools/course-model/build_overstone_canonical_from_normalized.py"),
                 "--source", str(SOURCE_PATH),
                 "--registry", str(ROOT / "course-models/COURSE_REGISTRY.json"),
+                "--greens", str(GREEN_PATH),
                 "--out", str(rebuilt_path),
             ],
             check=True,
         )
         rebuilt = load(rebuilt_path)
+        Draft202012Validator(schema).validate(rebuilt)
         difference = first_difference(rebuilt, canonical)
         assert difference is None, f"Deterministic builder differs from committed canonical draft at {difference}"
 
