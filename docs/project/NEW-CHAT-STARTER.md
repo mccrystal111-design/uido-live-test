@@ -75,6 +75,18 @@ Guardrails:
 - Treat a small sample as provisional, not proof.
 - The player owns the experiment; prompts should be relevant and unobtrusive.
 
+
+## Club distance stats and shot variants — DEC-018 (2026-10-10)
+
+For every club in the player's bag, the later club-stats view should show:
+- **Shortest recorded distance**
+- **Longest recorded distance**
+- **Average recorded distance**
+
+These values must be editable by the player, including later corrections or manual entry. Keep edits auditable/separate from the raw shot history; do not silently rewrite recorded shots when a reference value is edited. Make clear whether values represent observed shot data or player-edited club reference values.
+
+Shot capture must also support **partial/controlled wedge shots** and **punch shots** as identifiable shot types or variants. They should be filterable/analysable separately from full-swing shots so they do not distort a club's normal-distance picture. Preserve relevant context when available and allow later correction of recorded stats; unknown values remain blank rather than being represented as zero or a dash.
+
 ## Q&A Discovery Mode
 
 When Kieron explicitly starts a Q&A:
