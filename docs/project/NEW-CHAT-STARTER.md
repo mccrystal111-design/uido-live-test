@@ -87,6 +87,10 @@ These values must be editable by the player, including later corrections or manu
 
 Shot capture must also support **partial/controlled wedge shots** and **punch shots** as identifiable shot types or variants. They should be filterable/analysable separately from full-swing shots so they do not distort a club's normal-distance picture. Preserve relevant context when available and allow later correction of recorded stats; unknown values remain blank rather than being represented as zero or a dash.
 
+## Wedge matrix — DEC-019 (2026-10-10)
+
+In Bag / Club Distances, show an editable wedge matrix for each configured wedge (typically PW, GW, SW, LW), initially with quarter, half, three-quarter and full swing categories. Store player-entered reference distances separately from tracked shot observations, distinguish carry and total, and never derive invented partial-shot distances from full-swing yardages. Capture swing variant with each wedge shot, show sample size/uncertainty, and let the Caddie compare supported options at the same target yardage. Punch/knockdown shots remain separate identifiable variants. The matrix is part of the DEC-018 club-distance tracking foundation.
+
 ## Q&A Discovery Mode
 
 When Kieron explicitly starts a Q&A:
