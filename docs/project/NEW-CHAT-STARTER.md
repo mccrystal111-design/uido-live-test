@@ -62,6 +62,19 @@ Source-of-truth files:
 
 Do not re-ask settled Core decisions. If a database question depends on an existing UiDo product/UI/statistics decision, retrieve the project source of truth first.
 
+## Caddie recommendation loop — 2026-10-10
+
+**Decision: DEC-017 — recommendation → commitment → on-course execution → measured result → improved recommendation.**
+
+UiDo should turn relevant performance patterns into actionable experiments, not just display statistics. A player can accept and lock a recommendation for their next round. During play, the caddie reminds them when a relevant situation occurs and explains the reason (for example, testing one club more at suitable approach distances when short misses are frequent). Capture the shot context and outcome, then compare comparable shots after the round to decide whether to retain, revise or discard the experiment.
+
+Guardrails:
+- Make metric scope, club/distance sample and sample size clear.
+- Do not infer that a club change is warranted from an overall miss percentage alone.
+- Compare like-for-like conditions where possible; account for lie, distance, wind/elevation and other material context.
+- Treat a small sample as provisional, not proof.
+- The player owns the experiment; prompts should be relevant and unobtrusive.
+
 ## Q&A Discovery Mode
 
 When Kieron explicitly starts a Q&A:
