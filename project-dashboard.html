@@ -16,7 +16,7 @@ a{color:var(--forest);text-decoration:none}a:hover{text-decoration:underline}.wr
 <div class="eyebrow">UIDO / PROJECT CONTROL</div>
 <header><div><h1>Project dashboard</h1><div class="muted">One place to see what matters, what is blocked, and what needs a decision.</div></div><nav class="toplinks"><a class="btn primary" href="https://github.com/mccrystal111-design/uido-live-test/issues">Open issues ↗</a><a class="btn" href="https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI">Figma design ↗</a><button class="btn" id="refresh" type="button">↻ Refresh</button></nav></header>
 <section class="hero"><div><div class="eyebrow">CURRENT FOCUS · OPS-002</div><h2>Verify the real repository state before we move the build forward.</h2><p>Check source, commits, pull requests and the latest workflow results. Statuses should follow evidence, not assumptions.</p></div><div class="pill">P0 · PROJECT CONTROL</div></section>
-<section class="stats" aria-label="Live project summary"><div class="stat"><strong id="openCount">—</strong><span>Open issues</span></div><div class="stat"><strong id="closedCount">—</strong><span>Closed issues (recent page)</span></div><div class="stat"><strong id="prCount">—</strong><span>Open pull requests</span></div><div class="stat"><strong id="runStatus">—</strong><span>Latest workflow run</span></div></section>
+<section class="stats" aria-label="Live project summary"><div class="stat"><strong id="openCount">—</strong><span>Open issues</span></div><div class="stat"><strong id="closedCount">—</strong><span>Closed issues (recent page)</span></div><div class="stat"><strong id="prCount">—</strong><span>Open pull requests</span></div><div class="stat"><strong id="runStatus">—</strong><span>Latest active workflow run</span></div></section>
 <div class="sectionhead"><div><h2>Workstreams</h2><p>Live counts and links from the repository; workstream notes are the current planning baseline.</p></div></div>
 <section class="workstreams">
 <article class="workcard"><div class="code">OPS · CONTROL</div><h3>Project operations</h3><p>Source of truth, priorities, issue structure, decisions and handover.</p><div class="statusline"><span><i class="dot"></i><span id="opsStatus">Loading</span></span><a href="https://github.com/mccrystal111-design/uido-live-test/issues?q=is%3Aissue+OPS-">View ↗</a></div></article>
@@ -26,7 +26,7 @@ a{color:var(--forest);text-decoration:none}a:hover{text-decoration:underline}.wr
 </section>
 <div class="columns">
 <section><div class="sectionhead"><div><h2>Latest issues</h2><p>Fetched directly from the public GitHub repository API.</p></div></div><div class="panel"><div class="list loading" id="issues">Loading issues…</div></div></section>
-<section><div class="sectionhead"><div><h2>Workflow activity</h2><p>Read-only status; this page never starts or reruns a workflow.</p></div></div><div class="panel"><div class="list loading" id="runs">Loading workflows…</div><div id="runError" class="error"></div><div style="margin-top:12px"><a class="btn" href="https://github.com/mccrystal111-design/uido-live-test/actions">All workflow runs ↗</a></div></div>
+<section><div class="sectionhead"><div><h2>Workflow activity</h2><p>Recent active workflow runs. Push-triggered no-job entries from manual-only legacy workflows are omitted; this page never starts or reruns a workflow.</p></div></div><div class="panel"><div class="list loading" id="runs">Loading workflows…</div><div id="runError" class="error"></div><div style="margin-top:12px"><a class="btn" href="https://github.com/mccrystal111-design/uido-live-test/actions">All workflow runs ↗</a></div></div>
 <div class="sectionhead"><div><h2>Needs attention</h2><p>Human decisions and manual checks.</p></div></div><div class="panel"><div class="list">
 <div class="item"><div><a href="https://github.com/mccrystal111-design/uido-live-test/issues">Confirm canonical hole geometry contract</a><small>Needed before continuing AGNOSTIC45.</small></div><span class="tag">KIERON</span></div>
 <div class="item"><div><a href="https://github.com/mccrystal111-design/uido-live-test/actions">Review workflow runs</a><small>Configured workflows run normally; manual dispatch/reruns only when useful.</small></div><span class="tag">MANUAL</span></div>
@@ -47,15 +47,17 @@ function countPrefix(items,prefix){return items.filter(i=>i.title.startsWith(pre
 function workStatus(items,prefix){const subset=items.filter(i=>i.title.startsWith(prefix+"-"));if(!subset.length)return "No tagged issues yet";const open=subset.filter(i=>i.state==="open").length;return open+" open · "+(subset.length-open)+" closed"}
 async function refresh(){ $("refresh").disabled=true;$("refresh").textContent="Refreshing…";$("runError").textContent="";
 try{
- const [issues,prs,runs]=await Promise.all([get("/issues?state=all&per_page=100"),get("/pulls?state=open&per_page=100"),get("/actions/runs?per_page=6")]);
+ const [issues,prs,runs]=await Promise.all([get("/issues?state=all&per_page=100"),get("/pulls?state=open&per_page=100"),get("/actions/runs?per_page=50")]);
  const onlyIssues=issues.filter(i=>!i.pull_request);
  $("openCount").textContent=onlyIssues.filter(i=>i.state==="open").length;
  $("closedCount").textContent=onlyIssues.filter(i=>i.state==="closed").length;
  $("prCount").textContent=prs.length;
- $("runStatus").textContent=runs.workflow_runs?.length?(runs.workflow_runs[0].conclusion||runs.workflow_runs[0].status||"Unknown"):"None";
+ const ignoredPushNoJobWorkflows=new Set([".github/workflows/fix-home-screen.yml",".github/workflows/tune-home-target.yml",".github/workflows/fix-scorecard-v2.yml",".github/workflows/validate-canonical-v2.yml"]);
+ const list=(runs.workflow_runs||[]).filter(r=>!(r.event==="push"&&ignoredPushNoJobWorkflows.has(r.name)));
+ const latest=list[0];
+ $("runStatus").textContent=latest?(latest.conclusion||latest.status||"Unknown"):"None";
  renderIssues(onlyIssues.sort((a,b)=>new Date(b.updated_at)-new Date(a.updated_at)));
  $("opsStatus").textContent=workStatus(onlyIssues,"OPS");$("desStatus").textContent=workStatus(onlyIssues,"DES");$("rndStatus").textContent=workStatus(onlyIssues,"RND");$("crsStatus").textContent=workStatus(onlyIssues,"CRS");
- const list=runs.workflow_runs||[];
  $("runs").className="list";
  $("runs").innerHTML=list.slice(0,5).map(r=>{const status=r.conclusion||r.status||"unknown";const klass=status==="success"?"success":(["failure","cancelled","timed_out"].includes(status)?"failure":"");return '<div class="item"><div><a href="'+esc(r.html_url)+'">'+esc(r.name||r.display_title||"Workflow run")+'</a><small>'+esc(r.event||"event")+' · '+age(r.updated_at||r.created_at)+' · '+esc(r.head_branch||"")+'</small></div><span class="tag '+klass+'">'+esc(status.toUpperCase())+'</span></div>'}).join("")||'<div class="empty">No workflow runs returned.</div>';
  $("updated").textContent="Live GitHub data refreshed "+new Date().toLocaleString();
