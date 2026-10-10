@@ -1,6 +1,29 @@
 # UiDo — Current State
 
-Updated: 2026-10-09.
+Updated: 2026-10-10.
+
+## Execution checkpoint — 2026-10-10
+
+### Kite Core round/shot contract — mocked browser QA passed
+
+The browser contract is now green at [run 38080864650](https://github.com/mccrystal111-design/uido-live-test/actions/runs/38080864650). The test uses an in-page mock only; it does not authenticate against or write to production Supabase.
+
+The test exposed and fixed a real startup defect in `hawk.html`: auth-tab handlers called the `el()` DOM helper before its `const` declaration, causing a temporal-dead-zone ReferenceError and preventing the app from opening. The helper now initializes before auth setup.
+
+Verified mocked scenarios:
+- Invalid course/version UUIDs are rejected before any round insert.
+- Unpublished course versions and invalid/mismatched tee sets are rejected before insert.
+- A published, active course context creates a round with required course/version foreign keys.
+- Hole-score and shot writes carry the correct round/hole IDs and Kite source identity.
+- No browser page errors during the passing contract test.
+
+The draft round-persistence RLS migration also passed its isolated PostgreSQL test suite in [run 37915117865](https://github.com/mccrystal111-design/uido-live-test/actions/runs/37915117865). That is test-database evidence only; the migration has not been applied to production.
+
+**Still blocked:** actual live Auth/profile/round/hole/shot persistence. Only the production Supabase project is currently available, the Overstone revision is draft, and there is no isolated QA project plus published course fixture. Production remains untouched; do not claim end-to-end live persistence.
+
+### Club stats and wedge matrix decisions
+
+Accepted decisions DEC-018 and DEC-019 are now tracked by STAT-003 in the action register. Club statistics must include editable short/long/average observed distances; tracked partial wedge and punch shots must remain separately identifiable; wedge reference distances are editable and distinct from observed data, with sample size/uncertainty shown before the Caddie uses them.
 
 ## UiDo Core User Database — 2026-10-09
 
