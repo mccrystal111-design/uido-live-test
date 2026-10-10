@@ -109,7 +109,26 @@ def main() -> None:
     console_errors = []
     failed_requests = []
     dialogs = []
-    handler = partial(SimpleHTTPRequestHandler, directory=str(ROOT))
+    class MockedPageHandler(SimpleHTTPRequestHandler):
+        """Serve hawk.html with the Supabase CDN dependency replaced by the local mock."""
+
+        def do_GET(self):
+            if self.path.split("?", 1)[0] == "/hawk.html":
+                html = (ROOT / "hawk.html").read_text(encoding="utf-8")
+                cdn_tag = '<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>'
+                if cdn_tag not in html:
+                    self.send_error(500, "Expected Supabase CDN script tag was not found")
+                    return
+                body = html.replace(cdn_tag, "<script>" + MOCK_SUPABASE + "</script>", 1).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+                return
+            super().do_GET()
+
+    handler = partial(MockedPageHandler, directory=str(ROOT))
     server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
@@ -123,10 +142,6 @@ def main() -> None:
             page.on("console", lambda message: console_errors.append(message.text) if message.type == "error" else None)
             page.on("requestfailed", lambda request: failed_requests.append({"url": request.url, "failure": request.failure}))
             page.on("dialog", lambda dialog: (dialogs.append(dialog.message), dialog.accept()))
-            page.route(
-                "**/npm/@supabase/supabase-js@2*",
-                lambda route: route.fulfill(status=200, content_type="application/javascript", body=MOCK_SUPABASE),
-            )
             page.goto(url, wait_until="load")
             try:
                 page.wait_for_function(
