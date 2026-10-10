@@ -21,6 +21,12 @@ The draft round-persistence RLS migration also passed its isolated PostgreSQL te
 
 **Still blocked:** actual live Auth/profile/round/hole/shot persistence. Only the production Supabase project is currently available, the Overstone revision is draft, and there is no isolated QA project plus published course fixture. Production remains untouched; do not claim end-to-end live persistence.
 
+### Project dashboard — active workflow status and browser QA
+
+The dashboard previously surfaced repeated zero-job records from manual-only legacy workflows as the newest failure. Its run summary now requests a larger recent window and omits push-event entries from those manual-only workflows, while retaining manual-dispatch entries and the full GitHub Actions history link. This prevents those no-job records from masking meaningful active workflow results; the reason GitHub records them as push-event runs remains an OPS-002 investigation item.
+
+The updated published dashboard passed [browser QA run 38081087303](https://github.com/mccrystal111-design/uido-live-test/actions/runs/38081087303) at 390×844 and 1440×900. Both viewports returned HTTP 200, populated live GitHub data, had no console/page/HTTP errors and no horizontal overflow. I inspected both screenshots; this was a browser-rendered visual check, not a Figma design change. [QA screenshots/report artifact](https://github.com/mccrystal111-design/uido-live-test/actions/runs/38081087303/artifacts/11679784170).
+
 ### Club stats and wedge matrix decisions
 
 Accepted decisions DEC-018 and DEC-019 are now tracked by STAT-003 in the action register. Club statistics must include editable short/long/average observed distances; tracked partial wedge and punch shots must remain separately identifiable; wedge reference distances are editable and distinct from observed data, with sample size/uncertainty shown before the Caddie uses them.
