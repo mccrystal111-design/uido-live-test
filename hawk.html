@@ -53,6 +53,7 @@ dialog{border:1px solid var(--line);border-radius:20px;padding:20px;width:calc(1
 const KEY='hawk-field-test-v1';
 const SUPABASE_URL='https://itmlfcaukkngcoxaxcgm.supabase.co';
 const SUPABASE_KEY='sb_publishable_SFVmpTo4ewSizGjkLEyiRA_9tatAJPY';
+const el=id=>document.getElementById(id);
 const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let authMode='signup';
 const authGate=()=>el('authGate'), hawkApp=()=>el('hawkApp');
@@ -103,7 +104,6 @@ let saved={};try{saved=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
 const state={course:saved.course||'Practice Round',hole:saved.hole||1,holes:saved.holes||{},gps:null,watchId:null,trail:saved.trail||[],lastShot:saved.lastShot||null};
 let currentUser=null,coreRound=null,coreRoundHoles={};
 const getHole=()=>state.holes[state.hole]||(state.holes[state.hole]=blankHole());
-const el=id=>document.getElementById(id);
 function persist(){try{localStorage.setItem(KEY,JSON.stringify({course:state.course,hole:state.hole,holes:state.holes,trail:state.trail,lastShot:state.lastShot}))}catch(e){}}
 function updateSyncStatus(){el('syncStatus')&&(el('syncStatus').textContent=coreRound?'Core round '+coreRound.id.slice(0,8)+' active · local cache retained':'Core sync ready · start a round to save activity')}
 function yd(v){return v!==''&&v!=null&&Number.isFinite(Number(v))?Math.round(Number(v)):'—'}
