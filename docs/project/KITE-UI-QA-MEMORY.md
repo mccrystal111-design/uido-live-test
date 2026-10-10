@@ -517,3 +517,147 @@ This was a baseline review, not a design edit. No Figma layers were changed and 
 - Scores prototype is a simple newest-first retained-round list, intended to open each existing Scorecard in Review mode. Sample scores/dates are visual placeholders only.
 - Developer notes frame contains the Q&A decisions and implementation constraints. Navigation, sticky behaviour, round data, calculations and interactions are not yet wired; End Round save messaging still needs reconciliation.
 - No GitHub Actions were run. Screens remain subject to visual QA and iteration.
+
+
+## Kite Page UI voice Q&A log — 2026-10-10, from approximately 20:46 UK time
+
+**Purpose:** Detailed summary of the voice conversation about the Kite Figma screens. This is a decision log/transcript summary, not a verbatim audio transcript. Decisions below are the latest direction from this session and supersede older provisional visual directions where they conflict. This is documentation only: do not infer that Figma or application code has already been changed.
+
+### 1. Shared page backgrounds and visual consistency
+
+- Use the **exact same cream background colour already used on the existing Scorecard screen** on:
+  - Start Round
+  - Scorecard
+  - Player Profile
+  - Stats
+  - Scores
+- The reason is to make boxes, buttons, selected areas and nested page panels stand out, while keeping the non-on-course experience visually consistent.
+- **Do not apply the cream treatment everywhere.** Keep Home/front screen visually distinct as the opening/home experience; keep Yardage clean, bright and uncluttered for use on the course; keep End Round / Round Complete distinct as a finite finish/discard state.
+- Treat the existing Scorecard cream as the source of truth; do not approximate the shade or create variants.
+- Scores cards should use that same cream treatment and **drop shadows** to give them clearer separation/depth.
+
+### 2. Design-system rules are a high-priority requirement
+
+The user explicitly stressed that newly created pages must be “bang on” against the established UI principles from the start, in Figma and later in code. New screens must not drift in font sizes, colours, spacing or dimensions.
+
+- Create/maintain one authoritative set of UI principles in Figma Developer Notes and the GitHub project documentation.
+- Record and reuse the approved typography, colour palette, spacing, component sizes, shadows, selected/active states and interaction conventions.
+- Existing approved page headers on Scorecard, End Round and Player Profile use **Sora SemiBold at 25 pt**. Use this as the initial reference standard and verify it against the actual Figma styles before publishing the full specification.
+- Stats and Scores were observed to have header sizing inconsistent with those pages (Scores looked like Sora SemiBold 20 pt); align them to the verified standard rather than treating each new page independently.
+- Document heading, subheading, body, label and numeric styles, including font family/weight/size/colour; spacing and padding; corner treatment; shadows; and shared components.
+- Add a **new-page design checklist**: before a new page is considered complete, compare it with approved screens and tokens, use existing components/styles where possible, and document any intentional exception.
+- Do not invent unverified values for every colour/spacing token. Inspect the actual Figma source and record exact values in the implementation phase.
+- The user wants the UI principles tightened across both Figma design and eventual HTML/APK implementation. A visual mismatch should be treated as a design-system/QA issue, not accepted as normal drift.
+
+### 3. Stats page — filters and scoring trend
+
+The user has already made some UI adjustments in Figma. Preserve those edits during future implementation.
+
+- The scoring trend round-length filter is **9 holes / 18 holes / Both**.
+- The range control is labelled **“rounds”** in lowercase, with the selected count displayed beneath it.
+- Available counts are **5, 10 and 20**; they should work as direct, easy-to-tap buttons that immediately change the trend chart.
+- The user currently has the chart range set to **5**. For this scoring-trend control, retain **5 as the default** unless later review changes it. This supersedes the older provisional 10-round default recorded earlier for this particular trend UI.
+- The current line graph in Figma does not look like a proper line graph to the user. It may be a Figma/rendering issue or something that could also affect the actual HTML/APK implementation.
+- Before assuming the graph is acceptable, inspect the Figma result and test the relevant implementation/render in **Chromium**, using the available Stagehand/visual QA workflow and pixel comparison where practical. Confirm that the graph genuinely renders as a clear line graph, with sensible connected data points/lines, rather than merely assuming it will look right in production.
+- This is a QA task to investigate; do not claim it has already been tested or fixed.
+
+### 4. Stats page — rethink hierarchy and meaning of tabs
+
+The user considers the current Stats page layout/hierarchy confusing and wants a proper rework rather than cosmetic changes.
+
+- Keep the main sections/tabs: **Overview, Scoring, Performance**, but make the hierarchy clear and meaningful.
+- Avoid a page that says “Overview” as the main section and then repeats “Overview” immediately as a subheading. Use the main tab as the section heading and make subheadings describe their actual content.
+- Intended mental model:
+  - **Overview = what is happening** to the player's game.
+  - **Scoring = scoring results and patterns.**
+  - **Performance = why those results are happening and what the player can improve.**
+- The current placement of the scoring trend makes it unclear whether it belongs to Overview or Scoring. Resolve this deliberately in the redesign and make tab labels, section headings and content hierarchy agree.
+- Treat this as a structural rework of the Stats page, including section hierarchy and content order. Do not merely add more cards to the current layout.
+
+### 5. Stats Performance — progress over time, not percentages in isolation
+
+The existing Fairways Hit % and Greens in Regulation (GIR) % cards do not tell the whole story when shown only as averages.
+
+- Replace the isolated Fairways Hit and GIR percentage cards with **trend visualisations over time** (line graph or a clear bar chart, whichever communicates progression best).
+- Let the user select the last **5 / 10 / 20 rounds**, using the same simple direct-button pattern as the scoring trend. The Performance trend should default to **20 rounds**, so the player gets a useful longer-term view, while being able to compare recent 5- or 10-round form.
+- The purpose is to show whether recent performance is better or worse than the longer-run average; e.g. an overall 64% fairway figure can conceal much better recent form.
+- Calculate from eligible recorded data only. Missing fairway/GIR data must not be treated as a miss or zero. Make the chart's range and metric clear.
+- Decide during the redesign whether line or bar charts communicate progression most clearly, and keep the chart styling aligned with the shared design system.
+
+### 6. Stats Performance — prioritise Short Game & Penalties over putting
+
+The user considers short-game recovery and penalty avoidance more directly actionable for improving scores than average putts alone, particularly for mid- and high-handicap golfers.
+
+- Bring **Scrambling %**, **Sand Saves %**, and **Penalties per round** higher in the Performance section, above putting statistics.
+- Treat **Short Game & Penalties as part of Performance**, not as a separate peer section outside Performance.
+- Keep putting statistics available, but give them lower visual priority than the three short-game/penalty measures.
+- Preserve the existing agreed definitions:
+  - Scrambling success: missed the green in regulation and finished the hole in par or better.
+  - Sand-save success: played from a greenside bunker and finished the hole in par or better.
+  - Penalties per round: use recorded penalty data only.
+- Calculate only from eligible, known attempts/rounds. Unknown or ambiguous inputs are not failures or successes. Validate that the stored shot/lie, GIR, putt and hole-score fields support reliable derivation before implementation; do not add unnecessary manual entry by default.
+- Intended narrative: Overview tells the golfer what is happening; Scoring shows scoring results; Performance helps explain the causes and opportunities to improve.
+
+### 7. Scoring-outcome visualisation
+
+- The existing Stats scoring-outcome graphic feels loose and less polished than the **Round Statistics** visualisation already used on the Scorecard.
+- Reuse that existing Scorecard Round Statistics visual style as the reference: compact/tight layout, bold readable values, consistent colours, clear headers and established fonts.
+- Prefer reuse of the existing component or its visual rules where practical rather than creating a separate, inconsistent chart style.
+- Preserve the agreed grouped outcome categories: birdie or better, par, bogey, double bogey or worse. Keep the chart compact and legible on mobile.
+
+### 8. Scores screen — card treatment and diagnostic insight
+
+The user is happy with the general direction and had no further broad Scores-page changes beyond the details below.
+
+**Card appearance**
+- Apply the exact Scorecard cream background and a drop shadow to every tappable round card.
+- Keep the cards clear and readable, with enough visual life and useful context without clutter.
+
+**Score area and navigation**
+- Each card has two distinct tap targets/behaviours:
+  1. Tapping the main score area opens that specific round's **Scorecard in Review mode**.
+  2. Tapping the key-stat badge/box opens the player's **Stats page**, supporting reflection and improvement rather than simply revisiting the scorecard.
+- Make the different tap areas visually obvious and ensure the stat badge does not accidentally trigger the scorecard action.
+
+**Gross and net score hierarchy**
+- Make the gross score and score relative to par the prominent score area; for example, **77 / +5** as the main gross-score result, with the **net score 73** shown smaller and directly beneath/adjacent according to the card layout.
+- Do not use a separate full line saying “Net 73” if a clear smaller net number can do the job. Ensure the net number is still unambiguously identified as net score through a clear, consistent presentation.
+- Keep course name and date as supporting details; time may be shown where useful.
+
+**One key-stat callout on every round card**
+- Every round card should have a compact **key-stat badge/box** on the right-hand side, using the available card width.
+- It should highlight the most informative positive or negative performance factor for that specific round:
+  - Good round: surface a meaningful strength to reinforce.
+  - Poor round: surface the most relevant weakness or possible reason for the score.
+- Examples of the *kind* of insight include fairways hit being lower than usual, GIR being unusually strong/weak, excessive putts, penalties, or recovery performance. These are examples, not a fixed list or hard-coded rule.
+- The intent is diagnostic: **the outcome is what happened; the reason is what the golfer may be able to change.** The insight should help a golfer review a round and think about what to repeat or improve next time.
+- Use a badge/card treatment that is consistent with the existing Stats visual language, so the stat looks like one of the player's other stats rather than an unrelated decorative label.
+- Define the mechanism for selecting the key stat separately during product/data design. It should be based on the round's available data and meaningful comparison/baseline, not arbitrarily label one stat as “best” or “worst”.
+- Not every round will have enough data for every candidate stat. Handle missing data honestly and avoid inventing a positive/negative insight when the evidence is insufficient.
+- This is a new product behaviour to specify and prototype; it is not yet implemented.
+
+### 9. Weather context for a round — premium feature proposal
+
+The user proposed a weather indicator to give round scores context, especially for recreational golfers without a competition-based handicap process or official handicap index.
+
+- Where data access permits, retrieve weather for the **round's recorded date/time and location/area**, rather than asking the player to enter it manually.
+- The user believes the existing Supabase setup may be able to support retrieving weather for a given area and time. This is a technical investigation, **not a verified Supabase capability**; check the appropriate weather source/API and data architecture before promising it.
+- Show a subtle weather/context indicator on the Scores card (for example, high wind or rain) when reliable data is available. The intent is to help the golfer understand that conditions may have influenced a score and avoid over-interpreting a difficult round as poor ability.
+- Consider using the same conditions as context in future stats/round insights, but do not claim weather-adjusted handicap calculations or a formal Competition Scratch Score (CSS) equivalent unless a defensible calculation and rules are separately specified.
+- **Premium/paid feature only.** The user explicitly said sourcing weather information for each round should not be part of the free/ad-supported tier. Do not include it in Kite Free/ad-supported scope.
+- Investigate API/data costs, location/time accuracy, storage/caching, availability for past rounds and entitlement enforcement before implementation. Do not call this a confirmed feature until feasibility is established.
+
+### 10. Workflow and immediate next steps
+
+- The voice session was a **Q&A/design review only**. Do not silently start editing Figma while still reviewing.
+- Preserve changes the user has already made to the Stats screen.
+- Next implementation/QA work, after the user authorises moving from review to build:
+  1. Inspect the latest Figma frames and identify the exact Scorecard cream and approved typography/component tokens.
+  2. Update the Figma Developer Notes with the authoritative design-system specification and new-page checklist.
+  3. Rework Stats section hierarchy and performance visualisations as described above.
+  4. Update Scores card styling, gross/net hierarchy, independent tap targets and key-stat callout.
+  5. Validate the scoring-trend chart and other visualisations in Chromium with screenshot/pixel QA where practical.
+  6. Investigate weather-source feasibility for date/time/location, keeping it outside free/ad-supported scope.
+  7. Record implementation status and QA evidence separately from decisions; do not claim any item is implemented until verified.
+- Do not run or dispatch GitHub Actions as part of this documentation update.
+
