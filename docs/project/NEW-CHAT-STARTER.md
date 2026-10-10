@@ -64,9 +64,9 @@ Do not re-ask settled Core decisions. If a database question depends on an exist
 
 ## Caddie recommendation loop — 2026-10-10
 
-**Decision: DEC-017 — recommendation → commitment → on-course execution → measured result → improved recommendation.**
+**Decision: DEC-017 — recommendation → commitment → pre-round handshake → on-course execution → measured result → improved recommendation.**
 
-UiDo should turn relevant performance patterns into actionable experiments, not just display statistics. A player can accept and lock a recommendation for their next round. During play, the caddie reminds them when a relevant situation occurs and explains the reason (for example, testing one club more at suitable approach distances when short misses are frequent). Capture the shot context and outcome, then compare comparable shots after the round to decide whether to retain, revise or discard the experiment.
+UiDo should turn relevant performance patterns into actionable experiments, not just display statistics. A player can accept and lock a recommendation for their next round. At the pre-round handshake, briefly ask when they last played and whether they have practised since, then remind them of the active experiment. Avoid repeating known, current answers; let the golfer skip or change the experiment. During play, the caddie reminds them when a relevant situation occurs and explains the reason (for example, testing one club more at suitable approach distances when short misses are frequent). Capture the shot context and outcome, then compare comparable shots after the round to decide whether to retain, revise or discard the experiment.
 
 Guardrails:
 - Make metric scope, club/distance sample and sample size clear.
