@@ -62,6 +62,12 @@ The user explicitly requested a new GitHub log for this conversation and wants i
 ### D-10 — Start Round: adding players
 The existing Start Round screen has a Players section with the current player and an Add option. The user clarified that Add is for adding another player to the round by entering a guest's name, or eventually selecting/adding a junior golfer associated with a family account. Junior/family support is future functionality; do not treat it as part of the current adult V1 scope unless the user revises that decision.
 
+
+### D-11 — Tee Shot screen: fairway result and club/distance control
+On the Yardage / Tee Shot screen (`190:136`), the left-side directional controls at the bottom represent the tee-shot result: fairway hit, left miss, or right miss. The golfer selects one at the ball, once. This also creates an opportunity to capture GPS/location for the shot. This is a shot-result selection, not a control for choosing shot shape.
+
+The `Dr` section is the club selection: Driver, with its carry and total yardage shown. Do not interpret these two figures as GPS distances or as the fairway-result control.
+
 ## Existing Kite UI inventory (known from project context)
 
 These are existing screens, not missing-page proposals:
