@@ -72,6 +72,10 @@ The `Dr` section is the club selection: Driver, with its carry and total yardage
 ### D-12 — Log the selected club with the shot result
 When the golfer presses the fairway-result control (fairway hit, left miss or right miss), the app should log the currently selected club alongside that shot event. The golfer should not need to select the club again at the moment of recording; use the active club selection shown on the screen.
 
+
+### D-13 — After recording a shot, advance to the next shot's yardage screen
+After the golfer records a shot using the fairway-result control, Kite should move straight to the next shot's yardage screen. The golfer can then select the club for the next shot and record its result in the same way. This keeps the round flow moving shot by shot.
+
 ## Existing Kite UI inventory (known from project context)
 
 These are existing screens, not missing-page proposals:
