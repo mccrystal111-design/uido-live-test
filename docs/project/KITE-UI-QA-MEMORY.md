@@ -772,3 +772,6 @@ Continue reviewing the existing screens and their flow before adding more missin
 On Figma frame `190:136`, the bottom-left three-way result control means **fairway hit / left miss / right miss**. The golfer selects the result once at the ball; that selection is also a GPS/location-capture opportunity. It is not a shot-shape selector.
 
 The `Dr` area is club selection (Driver in the shown state), with **carry and total yardage** displayed. Keep this distinct from the fairway-result selection.
+
+
+**Shot logging clarification — 12 October 2026:** When the golfer presses the fairway-result control (fairway hit / left miss / right miss), log the currently selected club with that shot event. The golfer should not have to select the club again at the moment of recording.
