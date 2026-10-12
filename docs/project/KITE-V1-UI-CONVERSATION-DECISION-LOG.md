@@ -143,3 +143,53 @@ The user correctly pointed out that we have not established what happens when an
 
 ### D-19 — Player Profile edit interaction found in Figma developer notes
 Located the existing implementation guidance in the Developer Notes / Q&A Handoff frame (`302:162`, detail node `318:48`): **editing expands each Profile section in place, with Save / Cancel controls staying within the edited section.** This is the intended interaction pattern for the profile sections; do not create separate edit pages by default. The notes also say the displayed profile data is illustrative and implementation should connect it to the selected player record.
+
+
+---
+
+## Consolidated Kite Adult V1 UI Audit — 12 October 2026
+
+### Purpose
+Identify genuine missing adult V1 UI by comparing the current Figma page/frame inventory and Developer Notes against the agreed golfer journey. This is an audit of what is represented in the design, not a request to redesign existing screens. No Figma or app implementation changes were made.
+
+### Existing design coverage confirmed
+- **Home:** `93:2`
+- **Start Round:** `124:25` — course dropdown, player/guest add, Stroke Play/Stableford, tee choice, Start Round.
+- **Yardage / Tee Shot:** `190:136` — yardage, bunker information, fairway hit/left miss/right miss control, selected club and carry/total display.
+- **Approach states:** `219:2`, `229:143`, `255:267` — approach/score-entry/finish-hole states.
+- **Scorecard:** `261:30` — 18-hole scoring, score edit affordance and round statistics.
+- **Round Complete:** `261:125` — round summary, View/Edit Scorecard, End Round, Discard Round.
+- **Player Profile:** `295:5` — handicap, home course & tees, playing preferences, clubs & carry distances.
+- **Stats:** `302:5`; **Scores:** `302:121`.
+- **Developer Notes / Q&A Handoff:** `302:162`, including the Player Profile inline-edit interaction rule.
+
+### Prioritised gap register
+
+**Priority 1 — Login / Sign-up flow (confirmed missing from the reviewed page inventory).**
+The Home screen assumes an existing player/profile, but no login or registration screen is present in the reviewed Kite page inventory. Agreed direction: simple Google, Apple or email sign-up/sign-in. This is the first gap to design.
+
+**Priority 2 — First-run onboarding / profile setup states (required by agreed journey; not represented as a dedicated flow in the reviewed inventory).**
+Agreed journey is sign-up/sign-in → optional Player Profile setup → Home. Profile setup can be skipped, with a clear indication that some functionality may be limited when relevant details are absent. Design the first-run states and skip path without duplicating the existing Player Profile overview.
+
+**Priority 3 — Player Profile expanded edit states (interaction pattern specified; detailed form content not yet evidenced in the reviewed frames).**
+Developer Notes specify that each section expands in place and Save/Cancel remain within that section. The current visible frames show the collapsed summary states only. The detailed expanded fields/layouts still need to be located elsewhere in Figma or designed if they do not exist. This applies to all four sections: Handicap; Home course & tees; Playing preferences; Clubs & carry distances. Do not create four separate edit pages by default.
+
+**Priority 4 — Club-bag setup/edit details (specific states required by agreed product decisions; detailed UI not yet evidenced in the reviewed frames).**
+The existing profile has a Clubs & carry distances summary and “Manage bag” entry point. Required behaviour to support: full bag setup; optional shortcut entering Driver and 7-iron carry to estimate other clubs; estimates editable later; ability to skip all bag setup; no nagging/repeated prompts. The club-bag expanded editor/setup states need to be checked against this requirement. Treat this as a detailed part of Priority 3, not a separate duplicate profile page.
+
+### Not gaps based on current evidence
+- Course selection / Start Round setup: already exists.
+- Scorecard and round-completion screens: already exist.
+- Stats and Scores pages: already exist.
+- Player Profile overview: already exists.
+- Junior/family UI: explicitly future scope, not adult V1.
+- GPS/live-yardage functionality: out of scope for this UI gap audit.
+
+### Round-flow decisions to preserve
+- Pressing fairway hit / left miss / right miss records the result, currently selected club and GPS location where available.
+- After a shot is recorded, advance directly to the next shot's yardage screen.
+- The chequered flag is specifically for finishing the 18th hole; it opens Round Complete.
+- End Round is the final confirmation to retain/finish the round; Discard Round is separate.
+
+### Audit status / next action
+The first consolidated audit is complete based on the reviewed frame inventory and Q&A handoff. The first confirmed missing page is Login/Sign-up. Priorities 2–4 are required flow/detail states not evidenced in the reviewed page frames; before creating anything, check whether any expanded/setup states are already represented elsewhere in the Figma file. Do not keep repeating screen summaries; use this register as the current working list and amend it only when new evidence or a user decision changes the status.
