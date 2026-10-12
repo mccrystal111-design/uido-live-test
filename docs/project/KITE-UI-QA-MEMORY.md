@@ -781,3 +781,22 @@ The `Dr` area is club selection (Driver in the shown state), with **carry and to
 
 
 **Chequered-flag clarification — 12 October 2026:** The chequered flag is specifically for the 18th hole to finish the round. It is not the control for advancing from an ordinary hole to the next hole.
+
+
+## Scorecard and End Round screen review — 12 October 2026
+
+### Scorecard — Figma frame `261:30`
+- Shows the player, handicap, gross/net score and front/back totals.
+- Lists holes 1–18 with par, index, score, fairways hit/miss, GIR and putts.
+- Includes total score and round statistics (birdies, pars, bogeys, fairway %, GIR %, bunker %, up-and-down %, putts, putts/hole, penalties and HCP).
+- A note says “Tap a score to edit”; the bottom action is “Save Scorecard & Exit”.
+- This is existing coverage; do not list scorecard as a missing page based on current evidence.
+
+### End Round — Figma frame `261:125`
+- Shows a round-complete summary with score, net score, +/- figures and front/back totals.
+- Actions: “View/Edit Scorecard”, “End Round”, and “Discard Round”.
+- States that the round is saved to the player's profile.
+- This is existing coverage; do not list End Round as a missing page based on current evidence.
+
+### Flow question still to confirm
+The 18th-hole chequered flag is the action for finishing the round. The End Round screen appears to be a summary/confirmation step with separate “End Round” and “Discard Round” actions. Confirm whether tapping the chequered flag opens this End Round screen, with “End Round” then finalising the saved round.
