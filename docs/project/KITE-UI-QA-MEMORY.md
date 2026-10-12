@@ -661,3 +661,54 @@ The user proposed a weather indicator to give round scores context, especially f
   7. Record implementation status and QA evidence separately from decisions; do not claim any item is implemented until verified.
 - Do not run or dispatch GitHub Actions as part of this documentation update.
 
+### 11. Kite UI Style Menu v1 — living reference
+
+**Purpose and authority**
+- The curated, current Figma screens remain the visual source of truth. The style menu documents established patterns; it must not force a redesign of already-curated screens.
+- Figma visual reference: a separate frame on the `02 — Product UI` page named **Kite — UI Style Menu — V1** (frame ID `334:5`). Existing product screens and Developer Notes were not altered when this frame was created.
+- This file remains the written decision record. Update this section as decisions are confirmed during page curation; keep implementation status distinct from proposals.
+- Status labels: **Confirmed** = directly verified in current Figma; **Provisional** = useful working default, not locked; **To resolve** = needs review before standardising.
+
+**Confirmed page backgrounds**
+- Kite Navy `#0E1C2B`: Home and End Round.
+- Kite Ivory `#F4F1E6`: Start Round, Scorecard, Player Profile, Stats and Scores.
+- These values were checked against current Figma frame fills on 12 October 2026. Developer Notes uses a separate neutral background and is not included in the app-screen ivory rule.
+
+**Typography — observed roles, not a fully locked type scale**
+- Typeface in current screens: Sora.
+- Page title: 25 px, SemiBold (observed).
+- Section heading: 12–13 px, SemiBold (observed range).
+- Supporting text: 10–11 px, Regular (observed range).
+- Metric values: 22–29 px, Bold/SemiBold (observed range).
+- Hero score: 40–62 px, Bold/SemiBold (observed range).
+- Other sizes remain screen-specific until the remaining screens are curated. Do not force all text into these roles prematurely.
+
+**Observed colour candidates**
+- Navy `#0E1C2B`; white `#FFFFFF`; slate `#606870`; divider grey `#DCDDDB`; bar-track grey `#E5E7EB`; red `#F71928`; green `#009951`; bunker brown `#AC7F5E`; deep navy `#0E2334`; yellow `#FFCC00`.
+- Colour roles are recorded from current screens, but nearby grey/neutral variants still need a usage audit. Do not merge similar tokens until the differences are understood.
+
+**Components and layout**
+- Common observed card corner radii include 8, 10 and 12 px.
+- Provisional spacing defaults for evaluation only: compact gaps 4–8 px; standard gaps 12–16 px; section separation 20–24 px; divider 1 px.
+- Shadow values/presets remain provisional. Preserve existing effects until the current screens have been audited.
+- These defaults are not yet formal Figma styles, variables or component rules.
+
+**New-screen curation checklist**
+1. Check hierarchy and readability at mobile scale.
+2. Reuse established colour and typography roles where appropriate.
+3. Check cards, buttons, dividers, spacing and effects against curated screens.
+4. Preserve intentional screen-specific differences.
+5. Record exceptions and unresolved choices instead of guessing.
+6. Do not alter a curated screen merely to make it conform to this draft.
+7. Promote a token to confirmed only after checking it against current designs.
+
+**To resolve before token lock**
+- Audit remaining screens, including current Scores details.
+- Review near-duplicate greys and neutrals and determine whether they are intentional.
+- Verify spacing and shadow values against actual current Figma properties.
+- After the page curation is sufficiently stable, create reusable named Figma text, colour and effect styles/variables from approved tokens.
+
+**Change log — 12 October 2026**
+- Created the separate Figma Style Menu v1 frame (`334:5`) as a living reference. No product-screen designs were changed.
+- Verified the listed app-screen background colours against current frame fills.
+- No GitHub Actions were run.
