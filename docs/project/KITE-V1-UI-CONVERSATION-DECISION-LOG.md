@@ -84,6 +84,10 @@ On the score-entry state of the Yardage / Approach screen, the chequered-flag co
 ### D-15 — 18th-hole flag opens Round Complete; End Round confirms
 When the golfer taps the chequered flag on the 18th hole, open the existing Round Complete / End Round screen (`261:125`). From there, **End Round** is the final confirmation to finish and retain the round. **View/Edit Scorecard** allows review or correction before confirming; **Discard Round** remains a separate destructive option.
 
+
+### D-16 — Player Profile edit destinations remain unverified
+The Player Profile overview (`295:5`) visually shows edit affordances for Handicap, Home course & tees, Playing preferences, and Clubs & carry distances. We have **not** yet established what happens when any of these edit controls is tapped, whether each opens a separate screen, an inline editor, a modal, or another flow. Review and map all four interactions before deciding that any edit screen is missing; do not single out bag management as the only unknown.
+
 ## Existing Kite UI inventory (known from project context)
 
 These are existing screens, not missing-page proposals:
