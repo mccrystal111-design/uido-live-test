@@ -712,3 +712,12 @@ The user proposed a weather indicator to give round scores context, especially f
 - Created the separate Figma Style Menu v1 frame (`334:5`) as a living reference. No product-screen designs were changed.
 - Verified the listed app-screen background colours against current frame fills.
 - No GitHub Actions were run.
+
+### 12. Spacing register — required during screen curation
+
+- **Spacing is not yet fully measured or standardised.** The Style Menu's 4–8 px compact gaps, 12–16 px standard gaps, and 20–24 px section spacing are provisional suggestions, not verified design rules.
+- During curation, maintain a measured register for each reviewed screen: screen edge margins; card/tile internal padding; horizontal and vertical gaps between adjacent elements; section-to-section spacing; button/control dimensions and spacing; repeated component dimensions; corner radii; and shadow/effect properties where applicable.
+- Capture the actual measured value, screen/frame and element/context, whether the value is repeated, and status (confirmed, provisional, exception/to resolve). Avoid averaging distinct intentional patterns into one token.
+- Auto Layout item spacing and padding can be read directly where present. Several screens use manually positioned elements, so their geometry must be measured from node bounds/coordinates; an Auto Layout-only audit is incomplete.
+- Do not retrofit layouts just to create consistent numbers. Record existing patterns first, discuss outliers during curation, and only promote recurring approved values to reusable tokens after the audit.
+- Change log — 12 October 2026: Figma Style Menu updated to explicitly mark spacing as not yet measured and to require a measured spacing register. No product-screen layouts changed.
