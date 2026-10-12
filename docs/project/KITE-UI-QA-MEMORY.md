@@ -766,3 +766,9 @@ No other missing pages have been confirmed. Course selection and round setup mus
 
 ### Next review
 Continue reviewing the existing screens and their flow before adding more missing pages. Avoid a review of GPS/live-yardage behaviour. Once existing coverage has been reviewed, compile the prioritised list of confirmed gaps.
+
+
+### Tee Shot screen clarification — 12 October 2026
+On Figma frame `190:136`, the bottom-left three-way result control means **fairway hit / left miss / right miss**. The golfer selects the result once at the ball; that selection is also a GPS/location-capture opportunity. It is not a shot-shape selector.
+
+The `Dr` area is club selection (Driver in the shown state), with **carry and total yardage** displayed. Keep this distinct from the fairway-result selection.
