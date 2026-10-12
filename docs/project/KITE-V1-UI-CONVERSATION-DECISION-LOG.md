@@ -136,3 +136,7 @@ No other missing pages are confirmed yet. Do not promote earlier speculative sug
 - The assistant claimed to have reviewed Player Profile and described its coverage, but bag-management interactions have not actually been verified. Be honest about what has and has not been inspected.
 - The user wants a careful collaborative curation, not unsolicited criticism, implementation work, or a speculative page list.
 - Start Round: the Add player control supports a named guest now; a junior family golfer is a future possibility, not current adult V1 scope.
+
+
+### D-18 — Correction: edit destinations have not been established
+The user correctly pointed out that we have not established what happens when any Player Profile edit control is tapped. Earlier, I asked whether the existing Figma design included separate screens, which confirms this was still an open question. Do not state that the destination screens are missing or “not located” as a conclusion based only on an incomplete inventory search. The correct status for all four controls is **unknown / not yet established**. Continue tracing the design carefully, and if that cannot be resolved from Figma, ask the user rather than infer.
