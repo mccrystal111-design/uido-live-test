@@ -823,3 +823,5 @@ This confirms the main Player Profile overview and a bag-management entry point 
 
 
 **Correction — Player Profile edit destinations remain unknown:** We have not established what happens when any of the four edit controls is tapped. The earlier question asking whether separate screens exist was still unanswered; it was incorrect to turn an incomplete Figma search into a claim that destinations were not found. Status for all four controls is **unknown / not yet established**, not confirmed missing.
+
+**Player Profile edit interaction found in Figma — 12 October 2026:** The Developer Notes / Q&A Handoff frame (`302:162`, detail node `318:48`) explicitly states that editing expands each Profile section in place, with **Save / Cancel** controls staying within the edited section. This is the documented interaction pattern; separate edit pages are not the intended default. The prototype's displayed profile details are illustrative and implementation should connect the UI to the selected player record.
