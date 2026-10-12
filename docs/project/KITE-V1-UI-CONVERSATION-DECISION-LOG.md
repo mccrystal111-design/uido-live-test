@@ -68,6 +68,10 @@ On the Yardage / Tee Shot screen (`190:136`), the left-side directional controls
 
 The `Dr` section is the club selection: Driver, with its carry and total yardage shown. Do not interpret these two figures as GPS distances or as the fairway-result control.
 
+
+### D-12 — Log the selected club with the shot result
+When the golfer presses the fairway-result control (fairway hit, left miss or right miss), the app should log the currently selected club alongside that shot event. The golfer should not need to select the club again at the moment of recording; use the active club selection shown on the screen.
+
 ## Existing Kite UI inventory (known from project context)
 
 These are existing screens, not missing-page proposals:
