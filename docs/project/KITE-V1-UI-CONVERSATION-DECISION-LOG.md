@@ -140,3 +140,6 @@ No other missing pages are confirmed yet. Do not promote earlier speculative sug
 
 ### D-18 — Correction: edit destinations have not been established
 The user correctly pointed out that we have not established what happens when any Player Profile edit control is tapped. Earlier, I asked whether the existing Figma design included separate screens, which confirms this was still an open question. Do not state that the destination screens are missing or “not located” as a conclusion based only on an incomplete inventory search. The correct status for all four controls is **unknown / not yet established**. Continue tracing the design carefully, and if that cannot be resolved from Figma, ask the user rather than infer.
+
+### D-19 — Player Profile edit interaction found in Figma developer notes
+Located the existing implementation guidance in the Developer Notes / Q&A Handoff frame (`302:162`, detail node `318:48`): **editing expands each Profile section in place, with Save / Cancel controls staying within the edited section.** This is the intended interaction pattern for the profile sections; do not create separate edit pages by default. The notes also say the displayed profile data is illustrative and implementation should connect it to the selected player record.
