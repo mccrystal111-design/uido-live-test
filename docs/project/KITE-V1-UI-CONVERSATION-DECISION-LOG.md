@@ -88,6 +88,10 @@ When the golfer taps the chequered flag on the 18th hole, open the existing Roun
 ### D-16 — Player Profile edit destinations remain unverified
 The Player Profile overview (`295:5`) visually shows edit affordances for Handicap, Home course & tees, Playing preferences, and Clubs & carry distances. We have **not** yet established what happens when any of these edit controls is tapped, whether each opens a separate screen, an inline editor, a modal, or another flow. Review and map all four interactions before deciding that any edit screen is missing; do not single out bag management as the only unknown.
 
+
+### D-17 — Current Figma review: edit destinations not found yet
+The Product UI page was inspected for frames associated with the Player Profile edit controls. The Player Profile overview (`295:5`) is present, but the current frame inventory does not reveal distinct destination frames for Handicap, Home course & tees, Playing preferences, or Clubs & carry distances. This is not proof that no destinations exist elsewhere in the file; the four interactions remain unverified and must be traced in the design before we decide which edit screens need creating.
+
 ## Existing Kite UI inventory (known from project context)
 
 These are existing screens, not missing-page proposals:
