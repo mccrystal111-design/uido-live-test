@@ -817,3 +817,6 @@ This confirms the main Player Profile overview and a bag-management entry point 
 
 
 **Player Profile interaction status:** The overview (`295:5`) shows edit controls for Handicap, Home course & tees, Playing preferences, and Clubs & carry distances. We have not established what happens after tapping any of these controls. All four destinations/interactions remain to be reviewed; do not assume they open separate pages, and do not focus only on the bag flow until the others are checked too.
+
+
+**Edit destination review — 12 October 2026:** Inspected the Product UI frame inventory for Player Profile edit destinations. The profile overview (`295:5`) is present, but I have not found distinct destination frames for Handicap, Home course & tees, Playing preferences, or Clubs & carry distances in the current review. This does not prove no such frames exist elsewhere in the file. Keep all four interactions marked **unverified** until they can be traced; do not assume inline/modal/separate-screen behaviour.
