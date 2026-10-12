@@ -59,6 +59,9 @@ The screen already exists and should be reviewed/reused rather than proposing a 
 ### D-09 — Preserve decisions and update this log after each answer
 The user explicitly requested a new GitHub log for this conversation and wants it updated with each answer, because they dislike losing decisions or memory. This file must be updated as the conversation proceeds. Be transparent if a GitHub update fails.
 
+### D-10 — Start Round: adding players
+The existing Start Round screen has a Players section with the current player and an Add option. The user clarified that Add is for adding another player to the round by entering a guest's name, or eventually selecting/adding a junior golfer associated with a family account. Junior/family support is future functionality; do not treat it as part of the current adult V1 scope unless the user revises that decision.
+
 ## Existing Kite UI inventory (known from project context)
 
 These are existing screens, not missing-page proposals:
@@ -89,10 +92,12 @@ No other missing pages are confirmed yet. Do not promote earlier speculative sug
 ## Open questions / next review
 
 1. Continue reviewing existing screens before suggesting more missing pages.
-2. Next screen to inspect: **Start Round** (`124:25`), then ask only about an unclear interaction if needed.
-3. Authentication details still to curate when appropriate: precise provider/email interaction, forgotten-password path, and what profile setup fields are required versus optional. Do not interrupt the current screen-by-screen review by asking all these at once.
-4. Verify actual Player Profile interactions before claiming that bag management is fully covered.
-5. After the existing screen review is complete, compile a prioritised list of confirmed missing pages.
+2. Start Round (`124:25`) reviewed at a high level: course dropdown; Players (current player and Add); Stroke Play / Stableford; tee choices (White, Yellow, Red); Start Round button.
+3. Player Add interaction clarified: add a named guest now; a junior family golfer is a future possibility, not current adult V1 scope.
+4. Continue to the next existing screen/flow after this Start Round clarification, and ask only about genuine uncertainties.
+5. Authentication details still to curate when appropriate: precise provider/email interaction, forgotten-password path, and which profile setup fields are required versus optional. Do not interrupt the current screen-by-screen review by asking all these at once.
+6. Verify actual Player Profile interactions before claiming that bag management is fully covered.
+7. After the existing screen review is complete, compile a prioritised list of confirmed missing pages.
 
 ## Conversation corrections / guardrails
 
@@ -100,3 +105,4 @@ No other missing pages are confirmed yet. Do not promote earlier speculative sug
 - The assistant asked whether sign-up was required after the user had already answered. Do not repeat settled questions.
 - The assistant claimed to have reviewed Player Profile and described its coverage, but bag-management interactions have not actually been verified. Be honest about what has and has not been inspected.
 - The user wants a careful collaborative curation, not unsolicited criticism, implementation work, or a speculative page list.
+- Start Round: the Add player control supports a named guest now; a junior family golfer is a future possibility, not current adult V1 scope.
