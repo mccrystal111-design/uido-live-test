@@ -775,3 +775,6 @@ The `Dr` area is club selection (Driver in the shown state), with **carry and to
 
 
 **Shot logging clarification — 12 October 2026:** When the golfer presses the fairway-result control (fairway hit / left miss / right miss), log the currently selected club with that shot event. The golfer should not have to select the club again at the moment of recording.
+
+
+**Next-shot flow decision — 12 October 2026:** After a shot is recorded with the fairway-result control, advance directly to the next shot's yardage screen. The golfer selects the club for that next shot and records its result using the same flow.
