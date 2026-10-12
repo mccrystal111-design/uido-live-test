@@ -80,6 +80,10 @@ After the golfer records a shot using the fairway-result control, Kite should mo
 ### D-14 — Chequered flag is for finishing the 18th hole / round
 On the score-entry state of the Yardage / Approach screen, the chequered-flag control is specifically for the 18th hole to finish the round. It is not the action to advance from an ordinary hole to the next hole. Preserve this distinction in the round flow.
 
+
+### D-15 — 18th-hole flag opens Round Complete; End Round confirms
+When the golfer taps the chequered flag on the 18th hole, open the existing Round Complete / End Round screen (`261:125`). From there, **End Round** is the final confirmation to finish and retain the round. **View/Edit Scorecard** allows review or correction before confirming; **Discard Round** remains a separate destructive option.
+
 ## Existing Kite UI inventory (known from project context)
 
 These are existing screens, not missing-page proposals:
