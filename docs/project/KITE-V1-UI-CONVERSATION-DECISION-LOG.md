@@ -76,6 +76,10 @@ When the golfer presses the fairway-result control (fairway hit, left miss or ri
 ### D-13 — After recording a shot, advance to the next shot's yardage screen
 After the golfer records a shot using the fairway-result control, Kite should move straight to the next shot's yardage screen. The golfer can then select the club for the next shot and record its result in the same way. This keeps the round flow moving shot by shot.
 
+
+### D-14 — Chequered flag is for finishing the 18th hole / round
+On the score-entry state of the Yardage / Approach screen, the chequered-flag control is specifically for the 18th hole to finish the round. It is not the action to advance from an ordinary hole to the next hole. Preserve this distinction in the round flow.
+
 ## Existing Kite UI inventory (known from project context)
 
 These are existing screens, not missing-page proposals:
