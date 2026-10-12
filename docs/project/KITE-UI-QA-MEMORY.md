@@ -825,3 +825,28 @@ This confirms the main Player Profile overview and a bag-management entry point 
 **Correction — Player Profile edit destinations remain unknown:** We have not established what happens when any of the four edit controls is tapped. The earlier question asking whether separate screens exist was still unanswered; it was incorrect to turn an incomplete Figma search into a claim that destinations were not found. Status for all four controls is **unknown / not yet established**, not confirmed missing.
 
 **Player Profile edit interaction found in Figma — 12 October 2026:** The Developer Notes / Q&A Handoff frame (`302:162`, detail node `318:48`) explicitly states that editing expands each Profile section in place, with **Save / Cancel** controls staying within the edited section. This is the documented interaction pattern; separate edit pages are not the intended default. The prototype's displayed profile details are illustrative and implementation should connect the UI to the selected player record.
+
+
+---
+
+## Consolidated Kite Adult V1 UI Gap Audit — 12 October 2026
+
+### Existing screens found
+Home (`93:2`); Start Round (`124:25`); Yardage/Tee Shot (`190:136`); Approach states (`219:2`, `229:143`, `255:267`); Scorecard (`261:30`); Round Complete (`261:125`); Player Profile (`295:5`); Stats (`302:5`); Scores (`302:121`); Developer Notes/Q&A Handoff (`302:162`).
+
+### Prioritised gaps
+1. **Login / Sign-up — confirmed missing from the reviewed page inventory.** Agreed providers: Google, Apple or email; support both sign-up and returning-user sign-in.
+2. **First-run onboarding/profile setup — required by the agreed journey, not represented as a dedicated flow in the reviewed inventory.** Flow: sign-up/sign-in → optional profile setup → Home. Allow skipping; explain limitations only where relevant.
+3. **Player Profile expanded edit states — detailed fields/layouts not yet evidenced in the reviewed frames.** Developer Notes specify in-place expansion with Save/Cancel inside each section. Applies to Handicap, Home course & tees, Playing preferences, and Clubs & carry distances. Do not create separate edit pages by default.
+4. **Club-bag setup/edit states — detailed UI not yet evidenced in the reviewed frames.** Required options: full bag setup; alternatively enter Driver and 7-iron carry and estimate the rest; make estimates editable; allow skipping all setup; do not nag. Treat as detail within profile setup/edit, not a duplicate profile page.
+
+### Existing coverage / out of scope
+Course selection and Start Round, Scorecard, Round Complete, Player Profile overview, Stats and Scores already exist. Junior/family UI is future scope, not adult V1. GPS/live-yardage behaviour is out of scope for this audit.
+
+### Round-flow decisions
+- Fairway hit / left miss / right miss records result, current club and GPS location where available.
+- After a shot, advance directly to the next shot's yardage screen.
+- Chequered flag is for hole 18 and opens Round Complete.
+- End Round confirms finishing/retaining the round; Discard Round is separate.
+
+This audit is the current working register. Do not repeat individual screen summaries; update the register only when new evidence or a user decision changes it.
