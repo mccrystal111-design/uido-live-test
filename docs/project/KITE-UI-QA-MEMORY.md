@@ -721,3 +721,48 @@ The user proposed a weather indicator to give round scores context, especially f
 - Auto Layout item spacing and padding can be read directly where present. Several screens use manually positioned elements, so their geometry must be measured from node bounds/coordinates; an Auto Layout-only audit is incomplete.
 - Do not retrofit layouts just to create consistent numbers. Record existing patterns first, discuss outliers during curation, and only promote recurring approved values to reusable tokens after the audit.
 - Change log — 12 October 2026: Figma Style Menu updated to explicitly mark spacing as not yet measured and to require a measured spacing register. No product-screen layouts changed.
+
+
+---
+
+## Kite adult V1 UI curation — Q&A answers so far (12 October 2026)
+
+This section records the decisions from the ongoing screen-by-screen curation of missing Kite adult V1 UI pages. The detailed working log is `docs/project/KITE-V1-UI-CONVERSATION-DECISION-LOG.md`.
+
+### Scope and review method
+- Curate missing **Kite adult V1 UI pages** by reviewing existing Figma screens first.
+- Keep UiDo and future Kite Kids/junior UI out of current adult V1 scope.
+- Do not re-review GPS/live-yardage functionality; the user already understands that experience.
+- Review one screen/flow at a time. Ask only about genuine uncertainties and do not repeat settled questions.
+- Do not change Figma or implementation code unless explicitly requested. Do not run GitHub Actions.
+- Only add confirmed gaps to the missing-page register after existing screen coverage has been reviewed. Rank genuine gaps by priority.
+
+### Authentication and onboarding
+1. **First confirmed missing flow:** Login / Sign-up. Home already has a profile area for a logged-in user, so the missing piece is the entry/authentication flow.
+2. **Keep sign-up simple:** Google/Gmail, Apple, or email. Returning users should be able to sign in through the same options.
+3. **Working onboarding flow:** Sign up/log in → Player Profile setup (can skip) → Home.
+4. **Allow skipping profile setup:** explain that some functionality may be limited if relevant details are missing; do not force every field.
+5. **Club-bag setup:** offer full bag setup. If the golfer skips full setup, offer the simpler option of entering driver carry and 7-iron carry, then estimate other club distances from those anchors.
+6. **Allow skipping all bag setup:** this must remain a valid choice. Do not nag or repeatedly prompt the golfer to complete/update the bag.
+7. **Editable data:** estimated clubs/distances must be editable later. The golfer chooses when to update the bag.
+8. **Reuse existing Player Profile frame:** Figma frame `295:5` exists. Do not propose a duplicate profile page. The exact bag-management interactions still need verification before claiming full coverage.
+
+### Existing Start Round screen — reviewed at high level
+Figma frame `124:25`, “Kite — Start Round — Navy White — V1”, already includes:
+- Course dropdown/card.
+- Players section showing the current player and an **Add** control.
+- Format choices: Stroke Play and Stableford.
+- Tee choices: White, Yellow and Red.
+- Start Round button.
+
+**Player Add clarification:** Add lets the golfer enter a guest player's name for the round. Selecting/adding a junior golfer linked to a family account is a possible future feature, not current adult V1 scope. Do not treat junior/family UI as a current gap.
+
+### Current missing-page register
+| Priority | Gap | Status |
+|---|---|---|
+| 1 | Login / Sign-up authentication flow | Confirmed gap; details still to curate |
+
+No other missing pages have been confirmed. Course selection and round setup must not be listed as missing based on current evidence: the Start Round screen already includes the course dropdown, format, tee selection, player section and Start Round action.
+
+### Next review
+Continue reviewing the existing screens and their flow before adding more missing pages. Avoid a review of GPS/live-yardage behaviour. Once existing coverage has been reviewed, compile the prioritised list of confirmed gaps.
