@@ -814,3 +814,6 @@ Figma frame `295:5` (“Kite — Player Profile — V1”) has been visually rev
 - Editable **Clubs & carry distances** section, showing the number of clubs and a “Manage bag” summary.
 
 This confirms the main Player Profile overview and a bag-management entry point already exist; do not list the Player Profile overview itself as a missing page. The destination/edit forms and the exact club-bag interactions have not yet been visually inspected, so do not claim their details are confirmed.
+
+
+**Player Profile interaction status:** The overview (`295:5`) shows edit controls for Handicap, Home course & tees, Playing preferences, and Clubs & carry distances. We have not established what happens after tapping any of these controls. All four destinations/interactions remain to be reviewed; do not assume they open separate pages, and do not focus only on the bag flow until the others are checked too.
