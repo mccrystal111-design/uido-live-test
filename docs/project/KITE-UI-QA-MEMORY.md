@@ -800,3 +800,6 @@ The `Dr` area is club selection (Driver in the shown state), with **carry and to
 
 ### Flow question still to confirm
 The 18th-hole chequered flag is the action for finishing the round. The End Round screen appears to be a summary/confirmation step with separate “End Round” and “Discard Round” actions. Confirm whether tapping the chequered flag opens this End Round screen, with “End Round” then finalising the saved round.
+
+
+**18th-hole completion flow confirmed — 12 October 2026:** Tapping the chequered flag on hole 18 opens the existing Round Complete screen (`261:125`). The golfer can view/edit the scorecard or choose **End Round** as the final confirmation to finish and retain the round. **Discard Round** is a separate option.
