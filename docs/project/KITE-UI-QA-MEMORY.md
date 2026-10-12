@@ -803,3 +803,14 @@ The 18th-hole chequered flag is the action for finishing the round. The End Roun
 
 
 **18th-hole completion flow confirmed — 12 October 2026:** Tapping the chequered flag on hole 18 opens the existing Round Complete screen (`261:125`). The golfer can view/edit the scorecard or choose **End Round** as the final confirmation to finish and retain the round. **Discard Round** is a separate option.
+
+
+## Player Profile screen review — 12 October 2026
+Figma frame `295:5` (“Kite — Player Profile — V1”) has been visually reviewed. Existing coverage:
+- Selected player name and **Switch player** control.
+- Handicap summary card with edit affordance.
+- Editable **Home course & tees** section.
+- Editable **Playing preferences** section (summary indicates yards and app preferences).
+- Editable **Clubs & carry distances** section, showing the number of clubs and a “Manage bag” summary.
+
+This confirms the main Player Profile overview and a bag-management entry point already exist; do not list the Player Profile overview itself as a missing page. The destination/edit forms and the exact club-bag interactions have not yet been visually inspected, so do not claim their details are confirmed.
