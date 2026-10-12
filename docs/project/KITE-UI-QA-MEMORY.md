@@ -820,3 +820,6 @@ This confirms the main Player Profile overview and a bag-management entry point 
 
 
 **Edit destination review — 12 October 2026:** Inspected the Product UI frame inventory for Player Profile edit destinations. The profile overview (`295:5`) is present, but I have not found distinct destination frames for Handicap, Home course & tees, Playing preferences, or Clubs & carry distances in the current review. This does not prove no such frames exist elsewhere in the file. Keep all four interactions marked **unverified** until they can be traced; do not assume inline/modal/separate-screen behaviour.
+
+
+**Correction — Player Profile edit destinations remain unknown:** We have not established what happens when any of the four edit controls is tapped. The earlier question asking whether separate screens exist was still unanswered; it was incorrect to turn an incomplete Figma search into a claim that destinations were not found. Status for all four controls is **unknown / not yet established**, not confirmed missing.
