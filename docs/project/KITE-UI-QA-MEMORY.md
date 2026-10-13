@@ -1100,3 +1100,11 @@ Use confirmed category roll multipliers for estimated totals, allow total-distan
 - When location is available, order the full Kite course catalogue by distance, closest first, while allowing manual course selection.
 - If GPS/location is unavailable or permission is denied, show the full catalogue alphabetically and allow manual selection. Starting a round must not depend on location permission.
 - Documentation only; no Figma/app changes and no GitHub Actions.
+
+### Start Round — course changes update tee choices (confirmed 13 October 2026)
+- Changing the selected course refreshes the tee options to the tees available for that course.
+- Choose a sensible default tee for the newly selected course where possible; allow the golfer to manually select another available tee.
+- Do not preserve a selected tee if it is not offered at the new course.
+- Tee changes affect course/playing yardages only; they must not reset or recalculate saved personal club distances or regenerate an existing bag.
+- No Figma/app changes and no GitHub Actions.
+
