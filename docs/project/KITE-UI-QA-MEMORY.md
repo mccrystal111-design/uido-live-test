@@ -1005,3 +1005,10 @@ Offer this as a separate optional women's amateur starter profile alongside the 
 - Reuse the tee selection in Start Round to avoid asking twice. Distances are initial estimates and remain editable.
 - The exact mapping from selected tees to starter distance profiles still needs to be grounded in the current tee-selection/course context; do not assume tee colour universally maps to gender or exact ability.
 - Keep Driver + 7-iron personalisation and full bag skip options. No Figma/app changes made.
+
+
+### Automatic starter-bag creation — confirmed 13 October 2026
+- Create the starter bag automatically when the golfer starts their first round, using the selected tee to choose the default distance profile.
+- Do not require a separate bag-setup step during onboarding. The golfer can review/edit the generated bag later in the existing Player Profile.
+- Keep all values editable, retain the Driver + 7-iron personalisation option and the ability to skip bag setup. Label distances as estimates, not measured values.
+- Ground the tee-to-profile mapping in course/tee context; do not universally equate tee colour with gender or ability. No Figma/app changes made.
