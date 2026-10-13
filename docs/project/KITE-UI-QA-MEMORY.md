@@ -1146,3 +1146,9 @@ Use confirmed category roll multipliers for estimated totals, allow total-distan
 - Temporary GPS loss must not discard or block the round.
 - No Figma/app changes and no GitHub Actions.
 
+### Yardage screen — GPS accuracy warning only when needed (confirmed 13 October 2026)
+- Keep the live-yardage UI clean with no always-visible GPS accuracy indicator.
+- Display a warning only when GPS accuracy becomes poor enough to affect the reliability of yardages.
+- Maintain separate states for location disabled, GPS acquiring, and GPS signal lost.
+- No Figma/app changes and no GitHub Actions.
+
