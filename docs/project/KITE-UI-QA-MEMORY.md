@@ -850,3 +850,17 @@ Course selection and Start Round, Scorecard, Round Complete, Player Profile over
 - End Round confirms finishing/retaining the round; Discard Round is separate.
 
 This audit is the current working register. Do not repeat individual screen summaries; update the register only when new evidence or a user decision changes it.
+
+## Kite authentication / first-run decisions — 13 October 2026
+
+- Sign-up and returning-user sign-in both offer Google/Gmail, Apple, or email.
+- First-run flow: sign-up/sign-in → optional Player Profile setup → Home.
+- Profile setup can be skipped; explain a limitation only when relevant, and do not block Home.
+- Bag setup offers full entry or a shortcut using Driver carry + 7-iron carry to estimate the rest. Estimates remain editable.
+- The golfer may skip all bag setup. No nagging or repeated prompts; they decide when to update.
+- Reuse Player Profile overview frame 295:5. Do not duplicate it.
+- Adult Kite V1 only; junior/family UI is future scope. No Figma edits, app/code changes, or GitHub Actions during this curation pass.
+
+Developer Notes frame 302:162 was checked on 13 October. It contains general UI, Stats/Scores, data-safety, QA and profile implementation notes, but no authentication-specific guidance.
+
+Next: continue Priority 1 (Login/Sign-up) by settling only the remaining details: provider hand-off/error states, email sign-in/sign-up and forgotten-password recovery, and minimum fields for optional first-run profile setup. Do not re-ask settled decisions above. Check existing Figma coverage first and ask one focused question at a time.
