@@ -879,3 +879,8 @@ Next: continue Priority 1 (Login/Sign-up) by settling only the remaining details
 - Keep authentication itself minimal. In the post-auth profile step, start with the minimum useful details (player name and handicap); make setup skippable and allow the golfer to complete/edit the remaining profile and bag details later.
 - Skipping must still lead to Home, with no nagging or repeated prompts. Explain a missing detail only when it affects a feature.
 - This preserves the agreed journey: sign-up/sign-in → optional profile setup → Home, while ensuring golfers are invited to add useful details rather than never being asked.
+
+### Handicap in first-run setup — decision 13 October 2026
+- Ask the golfer for their handicap during optional first-run Player Profile setup.
+- Handicap is not compulsory: the golfer can skip that field and/or choose **Skip for now** for the whole setup, then continue to Home.
+- Do not block account creation or use of Kite when handicap is unknown. Keep the value editable later in Player Profile; explain limitations only where a missing handicap actually matters.
