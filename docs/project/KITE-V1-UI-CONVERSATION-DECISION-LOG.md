@@ -240,3 +240,9 @@ Do not ask again about the providers, skippable profile setup, Driver + 7-iron s
 - Provide a clear skip option so the golfer can skip an individual step where appropriate and/or leave the whole setup using **Skip for now**. Skipping leads to Home; do not nag or repeatedly prompt them later.
 - Preserve earlier decisions: ask for player name and handicap, but handicap is optional; include home course/tees and bag setup in the short flow as appropriate; bag setup can be full entry or Driver + 7-iron carry to estimate the remaining clubs, with estimates editable later. The golfer can skip all bag setup.
 - This is a documented product decision only. No Figma edits, app/code changes, or GitHub Actions.
+
+
+### First-run setup scope correction — 13 October 2026
+- **Decision:** do not ask for home course or preferred tees during first-run onboarding. The user considers these unnecessary in the initial setup.
+- Keep onboarding short and step-by-step, with the current focus on player name, optional handicap, and optional club-bag setup. The golfer can skip the whole flow or skip optional steps; skipping leads to Home without nagging.
+- This decision applies to first-run onboarding only; the existing Home course & tees section remains part of the Player Profile unless separately changed.
