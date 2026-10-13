@@ -1139,3 +1139,10 @@ Use confirmed category roll multipliers for estimated totals, allow total-distan
 - Distinguish this from disabled location, which shows **“Location disabled”** and **“Enable in Settings”** guidance.
 - No Figma/app changes and no GitHub Actions.
 
+### In-round GPS loss — keep round usable (confirmed 13 October 2026)
+- If GPS drops mid-round, preserve the active round and score-entry controls.
+- Show **“GPS signal lost — trying to reconnect”** and attempt recovery.
+- Pause live yardage updates until a usable fix returns, then resume.
+- Temporary GPS loss must not discard or block the round.
+- No Figma/app changes and no GitHub Actions.
+
