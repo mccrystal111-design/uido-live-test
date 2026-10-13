@@ -283,3 +283,12 @@ Do not ask again about the providers, skippable profile setup, Driver + 7-iron s
 - **Guest play:** the user raised that Kite should offer an option to play without signing in. Record this as a product direction to include a **Play without signing in** / guest path, with its precise capabilities and data persistence to be clarified before implementation. Do not force account creation before a golfer can start playing.
 - This revises the earlier working assumption that account creation is required before using Kite. Account creation/sign-in remains available for golfers who want a profile and account-linked features.
 - Documentation only; no Figma or app changes made.
+
+
+### Welcome screen and saving rounds — decisions 13 October 2026
+- **Entry point:** add a Welcome / Entry screen before the existing Home screen. Keep the current Home screen; this is a new entry screen, not a replacement.
+- Offer two clear paths: **Play without signing in** and **Sign in or create an account**. Account sign-in offers Google, Apple, or email/password as already agreed.
+- **Guest play:** golfers can access core play without registration. Guest rounds should be retained locally on the device so a golfer can finish and review a round without an account.
+- **Account-linked saving:** signing in/creating an account is the path to saving rounds to the golfer's account and, when supported, accessing history across devices. Do not imply cross-device sync exists until implemented.
+- Do not risk losing a round or block play because the golfer has not registered. Email verification remains non-blocking.
+- Add Welcome / Entry screen to the missing-page register ahead of authentication. This is a product decision/documentation update only; no Figma or app changes made, and no GitHub Actions run.
