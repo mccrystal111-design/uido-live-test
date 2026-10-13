@@ -1069,3 +1069,7 @@ Use confirmed category roll multipliers for estimated totals, allow total-distan
 ### Quick Setup saves immediately; edit later — confirmed 13 October 2026
 - After Driver and 7-iron carry are entered, generate and save the estimated bag immediately; no review/edit step before saving.
 - Individual clubs/distances can be edited later in Player Profile. Keep estimates identifiable and allow manual total-distance overrides. No Figma/app changes made.
+
+### Skipping bag personalisation — automatic starter bag on first round — confirmed 13 October 2026
+- If bag personalisation is skipped entirely, create a starter bag automatically when the golfer starts their first round, based on the selected tee.
+- Briefly explain that Kite is building a starter bag with estimated distances, without delaying play. Make the bag editable later in Player Profile and preserve any existing saved/personalised bag. No Figma/app changes made.
