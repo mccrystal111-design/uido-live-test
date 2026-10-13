@@ -1095,3 +1095,8 @@ Use confirmed category roll multipliers for estimated totals, allow total-distan
 - Calculate distance from the golfer's current location to courses and show the closest course first by default; golfer can select another course.
 - Location-unavailable fallback and the catalogue's storage/delivery mechanism remain to be verified; do not assume those implementation details.
 - Documentation only; no Figma/app changes and no GitHub Actions.
+
+### Start Round course selector — no-location fallback (13 October 2026)
+- When location is available, order the full Kite course catalogue by distance, closest first, while allowing manual course selection.
+- If GPS/location is unavailable or permission is denied, show the full catalogue alphabetically and allow manual selection. Starting a round must not depend on location permission.
+- Documentation only; no Figma/app changes and no GitHub Actions.
