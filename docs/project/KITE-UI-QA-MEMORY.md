@@ -891,3 +891,9 @@ Next: continue Priority 1 (Login/Sign-up) by settling only the remaining details
 - Keep a clear skip option at the relevant step and **Skip for now** for the overall setup. Skipping goes to Home and must not trigger nagging or repeated prompts.
 - Preserve the previously agreed minimum: ask for player name and handicap (handicap optional); include home course/tees and optional bag setup in the steps as appropriate. Bag setup supports full entry or Driver + 7-iron carry estimates, editable later, and may be skipped entirely.
 - Status: product decision recorded; no Figma or app changes made.
+
+
+### First-run setup scope correction — confirmed 13 October 2026
+- Do **not** include home course or preferred tees in the first-run onboarding flow; they are not needed at this stage.
+- Keep the step-by-step setup focused on player name, optional handicap, and optional club-bag setup. Keep skip options and no repeated prompts.
+- This removes those fields from onboarding only; it does not remove Home course & tees from the existing Player Profile.
