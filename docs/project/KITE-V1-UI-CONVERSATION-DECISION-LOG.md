@@ -193,3 +193,22 @@ The existing profile has a Clubs & carry distances summary and “Manage bag” 
 
 ### Audit status / next action
 The first consolidated audit is complete based on the reviewed frame inventory and Q&A handoff. The first confirmed missing page is Login/Sign-up. Priorities 2–4 are required flow/detail states not evidenced in the reviewed page frames; before creating anything, check whether any expanded/setup states are already represented elsewhere in the Figma file. Do not keep repeating screen summaries; use this register as the current working list and amend it only when new evidence or a user decision changes the status.
+
+## Authentication and first-run decisions — 13 October 2026
+
+The following answers are agreed and should be treated as settled; do not ask them again:
+- **Authentication methods:** offer Google/Gmail, Apple, and email for both new sign-up and returning-user sign-in.
+- **First-run journey:** sign-up/sign-in → optional Player Profile setup → Home.
+- **Profile setup:** skippable. Explain a limitation only at the point it matters; do not block entry to Home.
+- **Bag setup:** offer full bag entry, or a simplified option entering Driver carry and 7-iron carry to estimate the remaining clubs. Estimated values must be editable later.
+- **Skip behaviour:** the golfer may skip all bag setup. Do not nag or repeatedly prompt them; they choose when to update their profile.
+- **Reuse existing profile:** use the existing Player Profile overview (295:5); do not create a duplicate overview screen.
+- **Scope guardrails:** adult Kite V1 only; junior/family UI is future scope. No Figma edits, app/code changes, or GitHub Actions as part of this curation pass.
+
+### Current next step — Priority 1: authentication details
+The Developer Notes / Q&A Handoff (302:162) has been checked. It contains design-system, Stats/Scores, data-safety, QA and Player Profile implementation guidance, but no authentication-specific decisions. The next task is to define only the remaining auth details and then map the minimal Login/Sign-up states:
+1. Google/Apple provider hand-off and return/error states.
+2. Email sign-up/sign-in and forgotten-password recovery.
+3. Whether first-run profile setup asks only for the minimum useful fields initially, with the rest left editable in Player Profile.
+
+Do not ask again about the providers, skippable profile setup, Driver + 7-iron shortcut, editable estimates, or no-nagging rule. Check existing Figma coverage before proposing new screens, and ask one focused question at a time only where a product decision is genuinely missing.
