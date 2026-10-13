@@ -385,3 +385,11 @@ Use club-category-specific roll multipliers to estimate total distance from carr
 - Total remains an estimate derived from carry, and the golfer can manually override it.
 - **Still to decide:** which default multiplier to use within each range. Do not silently treat the example multipliers as final defaults until confirmed.
 - No Figma/app changes made.
+
+### Default roll multipliers confirmed — 13 October 2026
+The user approved the midpoint of each proposed club-category range as Kite's default total-distance estimate:
+- **Driver & fairway woods:** carry × **1.10**
+- **Hybrids & long irons (3i–5i):** carry × **1.07**
+- **Mid-irons (6i–8i):** carry × **1.05**
+- **Short irons & wedges (9i–LW):** carry × **1.02**
+These are starting estimates. Golfers can manually override total distance; switching tees must not overwrite saved personal club distances. This supersedes the open question about which multiplier to choose. No Figma/app changes made.
