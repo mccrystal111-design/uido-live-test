@@ -514,3 +514,9 @@ Use the starter set to support estimates and sensible prefilled values. Estimate
 - Do not discard or block the round because of a temporary signal loss.
 - Documentation only; no Figma/app changes and no GitHub Actions.
 
+### Yardage page — temporary 999 test value (confirmed 13 October 2026)
+- Temporarily display **999** as the yardage number on the yardage page during course-loading/testing.
+- Purpose: the user can open a course from home and quickly see whether the course/page data has loaded, without being on the course or relying on live GPS yardages.
+- Treat 999 as a diagnostic placeholder only, not a real yardage or production fallback. Replace/remove it when the loading test is complete or real yardage data is available.
+- Documentation/decision log only; no Figma/app changes and no GitHub Actions in this update.
+
