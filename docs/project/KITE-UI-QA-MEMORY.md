@@ -1031,3 +1031,11 @@ Estimate total distance from carry using a multiplier by club category:
 - Mid-irons (6i–8i): **1.04–1.06** (example 1.05).
 - Short irons & wedges (9i–LW): **1.01–1.03** (example 1.02).
 Golfer can override estimated total distance. The final default multiplier within each range remains to be confirmed. No Figma/app changes made.
+
+### Default roll multipliers confirmed — 13 October 2026
+Approved defaults for estimating total distance from carry:
+- Driver & fairway woods: **1.10**
+- Hybrids & long irons (3i–5i): **1.07**
+- Mid-irons (6i–8i): **1.05**
+- Short irons & wedges (9i–LW): **1.02**
+These are estimates; golfers may override total distance. Tee changes do not overwrite personal club distances. The default-multiplier decision is settled. No Figma/app changes made.
