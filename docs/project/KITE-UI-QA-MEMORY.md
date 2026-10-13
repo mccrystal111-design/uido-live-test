@@ -932,3 +932,12 @@ Next: continue Priority 1 (Login/Sign-up) by settling only the remaining details
 - Add a **Play without signing in** / guest path as the intended product direction. Do not force account creation before a golfer can start a round. Exact guest capabilities and whether guest data persists across sessions remain to be decided before implementation.
 - This supersedes the earlier working assumption that sign-up is required to use Kite. Sign-in/account creation remains available for account-linked features.
 - No Figma or app changes made.
+
+
+### Welcome screen and round saving — confirmed 13 October 2026
+- Add a **Welcome / Entry screen before the existing Home screen**; preserve Home as it is.
+- Two paths: **Play without signing in** or **Sign in or create an account** (Google, Apple, or email/password).
+- Guest golfers can use core play and retain rounds locally on their device, allowing them to finish and review a round without an account.
+- Signing in/creating an account is the route to save rounds to the account and eventually access history across devices. Do not promise cross-device access before it is implemented.
+- Never block a round or risk losing it because the golfer has not signed in. Email verification must remain non-blocking.
+- Prioritise Welcome / Entry screen before the authentication flow in the missing-page register. Documentation only; no Figma/app changes and no Actions run.
