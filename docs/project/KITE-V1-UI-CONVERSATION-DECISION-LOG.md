@@ -268,3 +268,10 @@ Do not ask again about the providers, skippable profile setup, Driver + 7-iron s
 - Show clear, concise inline feedback for invalid details, incorrect credentials, or an account that already exists; guide the golfer to the appropriate next action.
 - Keep feedback within the single Log in / Create account screen wherever practical, avoiding unnecessary extra screens. Forgot password recovery remains available from Log in.
 - Documentation only; no Figma or app changes made.
+
+
+### Forgot-password recovery flow — decision 13 October 2026
+- **Decision:** from Log in, **Forgot password?** opens a simple email-entry form.
+- Kite sends a password-reset email and confirms that the request was received. Use a neutral confirmation message that does not reveal whether the email address has an account.
+- The golfer follows the link in the email to reset their password, then returns to Log in.
+- Keep this focused; no unnecessary extra screens. Documentation only; no Figma or app changes made.
