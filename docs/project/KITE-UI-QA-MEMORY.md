@@ -954,3 +954,25 @@ Next: continue Priority 1 (Login/Sign-up) by settling only the remaining details
 - **Play without signing in** is the prominent yellow primary button.
 - **Sign in or create an account** is secondary.
 - Rationale: quick, low-friction access to golf is Kite's first promise. Welcome / Entry sits before, and does not replace, the existing Home screen. No Figma/app changes made.
+
+
+### Prefilled starter bag distances — user-provided baseline, 13 October 2026
+The user supplied candidate defaults for a men's everyday amateur / approximately 15-handicap starter bag. Treat them as estimates, not measured or universal distances; keep carry and total separate and all values editable.
+
+| Club | Carry (yd) | Total (yd) |
+|---|---:|---:|
+| Driver | 220 (provided range 215–225) | 236 |
+| 3-Wood | 200 | 215 |
+| 3-Hybrid | 185 | 197 |
+| 4-Iron | 175 | 186 |
+| 5-Iron | 160 | 169 |
+| 6-Iron | 150 | 162 |
+| 7-Iron | 140 | 154 |
+| 8-Iron | 130 | 146 |
+| 9-Iron | 118 | 136 |
+| PW | 105 | 121 |
+| GW | 95 | 104 |
+| SW | 83 | 84 |
+| LW | 72 | 75 |
+
+Use these as candidate prefilled starter values. For Driver, 220 yd is the midpoint of the supplied 215–225 yd carry range. Keep the Driver + 7-iron custom estimate path and a clear skip option. No Figma/app changes made.
