@@ -466,3 +466,11 @@ Use the starter set to support estimates and sensible prefilled values. Estimate
 - Allow the golfer to select a course manually; starting a round must not depend on granting location permission.
 - When location is available, continue to sort by distance with the closest course first and allow manual selection.
 - Documentation only; no Figma edits, app/code changes, or GitHub Actions.
+
+### Start Round course selector — tee options follow selected course (confirmed 13 October 2026)
+- When the golfer changes the selected course, update the available tee options to match that course.
+- Select a sensible default tee for the newly selected course where possible; the golfer can always change it manually.
+- Do not carry a tee selection across courses if that tee is not available at the newly selected course.
+- This is a Start Round course/tee dependency only. Changing tees updates course/playing yardages and must not overwrite personal club carry/total distances or regenerate an existing saved bag.
+- Documentation only; no Figma/app changes and no GitHub Actions.
+
