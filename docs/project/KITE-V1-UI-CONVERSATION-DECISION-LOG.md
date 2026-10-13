@@ -534,3 +534,10 @@ Use the starter set to support estimates and sensible prefilled values. Estimate
 - Do not add handicap-source selection or combine this editor with Kite-calculated practice handicap / official verification in this V1 editing state.
 - This decision defines the editor interaction, not the detailed validation rules or accepted numeric range; those remain open only if needed for implementation.
 - Documentation only. No Figma edits, app/code changes, or GitHub Actions.
+
+ 
+### Player Profile editing Q&A — Home course & tees editor, confirmed 13 October 2026
+- The expanded **Home course & tees** section allows the golfer to edit **both** their home course and their preferred tees for that course.
+- This sets profile defaults; it does not restrict course or tee choices when starting an individual round.
+- Changing the course should refresh the available tee options to those offered at the newly selected course. Do not retain a tee that is unavailable at the new course.
+- Documentation only. No Figma edits, app/code changes, or GitHub Actions.
