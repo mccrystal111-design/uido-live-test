@@ -1159,3 +1159,9 @@ Use confirmed category roll multipliers for estimated totals, allow total-distan
 - Allow the golfer to change the handicap number and choose Save or Cancel.
 - Do not add source-selection controls for player-entered, calculated practice, or officially verified handicap to this V1 editor.
 - This is a documented interaction decision; the expanded editor still needs to be represented/verified in Figma and QA'd when built. No Figma/app changes made.
+
+
+### Profile Q&A — bag editor layout (13 October 2026)
+- Compact editable club list for quick changes; each row opens detailed controls when needed.
+- Show carry and total distances; carry is primary, total is estimated unless overridden, and estimates are labelled.
+- Use inline Save/Cancel. Detailed Figma state still requires build/QA.
