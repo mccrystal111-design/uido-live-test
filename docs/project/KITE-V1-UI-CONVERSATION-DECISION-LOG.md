@@ -520,3 +520,9 @@ Use the starter set to support estimates and sensible prefilled values. Estimate
 - **999 is a display cap for this test, not a fixed placeholder**: on the course, show the actual live yardage when it is below 999. Do not show 999 merely to disguise missing course data or a failed GPS fix; those states should remain distinguishable.
 - Documentation/decision log only; no Figma/app changes and no GitHub Actions in this update.
 
+### Yardage screen — warn only when GPS accuracy affects yardages (confirmed 13 October 2026)
+- Keep the yardage screen clean; do not show a persistent GPS accuracy indicator.
+- Show a GPS accuracy warning only when the position is poor enough to make live yardages potentially unreliable.
+- Keep this distinct from location disabled and GPS signal lost states, which have their own recovery messages.
+- Documentation only; no Figma/app changes and no GitHub Actions.
+
