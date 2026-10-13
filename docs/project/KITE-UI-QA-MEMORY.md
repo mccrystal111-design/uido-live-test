@@ -1126,3 +1126,10 @@ Use confirmed category roll multipliers for estimated totals, allow total-distan
 - Retain location-based nearest-first sorting, alphabetical fallback when location is unavailable, and live search filtering.
 - No Figma/app changes and no GitHub Actions.
 
+### Start Round — GPS readiness and disabled-location state (confirmed direction, 13 October 2026)
+- Live GPS yardages are core functionality; do not start a round without the GPS/location capability needed for live yardages.
+- If location is disabled, show **“Location disabled”** and an **“Enable in Settings”** action/instruction.
+- Distinguish disabled permission/services from an active GPS fix attempt or weak signal, and provide appropriate recovery/retry guidance.
+- Whether course/tee setup is available while GPS acquires a fix, before Start Round is enabled, remains open.
+- No Figma/app changes and no GitHub Actions.
+
