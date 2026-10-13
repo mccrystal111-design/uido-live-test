@@ -292,3 +292,10 @@ Do not ask again about the providers, skippable profile setup, Driver + 7-iron s
 - **Account-linked saving:** signing in/creating an account is the path to saving rounds to the golfer's account and, when supported, accessing history across devices. Do not imply cross-device sync exists until implemented.
 - Do not risk losing a round or block play because the golfer has not registered. Email verification remains non-blocking.
 - Add Welcome / Entry screen to the missing-page register ahead of authentication. This is a product decision/documentation update only; no Figma or app changes made, and no GitHub Actions run.
+
+
+### Guest-round import after account creation — decision 13 October 2026
+- **Decision:** when a guest golfer later signs in or creates an account, Kite should offer to transfer/import their locally saved guest rounds into that account.
+- Make this an explicit, consent-based choice; do not silently merge or upload guest round history.
+- If they decline, preserve the local guest rounds and let them continue playing. Explain clearly if any local-only data will not be available on other devices.
+- This is a required product behaviour to account for in the guest-to-account flow; implementation details and conflict handling can be specified later. No Figma or app changes made.
