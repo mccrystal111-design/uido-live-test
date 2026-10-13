@@ -399,3 +399,10 @@ These are starting estimates. Golfers can manually override total distance; swit
 - Do not interrupt guest round-start with a separate bag-setup screen. The generated bag is editable later in Player Profile/profile management.
 - Apply the previously confirmed club-category roll multipliers for estimated total distances; carry and total remain editable, and tee changes do not overwrite saved distances.
 - This answer explicitly confirms the guest first-round path. Whether the same no-interruption behaviour should apply to a signed-in golfer's first round remains open. No Figma/app changes made.
+
+### Starter bag fallback for signed-in first round — confirmed 13 October 2026
+- Signed-in golfers have already been offered the opportunity to personalise their bag during optional first-run setup.
+- If they skip that option or have no saved bag when they start their first round, Kite automatically creates the starter bag from the selected tee. Do not interrupt round-start with another bag-setup prompt.
+- If they already configured/saved a bag, preserve and use their own club data; never replace it with the starter defaults.
+- The same fallback principle applies to guest golfers: create the starter bag when they start their first round without signing in, then allow edits later.
+- No Figma/app changes made.
