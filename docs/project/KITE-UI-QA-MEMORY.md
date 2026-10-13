@@ -941,3 +941,10 @@ Next: continue Priority 1 (Login/Sign-up) by settling only the remaining details
 - Signing in/creating an account is the route to save rounds to the account and eventually access history across devices. Do not promise cross-device access before it is implemented.
 - Never block a round or risk losing it because the golfer has not signed in. Email verification must remain non-blocking.
 - Prioritise Welcome / Entry screen before the authentication flow in the missing-page register. Documentation only; no Figma/app changes and no Actions run.
+
+
+### Guest-to-account round transfer — confirmed 13 October 2026
+- When a guest later signs in or creates an account, offer to transfer their locally saved guest rounds into the account.
+- Require explicit consent; do not upload or merge guest history silently.
+- If declined, preserve guest rounds locally and allow continued play. Be clear that local-only rounds may not be available on other devices.
+- Treat this as required behaviour for the guest-to-account flow; no Figma/app changes made.
