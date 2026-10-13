@@ -1050,3 +1050,7 @@ These are estimates; golfers may override total distance. Tee changes do not ove
 - If they skip bag personalisation or no saved bag exists, automatically create a starter bag from the selected tee when they start their first round; do not interrupt round-start with another setup prompt.
 - If a golfer already has a saved/personalised bag, preserve it and do not replace it with defaults. Guest golfers get the same automatic starter-bag fallback on their first round.
 - Generated values remain editable later in Player Profile/profile management. No Figma/app changes made.
+
+### Explain automatic starter-bag creation — confirmed direction, 13 October 2026
+- If the golfer has not personalised a bag, tell them Kite will build a starter bag for them using the selected tee, with estimated club distances that can be edited later in Player Profile.
+- Keep this brief and non-blocking; do not add a setup screen that delays the start of play. Exact wording/placement remains open. No Figma/app changes made.
