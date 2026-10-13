@@ -327,3 +327,25 @@ The user supplied the following **men's everyday amateur / approximately 15-hand
 | Lob Wedge (LW) | 72 | 75 |
 
 **Driver carry default:** the user gave a 215–225 yd range; 220 yd is the midpoint for a single editable prefill value. Preserve the original range in this note. Starter bag should be a fast option in onboarding; retain the alternative Driver + 7-iron personalisation route and the clear skip option. No Figma or app changes made.
+
+
+### Women's amateur starter-bag distance baseline — user-provided, 13 October 2026
+The user supplied this women's amateur distance range as a separate candidate baseline for Kite's prefilled starter bag. **Ignore the LPGA pro columns** for this product decision. Values are approximate ranges, not universal or measured distances. For a single prefill value, use the midpoint of each range, rounded to the nearest yard; preserve the original ranges in this log. Keep carry and total separate, and make every value editable.
+
+| Club | Amateur carry range (yd) | Amateur total range (yd) | Suggested prefill carry midpoint (yd) | Suggested prefill total midpoint (yd) |
+|---|---:|---:|---:|---:|
+| Driver | 140–155 | 174–185 | 148 | 180 |
+| 3-Wood | 125–135 | 150–165 | 130 | 158 |
+| 5-Wood | 115–125 | 135–145 | 120 | 140 |
+| 4-Hybrid | 105–115 | 125–135 | 110 | 130 |
+| 5-Iron | 95–105 | 110–120 | 100 | 115 |
+| 6-Iron | 88–98 | 100–110 | 93 | 105 |
+| 7-Iron | 80–90 | 92–102 | 85 | 97 |
+| 8-Iron | 72–82 | 84–94 | 77 | 89 |
+| 9-Iron | 65–75 | 76–86 | 70 | 81 |
+| Pitching Wedge | 58–68 | 68–78 | 63 | 73 |
+| Gap Wedge | 50–60 | 58–66 | 55 | 62 |
+| Sand Wedge | 42–50 | 46–54 | 46 | 50 |
+| Lob Wedge | 35–42 | 38–44 | 39 | 41 |
+
+This should be offered as a distinct women's amateur starter profile, alongside the previously recorded men's everyday-amateur starter bag. Do not assume sex determines actual distance or prevent the golfer choosing/editing any bag. No Figma or app changes made.
