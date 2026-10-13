@@ -1114,3 +1114,8 @@ Use confirmed category roll multipliers for estimated totals, allow total-distan
 - Keep manual selection. On course change, update the available tees and choose a sensible default where possible; preserve personal club distances when tees change.
 - No Figma/app changes and no GitHub Actions.
 
+### Start Round course search — no-results state (confirmed 13 October 2026)
+- When a query has no matches, display **“No courses found”** and provide a clear-search option.
+- Avoid a blank results area; clearing the query restores the full catalogue in its applicable sort order.
+- No Figma/app changes and no GitHub Actions.
+
