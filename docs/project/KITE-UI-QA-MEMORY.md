@@ -911,3 +911,10 @@ Next: continue Priority 1 (Login/Sign-up) by settling only the remaining details
 - Failure shows a short, clear message and offers retry or another sign-in method.
 - If the account already exists, guide the golfer to log in instead of creating a duplicate.
 - Keep the flow within the single auth screen where practical; avoid unnecessary screens. No Figma or app changes made.
+
+
+### Email authentication validation — confirmed 13 October 2026
+- Email sign-up/login requires a valid email address and password.
+- Account creation asks for password confirmation (enter the password twice).
+- Use concise inline messages for invalid details, incorrect credentials and existing accounts, with a clear next action.
+- Keep these states within the single Log in / Create account screen where practical; retain Forgot password recovery. No Figma or app changes made.
