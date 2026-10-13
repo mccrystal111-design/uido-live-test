@@ -1012,3 +1012,9 @@ Offer this as a separate optional women's amateur starter profile alongside the 
 - Do not require a separate bag-setup step during onboarding. The golfer can review/edit the generated bag later in the existing Player Profile.
 - Keep all values editable, retain the Driver + 7-iron personalisation option and the ability to skip bag setup. Label distances as estimates, not measured values.
 - Ground the tee-to-profile mapping in course/tee context; do not universally equate tee colour with gender or ability. No Figma/app changes made.
+
+
+### Tee changes preserve personal club distances — confirmed 13 October 2026
+- Changing tees updates course/playing yardages only. It must not overwrite or silently recalculate the golfer's personal club carry/total distances.
+- Starter-bag defaults are used for initial creation only; subsequent tee changes preserve the golfer's saved, editable club distances.
+- No Figma/app changes made.
