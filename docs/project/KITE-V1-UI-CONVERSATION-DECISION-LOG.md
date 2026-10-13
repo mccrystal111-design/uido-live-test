@@ -436,3 +436,8 @@ Use the starter set to support estimates and sensible prefilled values. Estimate
 - Explain briefly that Kite is building a starter bag with estimated club distances; do not block or delay starting the round.
 - The golfer can edit the bag and distances later in Player Profile. If they already have a saved/personalised bag, preserve it rather than replacing it with defaults.
 - No Figma/app changes made.
+
+### Starter bag is created once only — confirmed 13 October 2026
+- Create the automatic starter bag once, when the golfer starts their first round and has no saved/personalised bag.
+- Do not rebuild or reset it when the golfer changes tees later. Tee changes affect course yardages only; saved personal club distances remain intact.
+- The golfer can edit the starter bag later in Player Profile. No Figma/app changes made.
