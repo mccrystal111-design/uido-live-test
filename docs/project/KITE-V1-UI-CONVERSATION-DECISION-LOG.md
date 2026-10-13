@@ -481,3 +481,9 @@ Use the starter set to support estimates and sensible prefilled values. Estimate
 - Selecting a course refreshes the available tees and selects a sensible default where possible; the golfer may change it manually.
 - Documentation only; no Figma/app changes and no GitHub Actions.
 
+### Start Round course selector — empty search state (confirmed 13 October 2026)
+- If a course search returns no matches, show a clear **“No courses found”** message and an option to clear the search.
+- Do not leave the results area blank or imply the catalogue has no courses when the current query simply has no matches.
+- Preserve the normal nearest-first/alphabetical catalogue ordering when the search is cleared.
+- Documentation only; no Figma/app changes and no GitHub Actions.
+
