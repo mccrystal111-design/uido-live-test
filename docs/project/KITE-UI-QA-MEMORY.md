@@ -998,3 +998,10 @@ A separate women's amateur candidate starter bag has been supplied. Ignore the L
 | LW | 35–42 | 38–44 | 39 | 41 |
 
 Offer this as a separate optional women's amateur starter profile alongside the men's everyday-amateur profile. Do not assume sex determines the golfer's distances; let users choose and edit freely. Ignore LPGA pro distances. No Figma/app changes made.
+
+
+### Starter bag selection — use selected tee, confirmed 13 October 2026
+- Choose the default starter-bag distance profile using the golfer's already-selected tee, rather than asking them to choose a men's/women's or longer/shorter profile.
+- Reuse the tee selection in Start Round to avoid asking twice. Distances are initial estimates and remain editable.
+- The exact mapping from selected tees to starter distance profiles still needs to be grounded in the current tee-selection/course context; do not assume tee colour universally maps to gender or exact ability.
+- Keep Driver + 7-iron personalisation and full bag skip options. No Figma/app changes made.
