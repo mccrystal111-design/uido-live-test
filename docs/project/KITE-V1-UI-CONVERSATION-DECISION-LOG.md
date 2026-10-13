@@ -526,3 +526,11 @@ Use the starter set to support estimates and sensible prefilled values. Estimate
 - Keep this distinct from location disabled and GPS signal lost states, which have their own recovery messages.
 - Documentation only; no Figma/app changes and no GitHub Actions.
 
+
+
+### Player Profile editing Q&A — Handicap editor, confirmed 13 October 2026
+- The Handicap section expands in place, consistent with the existing Player Profile editing pattern.
+- The editor is simple manual entry: the golfer can enter or change the handicap number, then choose **Save** or **Cancel**.
+- Do not add handicap-source selection or combine this editor with Kite-calculated practice handicap / official verification in this V1 editing state.
+- This decision defines the editor interaction, not the detailed validation rules or accepted numeric range; those remain open only if needed for implementation.
+- Documentation only. No Figma edits, app/code changes, or GitHub Actions.
