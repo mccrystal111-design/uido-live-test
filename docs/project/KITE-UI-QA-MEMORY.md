@@ -1059,3 +1059,9 @@ These are estimates; golfers may override total distance. Tee changes do not ove
 - When a guest creates an account, offer them the option to build/personalise their own bag, supported by Kite's starter set of estimated distances.
 - Let them use and edit the starter set or personalise their bag; do not require entering every club manually.
 - Preserve existing guest rounds and personal club data where applicable. Guest-round transfer still requires explicit consent; do not silently discard bag/distance edits during account creation. No Figma/app changes made.
+
+### Own club-bag setup offers two routes — confirmed 13 October 2026
+When personalising a bag, offer:
+1. **Full setup:** enter each club and distance individually.
+2. **Quick setup:** enter Driver carry and 7-iron carry; estimate the remaining clubs/distances using the starter set.
+Use confirmed category roll multipliers for estimated totals, allow total-distance overrides, and keep the setup optional/editable later in Player Profile. No Figma/app changes made.
