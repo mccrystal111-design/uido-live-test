@@ -897,3 +897,9 @@ Next: continue Priority 1 (Login/Sign-up) by settling only the remaining details
 - Do **not** include home course or preferred tees in the first-run onboarding flow; they are not needed at this stage.
 - Keep the step-by-step setup focused on player name, optional handicap, and optional club-bag setup. Keep skip options and no repeated prompts.
 - This removes those fields from onboarding only; it does not remove Home course & tees from the existing Player Profile.
+
+
+### Club-bag step sequencing — confirmed 13 October 2026
+- Show club-bag setup automatically as step two after personal details.
+- Make its optional nature obvious and provide a clear **Skip** control; retain **Skip for now** for leaving onboarding altogether. Both routes continue to Home without repeated prompts.
+- Bag options remain full entry or Driver + 7-iron carry to estimate other clubs; estimates can be edited later and the entire step can be skipped.
