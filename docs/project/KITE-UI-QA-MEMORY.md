@@ -1073,3 +1073,8 @@ Use confirmed category roll multipliers for estimated totals, allow total-distan
 ### Skipping bag personalisation — automatic starter bag on first round — confirmed 13 October 2026
 - If bag personalisation is skipped entirely, create a starter bag automatically when the golfer starts their first round, based on the selected tee.
 - Briefly explain that Kite is building a starter bag with estimated distances, without delaying play. Make the bag editable later in Player Profile and preserve any existing saved/personalised bag. No Figma/app changes made.
+
+### Starter bag creation timing — confirmed 13 October 2026
+- Generate default bag values once at the first round if the golfer has no saved bag.
+- Later tee selections must not regenerate or reset club distances. Tee changes affect course yardages only.
+- The golfer may edit the bag later in Player Profile. No Figma/app changes made.
