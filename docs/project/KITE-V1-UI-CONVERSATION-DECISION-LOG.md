@@ -393,3 +393,9 @@ The user approved the midpoint of each proposed club-category range as Kite's de
 - **Mid-irons (6i–8i):** carry × **1.05**
 - **Short irons & wedges (9i–LW):** carry × **1.02**
 These are starting estimates. Golfers can manually override total distance; switching tees must not overwrite saved personal club distances. This supersedes the open question about which multiplier to choose. No Figma/app changes made.
+
+### Guest first-round starter bag — confirmed 13 October 2026
+- For a golfer's **first round without signing in**, create the starter bag automatically when they start the round, using the selected tee to choose the default distance profile.
+- Do not interrupt guest round-start with a separate bag-setup screen. The generated bag is editable later in Player Profile/profile management.
+- Apply the previously confirmed club-category roll multipliers for estimated total distances; carry and total remain editable, and tee changes do not overwrite saved distances.
+- This answer explicitly confirms the guest first-round path. Whether the same no-interruption behaviour should apply to a signed-in golfer's first round remains open. No Figma/app changes made.
