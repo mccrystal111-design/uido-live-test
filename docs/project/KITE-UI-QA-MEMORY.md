@@ -1108,3 +1108,9 @@ Use confirmed category roll multipliers for estimated totals, allow total-distan
 - Tee changes affect course/playing yardages only; they must not reset or recalculate saved personal club distances or regenerate an existing bag.
 - No Figma/app changes and no GitHub Actions.
 
+### Start Round course selector — search and filtering (confirmed 13 October 2026)
+- Provide a search field for the full course catalogue; filter results as the golfer types.
+- With an empty search, retain nearest-first ordering when location is available and alphabetical ordering when it is unavailable/denied.
+- Keep manual selection. On course change, update the available tees and choose a sensible default where possible; preserve personal club distances when tees change.
+- No Figma/app changes and no GitHub Actions.
+
