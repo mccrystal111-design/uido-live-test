@@ -460,3 +460,9 @@ Use the starter set to support estimates and sensible prefilled values. Estimate
 - The golfer can still choose a different course from the list.
 - This assumes location permission is available; exact fallback behaviour when location is unavailable, and whether the full catalogue is already stored/downloaded versus fetched from a service, remain implementation details to verify rather than assume.
 - Documentation only; no Figma edits, app/code changes, or GitHub Actions.
+
+### Start Round course selector — no-location fallback confirmed 13 October 2026
+- If GPS/location is unavailable or permission is denied, show the full course catalogue in **alphabetical order** instead of proximity order.
+- Allow the golfer to select a course manually; starting a round must not depend on granting location permission.
+- When location is available, continue to sort by distance with the closest course first and allow manual selection.
+- Documentation only; no Figma edits, app/code changes, or GitHub Actions.
