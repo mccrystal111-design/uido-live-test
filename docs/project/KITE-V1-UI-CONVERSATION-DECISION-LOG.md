@@ -501,3 +501,9 @@ Use the starter set to support estimates and sensible prefilled values. Estimate
 - The exact interaction while GPS is acquiring a fix (for example, whether course/tee setup remains available before Start Round is enabled) is still open; do not treat it as decided.
 - Documentation only; no Figma/app changes and no GitHub Actions.
 
+### Start Round — GPS acquiring state (confirmed 13 October 2026)
+- When location permission/services are enabled but Kite has not yet obtained a usable GPS fix, show **“Finding GPS…”** with a retry option.
+- Keep the golfer on Start Round while GPS is acquiring; do not enable Start Round until GPS is ready for live yardages.
+- Keep this distinct from the **“Location disabled”** state, which offers **“Enable in Settings”** guidance.
+- Documentation only; no Figma/app changes and no GitHub Actions.
+
