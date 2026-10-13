@@ -924,3 +924,11 @@ Next: continue Priority 1 (Login/Sign-up) by settling only the remaining details
 - Forgot password opens a simple form asking for the email address.
 - Send a password-reset email and show a neutral confirmation message that does not disclose whether an account exists for that address.
 - The golfer follows the email link to reset their password and then returns to Log in. Keep the flow minimal; no Figma or app changes made.
+
+
+### Email verification and guest play — decision / direction 13 October 2026
+- Email/password users should be prompted to verify their email, but this **must not prevent them from playing golf**. Verification is a non-blocking reminder, with a resend option.
+- No extra email-verification step is needed for Google or Apple sign-in in the Kite flow.
+- Add a **Play without signing in** / guest path as the intended product direction. Do not force account creation before a golfer can start a round. Exact guest capabilities and whether guest data persists across sessions remain to be decided before implementation.
+- This supersedes the earlier working assumption that sign-up is required to use Kite. Sign-in/account creation remains available for account-linked features.
+- No Figma or app changes made.
