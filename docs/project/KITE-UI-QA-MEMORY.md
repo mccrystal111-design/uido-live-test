@@ -1152,3 +1152,10 @@ Use confirmed category roll multipliers for estimated totals, allow total-distan
 - Maintain separate states for location disabled, GPS acquiring, and GPS signal lost.
 - No Figma/app changes and no GitHub Actions.
 
+
+
+### Player Profile — Handicap editing decision (13 October 2026)
+- Handicap editing is simple manual entry in the existing inline-expanded section.
+- Allow the golfer to change the handicap number and choose Save or Cancel.
+- Do not add source-selection controls for player-entered, calculated practice, or officially verified handicap to this V1 editor.
+- This is a documented interaction decision; the expanded editor still needs to be represented/verified in Figma and QA'd when built. No Figma/app changes made.
