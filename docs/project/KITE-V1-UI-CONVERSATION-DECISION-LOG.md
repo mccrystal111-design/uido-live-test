@@ -252,3 +252,11 @@ Do not ask again about the providers, skippable profile setup, Driver + 7-iron s
 - **Decision:** show the club-bag setup automatically as the second step after personal details; do not make the golfer opt into opening it.
 - The bag step must be clearly optional, with an obvious **Skip** action. The overall setup can still be exited with **Skip for now**; either route leads to Home without nagging or repeated prompts.
 - Preserve the agreed choices on the bag step: full bag entry or Driver + 7-iron carry to estimate the rest; estimated distances remain editable later; the golfer may skip the entire bag setup.
+
+
+### Google / Apple authentication outcomes — decision 13 October 2026
+- **Success:** continue into Kite; if this is a new account, offer the agreed optional step-by-step Player Profile setup.
+- **Cancelled:** return to the same Log in / Create account screen without displaying an error.
+- **Failed:** show a concise, clear error with an option to retry or choose another sign-in method.
+- **Existing account detected during sign-up:** guide the golfer to log in rather than create a duplicate account.
+- Keep these as states of the single authentication screen where practical; do not add unnecessary screens. Documentation only; no Figma or app changes made.
