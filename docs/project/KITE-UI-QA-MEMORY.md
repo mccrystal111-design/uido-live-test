@@ -1044,3 +1044,9 @@ These are estimates; golfers may override total distance. Tee changes do not ove
 - On a guest golfer's first round, create the starter bag automatically when they start the round, based on the selected tee; do not interrupt round-start with a bag-setup screen.
 - Make the generated bag available to edit later in Player Profile/profile management. Use the confirmed category roll multipliers for estimated totals; preserve saved distances when tees change.
 - This decision explicitly covers the first round without signing in. Signed-in first-round behaviour remains to be confirmed. No Figma/app changes made.
+
+### Starter bag fallback — guest and signed-in first rounds, confirmed 13 October 2026
+- The golfer has an optional opportunity to personalise their bag during first-run setup (for signed-in users).
+- If they skip bag personalisation or no saved bag exists, automatically create a starter bag from the selected tee when they start their first round; do not interrupt round-start with another setup prompt.
+- If a golfer already has a saved/personalised bag, preserve it and do not replace it with defaults. Guest golfers get the same automatic starter-bag fallback on their first round.
+- Generated values remain editable later in Player Profile/profile management. No Figma/app changes made.
