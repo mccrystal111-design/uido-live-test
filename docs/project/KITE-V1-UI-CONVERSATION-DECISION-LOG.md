@@ -548,3 +548,10 @@ Use the starter set to support estimates and sensible prefilled values. Estimate
 - Keep controls limited to preferences the V1 app actually supports; do not invent gameplay settings that are not implemented or agreed.
 - Use the existing inline expansion pattern with **Save** and **Cancel**.
 - Documentation only. No Figma edits, app/code changes, or GitHub Actions.
+
+
+### Player Profile editing Q&A — Manage bag layout, confirmed 13 October 2026
+- Use a compact editable club list for quick changes, with each club row opening more detailed controls when needed.
+- The list should expose carry and total distances clearly; carry is the primary value, total is estimated unless manually overridden, and estimates must be identifiable.
+- Keep the established inline section Save/Cancel pattern. Do not require the golfer to open a separate page for every routine distance edit.
+- Documentation only. No Figma edits, app/code changes, or GitHub Actions.
