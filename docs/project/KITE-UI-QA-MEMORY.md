@@ -903,3 +903,11 @@ Next: continue Priority 1 (Login/Sign-up) by settling only the remaining details
 - Show club-bag setup automatically as step two after personal details.
 - Make its optional nature obvious and provide a clear **Skip** control; retain **Skip for now** for leaving onboarding altogether. Both routes continue to Home without repeated prompts.
 - Bag options remain full entry or Driver + 7-iron carry to estimate other clubs; estimates can be edited later and the entire step can be skipped.
+
+
+### Google / Apple authentication outcomes — confirmed 13 October 2026
+- Success continues into Kite; new accounts are offered optional step-by-step profile setup.
+- Cancellation returns to the same Log in / Create account screen without an error message.
+- Failure shows a short, clear message and offers retry or another sign-in method.
+- If the account already exists, guide the golfer to log in instead of creating a duplicate.
+- Keep the flow within the single auth screen where practical; avoid unnecessary screens. No Figma or app changes made.
