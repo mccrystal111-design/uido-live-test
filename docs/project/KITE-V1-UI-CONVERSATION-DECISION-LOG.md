@@ -233,3 +233,10 @@ Do not ask again about the providers, skippable profile setup, Driver + 7-iron s
 - Ask the golfer for their handicap during optional first-run Player Profile setup.
 - Handicap is not compulsory: the golfer can skip that field and/or choose **Skip for now** for the whole setup, then continue to Home.
 - Do not block account creation or use of Kite when handicap is unknown. Keep the value editable later in Player Profile; explain limitations only where a missing handicap actually matters.
+
+
+### First-run setup layout — decision 13 October 2026
+- **Decision:** present optional Player Profile setup as a short **step-by-step flow**, not one long setup screen.
+- Provide a clear skip option so the golfer can skip an individual step where appropriate and/or leave the whole setup using **Skip for now**. Skipping leads to Home; do not nag or repeatedly prompt them later.
+- Preserve earlier decisions: ask for player name and handicap, but handicap is optional; include home course/tees and bag setup in the short flow as appropriate; bag setup can be full entry or Driver + 7-iron carry to estimate the remaining clubs, with estimates editable later. The golfer can skip all bag setup.
+- This is a documented product decision only. No Figma edits, app/code changes, or GitHub Actions.
