@@ -1023,3 +1023,11 @@ Offer this as a separate optional women's amateur starter profile alongside the 
 - Carry distance is the primary value the golfer edits; Kite estimates total distance from it.
 - Allow manual override of total distance when the estimate is unsuitable. Distinguish estimated total from a golfer-overridden value where shown.
 - Changing tees must not overwrite saved club distances. No Figma/app changes made.
+
+### Club total-distance roll multipliers — user-provided ranges, 13 October 2026
+Estimate total distance from carry using a multiplier by club category:
+- Driver & fairway woods: **1.08–1.12** (example 1.10).
+- Hybrids & long irons (3i–5i): **1.06–1.08** (example 1.07).
+- Mid-irons (6i–8i): **1.04–1.06** (example 1.05).
+- Short irons & wedges (9i–LW): **1.01–1.03** (example 1.02).
+Golfer can override estimated total distance. The final default multiplier within each range remains to be confirmed. No Figma/app changes made.
