@@ -275,3 +275,11 @@ Do not ask again about the providers, skippable profile setup, Driver + 7-iron s
 - Kite sends a password-reset email and confirms that the request was received. Use a neutral confirmation message that does not reveal whether the email address has an account.
 - The golfer follows the link in the email to reset their password, then returns to Log in.
 - Keep this focused; no unnecessary extra screens. Documentation only; no Figma or app changes made.
+
+
+### Email verification and guest play — decision 13 October 2026
+- **Email verification:** email/password accounts should be asked to verify their email, but verification must **never block the golfer from playing golf**. Allow access while unverified and show a clear, non-blocking reminder with an option to resend the verification email.
+- Google and Apple sign-in do not need this additional email-verification step in the Kite flow.
+- **Guest play:** the user raised that Kite should offer an option to play without signing in. Record this as a product direction to include a **Play without signing in** / guest path, with its precise capabilities and data persistence to be clarified before implementation. Do not force account creation before a golfer can start playing.
+- This revises the earlier working assumption that account creation is required before using Kite. Account creation/sign-in remains available for golfers who want a profile and account-linked features.
+- Documentation only; no Figma or app changes made.
