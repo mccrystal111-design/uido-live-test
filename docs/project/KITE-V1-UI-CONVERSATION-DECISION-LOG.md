@@ -487,3 +487,10 @@ Use the starter set to support estimates and sensible prefilled values. Estimate
 - Preserve the normal nearest-first/alphabetical catalogue ordering when the search is cleared.
 - Documentation only; no Figma/app changes and no GitHub Actions.
 
+### Start Round — remember last course and tee selection (confirmed 13 October 2026)
+- Remember the golfer's last selected course and tee selection for their next round, and preselect them where they remain valid.
+- Keep both selections editable. The golfer can choose another course or tee at any time.
+- If the remembered course is not available, fall back to the normal course list behaviour. If the remembered tee is not available at the selected course, choose a sensible available default where possible.
+- Continue to respect location-based nearest-first sorting, alphabetical fallback, and searchable filtering. Remembering the last selection should not prevent access to the full catalogue.
+- Documentation only; no Figma/app changes and no GitHub Actions.
+
