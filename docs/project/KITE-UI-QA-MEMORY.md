@@ -1089,3 +1089,9 @@ Use confirmed category roll multipliers for estimated totals, allow total-distan
 - Reason: existing Home contains Stats and Scores; a guest choosing to play should go straight into round setup.
 - Welcome remains before the existing Home; this changes only the guest primary-action destination. Signed-in/authenticated routing remains governed by the agreed auth and optional profile setup flow.
 - Documentation only. No Figma edits, app/code changes, or GitHub Actions.
+
+### Start Round course selector — proximity ordering (13 October 2026)
+- Populate the selector from the full course catalogue available in Kite.
+- Calculate distance from the golfer's current location to courses and show the closest course first by default; golfer can select another course.
+- Location-unavailable fallback and the catalogue's storage/delivery mechanism remain to be verified; do not assume those implementation details.
+- Documentation only; no Figma/app changes and no GitHub Actions.
