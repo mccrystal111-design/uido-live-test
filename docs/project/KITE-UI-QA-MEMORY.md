@@ -1018,3 +1018,8 @@ Offer this as a separate optional women's amateur starter profile alongside the 
 - Changing tees updates course/playing yardages only. It must not overwrite or silently recalculate the golfer's personal club carry/total distances.
 - Starter-bag defaults are used for initial creation only; subsequent tee changes preserve the golfer's saved, editable club distances.
 - No Figma/app changes made.
+
+### Club distance editing — carry-led total estimate with override — confirmed 13 October 2026
+- Carry distance is the primary value the golfer edits; Kite estimates total distance from it.
+- Allow manual override of total distance when the estimate is unsuitable. Distinguish estimated total from a golfer-overridden value where shown.
+- Changing tees must not overwrite saved club distances. No Figma/app changes made.
