@@ -217,3 +217,8 @@ Do not ask again about the providers, skippable profile setup, Driver + 7-iron s
 - **Decision (13 October 2026):** use email + password for email-based sign-up and returning-user sign-in (Option A). Include a **Forgot password?** recovery path.
 - Continue to offer Google/Gmail and Apple as alternatives.
 - This settles the email authentication method; it does not authorise implementation or Figma edits yet.
+
+### Authentication layout decision — one screen, two modes
+- **Decision (13 October 2026):** use one authentication screen with a **Log in / Create account** mode switch, not separate screens.
+- Both modes offer Google/Gmail, Apple, and email + password. Log in includes **Forgot password?** recovery; Create account uses the new-account fields.
+- Keep the interface concise and consistent with the existing Kite design system. This is a documented decision only; no Figma or app changes have been made.
