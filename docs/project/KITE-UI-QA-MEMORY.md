@@ -884,3 +884,10 @@ Next: continue Priority 1 (Login/Sign-up) by settling only the remaining details
 - Ask the golfer for their handicap during optional first-run Player Profile setup.
 - Handicap is not compulsory: the golfer can skip that field and/or choose **Skip for now** for the whole setup, then continue to Home.
 - Do not block account creation or use of Kite when handicap is unknown. Keep the value editable later in Player Profile; explain limitations only where a missing handicap actually matters.
+
+
+### First-run setup layout — confirmed 13 October 2026
+- Optional Player Profile setup should be a **short step-by-step flow**, rather than a single long screen.
+- Keep a clear skip option at the relevant step and **Skip for now** for the overall setup. Skipping goes to Home and must not trigger nagging or repeated prompts.
+- Preserve the previously agreed minimum: ask for player name and handicap (handicap optional); include home course/tees and optional bag setup in the steps as appropriate. Bag setup supports full entry or Driver + 7-iron carry estimates, editable later, and may be skipped entirely.
+- Status: product decision recorded; no Figma or app changes made.
