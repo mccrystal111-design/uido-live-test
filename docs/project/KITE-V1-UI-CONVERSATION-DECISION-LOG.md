@@ -212,3 +212,8 @@ The Developer Notes / Q&A Handoff (302:162) has been checked. It contains design
 3. Whether first-run profile setup asks only for the minimum useful fields initially, with the rest left editable in Player Profile.
 
 Do not ask again about the providers, skippable profile setup, Driver + 7-iron shortcut, editable estimates, or no-nagging rule. Check existing Figma coverage before proposing new screens, and ask one focused question at a time only where a product decision is genuinely missing.
+
+### Authentication decision — email credentials
+- **Decision (13 October 2026):** use email + password for email-based sign-up and returning-user sign-in (Option A). Include a **Forgot password?** recovery path.
+- Continue to offer Google/Gmail and Apple as alternatives.
+- This settles the email authentication method; it does not authorise implementation or Figma edits yet.
