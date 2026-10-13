@@ -1065,3 +1065,7 @@ When personalising a bag, offer:
 1. **Full setup:** enter each club and distance individually.
 2. **Quick setup:** enter Driver carry and 7-iron carry; estimate the remaining clubs/distances using the starter set.
 Use confirmed category roll multipliers for estimated totals, allow total-distance overrides, and keep the setup optional/editable later in Player Profile. No Figma/app changes made.
+
+### Quick Setup saves immediately; edit later — confirmed 13 October 2026
+- After Driver and 7-iron carry are entered, generate and save the estimated bag immediately; no review/edit step before saving.
+- Individual clubs/distances can be edited later in Player Profile. Keep estimates identifiable and allow manual total-distance overrides. No Figma/app changes made.
