@@ -260,3 +260,11 @@ Do not ask again about the providers, skippable profile setup, Driver + 7-iron s
 - **Failed:** show a concise, clear error with an option to retry or choose another sign-in method.
 - **Existing account detected during sign-up:** guide the golfer to log in rather than create a duplicate account.
 - Keep these as states of the single authentication screen where practical; do not add unnecessary screens. Documentation only; no Figma or app changes made.
+
+
+### Email authentication validation — decision 13 October 2026
+- **Decision:** require a valid email address and password for email-based authentication.
+- During account creation, ask the golfer to enter the password twice to catch typing mistakes.
+- Show clear, concise inline feedback for invalid details, incorrect credentials, or an account that already exists; guide the golfer to the appropriate next action.
+- Keep feedback within the single Log in / Create account screen wherever practical, avoiding unnecessary extra screens. Forgot password recovery remains available from Log in.
+- Documentation only; no Figma or app changes made.
