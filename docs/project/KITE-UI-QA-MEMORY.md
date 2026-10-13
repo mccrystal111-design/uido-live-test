@@ -1078,3 +1078,8 @@ Use confirmed category roll multipliers for estimated totals, allow total-distan
 - Generate default bag values once at the first round if the golfer has no saved bag.
 - Later tee selections must not regenerate or reset club distances. Tee changes affect course yardages only.
 - The golfer may edit the bag later in Player Profile. No Figma/app changes made.
+
+### Welcome / Entry screen — no tagline — confirmed 13 October 2026
+- No tagline or marketing slogan.
+- Keep the screen minimal: Kite branding, yellow primary **Play without signing in**, and secondary **Sign in or create an account**.
+- No feature tour or lengthy pre-play onboarding; Welcome / Entry comes before and does not replace Home. No Figma/app changes made.
