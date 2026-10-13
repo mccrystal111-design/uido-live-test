@@ -1119,3 +1119,10 @@ Use confirmed category roll multipliers for estimated totals, allow total-distan
 - Avoid a blank results area; clearing the query restores the full catalogue in its applicable sort order.
 - No Figma/app changes and no GitHub Actions.
 
+### Start Round — persist last course and tee (confirmed 13 October 2026)
+- Remember the golfer's last selected course and tee and preselect them for the next round when still valid.
+- Keep both selections editable. Never restrict the golfer to the remembered course.
+- If the course or tee is unavailable, fall back to the normal catalogue/tee-default behaviour.
+- Retain location-based nearest-first sorting, alphabetical fallback when location is unavailable, and live search filtering.
+- No Figma/app changes and no GitHub Actions.
+
