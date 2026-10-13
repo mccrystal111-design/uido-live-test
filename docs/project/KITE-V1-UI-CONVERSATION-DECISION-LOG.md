@@ -222,3 +222,9 @@ Do not ask again about the providers, skippable profile setup, Driver + 7-iron s
 - **Decision (13 October 2026):** use one authentication screen with a **Log in / Create account** mode switch, not separate screens.
 - Both modes offer Google/Gmail, Apple, and email + password. Log in includes **Forgot password?** recovery; Create account uses the new-account fields.
 - Keep the interface concise and consistent with the existing Kite design system. This is a documented decision only; no Figma or app changes have been made.
+
+### First-run profile prompt decision — 13 October 2026
+- **Clarification:** do not omit profile setup entirely. After account creation/sign-in, actively offer the golfer a short Player Profile setup, with a clear **Skip for now** option.
+- Keep authentication itself minimal. In the post-auth profile step, start with the minimum useful details (player name and handicap); make setup skippable and allow the golfer to complete/edit the remaining profile and bag details later.
+- Skipping must still lead to Home, with no nagging or repeated prompts. Explain a missing detail only when it affects a feature.
+- This preserves the agreed journey: sign-up/sign-in → optional profile setup → Home, while ensuring golfers are invited to add useful details rather than never being asked.
