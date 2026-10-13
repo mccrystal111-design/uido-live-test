@@ -474,3 +474,10 @@ Use the starter set to support estimates and sensible prefilled values. Estimate
 - This is a Start Round course/tee dependency only. Changing tees updates course/playing yardages and must not overwrite personal club carry/total distances or regenerate an existing saved bag.
 - Documentation only; no Figma/app changes and no GitHub Actions.
 
+### Start Round course selector — searchable catalogue (confirmed 13 October 2026)
+- Add a search field to the full course catalogue so golfers can type a course name.
+- Filter the displayed course list as the golfer types.
+- Preserve the existing sort behaviour when the search is empty: nearest first when location is available; alphabetical when location is unavailable or permission is denied. Manual course selection remains available.
+- Selecting a course refreshes the available tees and selects a sensible default where possible; the golfer may change it manually.
+- Documentation only; no Figma/app changes and no GitHub Actions.
+
