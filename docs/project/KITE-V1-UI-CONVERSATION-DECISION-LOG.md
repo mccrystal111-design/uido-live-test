@@ -453,3 +453,10 @@ Use the starter set to support estimates and sensible prefilled values. Estimate
 - Keep the existing Home screen for its current purpose; this decision changes only the guest entry route.
 - This updates the previously recorded general guest path: Welcome → Play without signing in → Start Round. The signed-in/authenticated path remains governed by the existing auth and optional profile-setup decisions.
 - Documentation only; no Figma edits, app/code changes, or GitHub Actions.
+
+### Start Round course selector — confirmed 13 October 2026
+- The course selector should be populated with **all courses available in Kite's course catalogue**, not only a manually curated shortlist or courses already played.
+- Use the golfer's current location to calculate distance to each course and sort the list by proximity, with the **closest course at the top** by default.
+- The golfer can still choose a different course from the list.
+- This assumes location permission is available; exact fallback behaviour when location is unavailable, and whether the full catalogue is already stored/downloaded versus fetched from a service, remain implementation details to verify rather than assume.
+- Documentation only; no Figma edits, app/code changes, or GitHub Actions.
