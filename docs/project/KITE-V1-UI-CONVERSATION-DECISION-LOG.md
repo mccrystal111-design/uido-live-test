@@ -507,3 +507,10 @@ Use the starter set to support estimates and sensible prefilled values. Estimate
 - Keep this distinct from the **“Location disabled”** state, which offers **“Enable in Settings”** guidance.
 - Documentation only; no Figma/app changes and no GitHub Actions.
 
+### In-round GPS loss — preserve play and pause live yardages (confirmed 13 October 2026)
+- If GPS signal is lost after a round starts, keep the round active and keep score entry available.
+- Show **“GPS signal lost — trying to reconnect”** while attempting to recover the signal.
+- Pause live yardage updates until a usable GPS fix returns; resume when location is reliable again.
+- Do not discard or block the round because of a temporary signal loss.
+- Documentation only; no Figma/app changes and no GitHub Actions.
+
