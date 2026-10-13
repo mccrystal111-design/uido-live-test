@@ -864,3 +864,7 @@ This audit is the current working register. Do not repeat individual screen summ
 Developer Notes frame 302:162 was checked on 13 October. It contains general UI, Stats/Scores, data-safety, QA and profile implementation notes, but no authentication-specific guidance.
 
 Next: continue Priority 1 (Login/Sign-up) by settling only the remaining details: provider hand-off/error states, email sign-in/sign-up and forgotten-password recovery, and minimum fields for optional first-run profile setup. Do not re-ask settled decisions above. Check existing Figma coverage first and ask one focused question at a time.
+### Authentication decision — email credentials
+- **Decision (13 October 2026):** use email + password for email-based sign-up and returning-user sign-in (Option A). Include a **Forgot password?** recovery path.
+- Continue to offer Google/Gmail and Apple as alternatives.
+- This settles the email authentication method; it does not authorise implementation or Figma edits yet.
