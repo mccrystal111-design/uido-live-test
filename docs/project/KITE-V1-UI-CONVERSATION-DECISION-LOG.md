@@ -446,3 +446,10 @@ Use the starter set to support estimates and sensible prefilled values. Estimate
 - Do not include a tagline or marketing slogan on the Welcome / Entry screen.
 - Keep the entry experience minimal and action-led: Kite branding, prominent yellow **Play without signing in**, and secondary **Sign in or create an account**.
 - Do not add a feature tour or lengthy onboarding before the golfer can play. Preserve the existing Home screen; Welcome / Entry sits before it. No Figma/app changes made.
+
+### Guest entry destination — confirmed 13 October 2026
+- When the golfer taps **Play without signing in** on Welcome / Entry, take them **straight to Start Round** (Figma frame 124:25), not Home.
+- Rationale: the existing Home screen contains Stats and Scores, which are not the immediate destination for a guest who wants to start playing.
+- Keep the existing Home screen for its current purpose; this decision changes only the guest entry route.
+- This updates the previously recorded general guest path: Welcome → Play without signing in → Start Round. The signed-in/authenticated path remains governed by the existing auth and optional profile-setup decisions.
+- Documentation only; no Figma edits, app/code changes, or GitHub Actions.
