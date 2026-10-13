@@ -1054,3 +1054,8 @@ These are estimates; golfers may override total distance. Tee changes do not ove
 ### Explain automatic starter-bag creation — confirmed direction, 13 October 2026
 - If the golfer has not personalised a bag, tell them Kite will build a starter bag for them using the selected tee, with estimated club distances that can be edited later in Player Profile.
 - Keep this brief and non-blocking; do not add a setup screen that delays the start of play. Exact wording/placement remains open. No Figma/app changes made.
+
+### Account creation: own-bag option backed by starter set — confirmed 13 October 2026
+- When a guest creates an account, offer them the option to build/personalise their own bag, supported by Kite's starter set of estimated distances.
+- Let them use and edit the starter set or personalise their bag; do not require entering every club manually.
+- Preserve existing guest rounds and personal club data where applicable. Guest-round transfer still requires explicit consent; do not silently discard bag/distance edits during account creation. No Figma/app changes made.
