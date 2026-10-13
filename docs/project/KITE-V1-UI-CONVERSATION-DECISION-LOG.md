@@ -375,3 +375,13 @@ This should be offered as a distinct women's amateur starter profile, alongside 
 - Allow the golfer to **override total distance manually** when the estimate does not match their real-world experience.
 - Keep both values visible where useful, make it clear which total is estimated versus manually overridden, and preserve saved values when tees change.
 - No Figma/app changes made.
+
+### Club total-distance roll multipliers — user-provided ranges, 13 October 2026
+Use club-category-specific roll multipliers to estimate total distance from carry. The user supplied these candidate ranges:
+- **Driver & fairway woods:** 1.08–1.12 (example: 150 yd carry × 1.10 = 165 yd total).
+- **Hybrids & long irons (3i–5i):** 1.06–1.08 (example: 110 yd × 1.07 = 118 yd).
+- **Mid-irons (6i–8i):** 1.04–1.06 (example: 85 yd × 1.05 = 89 yd).
+- **Short irons & wedges (9i–LW):** 1.01–1.03 (example: 60 yd × 1.02 = 61 yd).
+- Total remains an estimate derived from carry, and the golfer can manually override it.
+- **Still to decide:** which default multiplier to use within each range. Do not silently treat the example multipliers as final defaults until confirmed.
+- No Figma/app changes made.
