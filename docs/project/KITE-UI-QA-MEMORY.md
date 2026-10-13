@@ -948,3 +948,9 @@ Next: continue Priority 1 (Login/Sign-up) by settling only the remaining details
 - Require explicit consent; do not upload or merge guest history silently.
 - If declined, preserve guest rounds locally and allow continued play. Be clear that local-only rounds may not be available on other devices.
 - Treat this as required behaviour for the guest-to-account flow; no Figma/app changes made.
+
+
+### Welcome screen primary action — confirmed 13 October 2026
+- **Play without signing in** is the prominent yellow primary button.
+- **Sign in or create an account** is secondary.
+- Rationale: quick, low-friction access to golf is Kite's first promise. Welcome / Entry sits before, and does not replace, the existing Home screen. No Figma/app changes made.
