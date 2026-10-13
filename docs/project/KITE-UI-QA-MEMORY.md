@@ -1039,3 +1039,8 @@ Approved defaults for estimating total distance from carry:
 - Mid-irons (6i–8i): **1.05**
 - Short irons & wedges (9i–LW): **1.02**
 These are estimates; golfers may override total distance. Tee changes do not overwrite personal club distances. The default-multiplier decision is settled. No Figma/app changes made.
+
+### Guest first-round starter bag — confirmed 13 October 2026
+- On a guest golfer's first round, create the starter bag automatically when they start the round, based on the selected tee; do not interrupt round-start with a bag-setup screen.
+- Make the generated bag available to edit later in Player Profile/profile management. Use the confirmed category roll multipliers for estimated totals; preserve saved distances when tees change.
+- This decision explicitly covers the first round without signing in. Signed-in first-round behaviour remains to be confirmed. No Figma/app changes made.
