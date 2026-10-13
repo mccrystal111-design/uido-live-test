@@ -441,3 +441,8 @@ Use the starter set to support estimates and sensible prefilled values. Estimate
 - Create the automatic starter bag once, when the golfer starts their first round and has no saved/personalised bag.
 - Do not rebuild or reset it when the golfer changes tees later. Tee changes affect course yardages only; saved personal club distances remain intact.
 - The golfer can edit the starter bag later in Player Profile. No Figma/app changes made.
+
+### Welcome / Entry screen — no tagline — confirmed 13 October 2026
+- Do not include a tagline or marketing slogan on the Welcome / Entry screen.
+- Keep the entry experience minimal and action-led: Kite branding, prominent yellow **Play without signing in**, and secondary **Sign in or create an account**.
+- Do not add a feature tour or lengthy onboarding before the golfer can play. Preserve the existing Home screen; Welcome / Entry sits before it. No Figma/app changes made.
