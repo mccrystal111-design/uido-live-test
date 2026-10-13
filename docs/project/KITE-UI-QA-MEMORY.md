@@ -976,3 +976,25 @@ The user supplied candidate defaults for a men's everyday amateur / approximatel
 | LW | 72 | 75 |
 
 Use these as candidate prefilled starter values. For Driver, 220 yd is the midpoint of the supplied 215–225 yd carry range. Keep the Driver + 7-iron custom estimate path and a clear skip option. No Figma/app changes made.
+
+
+### Women's amateur starter-bag distance baseline — user-provided, 13 October 2026
+A separate women's amateur candidate starter bag has been supplied. Ignore the LPGA pro columns. Ranges are approximate; the midpoint columns below are suggested single-value prefills (rounded to nearest yard), not claims about an individual golfer. Carry and total remain separate and editable.
+
+| Club | Amateur carry range (yd) | Amateur total range (yd) | Suggested carry prefill (yd) | Suggested total prefill (yd) |
+|---|---:|---:|---:|---:|
+| Driver | 140–155 | 174–185 | 148 | 180 |
+| 3-Wood | 125–135 | 150–165 | 130 | 158 |
+| 5-Wood | 115–125 | 135–145 | 120 | 140 |
+| 4-Hybrid | 105–115 | 125–135 | 110 | 130 |
+| 5-Iron | 95–105 | 110–120 | 100 | 115 |
+| 6-Iron | 88–98 | 100–110 | 93 | 105 |
+| 7-Iron | 80–90 | 92–102 | 85 | 97 |
+| 8-Iron | 72–82 | 84–94 | 77 | 89 |
+| 9-Iron | 65–75 | 76–86 | 70 | 81 |
+| PW | 58–68 | 68–78 | 63 | 73 |
+| GW | 50–60 | 58–66 | 55 | 62 |
+| SW | 42–50 | 46–54 | 46 | 50 |
+| LW | 35–42 | 38–44 | 39 | 41 |
+
+Offer this as a separate optional women's amateur starter profile alongside the men's everyday-amateur profile. Do not assume sex determines the golfer's distances; let users choose and edit freely. Ignore LPGA pro distances. No Figma/app changes made.
