@@ -1133,3 +1133,9 @@ Use confirmed category roll multipliers for estimated totals, allow total-distan
 - Whether course/tee setup is available while GPS acquires a fix, before Start Round is enabled, remains open.
 - No Figma/app changes and no GitHub Actions.
 
+### Start Round — GPS acquiring state (confirmed 13 October 2026)
+- If location is enabled but a usable fix is not ready, show **“Finding GPS…”** and a retry option.
+- Keep the golfer on Start Round until GPS is ready; do not start a round before live yardages can work.
+- Distinguish this from disabled location, which shows **“Location disabled”** and **“Enable in Settings”** guidance.
+- No Figma/app changes and no GitHub Actions.
+
