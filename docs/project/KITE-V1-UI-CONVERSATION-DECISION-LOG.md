@@ -494,3 +494,10 @@ Use the starter set to support estimates and sensible prefilled values. Estimate
 - Continue to respect location-based nearest-first sorting, alphabetical fallback, and searchable filtering. Remembering the last selection should not prevent access to the full catalogue.
 - Documentation only; no Figma/app changes and no GitHub Actions.
 
+### Start Round — GPS required with a location-disabled recovery state (confirmed 13 October 2026)
+- Live GPS yardages are a core Kite feature. Do not let a golfer start a round that cannot provide the intended live-yardage experience because location is disabled.
+- If location services/permission are disabled, show a clear **“Location disabled”** state with an **“Enable in Settings”** action/instruction.
+- Distinguish disabled location/permission from GPS still acquiring a fix or having a weak signal; use a suitable status and retry/recovery guidance for each.
+- The exact interaction while GPS is acquiring a fix (for example, whether course/tee setup remains available before Start Round is enabled) is still open; do not treat it as decided.
+- Documentation only; no Figma/app changes and no GitHub Actions.
+
