@@ -305,3 +305,25 @@ Do not ask again about the providers, skippable profile setup, Driver + 7-iron s
 - **Decision:** make **Play without signing in** the prominent yellow primary button on the Welcome / Entry screen.
 - Keep **Sign in or create an account** as the secondary action. This supports Kite's promise of quick, low-friction access to golf while keeping account-based saving available.
 - Preserve the existing Home screen; Welcome / Entry is a new pre-home screen. No Figma or app changes made.
+
+
+### Prefilled starter bag distances — user-provided baseline, 13 October 2026
+The user supplied the following **men's everyday amateur / approximately 15-handicap** distances as the candidate default starter bag. Treat these as estimated starting values, not measured or universally representative distances. Show carry and total separately, and allow the golfer to edit them.
+
+| Club | Carry (yd) | Total (yd) |
+|---|---:|---:|
+| Driver | 220 (provided range 215–225) | 236 |
+| 3-Wood | 200 | 215 |
+| 3-Hybrid | 185 | 197 |
+| 4-Iron | 175 | 186 |
+| 5-Iron | 160 | 169 |
+| 6-Iron | 150 | 162 |
+| 7-Iron | 140 | 154 |
+| 8-Iron | 130 | 146 |
+| 9-Iron | 118 | 136 |
+| Pitching Wedge (PW) | 105 | 121 |
+| Gap Wedge (GW) | 95 | 104 |
+| Sand Wedge (SW) | 83 | 84 |
+| Lob Wedge (LW) | 72 | 75 |
+
+**Driver carry default:** the user gave a 215–225 yd range; 220 yd is the midpoint for a single editable prefill value. Preserve the original range in this note. Starter bag should be a fast option in onboarding; retain the alternative Driver + 7-iron personalisation route and the clear skip option. No Figma or app changes made.
