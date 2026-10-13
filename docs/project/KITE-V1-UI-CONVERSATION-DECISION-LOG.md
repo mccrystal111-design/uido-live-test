@@ -425,3 +425,8 @@ When the golfer chooses to personalise their bag, offer two clear routes:
 1. **Full bag setup:** enter clubs and distances individually.
 2. **Quick setup:** enter Driver carry and 7-iron carry; Kite estimates the remaining clubs/distances.
 Use the starter set to support estimates and sensible prefilled values. Estimated total distances use the confirmed club-category multipliers and can be manually overridden. Keep the process optional and allow the golfer to return to Player Profile later. No Figma/app changes made.
+
+### Quick Setup saves immediately; edit later — confirmed 13 October 2026
+- In Quick Setup, after the golfer enters Driver and 7-iron carry, Kite generates and saves the starter bag immediately.
+- Do not add a review/edit step before saving. The golfer can edit individual clubs/distances later in Player Profile.
+- Keep estimated values identifiable as estimates; total-distance multipliers and manual total overrides remain as previously agreed. No Figma/app changes made.
