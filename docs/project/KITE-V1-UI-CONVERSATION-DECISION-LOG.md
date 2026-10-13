@@ -541,3 +541,10 @@ Use the starter set to support estimates and sensible prefilled values. Estimate
 - This sets profile defaults; it does not restrict course or tee choices when starting an individual round.
 - Changing the course should refresh the available tee options to those offered at the newly selected course. Do not retain a tee that is unavailable at the new course.
 - Documentation only. No Figma edits, app/code changes, or GitHub Actions.
+
+
+### Player Profile editing Q&A — Playing preferences, confirmed 13 October 2026
+- The expanded **Playing preferences** section allows the golfer to change units (**yards/metres**) and relevant app display preferences supported in Kite V1.
+- Keep controls limited to preferences the V1 app actually supports; do not invent gameplay settings that are not implemented or agreed.
+- Use the existing inline expansion pattern with **Save** and **Cancel**.
+- Documentation only. No Figma edits, app/code changes, or GitHub Actions.
