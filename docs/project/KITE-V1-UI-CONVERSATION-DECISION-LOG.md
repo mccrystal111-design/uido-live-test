@@ -349,3 +349,10 @@ The user supplied this women's amateur distance range as a separate candidate ba
 | Lob Wedge | 35–42 | 38–44 | 39 | 41 |
 
 This should be offered as a distinct women's amateur starter profile, alongside the previously recorded men's everyday-amateur starter bag. Do not assume sex determines actual distance or prevent the golfer choosing/editing any bag. No Figma or app changes made.
+
+
+### Starter bag selection — use selected tee, 13 October 2026
+- **Decision:** choose the prefilled starter-bag distance profile based on the golfer's selected tee, rather than asking them to choose a men's/women's or longer/shorter profile.
+- Reuse the tee selection already present in Start Round; avoid asking the golfer the same thing again during onboarding. The starter bag is a convenient initial estimate, and every club distance remains editable.
+- **Open implementation detail:** confirm the mapping between tee choices and the available starter distance profiles when the existing tee-selection behaviour and course context are reviewed. Do not assume tee colour universally implies a particular gender or exact ability/distance.
+- Keep the Driver + 7-iron personalisation route and the option to skip bag setup. No Figma or app changes made.
