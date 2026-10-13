@@ -246,3 +246,9 @@ Do not ask again about the providers, skippable profile setup, Driver + 7-iron s
 - **Decision:** do not ask for home course or preferred tees during first-run onboarding. The user considers these unnecessary in the initial setup.
 - Keep onboarding short and step-by-step, with the current focus on player name, optional handicap, and optional club-bag setup. The golfer can skip the whole flow or skip optional steps; skipping leads to Home without nagging.
 - This decision applies to first-run onboarding only; the existing Home course & tees section remains part of the Player Profile unless separately changed.
+
+
+### Club-bag step sequencing — decision 13 October 2026
+- **Decision:** show the club-bag setup automatically as the second step after personal details; do not make the golfer opt into opening it.
+- The bag step must be clearly optional, with an obvious **Skip** action. The overall setup can still be exited with **Skip for now**; either route leads to Home without nagging or repeated prompts.
+- Preserve the agreed choices on the bag step: full bag entry or Driver + 7-iron carry to estimate the rest; estimated distances remain editable later; the golfer may skip the entire bag setup.
