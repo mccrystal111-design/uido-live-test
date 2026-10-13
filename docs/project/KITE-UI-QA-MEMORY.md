@@ -918,3 +918,9 @@ Next: continue Priority 1 (Login/Sign-up) by settling only the remaining details
 - Account creation asks for password confirmation (enter the password twice).
 - Use concise inline messages for invalid details, incorrect credentials and existing accounts, with a clear next action.
 - Keep these states within the single Log in / Create account screen where practical; retain Forgot password recovery. No Figma or app changes made.
+
+
+### Forgot-password recovery flow — confirmed 13 October 2026
+- Forgot password opens a simple form asking for the email address.
+- Send a password-reset email and show a neutral confirmation message that does not disclose whether an account exists for that address.
+- The golfer follows the email link to reset their password and then returns to Log in. Keep the flow minimal; no Figma or app changes made.
