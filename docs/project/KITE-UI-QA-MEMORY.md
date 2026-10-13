@@ -1083,3 +1083,9 @@ Use confirmed category roll multipliers for estimated totals, allow total-distan
 - No tagline or marketing slogan.
 - Keep the screen minimal: Kite branding, yellow primary **Play without signing in**, and secondary **Sign in or create an account**.
 - No feature tour or lengthy pre-play onboarding; Welcome / Entry comes before and does not replace Home. No Figma/app changes made.
+
+### Welcome guest-route decision — 13 October 2026
+- **Play without signing in** routes directly to **Start Round** (Figma frame 124:25), not Home.
+- Reason: existing Home contains Stats and Scores; a guest choosing to play should go straight into round setup.
+- Welcome remains before the existing Home; this changes only the guest primary-action destination. Signed-in/authenticated routing remains governed by the agreed auth and optional profile setup flow.
+- Documentation only. No Figma edits, app/code changes, or GitHub Actions.
