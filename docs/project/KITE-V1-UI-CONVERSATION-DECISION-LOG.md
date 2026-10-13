@@ -299,3 +299,9 @@ Do not ask again about the providers, skippable profile setup, Driver + 7-iron s
 - Make this an explicit, consent-based choice; do not silently merge or upload guest round history.
 - If they decline, preserve the local guest rounds and let them continue playing. Explain clearly if any local-only data will not be available on other devices.
 - This is a required product behaviour to account for in the guest-to-account flow; implementation details and conflict handling can be specified later. No Figma or app changes made.
+
+
+### Welcome screen primary action — decision 13 October 2026
+- **Decision:** make **Play without signing in** the prominent yellow primary button on the Welcome / Entry screen.
+- Keep **Sign in or create an account** as the secondary action. This supports Kite's promise of quick, low-friction access to golf while keeping account-based saving available.
+- Preserve the existing Home screen; Welcome / Entry is a new pre-home screen. No Figma or app changes made.
