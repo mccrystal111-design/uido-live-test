@@ -1,0 +1,53 @@
+name: Course Directory Import QA
+
+on:
+  push:
+    paths:
+      - 'database/schema/course_club_directory.sql'
+      - 'database/tests/course_directory_*.sql'
+      - 'tools/course-discovery/export_uk_club_directory_seed.py'
+      - '.github/workflows/course-directory-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  directory-import:
+    name: Import and access checks in disposable PostgreSQL
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: uido_directory_qa
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d uido_directory_qa"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: uido_directory_qa
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+      - name: Create isolated base schema and roles
+        run: psql -v ON_ERROR_STOP=1 -f database/tests/course_directory_qa_setup.sql
+      - name: Apply course club directory schema
+        run: psql -v ON_ERROR_STOP=1 -f database/schema/course_club_directory.sql
+      - name: Import the staged source directory
+        run: psql -v ON_ERROR_STOP=1 -f database/tests/course_directory_import.sql
+      - name: Verify row coverage and public read rules
+        run: psql -v ON_ERROR_STOP=1 -f database/tests/course_directory_assertions.sql

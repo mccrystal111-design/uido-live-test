@@ -1,0 +1,3 @@
+# The user-supplied contact seed stays local and must not be pushed to the public repository.
+/database/seeds/uk_club_directory_staging.json
+/database/seeds/uk_club_directory_payload.csv
