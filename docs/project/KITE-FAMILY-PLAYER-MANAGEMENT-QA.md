@@ -91,6 +91,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** The junior chooses their four-animal PIN sequence. The parent remains responsible for managing PIN resets.
 
+### FQ-21 — Parent can choose how to remove a junior profile
+
+**Confirmed 14 October 2026.** When removing a junior from family management, give the parent options to disable/remove the junior sign-in while keeping their round history, or delete the profile and its history.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
