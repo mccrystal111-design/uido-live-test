@@ -39,3 +39,8 @@
 ### Start Round Q&A — Two multi-player states (confirmed 14 October 2026)
 - Create an Add Player popup with Player Name, Handicap, and Tee.
 - Create a separate Start Round state showing all four players together, including their selected tees, to demonstrate the completed group layout.
+
+
+### Round recovery Q&A — Immediate resume on app open (confirmed 14 October 2026)
+- If an unfinished round exists when Kite opens, return the golfer straight to that round.
+- Avoid a recurring “Resume round?” prompt; the golfer can choose to close or leave the round from the round flow.
