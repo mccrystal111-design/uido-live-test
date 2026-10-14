@@ -128,3 +128,7 @@ This is a structural screen and interaction gap check from Figma frame/layer ins
 
 ### Round recovery — Resume interrupted round
 - **Resume state is not shown.** An in-progress round should always remain resumable, including after Kite closes or the phone restarts. Retain current round state and offer resume when the app reopens.
+
+
+### Round recovery — Immediate resume behavior
+- When Kite opens with an unfinished round, take the golfer straight back into it rather than showing a recurring resume prompt. Let the golfer choose to close or leave it from the round flow; preserve resumability.
