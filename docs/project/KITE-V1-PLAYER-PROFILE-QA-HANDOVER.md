@@ -56,7 +56,7 @@ Do not edit Figma or run GitHub Actions unless explicitly requested. Any later v
 - Developer Notes specify that profile sections expand in place and contain their own Save/Cancel controls. Profile data shown in the design is illustrative; implementation must connect it to the selected player record.
 - Existing Core decisions preserve relevant equipment and club/carry history. A bag/default change must not rewrite historical shots or saved rounds.
 - Tee changes affect course/playing yardages only; they must not reset personal club distances or regenerate a saved bag.
-- Adult Kite V1 only; junior/family UI is future scope.
+- This handover focuses on the adult Player Profile editing screens. The separate family/junior Q&A defines additional features that the user has confirmed for the first Kite V1 release; do not treat those features as future scope.
 
 ## Figma comparison — inspected 14 October 2026
 
