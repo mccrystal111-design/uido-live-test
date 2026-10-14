@@ -71,6 +71,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** When creating the junior sign-in, the parent sets its initial password. The parent also manages later password changes and resets.
 
+### FQ-16 — Use an animal-themed junior username with a separate password
+
+**Confirmed 14 October 2026.** Make the junior username animal-themed. It remains separate from the password, which is set and managed by the parent.
+
 ## Open questions
 
 1. Decide whether a junior profile created during round setup is saved to the family account immediately, or only after the round is saved.
