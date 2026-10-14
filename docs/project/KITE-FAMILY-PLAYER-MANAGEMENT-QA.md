@@ -199,6 +199,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** The parent can view and edit everything in the junior’s family profile, including profile details, golf settings, round history, and scorecards. This includes viewing and editing past scorecards.
 
+### FQ-48 — Junior profile converts to adult profile with history retained
+
+**Confirmed 14 October 2026.** When the junior grows up, convert their existing profile to an adult profile and keep their round history.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
