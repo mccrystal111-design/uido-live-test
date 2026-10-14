@@ -57,3 +57,10 @@
 - `445:24` currently presents a recurring “Resume Your Round?” prompt. This conflicts with the confirmed behavior: reopen directly into an unfinished round without a recurring prompt. Treat `445:24` as needing revision/removal.
 - One family/junior screen, `445:25` Junior Laptop Dashboard, remains on the Product UI page. Confirm whether this is intentionally retained; other family/junior flow frames are no longer present.
 - The remaining dashboard uses a plain yellow “KITE” text header and does not match the existing logo lockup; align it with the locked Kite brand if it remains in scope. Read-only review; no Figma edits made.
+
+
+### Adult multi-player flow remains in scope after family-screen cleanup (confirmed 14 October 2026)
+- Keep the Start Round **Add Player popup** in the adult V1 build. Include Player Name, Handicap, and Tee; allow additions up to four total players.
+- Keep a populated **four-player Start Round state** showing the group and each player's tee.
+- Keep a **four-player Round Complete / End Round state** with results for each player and access to the joint scorecard, modeled on the existing single-player completion card.
+- These adult round screens are separate from family roster and junior-management screens, which are being reworked through the family/junior Q&A.
