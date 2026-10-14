@@ -139,6 +139,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** Either the account-owning parent or an equally privileged co-parent can invite or remove a co-parent or guardian.
 
+### FQ-33 — Co-parent access is granted immediately
+
+**Confirmed 14 October 2026.** When a parent adds a co-parent or guardian, family access is granted immediately; the new co-parent does not need to accept an invitation first.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
