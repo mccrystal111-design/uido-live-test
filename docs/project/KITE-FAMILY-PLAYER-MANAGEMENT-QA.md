@@ -75,8 +75,12 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** Make the junior username animal-themed. It remains separate from the password, which is set and managed by the parent.
 
+### FQ-17 — Junior profile persists if the round is cancelled
+
+**Confirmed 14 October 2026.** If a parent creates a junior profile during round setup and then cancels the round, keep the junior profile in the family account.
+
 ## Open questions
 
-1. Decide whether a junior profile created during round setup is saved to the family account immediately, or only after the round is saved.
+1. Decide whether the parent chooses the animal-themed username or Kite suggests/generates it.
 2. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
 3. Continue one focused question at a time on adding, editing, switching, and managing family player profiles.
