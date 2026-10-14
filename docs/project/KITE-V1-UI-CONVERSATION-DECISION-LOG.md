@@ -20,3 +20,7 @@
 ### End Round Q&A — Up to four player result card (confirmed 14 October 2026)
 - For a group round, show one End Round state card with a result summary for each player, supporting up to four players.
 - Base the layout on the existing single-player End Round card and provide a way to open the full joint scorecard.
+
+
+### Round recovery Q&A — Keep round when save fails (confirmed 14 October 2026)
+- If saving a round fails, keep the round and entered scores on the device so the golfer can retry saving later without losing their work.
