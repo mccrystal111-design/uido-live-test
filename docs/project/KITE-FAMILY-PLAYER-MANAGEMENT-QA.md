@@ -131,6 +131,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** A co-parent or guardian can help manage the family account and junior profiles.
 
+### FQ-31 — Co-parent has the same management access as the account owner
+
+**Confirmed 14 October 2026.** A co-parent or guardian who is granted family access has the same management permissions as the account-owning parent.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
