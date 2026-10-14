@@ -5,7 +5,7 @@
 
 ## Scope
 
-This Q&A records the family and multi-player management direction following the user's request to continue beyond the adult V1 Player Profile work. The project decision log previously kept junior/family UI as future scope for adult V1 curation. This Q&A does not, by itself, change that delivery scope or revise existing decisions.
+This Q&A records the family and multi-player management direction following the user's request to continue beyond the adult V1 Player Profile work. The project decision log previously kept junior/family UI as future scope for adult V1 curation. The user has since confirmed that the first Kite V1 release should include a defined family/junior feature set; this Q&A will establish that scope before those screens are treated as ready to build.
 
 Preserve the established product model: Kite is one app for adult and junior players; a family/account can contain multiple player profiles; the parent can switch between players and track a child's shots and rounds; the child can use the same app independently; do not create a separate kids mode.
 
@@ -243,3 +243,8 @@ Preserve the established product model: Kite is one app for adult and junior pla
 | **Stringball** | Let players enter the string allowance from their handicap/rules, then record when and how much string is used to move a ball; show remaining string. | Measure the distance between the original and replacement ball locations from GPS points and subtract it from the remaining allowance. | Player confirms the move and starting/ending locations; GPS accuracy and a clear measurement method matter. The game’s allowance and end-of-round rules must be chosen. |
 
 **Shared GPS design principle:** use course and pin locations to make distances, hole transitions, shot mapping, and proximity comparisons easier. Treat GPS as a measurement and context aid, not an authority for judging game events. Preserve manual score/event confirmation and make the rules variant explicit. Where a candidate needs shot tracking, reuse the existing round shot/score workflow where possible; do not imply that GPS alone verifies a ball landed on the green, was holed, or won a hole.
+
+
+### FQ-54 — First Kite V1 release includes a defined family/junior feature set
+
+**Confirmed 14 October 2026.** Family and junior functionality should be included in the first Kite V1 release as a defined feature set. The exact scope and screens must be established through this Q&A before the family/junior designs are considered ready to build.
