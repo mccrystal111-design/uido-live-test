@@ -34,3 +34,8 @@
 ### Player Profile Q&A — Club categories belong in setup popups (confirmed 14 October 2026)
 - Supersedes the earlier proposal to group the Manage Bag list under Woods, Hybrids, Irons, and Wedges.
 - Keep the main bag list ungrouped for easier navigation. Present club categories as options within the Add Club popup and bag setup popups.
+
+
+### Start Round Q&A — Add Player popup and four-player overview states (confirmed 14 October 2026)
+- Build two Start Round design states: (1) the existing round setup with an Add Player popup containing Player Name, Handicap, and Tee; (2) the round setup populated with four players to show the group layout.
+- Keep the four-player state within the four-player maximum and show each player's tee. Use one shared scoring format for the round, as already decided.
