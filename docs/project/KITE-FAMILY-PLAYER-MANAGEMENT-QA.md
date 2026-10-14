@@ -95,6 +95,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** When removing a junior from family management, give the parent options to disable/remove the junior sign-in while keeping their round history, or delete the profile and its history.
 
+### FQ-22 — Parent alone can change a junior’s handicap
+
+**Confirmed 14 October 2026.** Only the parent can change the junior’s handicap.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
