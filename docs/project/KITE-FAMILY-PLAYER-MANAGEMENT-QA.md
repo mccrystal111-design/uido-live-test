@@ -203,6 +203,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** When the junior grows up, convert their existing profile to an adult profile and keep their round history.
 
+### FQ-49 — Converted adult profile becomes a separate account
+
+**Confirmed 14 October 2026.** After conversion from a junior profile, the adult profile becomes a separate account rather than remaining linked to the parent’s family account. Round history is retained as decided in FQ-48.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
