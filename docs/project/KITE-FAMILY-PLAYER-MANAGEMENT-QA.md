@@ -99,6 +99,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** Only the parent can change the junior’s handicap.
 
+### FQ-23 — Junior uses parent-chosen username and animal PIN
+
+**Confirmed 14 October 2026.** The junior signs in with a username chosen by the parent and the four-animal PIN. The username is not animal-themed.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
