@@ -124,3 +124,7 @@ This is a structural screen and interaction gap check from Figma frame/layer ins
 
 ### Round recovery — Save failure
 - **Save failure/retry state is not shown.** Preserve the round and entered scores on the device after a save failure and provide a clear retry path so the golfer does not lose their work.
+
+
+### Round recovery — Resume interrupted round
+- **Resume state is not shown.** An in-progress round should always remain resumable, including after Kite closes or the phone restarts. Retain current round state and offer resume when the app reopens.
