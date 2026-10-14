@@ -1,7 +1,7 @@
 
 
-### Profile Q&A — Club removal and bag count (confirmed 14 October 2026)
-- Removing a club from the bag uses a confirmation pop-up.
-- Show the number of clubs in the bag (for example, “12 clubs”) as the bag changes. No maximum-count denominator has been specified.
-- Removing a club from the active bag must not erase its retained club/shot history.
+### Profile Q&A — Club-count maximum clarification (confirmed 14 October 2026)
+- **Correction to the preceding club-removal and bag-count note:** the bag may contain up to **13 clubs plus a putter**.
+- Show the count against the 13-club allowance (for example, **12/13**) and account for the putter separately.
+- This supersedes the earlier note that no maximum-count denominator had been specified.
 - Detailed Figma state still requires build and visual QA; no Figma/app changes or GitHub Actions.
