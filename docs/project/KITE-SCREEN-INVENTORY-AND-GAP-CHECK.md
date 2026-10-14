@@ -12,7 +12,7 @@ The existing file contains a substantial adult Kite V1 product flow: entry/authe
 
 The new joint scorecard frame is present and lays out four players across 18 holes, with round totals and round statistics. This closes an important **four-player scorecard display** gap.
 
-The family/player flow is still missing its connective screens: family roster, player switching/selection, adding a junior or guest, multi-player setup with a tee for each player, the junior laptop dashboard and junior sign-in states. The current End Round screen is still a single-player summary. The confirmed update is one similar group state card with result summaries for up to four players and a way to open the joint scorecard.
+The family/player flow is part of the first Kite V1 release. Its connective screens are still missing or incomplete: family roster, player switching/selection, adding a junior or guest, multi-player setup with a tee for each player, junior laptop dashboard and junior sign-in states. The current End Round screen is still a single-player summary. The confirmed update is one similar group state card with result summaries for up to four players and a way to open the joint scorecard.
 
 ## Screens and states already in Figma
 
@@ -105,11 +105,11 @@ The bag design already shows the 13-club count plus separate putter, carry/total
 - **Carry-change confirmation is not shown.** Add the confirmed prompt/state for updating the total after carry changes.
 - **Club-limit warning popup is not shown.** The agreed bag count is 13 non-putter clubs plus a separate putter. When exceeding the competition limit, show a non-blocking reminder that the Rules of Golf allow 14 clubs total including the putter; adding the club is not prevented.
 
-### Later, not a blocker for the first family-player screens
+### Unresolved or exploratory family-player decisions
 
 - Adult conversion flow: parent starts and completes the transfer when ready; preserve round history; create a separate adult account managed by its owner. The parent’s access after separation is still unanswered.
 - Future “fun” scoring formats and rules remain undecided.
-- Full co-parent/account-link management can be kept as a small extension to the family roster: an adult with an existing Kite account can be added to a family profile; a no-account adult is a guest. Avoid creating an unlinked guardian-management subsystem.
+- Full co-parent/account-link management is in the confirmed V1 family scope and can be kept as a small extension to the family roster: an adult with an existing Kite account can be added to a family profile; a no-account adult is a guest. Avoid creating an unlinked guardian-management subsystem.
 
 ## Suggested first build slice
 
