@@ -219,6 +219,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** The parent starts the transfer from the junior profile to a separate adult account. The other person confirms it as part of the transfer.
 
+### FQ-53 — Parent can complete adult-account transfer without junior confirmation
+
+**Confirmed 14 October 2026.** The parent can complete the transfer from junior profile to adult account without requiring the junior to confirm it. This clarifies FQ-51: the parent starts and completes the transfer when the junior is ready; junior confirmation is not a required step.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
