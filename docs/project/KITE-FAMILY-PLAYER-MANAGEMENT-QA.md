@@ -47,7 +47,11 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** A single round can include both adult and junior players.
 
+### FQ-10 — Junior mode applies to the whole mixed round
+
+**Confirmed 14 October 2026.** If adult and junior players are included together, junior mode applies to the entire round, not only the junior participant.
+
 ## Open questions
 
-1. In a mixed round, decide whether junior mode applies to the whole round or only to the junior player's experience/settings.
+1. In a mixed round, decide whether each player can use their own tee or the whole group must use one tee.
 2. Continue one focused question at a time on adding, editing, switching, and managing family player profiles.
