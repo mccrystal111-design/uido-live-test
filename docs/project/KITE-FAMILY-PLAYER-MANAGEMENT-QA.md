@@ -23,7 +23,11 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** The parent can create a username for the junior. The junior does not need their own email address.
 
+### FQ-04 — Parent manages junior password changes and resets
+
+**Confirmed 14 October 2026.** The parent manages all password changes and resets for the junior sign-in.
+
 ## Open questions
 
-1. Decide who controls the junior's password: can the junior change it, or does the parent manage resets and changes?
+1. Decide which name is displayed for the junior in the family player list and dashboard: real name or a chosen display name/nickname.
 2. Continue one focused question at a time on adding, editing, switching, and managing family player profiles.
