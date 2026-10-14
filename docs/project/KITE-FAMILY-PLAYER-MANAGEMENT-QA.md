@@ -225,5 +225,18 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 ## Open questions
 
-1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
+1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided. Candidate games and GPS opportunities are listed below.
 2. Continue one focused question at a time on adding, editing, switching, and managing family player profiles.
+
+## Fun scoring candidates and GPS opportunities
+
+**Status: exploratory shortlist only — not a confirmed V1 feature or final ruleset.** Inspired by [Stonegate Golf’s family golf games](https://www.stonegategolf.com/blog/38-fun-family-golf-games-on-the-course).
+
+| Candidate | Possible in-app scoring flow | How GPS can help | What still needs player input |
+| --- | --- | --- | --- |
+| **Bingo Bango Bongo** | Award a point for first onto the green, closest to the pin once all balls are on, and first holed. Show the three point opportunities per hole. | Track each player’s shot locations and distance to the pin; use the pin location to compare proximity. GPS can provide distance context and a suggested closest ball. | Confirm who reached the green first and who holed first. GPS alone cannot reliably establish event order or that a ball is holed; players confirm each event. |
+| **Rabbit** | Track who wins each hole under the chosen hole-scoring rule; the Rabbit is claimed, retained, or released on a tie according to the selected rules. Show current holder and running Rabbit points. | Measure/record each player’s shots and hole location, support hole-by-hole score entry, and calculate net results using each player’s handicap. | Enter/confirm strokes and resolve ties. The Rabbit capture/retention rule must be selected before implementation. |
+| **Six Six Six** | Divide an 18-hole round into three six-hole blocks and rotate pairings/teams at holes 1, 7, and 13; calculate each block’s team result. | Identify holes and block boundaries from the course/round, and capture the same hole scores already used by the scorecard. | Choose or confirm the pairing and scoring rule for each block; GPS adds little to team selection itself. |
+| **Wolf** | Rotate the Wolf by tee order; before play on each hole, record the Wolf’s partner choice or lone-wolf choice, then calculate that hole’s team result. | Provide hole and tee context, turn order prompts, and the hole scores used for the result. | Record the partner/lone-wolf choice before play and confirm any variant rules. GPS cannot infer the choice. |
+
+**Shared GPS design principle:** use course and pin locations to make distances, hole transitions, shot mapping, and proximity comparisons easier. Treat GPS as a measurement and context aid, not an authority for judging game events. Preserve manual score/event confirmation and make the rules variant explicit. Where a candidate needs shot tracking, reuse the existing round shot/score workflow where possible; do not imply that GPS alone verifies a ball landed on the green, was holed, or won a hole.
