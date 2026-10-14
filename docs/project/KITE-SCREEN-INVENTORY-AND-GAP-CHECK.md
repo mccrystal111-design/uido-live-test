@@ -92,7 +92,7 @@ The bag design already shows the 13-club count plus separate putter, carry/total
 3. **Add/select player flow.** Start Round has an Add / Select Player control, but no picker for saved family profiles or saved guests, no add-existing-Kite-account-to-family-profile state, and no reusable guest name/handicap create/edit state.
 4. **Create junior while setting up a round.** No inline junior profile form exists. The junior profile must remain saved if round setup is cancelled.
 5. **Junior sign-in and account setup.** Existing auth is email/account oriented. Missing junior-specific parent-created username, parent-set password, junior-chosen four-animal PIN setup, and parent-managed password/PIN reset states.
-6. **Junior laptop dashboard.** No desktop/laptop frame exists for the junior’s display name, points, badges, current handicap, past rounds, and scorecards. Junior can see all participants’ scores but cannot edit saved scorecards.
+6. **Junior laptop dashboard.** A frame exists at `445:25`, but the user reports removing the family/junior screen set; this is the lone family/junior frame still on the page and its retention needs confirmation. If retained, it must show the agreed dashboard content and use the locked Kite logo and palette. Junior can see all participants’ scores but cannot edit saved scorecards.
 7. **Multi-player Start Round.** Current Start Round shows one current player and one Add / Select Player control. Build two states: an Add Player popup with Player Name, Handicap, and Tee; and a separate Start Round screen showing all four players together. The four-player state needs each player's tee and one shared scoring format.
 8. **Multi-player End Round.** Current End Round is headed “Your Round” and shows one player’s result. It needs a parent-facing saved-round summary for all participants, with access to the joint scorecard and score editing.
 9. **Junior profile management states.** The adult profile edit sections provide a useful base, but there are no family-selected junior profile states showing parent full access, junior edit permissions, and the different handicap permissions.
@@ -132,3 +132,4 @@ This is a structural screen and interaction gap check from Figma frame/layer ins
 
 ### Round recovery — Immediate resume behavior
 - When Kite opens with an unfinished round, take the golfer straight back into it rather than showing a recurring resume prompt. Let the golfer choose to close or leave it from the round flow; preserve resumability.
+- Current Figma frame `445:24` still shows a “Resume Your Round?” popup with a “Keep for Later” option; this conflicts with the confirmed immediate-resume behavior and needs revision/removal.
