@@ -211,6 +211,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** Once the junior profile has converted to a separate adult account, the account is managed by its owner rather than the parent.
 
+### FQ-51 — Adult conversion is a transfer completed by junior and parent
+
+**Confirmed 14 October 2026.** Converting the junior profile to an adult account is not automatic; the junior and parent complete a transfer when the junior is ready.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
