@@ -15,9 +15,13 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** The junior should be able to access a dashboard on a laptop to view their points, badges, and similar information. The junior's account/profile should remain under the parent's account.
 
-**Still open:** the access method is not yet decided—for example, parent sign-in followed by switching to the junior profile, or junior credentials managed/linked under the parent's account.
+### FQ-02 — Junior has a sign-in managed by the parent
+
+**Confirmed 14 October 2026.** The junior should have their own sign-in, managed by the parent, while the junior account/profile remains under the parent's account.
+
+**Still open:** the sign-in identifier and credential setup method have not yet been decided.
 
 ## Open questions
 
-1. Decide how the junior accesses their laptop dashboard while the account remains under the parent.
+1. Decide how the parent creates the junior's managed sign-in: child email, parent-managed username, or another approach.
 2. Continue one focused question at a time on adding, editing, switching, and managing family player profiles.
