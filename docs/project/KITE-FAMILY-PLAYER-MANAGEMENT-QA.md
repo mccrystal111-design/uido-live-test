@@ -31,7 +31,11 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** Show the junior's chosen display name or nickname in the family player list and junior dashboard.
 
+### FQ-06 — Junior sign-in is restricted to its own player profile
+
+**Confirmed 14 October 2026.** When signed in with the junior username, the junior can access only their own player profile and cannot switch to other family players.
+
 ## Open questions
 
-1. Decide whether the junior's sign-in can access only their own player profile, or can switch to other family players.
+1. Decide which junior profile details the junior can edit themselves, versus details reserved for parent management.
 2. Continue one focused question at a time on adding, editing, switching, and managing family player profiles.
