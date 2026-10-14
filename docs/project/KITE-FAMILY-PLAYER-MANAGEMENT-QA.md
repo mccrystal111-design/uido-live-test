@@ -19,9 +19,11 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** The junior should have their own sign-in, managed by the parent, while the junior account/profile remains under the parent's account.
 
-**Still open:** the sign-in identifier and credential setup method have not yet been decided.
+### FQ-03 — Parent-created username; junior email not required
+
+**Confirmed 14 October 2026.** The parent can create a username for the junior. The junior does not need their own email address.
 
 ## Open questions
 
-1. Decide how the parent creates the junior's managed sign-in: child email, parent-managed username, or another approach.
+1. Decide who controls the junior's password: can the junior change it, or does the parent manage resets and changes?
 2. Continue one focused question at a time on adding, editing, switching, and managing family player profiles.
