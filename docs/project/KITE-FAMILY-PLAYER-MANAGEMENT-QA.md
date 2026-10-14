@@ -39,7 +39,11 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** The junior can change their own chosen display name or nickname.
 
+### FQ-08 — Junior mode is selected for the round and lasts until the round is saved
+
+**Confirmed 14 October 2026.** When a junior is selected while adding a player, Kite switches into junior mode for that round. Junior mode remains in effect until that round is saved; it is not a persistent app-wide player context.
+
 ## Open questions
 
-1. Decide whether a parent's active-player switch applies across the app (Home, Stats, Scores, Profile and new rounds) or only to a selected round.
+1. Decide how junior mode behaves if adult and junior players are included in the same round: does it apply to the whole round or only the junior?
 2. Continue one focused question at a time on adding, editing, switching, and managing family player profiles.
