@@ -127,6 +127,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** The junior uses their own sign-in for the laptop dashboard only. Round setup and play are managed by the parent on the parent’s phone.
 
+### FQ-30 — Co-parent or guardian can help manage the family
+
+**Confirmed 14 October 2026.** A co-parent or guardian can help manage the family account and junior profiles.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
