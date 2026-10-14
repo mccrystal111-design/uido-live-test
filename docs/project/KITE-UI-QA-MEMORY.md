@@ -49,3 +49,11 @@
 ### Family/junior V1 scope clarification (confirmed 14 October 2026)
 - Treat all previously confirmed answers in `KITE-FAMILY-PLAYER-MANAGEMENT-QA.md` as requirements for the first Kite V1 release, unless explicitly marked exploratory or unresolved.
 - Do not re-ask already confirmed family/junior decisions as phase-scope questions.
+
+
+### Product UI review — family screen cleanup and adult popup states (checked 14 October 2026)
+- The user reports deleting the family/junior screens to avoid confusing scope, retaining adult screen states and requesting applicable states be presented as popups.
+- Current Product UI metadata shows adult popup states `445:22` Club Limit Reminder, `445:23` Round Save Failure, and `445:24` Resume Interrupted Round. Screenshots confirm the first two are overlays on existing adult screens.
+- `445:24` currently presents a recurring “Resume Your Round?” prompt. This conflicts with the confirmed behavior: reopen directly into an unfinished round without a recurring prompt. Treat `445:24` as needing revision/removal.
+- One family/junior screen, `445:25` Junior Laptop Dashboard, remains on the Product UI page. Confirm whether this is intentionally retained; other family/junior flow frames are no longer present.
+- The remaining dashboard uses a plain yellow “KITE” text header and does not match the existing logo lockup; align it with the locked Kite brand if it remains in scope. Read-only review; no Figma edits made.
