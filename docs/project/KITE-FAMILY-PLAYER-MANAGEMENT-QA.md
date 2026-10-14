@@ -111,6 +111,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** Both the parent and junior can manage the junior’s club list and carry distances.
 
+### FQ-26 — Both parent and junior can change home course and preferred tees
+
+**Confirmed 14 October 2026.** Both the parent and junior can change the junior’s home course and preferred tees.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
