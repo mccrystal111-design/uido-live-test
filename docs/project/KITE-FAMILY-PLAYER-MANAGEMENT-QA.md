@@ -43,7 +43,11 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** When a junior is selected while adding a player, Kite switches into junior mode for that round. Junior mode remains in effect until that round is saved; it is not a persistent app-wide player context.
 
+### FQ-09 — Adult and junior players can play in the same round
+
+**Confirmed 14 October 2026.** A single round can include both adult and junior players.
+
 ## Open questions
 
-1. Decide how junior mode behaves if adult and junior players are included in the same round: does it apply to the whole round or only the junior?
+1. In a mixed round, decide whether junior mode applies to the whole round or only to the junior player's experience/settings.
 2. Continue one focused question at a time on adding, editing, switching, and managing family player profiles.
