@@ -179,6 +179,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** The junior can view their own past rounds and scorecards on the laptop dashboard, in addition to points and badges.
 
+### FQ-43 — Junior can see all players’ scores on mixed-round scorecards
+
+**Confirmed 14 October 2026.** When viewing a mixed adult-and-junior round scorecard, the junior can see all players’ scores, not only their own.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
