@@ -143,6 +143,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** When a parent adds a co-parent or guardian, family access is granted immediately; the new co-parent does not need to accept an invitation first.
 
+### FQ-34 — Co-parent can be created as a dashboard profile and linked to Kite account if needed
+
+**Confirmed 14 October 2026.** A co-parent or guardian can be created as a parent profile within the family dashboard. That profile can be linked to a Kite account if needed.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
