@@ -5,7 +5,7 @@
 
 ## Scope
 
-This Q&A records the family and multi-player management direction following the user's request to continue beyond the adult V1 Player Profile work. The project decision log previously kept junior/family UI as future scope for adult V1 curation. The user has since confirmed that the first Kite V1 release should include a defined family/junior feature set, including the junior laptop dashboard; this Q&A will establish the remaining scope before those screens are treated as ready to build.
+This Q&A records the family and multi-player management direction following the user's request to continue beyond the adult V1 Player Profile work. The project decision log previously kept junior/family UI as future scope for adult V1 curation. The user has confirmed that the first Kite V1 release includes the defined family/junior feature set. All earlier confirmed answers in this Q&A apply to V1 unless explicitly marked exploratory or unresolved. The junior laptop dashboard is included. This Q&A is for defining and validating those V1 requirements before screens are treated as ready to build.
 
 Preserve the established product model: Kite is one app for adult and junior players; a family/account can contain multiple player profiles; the parent can switch between players and track a child's shots and rounds; the child can use the same app independently; do not create a separate kids mode.
 
@@ -253,3 +253,8 @@ Preserve the established product model: Kite is one app for adult and junior pla
 ### FQ-55 — Junior laptop dashboard is included in first Kite V1 release
 
 **Confirmed 14 October 2026.** The junior laptop dashboard is essential and should be included in the first Kite V1 release’s defined family/junior feature set.
+
+
+### FQ-56 — All prior confirmed family/junior answers apply to V1
+
+**Confirmed 14 October 2026.** All previously confirmed answers in this family/junior Q&A are intended for the first Kite V1 release, not a later phase. Continue to distinguish confirmed requirements from exploratory ideas and unresolved rules; do not re-ask confirmed V1 decisions as scope questions.
