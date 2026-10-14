@@ -32,7 +32,7 @@ Node IDs link to the corresponding Figma frame.
 | Scores — V1 | [302:121](https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI/UiDo?node-id=302-121) |
 | Stats — V1 | [302:5](https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI/UiDo?node-id=302-5) |
 
-The joint scorecard frame shows four player names/handicaps, four score columns, front and back nines, round totals, round statistics, and an End Round action.
+The joint scorecard frame shows four player names/handicaps, four score columns, front and back nines, round totals, round statistics, and an End Round action. The confirmed round cap is four total players, including the signed-in golfer; family players and saved guests count toward that cap.
 
 ### Player profile and bag states
 
