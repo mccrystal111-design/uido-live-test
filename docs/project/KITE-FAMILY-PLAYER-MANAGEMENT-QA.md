@@ -59,7 +59,12 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** All players in a mixed adult-and-junior round use the same scoring format, such as Stroke Play or Stableford.
 
+### FQ-13 — Standard formats use each player's own handicap
+
+**Confirmed 14 October 2026.** In standard Stroke Play or Stableford, apply each player's own handicap to their score.
+
 ## Open questions
 
-1. Decide whether each player uses their own handicap for scoring in a mixed round.
-2. Continue one focused question at a time on adding, editing, switching, and managing family player profiles.
+1. Decide how a parent creates a junior profile: in family/player management ahead of time, or inline while adding a player to a round.
+2. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
+3. Continue one focused question at a time on adding, editing, switching, and managing family player profiles.
