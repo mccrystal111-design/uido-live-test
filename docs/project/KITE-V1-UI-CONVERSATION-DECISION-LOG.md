@@ -15,3 +15,8 @@
 ### Start Round Q&A — Maximum four players (confirmed 14 October 2026)
 - Limit a round to four total players, counting the signed-in golfer and any selected family players or saved guests.
 - Match the Start Round participant cap to the existing joint scorecard for up to four players.
+
+
+### End Round Q&A — Up to four player result card (confirmed 14 October 2026)
+- For a group round, show one End Round state card with a result summary for each player, supporting up to four players.
+- Base the layout on the existing single-player End Round card and provide a way to open the full joint scorecard.
