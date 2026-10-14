@@ -1,6 +1,6 @@
 
 
-### Player Profile editing Q&A — Prompt when carry changes, confirmed 14 October 2026
-- When the golfer changes a club's carry distance, show a pop-up asking whether to change the total distance too.
-- Offer to update total using the new carry-based estimate or keep the current total (including a manually entered value); do not silently replace a manual total.
+### Player Profile editing Q&A — Newly added club starts blank, confirmed 14 October 2026
+- A newly added club starts with its carry distance blank and waits for the golfer to enter a value; do not prefill or invent a carry distance.
+- Once carry is entered, calculate and show the estimated total, while allowing manual total entry as already agreed.
 - Documentation only; no Figma edits, app/code changes, or GitHub Actions.
