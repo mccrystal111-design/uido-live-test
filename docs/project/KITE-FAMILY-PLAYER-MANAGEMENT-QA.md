@@ -151,6 +151,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** A co-parent profile in the family dashboard can be managed without linking it to a separate Kite sign-in.
 
+### FQ-36 — Co-parent can link their own Kite account
+
+**Confirmed 14 October 2026.** If a co-parent wants their own Kite sign-in later, they can connect their own Kite account to their existing family dashboard profile.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
