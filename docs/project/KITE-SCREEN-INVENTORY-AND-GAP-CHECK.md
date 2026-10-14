@@ -120,3 +120,7 @@ The bag design already shows the 13-club count plus separate putter, carry/total
 5. Design the junior sign-in and laptop dashboard states.
 
 This is a structural screen and interaction gap check from Figma frame/layer inspection and the current decision log. It is not a pixel-level visual QA review. No Figma changes or GitHub Actions were run.
+
+
+### Round recovery — Save failure
+- **Save failure/retry state is not shown.** Preserve the round and entered scores on the device after a save failure and provide a clear retry path so the golfer does not lose their work.
