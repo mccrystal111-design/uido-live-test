@@ -93,7 +93,7 @@ The bag design already shows the 13-club count plus separate putter, carry/total
 4. **Create junior while setting up a round.** No inline junior profile form exists. The junior profile must remain saved if round setup is cancelled.
 5. **Junior sign-in and account setup.** Existing auth is email/account oriented. Missing junior-specific parent-created username, parent-set password, junior-chosen four-animal PIN setup, and parent-managed password/PIN reset states.
 6. **Junior laptop dashboard.** No desktop/laptop frame exists for the junior’s display name, points, badges, current handicap, past rounds, and scorecards. Junior can see all participants’ scores but cannot edit saved scorecards.
-7. **Multi-player Start Round.** Current Start Round shows one current player and one Add / Select Player control. It has one Tee section at round level. The confirmed flow needs up to four players, a tee choice for each player, and one shared scoring format.
+7. **Multi-player Start Round.** Current Start Round shows one current player and one Add / Select Player control. Build two states: an Add Player popup with Player Name, Handicap, and Tee; and a separate Start Round screen showing all four players together. The four-player state needs each player's tee and one shared scoring format.
 8. **Multi-player End Round.** Current End Round is headed “Your Round” and shows one player’s result. It needs a parent-facing saved-round summary for all participants, with access to the joint scorecard and score editing.
 9. **Junior profile management states.** The adult profile edit sections provide a useful base, but there are no family-selected junior profile states showing parent full access, junior edit permissions, and the different handicap permissions.
 10. **Removal/deactivation of a junior profile.** No family-player removal confirmation offers the confirmed choices: remove sign-in and retain history, or delete the profile and history.
@@ -113,7 +113,7 @@ The bag design already shows the 13-club count plus separate putter, carry/total
 
 ## Suggested first build slice
 
-1. Add a family roster/player picker reachable from the existing Switch Player and Add / Select Player controls.
+1. Build the two Start Round states: Add Player popup (Player Name, Handicap, Tee) and the populated four-player overview.
 2. Design inline Add Junior and Add Guest states, including saved guest name and handicap.
 3. Expand Start Round to a maximum of four participants with per-player tee selection and one shared format.
 4. Use the existing four-player scorecard frame; update End Round to show all participants and parent edit access.
