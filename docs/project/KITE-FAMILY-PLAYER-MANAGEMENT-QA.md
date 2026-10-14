@@ -103,6 +103,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** The junior signs in with a username chosen by the parent and the four-animal PIN. The username is not animal-themed.
 
+### FQ-24 — Both parent and junior can change the display name
+
+**Confirmed 14 October 2026.** The junior can change their own display name, and the parent can change it as well.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
