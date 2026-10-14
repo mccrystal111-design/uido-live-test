@@ -171,6 +171,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** Save a guest’s handicap with their reusable name so it is available for future rounds.
 
+### FQ-41 — Saved guest name and handicap can be edited
+
+**Confirmed 14 October 2026.** A saved guest entry includes the guest’s name and handicap, and both can be edited for future rounds.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
