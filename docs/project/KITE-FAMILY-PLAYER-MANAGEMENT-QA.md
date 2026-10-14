@@ -195,6 +195,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** A parent’s change to a junior’s handicap applies to future rounds only. Previously saved rounds and scorecards keep the handicap and scores recorded at the time.
 
+### FQ-47 — Parent can view and edit the junior’s full profile and golf data
+
+**Confirmed 14 October 2026.** The parent can view and edit everything in the junior’s family profile, including profile details, golf settings, round history, and scorecards. This includes viewing and editing past scorecards.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
