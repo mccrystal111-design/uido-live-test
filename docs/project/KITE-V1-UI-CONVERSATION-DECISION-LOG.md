@@ -1,7 +1,6 @@
 
 
-### Player Profile editing Q&A — Club-count maximum clarification, confirmed 14 October 2026
-- **Correction to the preceding club-removal and bag-count decision:** the bag may contain up to **13 clubs plus a putter**.
-- Show the count against the 13-club allowance (for example, **12/13**) and account for the putter separately.
-- The earlier statement that no maximum-count denominator had been specified is superseded.
+### Player Profile editing Q&A — Bag list grouped by club category, confirmed 14 October 2026
+- Organise the manageable club list into categories: **Woods, Hybrids, Irons, and Wedges**, with each club listed under its category.
+- Preserve the confirmed allowance of up to 13 clubs plus a putter; the putter's placement in the category list remains to be clarified.
 - Documentation only; no Figma edits, app/code changes, or GitHub Actions.
