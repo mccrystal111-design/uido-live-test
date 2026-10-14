@@ -183,6 +183,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** When viewing a mixed adult-and-junior round scorecard, the junior can see all players’ scores, not only their own.
 
+### FQ-44 — Junior dashboard scorecards are view-only
+
+**Confirmed 14 October 2026.** The junior can view saved scorecards from the laptop dashboard but cannot edit them. The parent handles scorecard changes.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
