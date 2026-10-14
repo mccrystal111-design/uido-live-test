@@ -24,3 +24,8 @@
 
 ### Round recovery Q&A — Keep round when save fails (confirmed 14 October 2026)
 - If saving a round fails, keep the round and entered scores on the device so the golfer can retry saving later without losing their work.
+
+
+### Round recovery Q&A — In-progress round always resumable (confirmed 14 October 2026)
+- Keep an in-progress round in a resumable state throughout play. If Kite closes or the phone restarts, retain the round so the golfer can resume when they reopen the app.
+- This complements the save-failure decision: preserve the round and entered scores locally if saving fails, with a retry path.
