@@ -29,3 +29,8 @@
 ### Round recovery Q&A — In-progress round always resumable (confirmed 14 October 2026)
 - Keep an in-progress round in a resumable state throughout play. If Kite closes or the phone restarts, retain the round so the golfer can resume when they reopen the app.
 - This complements the save-failure decision: preserve the round and entered scores locally if saving fails, with a retry path.
+
+
+### Player Profile Q&A — Club categories belong in setup popups (confirmed 14 October 2026)
+- Supersedes the earlier proposal to group the Manage Bag list under Woods, Hybrids, Irons, and Wedges.
+- Keep the main bag list ungrouped for easier navigation. Present club categories as options within the Add Club popup and bag setup popups.
