@@ -34,3 +34,8 @@
 ### Profile Q&A — Club categories in popups (confirmed 14 October 2026)
 - Keep the main Manage Bag club list ungrouped.
 - Offer club categories within Add Club and bag setup popups to make navigation easier. This supersedes the earlier grouped-list proposal.
+
+
+### Start Round Q&A — Two multi-player states (confirmed 14 October 2026)
+- Create an Add Player popup with Player Name, Handicap, and Tee.
+- Create a separate Start Round state showing all four players together, including their selected tees, to demonstrate the completed group layout.
