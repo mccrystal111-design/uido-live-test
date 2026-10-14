@@ -51,7 +51,11 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** If adult and junior players are included together, junior mode applies to the entire round, not only the junior participant.
 
+### FQ-11 — Each player in a mixed round chooses their own tee
+
+**Confirmed 14 October 2026.** In a round with adults and juniors, each player can choose their own tee.
+
 ## Open questions
 
-1. In a mixed round, decide whether each player can use their own tee or the whole group must use one tee.
+1. Decide whether Stroke Play / Stableford is chosen once for the whole round or separately by each player.
 2. Continue one focused question at a time on adding, editing, switching, and managing family player profiles.
