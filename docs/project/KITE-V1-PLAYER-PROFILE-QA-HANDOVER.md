@@ -40,7 +40,8 @@ Do not edit Figma or run GitHub Actions unless explicitly requested. Any later v
 ### Clubs & carry distances / Manage bag
 - Use a compact editable bag list for quick changes, with each club row opening detailed controls.
 - Group the club list under **Woods, Hybrids, Irons, and Wedges**, using Kite's curated club-type list.
-- Allow up to **13 clubs plus a putter**. Show the 13-club count, for example **12/13**; the putter is counted separately.
+- Allow up to **13 non-putter clubs plus a separately listed putter** in the bag. Show the non-putter count, for example **12/13**.
+- If the player attempts to exceed the competition limit, show a warning popup that the Rules of Golf allow no more than **14 clubs total, including the putter** (Rule 4.1b). This is a reminder, not a hard block; do not prevent adding the club. [USGA Rules FAQ](https://www.usga.org/RulesFAQ/rules_answer.asp?FAQidx=246&Rule=0&Topic=9).
 - Include the putter automatically during initial setup and display it as its own row. Do not show carry or total fields for the putter.
 - For other clubs, detailed controls include club type, carry distance, and total distance. Carry is the primary value.
 - Estimate total automatically from carry and clearly identify estimated values. Allow manual total entry.
