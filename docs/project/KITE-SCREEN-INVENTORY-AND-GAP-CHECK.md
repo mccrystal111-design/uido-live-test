@@ -103,7 +103,7 @@ The bag design already shows the 13-club count plus separate putter, carry/total
 - **Club category organization is not visible** in the current Manage Bag list. The agreed listing uses Woods, Hybrids, Irons, and Wedges categories, followed by the clubs in each category.
 - **Existing club carry/total editor state is not shown.** The add-club popup supports blank carry, estimated total, and manual total; a detailed edit state is still needed for existing club rows.
 - **Carry-change confirmation is not shown.** Add the confirmed prompt/state for updating the total after carry changes.
-- **Maximum-count state is not shown.** The file shows 13/13 and an add popup at 12/13, but not the behavior when trying to add a fourteenth non-putter club. Limit remains 13 clubs plus a separate putter.
+- **Club-limit warning popup is not shown.** The agreed bag count is 13 non-putter clubs plus a separate putter. When exceeding the competition limit, show a non-blocking reminder that the Rules of Golf allow 14 clubs total including the putter; adding the club is not prevented.
 
 ### Later, not a blocker for the first family-player screens
 
