@@ -12,7 +12,7 @@ The existing file contains a substantial adult Kite V1 product flow: entry/authe
 
 The new joint scorecard frame is present and lays out four players across 18 holes, with round totals and round statistics. This closes an important **four-player scorecard display** gap.
 
-The family/player flow is still missing its connective screens: family roster, player switching/selection, adding a junior or guest, multi-player setup with a tee for each player, the junior laptop dashboard and junior sign-in states. The current End Round screen is still a single-player summary.
+The family/player flow is still missing its connective screens: family roster, player switching/selection, adding a junior or guest, multi-player setup with a tee for each player, the junior laptop dashboard and junior sign-in states. The current End Round screen is still a single-player summary. The confirmed update is one similar group state card with result summaries for up to four players and a way to open the joint scorecard.
 
 ## Screens and states already in Figma
 
