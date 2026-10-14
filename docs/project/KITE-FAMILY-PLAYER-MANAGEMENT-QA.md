@@ -107,6 +107,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** The junior can change their own display name, and the parent can change it as well.
 
+### FQ-25 — Both parent and junior can manage clubs and carry distances
+
+**Confirmed 14 October 2026.** Both the parent and junior can manage the junior’s club list and carry distances.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
