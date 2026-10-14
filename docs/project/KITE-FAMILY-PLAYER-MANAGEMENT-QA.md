@@ -163,6 +163,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** A guest is a name that can be selected again as a previously selected player in a later round; the guest does not need a Kite account.
 
+### FQ-39 — Parent can enter a guest’s handicap
+
+**Confirmed 14 October 2026.** When adding a guest player to a round, the parent can enter that player’s handicap so the round scoring can use it.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
