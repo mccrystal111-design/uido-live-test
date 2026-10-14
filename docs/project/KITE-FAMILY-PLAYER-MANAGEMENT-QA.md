@@ -191,6 +191,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** The junior can see their current handicap on the laptop dashboard. Only the parent can change it.
 
+### FQ-46 — Handicap changes apply to future rounds only
+
+**Confirmed 14 October 2026.** A parent’s change to a junior’s handicap applies to future rounds only. Previously saved rounds and scorecards keep the handicap and scores recorded at the time.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
