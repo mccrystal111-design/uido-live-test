@@ -67,8 +67,12 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** The parent can create a junior profile inline as part of adding a player to a round, rather than needing to create it beforehand in family/player management.
 
+### FQ-15 — Parent sets the initial junior password
+
+**Confirmed 14 October 2026.** When creating the junior sign-in, the parent sets its initial password. The parent also manages later password changes and resets.
+
 ## Open questions
 
-1. Decide how the parent sets the initial password for a new junior sign-in.
+1. Decide whether a junior profile created during round setup is saved to the family account immediately, or only after the round is saved.
 2. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
 3. Continue one focused question at a time on adding, editing, switching, and managing family player profiles.
