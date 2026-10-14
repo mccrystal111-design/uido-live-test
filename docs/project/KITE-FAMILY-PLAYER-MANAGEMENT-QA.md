@@ -175,6 +175,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** A saved guest entry includes the guest’s name and handicap, and both can be edited for future rounds.
 
+### FQ-42 — Junior dashboard shows past rounds and scorecards
+
+**Confirmed 14 October 2026.** The junior can view their own past rounds and scorecards on the laptop dashboard, in addition to points and badges.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
