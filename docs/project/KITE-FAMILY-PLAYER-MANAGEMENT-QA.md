@@ -5,7 +5,7 @@
 
 ## Scope
 
-This Q&A records the family and multi-player management direction following the user's request to continue beyond the adult V1 Player Profile work. The project decision log previously kept junior/family UI as future scope for adult V1 curation. The user has since confirmed that the first Kite V1 release should include a defined family/junior feature set; this Q&A will establish that scope before those screens are treated as ready to build.
+This Q&A records the family and multi-player management direction following the user's request to continue beyond the adult V1 Player Profile work. The project decision log previously kept junior/family UI as future scope for adult V1 curation. The user has since confirmed that the first Kite V1 release should include a defined family/junior feature set, including the junior laptop dashboard; this Q&A will establish the remaining scope before those screens are treated as ready to build.
 
 Preserve the established product model: Kite is one app for adult and junior players; a family/account can contain multiple player profiles; the parent can switch between players and track a child's shots and rounds; the child can use the same app independently; do not create a separate kids mode.
 
@@ -248,3 +248,8 @@ Preserve the established product model: Kite is one app for adult and junior pla
 ### FQ-54 — First Kite V1 release includes a defined family/junior feature set
 
 **Confirmed 14 October 2026.** Family and junior functionality should be included in the first Kite V1 release as a defined feature set. The exact scope and screens must be established through this Q&A before the family/junior designs are considered ready to build.
+
+
+### FQ-55 — Junior laptop dashboard is included in first Kite V1 release
+
+**Confirmed 14 October 2026.** The junior laptop dashboard is essential and should be included in the first Kite V1 release’s defined family/junior feature set.
