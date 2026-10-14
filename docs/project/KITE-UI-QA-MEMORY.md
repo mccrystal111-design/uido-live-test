@@ -1,7 +1,6 @@
 
 
-### Profile Q&A — Estimated and manual total distance (confirmed 14 October 2026)
-- Calculate the club's total distance automatically as an estimate from its carry distance.
-- Allow the golfer to enter a manual total distance, clearly distinguished from an estimate.
-- When carry changes, update the estimated total automatically; manual entry remains available.
+### Profile Q&A — Prompt when carry changes (confirmed 14 October 2026)
+- When the golfer changes a club's carry distance, show a pop-up asking whether to change total distance too.
+- Offer to update total using the new carry-based estimate or keep the current total, including a manually entered value; do not silently replace a manual total.
 - Detailed Figma state still requires build and visual QA; no Figma/app changes or GitHub Actions.
