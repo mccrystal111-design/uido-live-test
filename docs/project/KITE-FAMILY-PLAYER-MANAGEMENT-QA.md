@@ -55,7 +55,11 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** In a round with adults and juniors, each player can choose their own tee.
 
+### FQ-12 — Mixed round uses one scoring format
+
+**Confirmed 14 October 2026.** All players in a mixed adult-and-junior round use the same scoring format, such as Stroke Play or Stableford.
+
 ## Open questions
 
-1. Decide whether Stroke Play / Stableford is chosen once for the whole round or separately by each player.
+1. Decide whether each player uses their own handicap for scoring in a mixed round.
 2. Continue one focused question at a time on adding, editing, switching, and managing family player profiles.
