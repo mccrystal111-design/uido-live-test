@@ -61,7 +61,7 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 ### FQ-13 — Standard formats use each player's own handicap
 
-**Confirmed 14 October 2026.** In standard Stroke Play or Stableford, apply each player's own handicap to their score.
+**Confirmed 14 October 2026.** In standard Stroke Play or Stableford, apply each player's own handicap to their score. Future “fun” scoring methods may be offered; their formats and rules remain undecided.
 
 ### FQ-14 — Parent can create a junior profile while adding them to a round
 
@@ -71,9 +71,9 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** When creating the junior sign-in, the parent sets its initial password. The parent also manages later password changes and resets.
 
-### FQ-16 — Use an animal-themed junior username with a separate password
+### FQ-16 — Animal PIN is an additional junior sign-in element
 
-**Confirmed 14 October 2026.** Make the junior username animal-themed. It remains separate from the password, which is set and managed by the parent.
+**Confirmed 14 October 2026.** Use an animal-based PIN where each animal represents a number. The animal PIN is used in addition to the regular password; it does not replace the password.
 
 ### FQ-17 — Junior profile persists if the round is cancelled
 
@@ -81,6 +81,6 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 ## Open questions
 
-1. Decide whether the parent chooses the animal-themed username or Kite suggests/generates it.
+1. Decide when the junior enters the animal PIN in the sign-in flow.
 2. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
 3. Continue one focused question at a time on adding, editing, switching, and managing family player profiles.
