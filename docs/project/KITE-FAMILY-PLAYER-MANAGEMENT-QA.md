@@ -79,8 +79,12 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** If a parent creates a junior profile during round setup and then cancels the round, keep the junior profile in the family account.
 
+### FQ-18 — Junior enters the animal PIN at every sign-in
+
+**Confirmed 14 October 2026.** The junior enters their animal PIN every time they sign in, alongside the regular password.
+
 ## Open questions
 
-1. Decide when the junior enters the animal PIN in the sign-in flow.
+1. Decide the number of animal selections in the PIN.
 2. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
 3. Continue one focused question at a time on adding, editing, switching, and managing family player profiles.
