@@ -87,8 +87,11 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** The junior animal PIN uses a sequence of four animals, with each animal representing a number.
 
+### FQ-20 — Junior chooses their animal PIN
+
+**Confirmed 14 October 2026.** The junior chooses their four-animal PIN sequence. The parent remains responsible for managing PIN resets.
+
 ## Open questions
 
-1. Decide who chooses the junior's four-animal PIN.
-2. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
-3. Continue one focused question at a time on adding, editing, switching, and managing family player profiles.
+1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
+2. Continue one focused question at a time on adding, editing, switching, and managing family player profiles.
