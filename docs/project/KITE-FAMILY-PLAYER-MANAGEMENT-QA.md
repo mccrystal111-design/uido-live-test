@@ -35,7 +35,11 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** When signed in with the junior username, the junior can access only their own player profile and cannot switch to other family players.
 
+### FQ-07 — Junior can change their own display name
+
+**Confirmed 14 October 2026.** The junior can change their own chosen display name or nickname.
+
 ## Open questions
 
-1. Decide which junior profile details the junior can edit themselves, versus details reserved for parent management.
+1. Decide whether a parent's active-player switch applies across the app (Home, Stats, Scores, Profile and new rounds) or only to a selected round.
 2. Continue one focused question at a time on adding, editing, switching, and managing family player profiles.
