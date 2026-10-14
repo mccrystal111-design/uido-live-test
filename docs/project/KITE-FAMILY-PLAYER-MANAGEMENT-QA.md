@@ -159,6 +159,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** An adult without a Kite profile is treated as a guest. An adult with an existing Kite account can be added to a family profile, which gives them access to manage the family profile. This clarifies the co-parent discussion: the earlier idea of an unlinked co-parent profile independently managing family data is superseded. Equal co-parent management access and guardian management apply once a Kite account is added to the family profile.
 
+### FQ-38 — Guest players can be selected again by name
+
+**Confirmed 14 October 2026.** A guest is a name that can be selected again as a previously selected player in a later round; the guest does not need a Kite account.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
