@@ -167,6 +167,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** When adding a guest player to a round, the parent can enter that player’s handicap so the round scoring can use it.
 
+### FQ-40 — Save guest handicap with reusable name
+
+**Confirmed 14 October 2026.** Save a guest’s handicap with their reusable name so it is available for future rounds.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
