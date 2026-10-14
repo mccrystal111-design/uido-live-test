@@ -1,6 +1,6 @@
 
 
-### Player Profile editing Q&A — Newly added club starts blank, confirmed 14 October 2026
-- A newly added club starts with its carry distance blank and waits for the golfer to enter a value; do not prefill or invent a carry distance.
-- Once carry is entered, calculate and show the estimated total, while allowing manual total entry as already agreed.
+### Player Profile editing Q&A — Putter included in initial setup, confirmed 14 October 2026
+- Include the putter automatically in the golfer's bag during initial setup.
+- Show it as its own separate row in the bag list, outside the 13-club allowance.
 - Documentation only; no Figma edits, app/code changes, or GitHub Actions.
