@@ -27,7 +27,11 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** The parent manages all password changes and resets for the junior sign-in.
 
+### FQ-05 — Use a chosen display name or nickname
+
+**Confirmed 14 October 2026.** Show the junior's chosen display name or nickname in the family player list and junior dashboard.
+
 ## Open questions
 
-1. Decide which name is displayed for the junior in the family player list and dashboard: real name or a chosen display name/nickname.
+1. Decide whether the junior's sign-in can access only their own player profile, or can switch to other family players.
 2. Continue one focused question at a time on adding, editing, switching, and managing family player profiles.
