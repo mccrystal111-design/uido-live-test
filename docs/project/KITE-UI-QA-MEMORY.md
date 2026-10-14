@@ -44,3 +44,8 @@
 ### Round recovery Q&A — Immediate resume on app open (confirmed 14 October 2026)
 - If an unfinished round exists when Kite opens, return the golfer straight to that round.
 - Avoid a recurring “Resume round?” prompt; the golfer can choose to close or leave the round from the round flow.
+
+
+### Family/junior V1 scope clarification (confirmed 14 October 2026)
+- Treat all previously confirmed answers in `KITE-FAMILY-PLAYER-MANAGEMENT-QA.md` as requirements for the first Kite V1 release, unless explicitly marked exploratory or unresolved.
+- Do not re-ask already confirmed family/junior decisions as phase-scope questions.
