@@ -119,6 +119,10 @@ Preserve the established product model: Kite is one app for adult and junior pla
 
 **Confirmed 14 October 2026.** Both the parent and junior can change the junior’s app preferences, including units such as yards or metres.
 
+### FQ-28 — Parent starts and manages rounds on the parent’s phone
+
+**Confirmed 14 October 2026.** Round setup and starting should be handled by the parent on the parent’s phone. A junior signing in should not start a round themselves.
+
 ## Open questions
 
 1. Future “fun” scoring methods may be offered; their formats and rules have not yet been decided.
