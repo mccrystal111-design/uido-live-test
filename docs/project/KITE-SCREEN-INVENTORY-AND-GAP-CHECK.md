@@ -125,9 +125,9 @@ Already present in Figma: the joint four-player scorecard `438:148`, club-limit 
 - [ ] **Four-player Start Round state:** show all four players, each player's tee, and the shared round scoring format.
 - [ ] **Four-player Round Complete card:** follow the existing single-player result-card pattern, summarize each player's result, and link to the joint scorecard.
 - [ ] **App Settings hub:** grouped rows for yards/metres and Celsius/Fahrenheit; account email/password and linked sign-in management; Log Out; Delete Account with confirmation; About rows: Terms of Use — View, Privacy Policy — View, App Version — V1, Software Licences — View; Support items as defined in the App Settings Q&A. Rows open lightweight selection or information popups.
-- [ ] **Terms of Use view:** readable destination opened from the Settings row.
-- [ ] **Privacy Policy view:** readable destination opened from the Settings row.
-- [ ] **Software Licences view:** readable destination opened from the Settings row.
+- [ ] **Terms of Use view:** read-only page inside Kite, opened from the Settings row.
+- [ ] **Privacy Policy view:** read-only page inside Kite, opened from the Settings row.
+- [ ] **Software Licences view:** one read-only page inside Kite containing the licence notices.
 - App Version is displayed inline as “V1”; no separate version screen is needed.
 
 ### Player Profile and Bag updates
