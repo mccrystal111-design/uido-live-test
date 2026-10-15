@@ -143,3 +143,12 @@ This is a structural screen and interaction gap check from Figma frame/layer ins
 - Account: view/change sign-in email and password; show and manage linked sign-in providers; Log Out at the bottom; Delete Account with a clear confirmation step.
 - About: Terms, Privacy, app version, and software licences.
 - Support: Help/Contact Support and Rate Kite.
+
+
+### Shared visual requirements for new V1 screens
+- Reuse the approved Kite logo lockup and symbol from the Figma brand source; do not recreate or substitute the mark. The lockup is the thin white hex golf symbol beside the lowercase “kite” wordmark in Sora ExtraLight, with the i-dot removed.
+- Use Sora typography and match the hierarchy in the existing approved Kite screens and UI Style Menu.
+- Use the approved Kite palette: deep navy `#0E1C2B`, warm off-white `#F4F1E6`, and yellow `#FFCC00`; reserve orange for secondary/accent use.
+- Match spacing, insets, and alignment to the UI Style Menu and adjacent approved Kite screens. This gap list does not establish a separate numeric spacing scale.
+- Apply these standards to the App Settings hub, Add Player popup, populated four-player Start Round state, and four-player Round Complete card.
+- Mark a visual state complete only after inspecting the rendered Figma screen at actual size; structural presence alone is not visual approval.
