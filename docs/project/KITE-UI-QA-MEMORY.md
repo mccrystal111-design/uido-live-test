@@ -74,3 +74,4 @@
 - Do not include notification controls in V1 App Settings.
 - V1 is English-only; omit a language selector from App Settings.
 - Include controls in V1 App Settings to view or change the account sign-in email and password.
+- Include a Log Out action at the bottom of App Settings.
