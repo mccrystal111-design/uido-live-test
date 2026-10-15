@@ -79,3 +79,8 @@
 - Show and allow players to manage linked sign-in providers, such as Google.
 - Include Terms, Privacy, app version, and software licences in About.
 - Include Help/Contact Support and Rate Kite in Support.
+
+
+### Family/junior screen implementation timing (confirmed 15 October 2026)
+- Preserve the confirmed family/junior V1 decisions in `KITE-FAMILY-PLAYER-MANAGEMENT-QA.md`.
+- Family/junior screen creation and rebuild are deferred; do not include them in the current screen build slice unless the user later asks to resume that work.
