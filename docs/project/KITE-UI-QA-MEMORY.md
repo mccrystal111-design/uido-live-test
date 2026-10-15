@@ -75,3 +75,7 @@
 - V1 is English-only; omit a language selector from App Settings.
 - Include controls in V1 App Settings to view or change the account sign-in email and password.
 - Include a Log Out action at the bottom of App Settings.
+- Include a Delete Account action with a clear confirmation step.
+- Show and allow players to manage linked sign-in providers, such as Google.
+- Include Terms, Privacy, app version, and software licences in About.
+- Include Help/Contact Support and Rate Kite in Support.
