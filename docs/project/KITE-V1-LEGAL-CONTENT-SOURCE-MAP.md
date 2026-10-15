@@ -55,7 +55,8 @@ This document records what the repository currently supports as evidence for Kit
 - **Confirmed by the product owner:** Kite is currently provided by the owner personally as an individual service provider operating in the UK.
 - Planned public-facing name: **All Green Golf Company** (an eventual company name; incorporation/legal-entity status is not confirmed).
 - Postal service address supplied for the published contact details: **22 Landcross Drive, Northampton, NN3 3LS**. Do not label it a registered office unless company formation and registration confirm that status.
-- Public privacy/data-protection and support contact email, plus complaint/escalation route, still need to be confirmed.
+- **Confirmed by the product owner:** use `support@kitegolf.com` as the shared public support and privacy-request contact.
+- Complaint/escalation route and operational response process still need to be defined.
 - Governing-law and court/jurisdiction approach for Terms, while preserving mandatory consumer rights.
 - User-facing privacy/data-protection contact and support contact; complaint/escalation route.
 - Governing-law and court/jurisdiction approach for Terms, while preserving mandatory consumer rights.
