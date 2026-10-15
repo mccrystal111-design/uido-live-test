@@ -124,7 +124,7 @@ Already present in Figma: the joint four-player scorecard `438:148`, club-limit 
 - [ ] **Add Player popup:** Player Name, Handicap, Tee; cap the round at four total players, including the signed-in golfer.
 - [ ] **Four-player Start Round state:** show all four players, each player's tee, and the shared round scoring format.
 - [ ] **Four-player Round Complete card:** follow the existing single-player result-card pattern, summarize each player's result, and link to the joint scorecard.
-- [ ] **App Settings hub:** grouped rows for yards/metres and Celsius/Fahrenheit; account email/password and linked sign-in management; Log Out; Delete Account with confirmation; About and Support items as defined in the App Settings Q&A. Rows open lightweight selection or information popups.
+- [ ] **App Settings hub:** grouped rows for yards/metres and Celsius/Fahrenheit; account email/password and linked sign-in management; Log Out; Delete Account with confirmation; About rows: Terms of Use — View, Privacy Policy — View, App Version — V1, Software Licences — View; Support items as defined in the App Settings Q&A. Rows open lightweight selection or information popups.
 
 ### Player Profile and Bag updates
 - [ ] **Club category choices:** offer Woods, Hybrids, Irons, and Wedges within Add Club and bag setup popups. Keep the main Manage Bag list ungrouped.
@@ -163,7 +163,7 @@ This is a structural screen and interaction gap check from Figma frame/layer ins
 - Keep it lightweight: grouped rows show current values and open small selection or information popups as appropriate.
 - General: yards/metres (also available in Player Profile Playing Preferences) and Celsius/Fahrenheit. Do not include handedness, notification controls, or a language selector in V1.
 - Account: view/change sign-in email and password; show and manage linked sign-in providers; Log Out at the bottom; Delete Account with a clear confirmation step.
-- About: Terms, Privacy, app version, and software licences.
+- About: Terms of Use — View; Privacy Policy — View; App Version — V1; Software Licences — View.
 - Support: Help/Contact Support and Rate Kite.
 
 
