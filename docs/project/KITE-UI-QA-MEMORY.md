@@ -71,3 +71,4 @@
 - Make the yards/metres preference available in both App Settings and Player Profile Playing Preferences.
 - Include a Celsius/Fahrenheit selector in App Settings for temperature or weather displays.
 - Do not include a left/right-handed preference in V1 App Settings.
+- Do not include notification controls in V1 App Settings.
