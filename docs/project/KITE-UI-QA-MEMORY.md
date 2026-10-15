@@ -77,7 +77,7 @@
 - Include a Log Out action at the bottom of App Settings.
 - Include a Delete Account action with a clear confirmation step.
 - Show and allow players to manage linked sign-in providers, such as Google.
-- Include Terms, Privacy, app version, and software licences in About.
+- About rows: **Terms of Use — View**; **Privacy Policy — View**; **App Version — V1**; **Software Licences — View**.
 - Include Help/Contact Support and Rate Kite in Support.
 
 
