@@ -12,7 +12,7 @@ The existing file contains a substantial adult Kite V1 product flow: entry/authe
 
 The new joint scorecard frame is present and lays out four players across 18 holes, with round totals and round statistics. This closes an important **four-player scorecard display** gap.
 
-The family/player flow is part of the first Kite V1 release, with scope being reworked through its Q&A. Its connective screens may change. The adult multi-player round flow remains required: an Add Player popup (Player Name, Handicap, Tee) supporting up to four players, a populated four-player Start Round state, and a four-player Round Complete card with joint-scorecard access. The current End Round screen is still a single-player summary. The confirmed update is one similar group state card with result summaries for up to four players and a way to open the joint scorecard.
+The family/player feature set and prior decisions remain part of the first Kite V1 release, documented in the family/player Q&A. The user has deferred rebuilding family/junior screens for the current build slice. The adult multi-player round flow remains required: an Add Player popup (Player Name, Handicap, Tee) supporting up to four players, a populated four-player Start Round state, and a four-player Round Complete card with joint-scorecard access. The current End Round screen is still a single-player summary. The confirmed update is one similar group state card with result summaries for up to four players and a way to open the joint scorecard.
 
 ## Screens and states already in Figma
 
@@ -85,7 +85,7 @@ The bag design already shows the 13-club count plus separate putter, carry/total
 
 ## Gap check against confirmed family/player requirements
 
-### Missing for the first useful family-player design/build
+### Family/player screens missing from Figma (V1 scope; current build deferred)
 
 1. **Family player roster/management screen.** There is no screen listing the family’s adult and junior profiles, guest names, or management actions. Keep the current profile overview; add the roster and selection state rather than duplicating profile pages.
 2. **Switch-player state.** Player Profile has a Switch Player control, but no player picker, selected-player state, or path back to the profile.
@@ -111,14 +111,13 @@ The bag design already shows the 13-club count plus separate putter, carry/total
 - Future “fun” scoring formats and rules remain undecided.
 - Full co-parent/account-link management is in the confirmed V1 family scope and can be kept as a small extension to the family roster: an adult with an existing Kite account can be added to a family profile; a no-account adult is a guest. Avoid creating an unlinked guardian-management subsystem.
 
-## Suggested first build slice
+## Suggested current build slice — family/junior screens deferred
 
-1. Build the two adult Start Round states: Add Player popup (Player Name, Handicap, Tee) and the populated four-player overview.
+1. Build the Add Player popup and populated four-player Start Round state.
 2. Build the four-player Round Complete card with access to the joint scorecard.
-2. Design inline Add Junior and Add Guest states, including saved guest name and handicap.
-3. Expand Start Round to a maximum of four participants with per-player tee selection and one shared format.
-4. Use the existing four-player scorecard frame; update End Round to show all participants and parent edit access.
-5. Design the junior sign-in and laptop dashboard states.
+3. Build the lightweight App Settings hub and its agreed popup/detail states.
+
+Family/junior requirements remain in V1 scope and are recorded in `KITE-FAMILY-PLAYER-MANAGEMENT-QA.md`, but do not recreate or build those screens in this slice. Resume that design work only when the user asks.
 
 This is a structural screen and interaction gap check from Figma frame/layer inspection and the current decision log. It is not a pixel-level visual QA review. No Figma changes or GitHub Actions were run.
 
