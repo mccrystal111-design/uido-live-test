@@ -64,3 +64,8 @@
 - Keep a populated **four-player Start Round state** showing the group and each player's tee.
 - Keep a **four-player Round Complete / End Round state** with results for each player and access to the joint scorecard, modeled on the existing single-player completion card.
 - These adult round screens are separate from family roster and junior-management screens, which are being reworked through the family/junior Q&A.
+
+
+### App Settings Q&A — Measurement preference access (confirmed 15 October 2026)
+- Follow the reference pattern of a simple Settings hub: grouped rows show current values and open lightweight selection or information popups as appropriate.
+- Make the yards/metres preference available in both App Settings and Player Profile Playing Preferences.
