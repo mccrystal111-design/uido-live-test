@@ -134,3 +134,12 @@ This is a structural screen and interaction gap check from Figma frame/layer ins
 ### Round recovery — Immediate resume behavior
 - When Kite opens with an unfinished round, take the golfer straight back into it rather than showing a recurring resume prompt. Let the golfer choose to close or leave it from the round flow; preserve resumability.
 - Current Figma frame `445:24` still shows a “Resume Your Round?” popup with a “Keep for Later” option; this conflicts with the confirmed immediate-resume behavior and needs revision/removal.
+
+
+### App Settings — V1 Q&A and screen gap (confirmed 15 October 2026)
+- No App Settings screen or nested settings state is currently present in Product UI; a dedicated App Settings hub is still missing.
+- Keep it lightweight: grouped rows show current values and open small selection or information popups as appropriate.
+- General: yards/metres (also available in Player Profile Playing Preferences) and Celsius/Fahrenheit. Do not include handedness, notification controls, or a language selector in V1.
+- Account: view/change sign-in email and password; show and manage linked sign-in providers; Log Out at the bottom; Delete Account with a clear confirmation step.
+- About: Terms, Privacy, app version, and software licences.
+- Support: Help/Contact Support and Rate Kite.
