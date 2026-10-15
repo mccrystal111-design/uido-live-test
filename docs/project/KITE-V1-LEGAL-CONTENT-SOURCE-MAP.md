@@ -60,7 +60,8 @@ This document records what the repository currently supports as evidence for Kit
 - Governing-law and court/jurisdiction approach for Terms, while preserving mandatory consumer rights.
 
 ### Product scope and commercial terms
-- Countries/regions in which V1 launches and minimum age/eligibility.
+- **Confirmed by the product owner:** Kite V1 launches in the UK only.
+- Minimum age/eligibility and age/parental-consent rules for junior accounts remain undecided.
 - Whether V1 is free, paid, trialled, or offers Kite Family subscription; price, billing provider, renewal/cancellation/refund mechanics.
 - Precisely which features are advisory (GPS distances, caddie recommendations, handicap/statistics) and any availability or accuracy limits.
 
