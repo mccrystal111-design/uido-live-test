@@ -84,3 +84,8 @@
 ### Family/junior screen implementation timing (confirmed 15 October 2026)
 - Preserve the confirmed family/junior V1 decisions in `KITE-FAMILY-PLAYER-MANAGEMENT-QA.md`.
 - Family/junior screen creation and rebuild are deferred; do not include them in the current screen build slice unless the user later asks to resume that work.
+
+
+### App Settings Q&A — About destination views (confirmed 15 October 2026)
+- V1 needs readable destination views for Terms of Use, Privacy Policy, and Software Licences, opened from their Settings rows marked “View”.
+- Show App Version as an inline Settings value, “V1”; it does not need a separate destination screen.
