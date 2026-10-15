@@ -87,9 +87,11 @@ Potential future integrations such as Garmin, TrackMan, WHS/GHIN are not to be d
 
 ## 8. How long we keep information
 
-The Core Q&A records an idea of keeping a retired customer’s data recoverable for about five years and then anonymising useful statistics. The Core baseline says the final legal/privacy retention policy is still open. This is not yet a firm retention promise.
+We will keep personal information only for as long as we can justify it for the purpose for which it was collected, subject to any specific legal requirements. We will set and review retention periods by data category.
 
-**[OPEN: choose and implement retention periods by data category, including active and deleted accounts, junior profiles, precise location, round/shot history, support messages, payment records, security logs and backups. Explain deletion/anonymisation timing and legal exceptions.]**
+A broad product idea has been to let a golfer return after a long break by keeping a dormant account and its history recoverable. No duration or retention schedule has been approved. A dormant account that has not been deleted is different from an account-deletion request; the five-year idea is not a blanket rule for deletion requests.
+
+**[OPEN: define and implement retention periods by data category, including dormant accounts, junior profiles, precise location, round/shot history, support messages, payment records, security logs and backups. Define the account-deletion outcome, any specific justified exceptions, and whether effectively anonymised statistics may be retained. Do not publish the old five-year idea as a firm promise.]**
 
 ## 9. Your choices and rights
 
