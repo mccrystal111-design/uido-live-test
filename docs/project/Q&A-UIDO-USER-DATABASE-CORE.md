@@ -43,16 +43,17 @@ Core should be flexible enough to accept future third-party data sources such as
 
 Original user/device data supplied by external systems should be retained alongside the customer's Core data. UiDo's interpretation/calculations should be stored separately so the original source record is preserved.
 
-### Q8 — Data deletion / retention
-**Decision:** Retain useful statistical data; do not immediately destroy the golf history when a customer retires/deletes their active account.
+### Q8 — Dormant accounts, reactivation and deletion
+**Status: OPEN — broad product idea only; no final retention or deletion decision.**
 
-The current direction is:
-- Retain retired customer data in a recoverable state for approximately **5 years**
-- Retain golf/statistical value for the decision engine
-- After the 5-year recoverable period, **anonymize** the customer-linked data rather than simply deleting the useful statistical history
-- If a customer returns within the recoverable period, their previous history should be capable of being restored to their account
+On 15 October 2026, the product owner clarified that the earlier idea of keeping a golfer’s history recoverable for about five years was a broad reactivation concept: a golfer might pause golf for a life change (for example, having children) and later return. The owner has not settled the data-protection implications or approved a five-year period.
 
-Exact legal/privacy implementation and retention policy still needs to be finalized against applicable requirements.
+Keep these cases distinct:
+- **Dormant/retired account:** a possible recoverable state for a golfer who stops using Kite but has not asked for account deletion. The purpose, data categories, period, access/use restrictions, review process and lawful basis all remain to be defined and justified.
+- **Account deletion / erasure request:** do not apply a blanket five-year recoverable hold based on the reactivation idea. Assess the request under applicable data-protection rights and retain only specific records where there is a justified legal basis/need; define and disclose any exceptions and timelines.
+- **Anonymised statistics:** whether any aggregate golf statistics can be retained after an account is deleted remains open; confirm that the anonymisation is effective and that the retained information is no longer personal data.
+
+Do not state a fixed retention period or deletion outcome in customer-facing copy until the product purpose, data-by-data schedule and implementation have been decided and checked against current UK requirements.
 
 ### Q9 — Hawk versus Core
 **Decision:** Core first, Hawk subset second.
