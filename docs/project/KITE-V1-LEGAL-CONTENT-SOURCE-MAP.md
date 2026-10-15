@@ -40,6 +40,14 @@ This document records what the repository currently supports as evidence for Kit
 - [Leaflet guidance on attribution and tile-provider terms](https://github.com/Leaflet/Leaflet/blob/main/FAQ.md)
 - [Esri World Imagery service](https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer)
 
+## Working legal-content drafts
+
+- [Terms of Use draft](../legal/KITE-V1-TERMS-OF-USE-DRAFT.md)
+- [Privacy Policy draft](../legal/KITE-V1-PRIVACY-POLICY-DRAFT.md)
+- [Software Licences page draft](../legal/KITE-V1-SOFTWARE-LICENCES-DRAFT.md)
+
+All three are explicitly marked working drafts with blockers. They are not release-ready disclosures.
+
 ## Known Settings decisions
 
 - Terms of Use and Privacy Policy open as read-only pages inside Kite.
