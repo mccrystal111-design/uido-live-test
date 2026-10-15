@@ -52,7 +52,10 @@ This document records what the repository currently supports as evidence for Kit
 ## Inputs still required before release-ready legal copy
 
 ### Service operator and contact
-- Legal entity/person providing Kite, registered/trading name, registered address and jurisdiction.
+- **Confirmed by the product owner:** Kite is provided by the owner personally as an individual service provider operating in the UK.
+- Exact legal name and service/registered address still need to be supplied for the published notice; no company or specific UK jurisdiction is assumed.
+- User-facing privacy/data-protection contact and support contact; complaint/escalation route.
+- Governing-law and court/jurisdiction approach for Terms, while preserving mandatory consumer rights.
 - User-facing privacy/data-protection contact and support contact; complaint/escalation route.
 - Governing-law and court/jurisdiction approach for Terms, while preserving mandatory consumer rights.
 
