@@ -69,3 +69,4 @@
 ### App Settings Q&A — Measurement preference access (confirmed 15 October 2026)
 - Follow the reference pattern of a simple Settings hub: grouped rows show current values and open lightweight selection or information popups as appropriate.
 - Make the yards/metres preference available in both App Settings and Player Profile Playing Preferences.
+- Include a Celsius/Fahrenheit selector in App Settings for temperature or weather displays.
