@@ -1,6 +1,6 @@
 # Kite Screen Inventory & Gap Check
 
-**Reviewed:** 14 October 2026  
+**Reviewed:** 15 October 2026  
 **Figma file:** UiDo — Brand & Product Design System  
 **Figma file key:** 6peEDBx1XNqpZ3UAeUlHyI  
 **Product page:** 02 — Product UI (page 6:2)  
@@ -93,10 +93,17 @@ The bag design already shows the 13-club count plus separate putter, carry/total
 4. **Create junior while setting up a round.** No inline junior profile form exists. The junior profile must remain saved if round setup is cancelled.
 5. **Junior sign-in and account setup.** Existing auth is email/account oriented. Missing junior-specific parent-created username, parent-set password, junior-chosen four-animal PIN setup, and parent-managed password/PIN reset states.
 6. **Junior laptop dashboard.** A frame exists at `445:25`, but the user reports removing the family/junior screen set; this is the lone family/junior frame still on the page and its retention needs confirmation. If retained, it must show the agreed dashboard content and use the locked Kite logo and palette. Junior can see all participants’ scores but cannot edit saved scorecards.
-7. **Adult multi-player Start Round.** Keep two required states separate from family roster management: an Add Player popup with Player Name, Handicap, and Tee, allowing up to four players total; and a populated Start Round screen showing four players, each player's tee, and the shared scoring format.
-8. **Multi-player End Round.** Current End Round is headed “Your Round” and shows one player’s result. It needs a parent-facing saved-round summary for all participants, with access to the joint scorecard and score editing.
-9. **Junior profile management states.** The adult profile edit sections provide a useful base, but there are no family-selected junior profile states showing parent full access, junior edit permissions, and the different handicap permissions.
-10. **Removal/deactivation of a junior profile.** No family-player removal confirmation offers the confirmed choices: remove sign-in and retain history, or delete the profile and history.
+7. **Junior profile management states.** The adult profile edit sections provide a useful base, but there are no family-selected junior profile states showing parent full access, junior edit permissions, and the different handicap permissions.
+8. **Removal/deactivation of a junior profile.** No family-player removal confirmation offers the confirmed choices: remove sign-in and retain history, or delete the profile and history.
+
+### Adult V1 screens and interaction gaps (current Figma review: 15 October 2026)
+
+1. **App Settings hub.** No Settings screen is present. The content and popup behavior are now defined in the App Settings Q&A section below.
+2. **Add Player and group setup.** Add Player popup is absent; build fields for Player Name, Handicap, and Tee, capped at four total players, plus a populated four-player Start Round state showing each tee and the shared scoring format.
+3. **Group Round Complete.** End Round is still a single-player summary. Build a similar group result card for up to four players with access to the joint scorecard.
+4. **Club editing.** Add the club categories in Add Club and bag setup popups (keep the main bag list ungrouped); add detailed carry/total editing for existing clubs and a confirmation when changing carry updates total.
+
+Already present in Figma: the joint four-player scorecard `438:148`, club-limit reminder `445:22`, and round-save-failure popup `445:23`. The save-failure behavior still needs to preserve round data on-device and support retry; this is implementation work in addition to the existing popup.
 
 ### Player Profile / bag states to finish
 
@@ -123,16 +130,16 @@ This is a structural screen and interaction gap check from Figma frame/layer ins
 
 
 ### Round recovery — Save failure
-- **Save failure/retry state is not shown.** Preserve the round and entered scores on the device after a save failure and provide a clear retry path so the golfer does not lose their work.
+- Popup `445:23` is present. Implement the confirmed behavior behind it: retain the round and entered scores on-device after a save failure and allow retry.
 
 
 ### Round recovery — Resume interrupted round
-- **Resume state is not shown.** An in-progress round should always remain resumable, including after Kite closes or the phone restarts. Retain current round state and offer resume when the app reopens.
+- Keep an in-progress round resumable after Kite closes or the phone restarts. When Kite opens with an unfinished round, take the golfer directly back into it; implement this as round restoration, not a recurring resume prompt.
 
 
 ### Round recovery — Immediate resume behavior
 - When Kite opens with an unfinished round, take the golfer straight back into it rather than showing a recurring resume prompt. Let the golfer choose to close or leave it from the round flow; preserve resumability.
-- Current Figma frame `445:24` still shows a “Resume Your Round?” popup with a “Keep for Later” option; this conflicts with the confirmed immediate-resume behavior and needs revision/removal.
+- No resume-choice popup is present in the current Product UI structure. Do not add one; the confirmed behavior is to reopen directly into the unfinished round.
 
 
 ### App Settings — V1 Q&A and screen gap (confirmed 15 October 2026)
