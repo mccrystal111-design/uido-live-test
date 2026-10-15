@@ -258,3 +258,8 @@ Preserve the established product model: Kite is one app for adult and junior pla
 ### FQ-56 — All prior confirmed family/junior answers apply to V1
 
 **Confirmed 14 October 2026.** All previously confirmed answers in this family/junior Q&A are intended for the first Kite V1 release, not a later phase. Continue to distinguish confirmed requirements from exploratory ideas and unresolved rules; do not re-ask confirmed V1 decisions as scope questions.
+
+
+### Screen implementation status — deferred (15 October 2026)
+- Family/junior decisions remain part of the confirmed Kite V1 product scope.
+- Do not rebuild or create family/junior screens in the current design/build slice. Keep the decisions in this Q&A as requirements for when that work is explicitly resumed.
