@@ -66,7 +66,8 @@ This document records what the repository currently supports as evidence for Kit
 - **Confirmed by the product owner:** junior profiles are for all users under 18, including under-13s.
 - The account eligibility and parent-consent/authority flow still needs to match this age range and be verified against implementation.
 - Kite Family is already recorded as a paid £24.99/year ad-free family subscription in the project Decision Log. **Confirmed for legal terms:** it auto-renews annually; members manage or cancel it through the provider they purchased it from.
-- Purchase provider(s), trial/introductory offers, applicable VAT/tax display and refund handling still need confirmation.
+- **Purchase provider is undecided for V1** (confirmed by the product owner); Terms must not imply a specific store or cancellation route until selected.
+- Trial/introductory offers, applicable VAT/tax display and refund handling still need confirmation.
 - Precisely which features are advisory (GPS distances, caddie recommendations, handicap/statistics) and any availability or accuracy limits.
 
 ### Data practices to verify against the release build and service configuration
