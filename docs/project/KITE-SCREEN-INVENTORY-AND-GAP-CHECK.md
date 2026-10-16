@@ -1,6 +1,6 @@
 # Kite Screen Inventory & Gap Check
 
-**Reviewed:** 15 October 2026  
+**Reviewed:** 16 October 2026  
 **Figma file:** UiDo — Brand & Product Design System  
 **Figma file key:** 6peEDBx1XNqpZ3UAeUlHyI  
 **Product page:** 02 — Product UI (page 6:2)  
@@ -96,21 +96,19 @@ The bag design already shows the 13-club count plus separate putter, carry/total
 7. **Junior profile management states.** The adult profile edit sections provide a useful base, but there are no family-selected junior profile states showing parent full access, junior edit permissions, and the different handicap permissions.
 8. **Removal/deactivation of a junior profile.** No family-player removal confirmation offers the confirmed choices: remove sign-in and retain history, or delete the profile and history.
 
-### Adult V1 screens and interaction gaps (current Figma review: 15 October 2026)
+### Current adult screen review (Figma checked 16 October 2026)
 
-1. **App Settings hub.** No Settings screen is present. The content and popup behavior are now defined in the App Settings Q&A section below.
-2. **Add Player and group setup.** Add Player popup is absent; build fields for Player Name, Handicap, and Tee, capped at four total players, plus a populated four-player Start Round state showing each tee and the shared scoring format.
-3. **Group Round Complete.** End Round is still a single-player summary. Build a similar group result card for up to four players with access to the joint scorecard.
-4. **Club editing.** Add the club categories in Add Club and bag setup popups (keep the main bag list ungrouped); add detailed carry/total editing for existing clubs and a confirmation when changing carry updates total.
+The following required states are now present in the Product UI page: Add Player popup [487:225], populated four-player Start Round [487:296], Round Complete — Four Players [466:345], App Settings hub [461:5], Settings account and linked-provider states [461:245, 461:350], Delete Account confirmation [461:451], and Terms, Privacy, and Software Licences views [466:190, 466:216, 466:242]. The four-player joint scorecard [438:148], club-limit reminder [445:22], and round-save-failure popup [445:23] are also present.
 
-Already present in Figma: the joint four-player scorecard `438:148`, club-limit reminder `445:22`, and round-save-failure popup `445:23`. The save-failure behavior still needs to preserve round data on-device and support retry; this is implementation work in addition to the existing popup.
+Current screen gaps:
+1. The four-player Start Round state shows player names and handicaps but does not show each player's selected tee. The Add Player popup has a tee field; the selected value needs to remain visible in the group list.
+2. The Manage Bag list shows carry/total values, but there is no detailed edit state for an existing club row and no confirmation state for recalculating total after carry changes.
+3. The Add Club popup has the Woods, Hybrids, Irons, and Wedges category chooser [466:372]. The Full Bag Setup state [359:93] still presents club rows/dropdowns without visibly showing this category-browsing route. Preserve the ungrouped main bag list.
+4. The Terms, Privacy, and Software Licences screens are structurally present, but their current Figma copy still contains “pending” or placeholder text. Replace it with the final Kite legal and licence content before V1 release.
 
-### Player Profile / bag states to finish
+The Settings hub, measurement and temperature popups, account management, support, and delete confirmation are present. No additional Settings screen is currently identified as missing.
 
-- **Club categories should be offered in setup popups, not used to group the main list.** Keep the Manage Bag list ungrouped; provide Woods, Hybrids, Irons, and Wedges as options within Add Club and bag setup popups.
-- **Existing club carry/total editor state is not shown.** The add-club popup supports blank carry, estimated total, and manual total; a detailed edit state is still needed for existing club rows.
-- **Carry-change confirmation is not shown.** Add the confirmed prompt/state for updating the total after carry changes.
-- **Club-limit warning popup is not shown.** The agreed bag count is 13 non-putter clubs plus a separate putter. When exceeding the competition limit, show a non-blocking reminder that the Rules of Golf allow 14 clubs total including the putter; adding the club is not prevented.
+Round recovery is a behavior check rather than a new screen: the save-failure popup communicates on-device retention and retry, but runtime persistence must be verified; reopening Kite with an unfinished round must return directly to that round without a resume-choice prompt.
 
 ### Unresolved or exploratory family-player decisions
 
@@ -118,31 +116,39 @@ Already present in Figma: the joint four-player scorecard `438:148`, club-limit 
 - Future “fun” scoring formats and rules remain undecided.
 - Full co-parent/account-link management is in the confirmed V1 family scope and can be kept as a small extension to the family roster: an adult with an existing Kite account can be added to a family profile; a no-account adult is a guest. Avoid creating an unlinked guardian-management subsystem.
 
-## Adult V1 build list — family/junior screens deferred
+## Adult V1 actionable build list — family/junior screens deferred
 
-### Screens to build
-- [ ] **Add Player popup:** Player Name, Handicap, Tee; cap the round at four total players, including the signed-in golfer.
-- [ ] **Four-player Start Round state:** show all four players, each player's tee, and the shared round scoring format.
-- [ ] **Four-player Round Complete card:** follow the existing single-player result-card pattern, summarize each player's result, and link to the joint scorecard.
-- [ ] **App Settings hub:** grouped rows for yards/metres and Celsius/Fahrenheit; account email/password and linked sign-in management; Log Out; Delete Account with confirmation; About rows: Terms of Use — View, Privacy Policy — View, App Version — V1, Software Licences — View; Support items as defined in the App Settings Q&A. Rows open lightweight selection or information popups.
-- [ ] **Terms of Use view:** read-only page inside Kite, opened from the Settings row.
-- [ ] **Privacy Policy view:** read-only page inside Kite, opened from the Settings row.
-- [ ] **Software Licences view:** one read-only page inside Kite containing the licence notices.
-- App Version is displayed inline as “V1”; no separate version screen is needed.
+The existing Add Player, four-player Start Round, Round Complete, Settings, legal-view, joint-scorecard, club-limit, and save-failure frames are present. Build the remaining work in this order:
 
-### Player Profile and Bag updates
-- [ ] **Club category choices:** offer Woods, Hybrids, Irons, and Wedges within Add Club and bag setup popups. Keep the main Manage Bag list ungrouped.
-- [ ] **Edit an existing club:** open detailed carry and total controls from each editable club row. New carry starts blank; estimate total automatically after entry and allow manual total entry. Putter has no carry or total fields.
-- [ ] **Carry-change confirmation:** when carry is changed for an existing club, show a prompt to update its total.
+### 1. Show the selected tee for each player in the four-player Start Round state
+- **Figma state:** [Kite — Start Round — Four Player — V1, 487:296](https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI/UiDo?node-id=487-296).
+- **Change:** Add a visible tee value to each player row, using the tee selected in the Add Player popup. Keep one shared scoring format for the round.
+- **Done when:** The populated state can show four players with distinct tees, every displayed tee matches that player's selection, and the shared round format remains clear.
 
-### Round behavior to finish
-- [ ] **Save-failure recovery:** popup `445:23` exists; retain in-progress round data on-device and allow the player to retry saving later.
-- [ ] **Interrupted-round recovery:** restore the unfinished round directly when Kite opens. Do not add a recurring resume-choice popup.
+### 2. Add detailed editing for existing clubs and carry-change handling
+- **Figma state:** [Manage Bag, 410:5](https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI/UiDo?node-id=410-5); current Add Club reference [429:146](https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI/UiDo?node-id=429-146).
+- **Change:** Make each active club row open detailed controls for carry and total. When carry changes, show a prompt asking whether to update the total; allow the player to keep or manually adjust the total.
+- **Done when:** Existing values load into the editor; carry and total can be edited; the carry-change prompt is shown only when carry changes; the putter has no carry/total fields; Save and Cancel follow the existing in-place profile editing pattern.
 
-### Already present — retain and reuse
-- Four-player joint scorecard: `438:148`.
-- Non-blocking club-limit reminder: `445:22`.
-- Round-save-failure popup: `445:23`.
+### 3. Add category browsing to full bag setup
+- **Figma state:** [Full Bag Setup, 359:93](https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI/UiDo?node-id=359-93); reuse the [club category chooser, 466:372](https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI/UiDo?node-id=466-372).
+- **Change:** Let players browse Woods, Hybrids, Irons, and Wedges from the club-type selection in full bag setup, as in Add Club. Keep the main Manage Bag list ungrouped. Quick Setup may retain its focused Driver and 7-Iron entry.
+- **Done when:** Full setup offers category-based club selection without grouping the saved bag list or changing the existing distance-entry behavior.
+
+### 4. Replace placeholder text in the legal and licence views
+- **Figma states:** [Terms of Use, 466:190](https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI/UiDo?node-id=466-190), [Privacy Policy, 466:216](https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI/UiDo?node-id=466-216), and [Software Licences, 466:242](https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI/UiDo?node-id=466-242).
+- **Change:** Populate the existing read-only pages with the final Kite Terms of Use, Privacy Policy, and third-party licence notices. Remove “pending” and generic placeholder copy.
+- **Done when:** Each page contains the intended V1 content, is reachable from Settings, and remains readable in the designed viewport.
+
+### 5. Verify round recovery behavior (no new screen)
+- **Existing state:** [Round Save Failure popup, 445:23](https://www.figma.com/design/6peEDBx1XNqpZ3UAeUlHyI/UiDo?node-id=445-23).
+- **Change:** Verify failed saves preserve the round and entered scores on-device and allow retry; verify an unfinished round is restored directly when Kite reopens.
+- **Done when:** A simulated save failure does not lose entered scores, retry can complete the save, and reopening with an unfinished round returns directly to it without a recurring resume prompt.
+
+### Build-list boundaries
+- Keep family/junior screen creation deferred; do not recreate those screens in this adult build slice.
+- The four-player group state is an adult round setup feature and remains in scope.
+- Visual work is complete only after inspecting the rendered Figma state at its intended size.
 
 Family/junior requirements remain part of V1 and are recorded in `KITE-FAMILY-PLAYER-MANAGEMENT-QA.md`; their screens are deferred. Do not recreate or build those screens until the user asks to resume that work.
 
