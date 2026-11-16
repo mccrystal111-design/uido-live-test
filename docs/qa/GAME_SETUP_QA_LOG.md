@@ -36,7 +36,8 @@ Purpose: Capture agreed rules and open questions for the game setup dialogs. Add
 - Players dig after every shot, at the spot where the ball lands.
 - Every dig uncovers an item; no dig is empty.
 - Each item has its own point value, in addition to the terrain reward and any eligible distance bonus.
-- The landing surface determines its item pool. Previously selected examples: occasional lower-value snake in rough, crab in sand/bunker and acorn in trees. Coins, gems and treasure are the higher-value finds.
+- The landing surface determines its item pool. Previously selected examples: occasional lower-value snake in rough, crab in sand/bunker and acorn in trees.
+- Item value order: treasure/relics and the long-drive idol highest; gems next; coins below gems; critters and woodland finds lowest.
 - Each find earns points, and collected points are totalled at the end.
 - The Figma scorecard/end screens show Points as the result, with Total Yards and Total Steps as supporting stats.
 - Ground value order is **green > fairway > rough > sand > trees**.
@@ -45,9 +46,8 @@ Purpose: Capture agreed rules and open questions for the game setup dialogs. Add
 
 ### To decide
 
-- Exact point values for each ground type.
 - The fairway/green distance bonus grows steadily with straight-line distance, measured in yards (not in tiers). The rate is 1 bonus point per 10 yards of straight-line distance between consecutive dig spots. Bonus applies only when the new dig spot is fairway or green.
-- Exact point values and reward hierarchy for each item.
+- Exact point values for each terrain and item; the reward hierarchy is confirmed.
 - Whether water has its own item pool/reward.
 
 ## Bingo, Bango, Bongo
