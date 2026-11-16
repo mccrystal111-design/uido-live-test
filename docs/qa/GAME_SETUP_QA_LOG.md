@@ -43,7 +43,7 @@ Purpose: Capture agreed rules and open questions for the game setup dialogs. Add
 ### To decide
 
 - Exact point values for each ground type.
-- How the fairway/green distance bonus scales with distance.
+- The fairway/green distance bonus grows steadily with straight-line distance (not in tiers). The exact unit/rate is still to decide.
 - Which collectible items can appear in each area, and how water affects digging/rewards.
 
 ## Bingo, Bango, Bongo
