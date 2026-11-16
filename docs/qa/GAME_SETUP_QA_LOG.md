@@ -34,6 +34,7 @@ Purpose: Capture agreed rules and open questions for the game setup dialogs. Add
 - It is an individual-only game.
 - There is no golf score; the aim is to explore and dig around the course.
 - Players dig after every shot, at the spot where the ball lands.
+- Every dig uncovers an item; no dig is empty.
 - Each find earns points, and collected points are totalled at the end.
 - The Figma scorecard/end screens show Points as the result, with Total Yards and Total Steps as supporting stats.
 - Ground value order is **green > fairway > rough > sand > trees**.
