@@ -27,7 +27,7 @@ Purpose: Capture agreed rules and open questions for the game setup dialogs. Add
 
 - How players are assigned to teams in the setup dialog.
 - Tied matchplay holes are halved, as in normal matchplay.
-- How to handle a tied match at the end of the round.
+- If a match is tied after 9 or 18 holes, it remains a tie.
 
 ## Treasure Hunt
 
