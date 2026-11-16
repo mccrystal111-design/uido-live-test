@@ -32,7 +32,7 @@ Purpose: Capture agreed rules and open questions for the game setup dialogs. Add
 ### Confirmed
 
 - It is a cooperative, just-for-fun hunt; there are no individual scores or competitive rankings.
-- Two or more children can play together.
+- Up to four players can join one hunt, selected in the shared player setup before choosing a game.
 - All players contribute to one shared points total; there are no per-player totals.
 - There is no golf score; the aim is to explore and dig around the course.
 - Players dig after every shot, at the spot where the ball lands.
@@ -67,6 +67,7 @@ Purpose: Capture agreed rules and open questions for the game setup dialogs. Add
 
 ## Dialog design notes
 
+- Players are selected before choosing a game; game-specific setup dialogs should not ask to add players again.
 - The Add Player dialog was used as a size and shape placeholder for the Fly a Kite game setup dialog.
 - Final setup dialog copy and controls should follow the confirmed rules above; do not treat placeholder fields as game requirements.
 - String Ball is out of scope; Fly a Kite replaces it.
