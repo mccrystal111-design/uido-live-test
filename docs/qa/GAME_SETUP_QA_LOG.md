@@ -21,6 +21,7 @@ Purpose: Capture agreed rules and open questions for the game setup dialogs. Add
   - **VS Battle:** matchplay.
   - **Teams VS Battle:** team matchplay using betterball scoring.
 - Team sizes may be uneven, such as two children versus one parent.
+- Players choose their own team sides in Teams VS Battle.
 
 ### To decide
 
