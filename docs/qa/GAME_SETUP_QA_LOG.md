@@ -31,7 +31,8 @@ Purpose: Capture agreed rules and open questions for the game setup dialogs. Add
 
 ### Confirmed
 
-- It is an individual-only game.
+- It is a cooperative, just-for-fun hunt; there are no individual scores or competitive rankings.
+- Two or more children can play together.
 - There is no golf score; the aim is to explore and dig around the course.
 - Players dig after every shot, at the spot where the ball lands.
 - Every dig uncovers an item; no dig is empty.
@@ -40,7 +41,7 @@ Purpose: Capture agreed rules and open questions for the game setup dialogs. Add
 - Item value order: treasure/relics and the long-drive idol highest; gems next; coins below gems; critters and woodland finds lowest.
 - Each find earns points, and collected points are totalled at the end.
 - Players can choose a 9-hole or 18-hole hunt, and can end early to go to the end-of-round screen with their current totals.
-- The Figma scorecard/end screens show Points as the result, with Total Yards and Total Steps as supporting stats.
+- The Figma scorecard/end screens show Points as the result, with Total Yards and Total Steps as supporting stats. Whether points are shown as one shared group total remains to confirm.
 - Ground value order is **green > fairway > rough > sand > trees**.
 - The largest point-value gap should be between green/fairway and the lower-value areas. Differences among rough, sand and trees should be smaller.
 - There is a straight-line distance bonus between consecutive dig spots, but it applies only when the new dig spot is on the fairway or green.
