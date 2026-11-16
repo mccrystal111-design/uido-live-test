@@ -36,12 +36,13 @@ Purpose: Capture agreed rules and open questions for the game setup dialogs. Add
 - Players dig after every shot, at the spot where the ball lands.
 - Each find earns points, and collected points are totalled at the end.
 - The Figma scorecard/end screens show Points as the result, with Total Yards and Total Steps as supporting stats.
-- Reward value depends on the ground where the player digs. Green is worth more than fairway; rough, trees, sand and other areas are worth less.
+- Ground value order is **green > fairway > rough > sand > trees**.
+- The largest point-value gap should be between green/fairway and the lower-value areas. Differences among rough, sand and trees should be smaller.
 - There is a straight-line distance bonus between consecutive dig spots, but it applies only when the new dig spot is on the fairway or green.
 
 ### To decide
 
-- Exact point values and the relative order of rough, trees, sand and other ground.
+- Exact point values for each ground type.
 - How the fairway/green distance bonus scales with distance.
 - Which collectible items can appear in each area, and how water affects digging/rewards.
 
