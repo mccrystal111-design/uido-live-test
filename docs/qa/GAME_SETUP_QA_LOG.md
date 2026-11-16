@@ -46,13 +46,14 @@ Purpose: Capture agreed rules and open questions for the game setup dialogs. Add
 - Players can choose a 9-hole or 18-hole hunt, and can end early to go to the end-of-round screen with their current totals.
 - The Figma scorecard/end screens show Points as the result, with Total Yards and Total Steps as supporting stats. Whether points are shown as one shared group total remains to confirm.
 - Ground value order is **green > fairway > rough > sand > trees**.
+- Terrain bonuses added to each item's points: **green +5, fairway +4, rough +2, sand +1, trees +0, water +0**.
 - The largest point-value gap should be between green/fairway and the lower-value areas. Differences among rough, sand and trees should be smaller.
 - There is a straight-line distance bonus between consecutive dig spots, but it applies only when the new dig spot is on the fairway or green.
 
 ### To decide
 
 - The fairway/green distance bonus grows steadily with straight-line distance, measured in yards (not in tiers). The rate is 1 bonus point per 10 yards of straight-line distance between consecutive dig spots. Bonus applies only when the new dig spot is fairway or green.
-- Exact point values for each terrain and item; the reward hierarchy is confirmed.
+- Exact point values for each item; the item reward hierarchy is confirmed.
 - Water is a valid landing area and always yields an item; an old boot is the water-pool example, treated as a low-value find.
 - The old boot is the lowest-value collectible.
 
