@@ -53,7 +53,7 @@ Purpose: Capture agreed rules and open questions for the game setup dialogs. Add
 ### To decide
 
 - The fairway/green distance bonus grows steadily with straight-line distance, measured in yards (not in tiers). The rate is 1 bonus point per 10 yards of straight-line distance between consecutive dig spots. Bonus applies only when the new dig spot is fairway or green.
-- Confirmed item values (each item is worth more than 20 and less than 90 points): old boot 21; critters and woodland finds 25; copper coin 32; silver coin 38; gems 48; treasure chest 65; relics 78; long-drive idol 85. Terrain and eligible distance bonuses are added separately.
+- Confirmed item values (each item is worth more than 20 and less than 90 points): old boot 21; critters and woodland finds 25; copper coin 32; silver coin 38; common gem 48; treasure chest 65; relics 78; long-drive idol 85. Gem colour variants should be valued by rarity, with rarer gemstones worth more; exact variant values remain to decide. Terrain and eligible distance bonuses are added separately.
 - Water is a valid landing area and always yields an item; an old boot is the water-pool example, treated as a low-value find.
 - The old boot is the lowest-value collectible.
 
