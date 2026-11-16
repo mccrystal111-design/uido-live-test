@@ -48,7 +48,7 @@ Purpose: Capture agreed rules and open questions for the game setup dialogs. Add
 
 - The fairway/green distance bonus grows steadily with straight-line distance, measured in yards (not in tiers). The rate is 1 bonus point per 10 yards of straight-line distance between consecutive dig spots. Bonus applies only when the new dig spot is fairway or green.
 - Exact point values for each terrain and item; the reward hierarchy is confirmed.
-- Whether water has its own item pool/reward.
+- Water is a valid landing area and always yields an item; an old boot is the water-pool example, treated as a low-value find.
 
 ## Bingo, Bango, Bongo
 
