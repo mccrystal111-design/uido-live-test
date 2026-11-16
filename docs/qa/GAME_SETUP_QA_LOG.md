@@ -26,7 +26,8 @@ Purpose: Capture agreed rules and open questions for the game setup dialogs. Add
 ### To decide
 
 - How players are assigned to teams in the setup dialog.
-- How to handle tied holes or a tied match.
+- Tied matchplay holes are halved, as in normal matchplay.
+- How to handle a tied match at the end of the round.
 
 ## Treasure Hunt
 
