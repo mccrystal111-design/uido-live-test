@@ -43,7 +43,7 @@ Purpose: Capture agreed rules and open questions for the game setup dialogs. Add
 ### To decide
 
 - Exact point values for each ground type.
-- The fairway/green distance bonus grows steadily with straight-line distance, measured in yards (not in tiers). The exact points-per-yard rate is still to decide.
+- The fairway/green distance bonus grows steadily with straight-line distance, measured in yards (not in tiers). The rate is 1 bonus point per 10 yards of straight-line distance between consecutive dig spots. Bonus applies only when the new dig spot is fairway or green.
 - Which collectible items can appear in each area, and how water affects digging/rewards.
 
 ## Bingo, Bango, Bongo
