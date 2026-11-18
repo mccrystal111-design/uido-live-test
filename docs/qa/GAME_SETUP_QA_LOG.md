@@ -40,21 +40,19 @@ Purpose: Capture agreed rules and open questions for the game setup dialogs. Add
 - Players dig after every shot, at the spot where the ball lands.
 - Every dig uncovers an item; no dig is empty.
 - Each item has its own point value, in addition to the terrain reward and any eligible distance bonus.
-- The landing surface determines its item pool. Previously selected examples: occasional lower-value snake in rough, crab in sand/bunker and acorn in trees.
+- The landing surface determines its item pool. Examples include an occasional lower-value snake in rough, crab in sand/bunker, and acorn in trees.
 - Item value order: treasure/relics and the long-drive idol highest; gems next; coins below gems; critters and woodland finds lowest.
 - Each find earns points, and collected points are totalled at the end.
 - Players can choose a 9-hole or 18-hole hunt, and can end early to go to the end-of-round screen with their current totals.
-- The Figma scorecard/end screens show Points as the result, with Total Yards and Total Steps as supporting stats. The example totals shown on the screens (such as 140 points in play and 1,251 at the end) are placeholders, not a target scoring scale.
+- The Figma scorecard/end screens show Points as the result, with Total Yards and Total Steps as supporting stats. Example totals on the screens (such as 140 points in play and 1,251 at the end) are placeholders, not a target scoring scale.
 - Ground value order is **green > fairway > rough > sand > trees**.
-- Terrain bonuses added to each item's points: **green +5, fairway +4, rough +2, sand +1, trees +0, water +0**.
+- Terrain bonuses are added to each item's points: **green +5, fairway +4, rough +2, sand +1, trees +0, water +0**.
 - The largest point-value gap should be between green/fairway and the lower-value areas. Differences among rough, sand and trees should be smaller.
-- There is a straight-line distance bonus between consecutive dig spots, but it applies only when the new dig spot is on the fairway or green.
-
-### To decide
-
-- The fairway/green distance bonus grows steadily with straight-line distance, measured in yards (not in tiers). The rate is 1 bonus point per 10 yards of straight-line distance between consecutive dig spots. Bonus applies only when the new dig spot is fairway or green.
-- Confirmed item values (each item is worth more than 20 and less than 90 points): old boot 21; critters and woodland finds 25; copper coin 32; silver coin 38; common gem 48; treasure chest 65; relics 78; long-drive idol 85. Gem colour variants should be valued by rarity, with rarer gemstones worth more; the colour variants use real gemstone names: turquoise (turquoise), yellow (citrine), purple (amethyst), pink (pink sapphire) and black (black opal). Their game point ladder is inspired by rarity, not a literal real-world price scale. Terrain and eligible distance bonuses are added separately.
-- Water is a valid landing area and always yields an item; an old boot is the water-pool example, treated as a low-value find.
+- The distance bonus is a straight-line distance between consecutive dig spots, measured in yards. It grows steadily rather than using tiers, at **1 bonus point per 10 yards**.
+- The distance bonus applies only when the new dig spot is on the fairway or green.
+- Each collectible is worth more than 20 and less than 90 points, before terrain and eligible distance bonuses: old boot 21; critters and woodland finds 25; copper coin 32; silver coin 38; common gem 48; treasure chest 65; relics 78; long-drive idol 85.
+- Gem variants are valued by rarity, with rarer gemstones worth more. The colour variants use real gemstone names: turquoise, citrine (yellow), amethyst (purple), pink sapphire, and black opal. Their game point ladder is inspired by rarity, not a literal real-world price scale.
+- Water is a valid landing area and always yields an item; an old boot is the water-pool example and is a low-value find.
 - The old boot is the lowest-value collectible.
 
 ## Bingo, Bango, Bongo
