@@ -35,6 +35,7 @@ Purpose: Capture agreed rules and open questions for the game setup dialogs. Add
 
 - It is a cooperative, just-for-fun hunt; there are no individual scores or competitive rankings.
 - Treasure Hunt can be played individually or with a group of up to four players (**1–4 players**), selected in the shared player setup before choosing a game.
+- Players can select their shovel colour from the available shovel colour options in Figma.
 - All players contribute to one shared points total; there are no per-player totals.
 - There is no golf score; the aim is to explore and dig around the course.
 - Players dig after every shot, at the spot where the ball lands.
