@@ -39,6 +39,7 @@ Purpose: Capture agreed rules and open questions for the game setup dialogs. Add
 - All players contribute to one shared points total; there are no per-player totals.
 - There is no golf score; the aim is to explore and dig around the course.
 - Players dig after every shot, at the spot where the ball lands.
+- Each player's dig allowance is set per hole: the hole's par plus the handicap strokes allocated to that hole. For example, a 54-handicap player such as Rudi gets 3 extra digs over par on each hole in an 18-hole round. Once the player exceeds that hole's allowance, show the **Bad Luck / Nothing Found** screen instead of awarding another find.
 - Every dig uncovers an item; no dig is empty.
 - Each item has its own point value, in addition to the terrain reward and any eligible distance bonus.
 - The landing surface determines its item pool. Examples include an occasional lower-value snake in rough, crab in sand/bunker, and acorn in trees.
