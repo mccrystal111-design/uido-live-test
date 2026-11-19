@@ -41,10 +41,14 @@ Purpose: Capture agreed rules and open questions for the game setup dialogs. Add
 - Players dig after every shot, at the spot where the ball lands.
 - Hole sequence: everyone tees off first. The group then goes to each player's ball in turn; select that player's chosen shovel to dig at the ball's landing spot and reveal the find, then continue to the next player.
 - The scorecard shows the player shovels across the top (up to four). Selecting a player's shovel quickly shows that player's stats and collected items, including their most recent find and the current points totals.
+- Reaching the green under GIR, including handicap shots, earns the player a prestige item. The player's shovel identifies whose find it is, and this starts the putting phase.
+- During the putting phase, each dig is followed by an **In the hole?** prompt with a cross for no and a tick for yes.
+- While the player still has shots remaining within their par-plus-handicap allowance, they can receive high-value items; this stops when they run out of shots.
+- Once everyone has holed out, the game automatically moves on to the next hole.
 - The scorecard includes a link to an **All Finds** screen for the selected player. Its collection grid has 24 item spaces and scrolls vertically. Finds are ordered by each item's base point value. A player can collect multiple copies of an item; its grid cell shows the quantity in the top-right corner.
 - Selecting an item in the All Finds grid opens a pop-up showing its title, value and provenance.
 - Each player's dig allowance is set per hole: the hole's par plus the handicap strokes allocated to that hole. For example, a 54-handicap player such as Rudi gets 3 extra digs over par on each hole in an 18-hole round. Once the player exceeds that hole's allowance, show the **Bad Luck / Nothing Found** screen instead of awarding another find.
-- Every dig uncovers an item; no dig is empty.
+- Every eligible dig uncovers an item. Once a player's per-hole dig allowance is used, show the **Bad Luck / Nothing Found** screen instead of awarding another find.
 - Each item has its own point value, in addition to the terrain reward and any eligible distance bonus.
 - The landing surface determines its item pool. Examples include an occasional lower-value snake in rough, crab in sand/bunker, and acorn in trees.
 - Item value order: treasure/relics and the long-drive idol highest; gems next; coins below gems; critters and woodland finds lowest.
@@ -60,6 +64,10 @@ Purpose: Capture agreed rules and open questions for the game setup dialogs. Add
 - Gem variants are valued by rarity, with rarer gemstones worth more. The colour variants use real gemstone names: turquoise, citrine (yellow), amethyst (purple), pink sapphire, and black opal. Their game point ladder is inspired by rarity, not a literal real-world price scale.
 - Water is a valid landing area and always yields an item; an old boot is the water-pool example and is a low-value find.
 - The old boot is the lowest-value collectible.
+
+### To decide
+
+- Rebalance and confirm the point values for the green prestige item and high-value putting-phase items so the rewards work with the per-hole allowance and remaining shots.
 
 ## Bingo, Bango, Bongo
 
