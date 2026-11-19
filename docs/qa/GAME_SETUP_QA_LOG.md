@@ -44,7 +44,8 @@ Purpose: Capture agreed rules and open questions for the game setup dialogs. Add
 - Reaching the green under GIR, including handicap shots, earns the player a prestige item. The player's shovel identifies whose find it is, and this starts the putting phase.
 - During the putting phase, each dig is followed by an **In the hole?** prompt with a cross for no and a tick for yes.
 - While the player still has shots remaining within their par-plus-handicap allowance, they can receive high-value items; this stops when they run out of shots.
-- Once everyone has holed out, the game automatically moves on to the next hole.
+- Once everyone on a hole has either holed out or used their dig allowance, the game automatically moves on to the next hole.
+- At the end of the selected 9-hole or 18-hole round, once everyone has either holed out or used their digs on the final hole, show the checkered flag icon. Players tap it to end the round.
 - The scorecard includes a link to an **All Finds** screen for the selected player. Its collection grid has 24 item spaces and scrolls vertically. Finds are ordered by each item's base point value. A player can collect multiple copies of an item; its grid cell shows the quantity in the top-right corner.
 - Selecting an item in the All Finds grid opens a pop-up showing its title, value and provenance.
 - Each player's dig allowance is set per hole: the hole's par plus the handicap strokes allocated to that hole. For example, a 54-handicap player such as Rudi gets 3 extra digs over par on each hole in an 18-hole round. Once the player exceeds that hole's allowance, show the **Bad Luck / Nothing Found** screen instead of awarding another find.
