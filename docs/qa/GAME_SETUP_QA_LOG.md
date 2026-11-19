@@ -41,6 +41,7 @@ Purpose: Capture agreed rules and open questions for the game setup dialogs. Add
 - Players dig after every shot, at the spot where the ball lands.
 - Hole sequence: everyone tees off first. The group then goes to each player's ball in turn; select that player's chosen shovel to dig at the ball's landing spot and reveal the find, then continue to the next player.
 - The scorecard shows the player shovels across the top (up to four). Selecting a player's shovel quickly shows that player's stats and collected items, including their most recent find and the current points totals.
+- The scorecard includes a link to an **All Finds** screen, which shows a grid of every find collected by the selected player.
 - Each player's dig allowance is set per hole: the hole's par plus the handicap strokes allocated to that hole. For example, a 54-handicap player such as Rudi gets 3 extra digs over par on each hole in an 18-hole round. Once the player exceeds that hole's allowance, show the **Bad Luck / Nothing Found** screen instead of awarding another find.
 - Every dig uncovers an item; no dig is empty.
 - Each item has its own point value, in addition to the terrain reward and any eligible distance bonus.
